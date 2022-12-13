@@ -1,0 +1,11 @@
+<div appExtendPageHeight class="flexed">
+    <app-main-menu-panel></app-main-menu-panel>
+    <div class="flexed column stretched p10">
+        <h2>Шаблоны</h2>
+        <virtual-scroller #templatesScroll [items]="testitems">
+            <div *ngFor="let item of templatesScroll.viewPortItems">
+                {{item.info}}
+            </div>
+        </virtual-scroller>
+    </div>
+</div>

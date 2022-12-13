@@ -1,0 +1,29 @@
+.wrapper{
+  overflow: hidden;
+  transition: height 0.2s ease-out;
+  border-radius: .5rem;
+}
+
+.title {
+  padding: .7rem;
+  font-size: 1.2rem;
+  color: var(--tc-700);
+  cursor: pointer;
+  user-select: none;
+  &.active{
+    color: var(--mc);
+  }
+  &:hover {
+    background-color: var(--bgc-300);
+  }
+  &-icon {
+    font-size: 1.5rem;
+    transform: translateY(.15rem);
+  }
+  &-expanded-icon{
+    transition: transform 0.3s cubic-bezier(1.000, -0.600, 0.000, 1.650);
+    &.rotated{
+      transform: rotate(180deg);
+    }
+  }
+}

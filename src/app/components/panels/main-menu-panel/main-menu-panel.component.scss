@@ -1,0 +1,10 @@
+.panel{
+  display: flex;
+  flex-direction: column;
+  background-color: var(--bgc-200);
+  border-right: 1px solid var(--bgc-300);
+  min-height: 100%;
+  min-width: 20rem;
+  padding: 1rem;
+  gap: 1rem;
+}

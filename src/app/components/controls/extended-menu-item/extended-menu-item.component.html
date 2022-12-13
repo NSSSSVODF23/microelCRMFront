@@ -1,0 +1,8 @@
+<div #wrapperElem class="flexed column wrapper">
+    <div #titleElem class="title flexed gap6 hcenter" (click)="toggle()" [routerLink]="link" routerLinkActive="active">
+        <span class="material-icons-round title-icon">{{icon}}</span> {{caption}}
+        <div class="stretched"></div>
+        <span *ngIf="hasChild()" class="material-icons-round title-expanded-icon" [ngClass]="{rotated:extended}">expand_more</span>
+    </div>
+    <app-sub-extended-menu-item *ngFor="let el of elements" [caption]="el.label" [link]="el.link"></app-sub-extended-menu-item>
+</div>

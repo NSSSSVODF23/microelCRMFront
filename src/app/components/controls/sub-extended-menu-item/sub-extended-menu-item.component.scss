@@ -1,0 +1,16 @@
+.item {
+  font-size: 1.2rem;
+  color: var(--tc-500);
+  padding: 0.5rem 0 0.5rem 2rem;
+  transition: color .2s ease-out;
+  cursor: pointer;
+  user-select: none;
+
+  &.active{
+    color: var(--mc);
+  }
+}
+
+.item:hover {
+  color: var(--tc-700);
+}

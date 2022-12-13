@@ -1,1 +1,145 @@
-/* You can add global styles to this file, and also import other style files */
+:root {
+  --bgc-100: #F6F8FA;
+  --bgc-200: #edf1f6;
+  --bgc-300: #e5eaef;
+  --bgc-400: #c6cdd5;
+  --bgc-500: #b8c0c9;
+  --bgc-600: #646E78;
+  --bgc-900: #3B4C5B;
+  --tc-100: #FFFFFF;
+  --tc-500: #9EABB9;
+  --tc-700: #5B6A9D;
+  --tc-900: #141a2f;
+  --mc: #3151C1;
+}
+
+html, body {
+  padding: 0;
+  margin: 0;
+  background-color: var(--bgc-100);
+  font-size: 13px;
+  font-family: var(--font-family);
+  color: var(--tc-900);
+}
+
+.button {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+
+.flexed{
+  display: flex;
+  &.column{
+    flex-direction: column;
+    &.hcenter{
+      justify-items: center;
+    }
+    &.vcenter{
+      align-items: center;
+    }
+  }
+  &.hcenter{
+    align-items: center;
+  }
+  &.vcenter{
+    justify-content: center;
+  }
+  &.gap10{
+    gap: 1rem;
+  }
+  &.gap9{
+    gap: .9rem;
+  }
+  &.gap8{
+    gap: .8rem;
+  }
+  &.gap7{
+    gap: .7rem;
+  }
+  &.gap6{
+    gap: .6rem;
+  }
+  &.gap5{
+    gap: .5rem;
+  }
+  &.gap4{
+    gap: .4rem;
+  }
+  &.gap3{
+    gap: .3rem;
+  }
+  &.gap2{
+    gap: .2rem;
+  }
+  &.gap1{
+    gap: .1rem;
+  }
+}
+
+.p{
+  &1{
+    padding:.1rem;
+  }
+  &2{
+    padding:.2rem;
+  }
+  &3{
+    padding:.3rem;
+  }
+  &4{
+    padding:.4rem;
+  }
+  &5{
+    padding:.5rem;
+  }
+  &6{
+    padding:.6rem;
+  }
+  &7{
+    padding:.7rem;
+  }
+  &8{
+    padding:.8rem;
+  }
+  &9{
+    padding:.9rem;
+  }
+  &10{
+    padding:1rem;
+  }
+  &11{
+    padding:1.1rem;
+  }
+  &12{
+    padding:1.2rem;
+  }
+  &13{
+    padding:1.3rem;
+  }
+  &14{
+    padding:1.4rem;
+  }
+  &15{
+    padding:1.5rem;
+  }
+  &16{
+    padding:1.6rem;
+  }
+  &17{
+    padding:1.7rem;
+  }
+  &18{
+    padding:1.8rem;
+  }
+  &19{
+    padding:1.9rem;
+  }
+  &20{
+    padding:2rem;
+  }
+}
+
+.stretched{
+  flex:1;
+}
