@@ -1,0 +1,50 @@
+
+.loading-panel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: fixed;
+  font-size: 1.2rem;
+  font-weight: 400;
+  color: var(--mc);
+  gap: .7rem;
+  overflow: hidden;
+  z-index: 1;
+  padding-top: .5rem;
+  //background: linear-gradient(180deg, rgba(0, 0, 0, 0), rgba(0, 0, 0, .1));
+  //box-shadow:
+  backdrop-filter: blur(1px);
+
+  .wait-indicator {
+    width: 30%;
+    height: 1px;
+    background-color: var(--mc);
+    animation: loading-animation 1s infinite ease-in-out;
+    align-self: flex-start;
+    position: relative;
+  }
+
+}
+
+@keyframes loading-animation {
+  0% {
+    transform: translateX(-100%);
+    left: 0;
+    width: 5%;
+  }
+  5% {
+    width: 50%;
+  }
+  50% {
+    width: 20%;
+  }
+  99% {
+    width: 0%;
+    transform: translateX(-100%);
+  }
+  100% {
+    left: 100%;
+    transform: translateX(100%);
+    width: 0%;
+  }
+}

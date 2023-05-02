@@ -1,0 +1,52 @@
+<div class="tags-view wrap">
+    <div *ngFor="let tag of tags | slice:0:3" [style.background-color]="tag.color" class="tags-view-item">
+        {{tag.name}}
+    </div>
+    <ng-container *ngIf="extend">
+        <div *ngFor="let tag of tags | slice:3" [style.background-color]="tag.color" class="tags-view-item">
+            {{tag.name}}
+        </div>
+    </ng-container>
+    <div (click)="extend=!extend" *ngIf="tags.length>3" class="tags-view-item clickable">
+        <span *ngIf="!extend">
+            {{tags.length - 3}}+
+        </span>
+        <span *ngIf="extend" class="material-icons-round">
+            chevron_left
+        </span>
+    </div>
+    <app-button (onClick)="openTagManagementDialog($event)" *ngIf="tags.length===0" [disabled]="disabled" icon="add"
+                label="Добавить теги" model="p-button-text"></app-button>
+    <app-icon-button (onClick)="openTagManagementDialog($event)" *ngIf="tags.length > 0" [disabled]="disabled"
+                     icon="edit" pTooltip="Редактировать теги"></app-icon-button>
+</div>
+
+<p-overlayPanel #managementOp hideTransitionOptions="0ms" showTransitionOptions="0ms">
+    <ng-template pTemplate="content">
+        <div class="flexed gap5">
+            <p-multiSelect (keyup.enter)="editTaskTags()" [(ngModel)]="editValueTags" [filter]="true"
+                           [options]="availableTags"
+                           appendTo="body" defaultLabel="Выберете теги для заявки"
+                           filterBy="name" pAutoFocus>
+                <ng-template let-value pTemplate="selectedItems">
+                    <div *ngIf="!value || value.length === 0" class="tags-view-placeholder">Выберете теги для заявки
+                    </div>
+                    <div class="tags-view wrap max">
+                        <div *ngFor="let tag of value" [style.background-color]="tag.color" class="tags-view-item">
+                            {{tag.name}}
+                        </div>
+                    </div>
+                </ng-template>
+                <ng-template let-tag pTemplate="item">
+                    <div [style.background-color]="tag.color" class="tags-view-item">
+                        {{tag.name}}
+                    </div>
+                </ng-template>
+            </p-multiSelect>
+            <app-button (onClick)="editTaskTags()" [disabled]="editValueTags.join()===tags.join() || disabled"
+                        [loading]="settingNewTags"
+                        icon="edit"
+                        label="Изменить" model="p-button-success"></app-button>
+        </div>
+    </ng-template>
+</p-overlayPanel>

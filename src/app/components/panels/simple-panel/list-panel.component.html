@@ -1,0 +1,11 @@
+<div #headerItm class="header">
+    <ng-container *ngTemplateOutlet="headerTemplate"></ng-container>
+    <ng-container *ngIf="!headerTemplate">
+        {{header}}
+    </ng-container>
+</div>
+<div #contentItm class="content">
+    <div *ngFor="let item of items">
+        <ng-container *ngTemplateOutlet="itemTemplate; context: {$implicit:item}"></ng-container>
+    </div>
+</div>

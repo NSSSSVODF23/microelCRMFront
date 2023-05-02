@@ -1,4 +1,77 @@
 <div appExtendPageHeight class="flexed">
     <app-main-menu-panel></app-main-menu-panel>
-    <p>requests-page works!</p>
+    <div class="flexed column gap10 p10 stretched">
+        <div class="flexed gap10">
+            <div #taskListView class="stretched relative">
+                <div class="global-filters">
+                    <app-text-search-input (onSearch)="taskService.contextSearch()"
+                                           [(value)]="taskService.contextSearchString"></app-text-search-input>
+                </div>
+                <ng-container *ngIf="taskService.taskItemsLoading">
+                    <app-task-list-element *ngFor="let item of loadingItems" [isLoading]="true"></app-task-list-element>
+                </ng-container>
+                <ng-container *ngIf="!taskService.taskItemsLoading">
+                    <div *ngFor="let item of taskService.taskItems; let i = index" [style.display]="'inline'">
+                        <app-timestamp-chips *ngIf="isNewDate(taskService.taskItems, i)" [index]="i" [timestamp]="item.created"></app-timestamp-chips>
+                        <app-task-list-element [item]="item"></app-task-list-element>
+                    </div>
+                </ng-container>
+
+                <div *ngIf="!taskService.taskItemsLoading && taskService.taskItems.length === 0"
+                     class="flexed vcenter p10">
+                    <div class="header400 flexed hcenter gap3">
+                        <i class="mdi-manage_search"></i>
+                        Задачи не найдены
+                    </div>
+                </div>
+                <div class="sticky bottom0">
+                    <p-paginator #paginator (onPageChange)="taskService.pageChange($event)" [alwaysShow]="false"
+                                 [rows]="taskService.TASK_PAGE_SIZE" [showCurrentPageReport]="true"
+                                 [totalRecords]="taskService.totalTaskItems"
+                                 currentPageReportTemplate="Показано с {first} по {last} из {totalRecords} задач"
+                                 styleClass="back-blured"></p-paginator>
+                </div>
+            </div>
+
+            <div [limited]="true" [shift]="13" [style.align-self]="'flex-start'" appExtendPageHeight class="filter-panel">
+                <ng-container *ngTemplateOutlet="mainTaskFilters"></ng-container>
+                <ng-container *ngIf="taskService.templateFilterFields.length > 0">
+                    <span class="caption-header">Фильтры</span>
+                    <div [formGroup]="taskService.templateFilterForm" class="flexed column gap5">
+                        <app-task-template-filter-input *ngFor="let field of taskService.templateFilterFields" [field]="field"
+                                                        [formControlName]="field.id">
+                        </app-task-template-filter-input>
+                    </div>
+                </ng-container>
+                <app-button (onClick)="taskService.filtersApply()" icon="filter_alt" label="Применить"></app-button>
+            </div>
+<!--            <app-loading-panel [isShow]="taskService.taskItemsLoading"-->
+<!--                               [parentElement]="taskListView"></app-loading-panel>-->
+        </div>
+    </div>
 </div>
+<p-scrollTop></p-scrollTop>
+
+<!--Панель фильтров с основными фильтрами задачи-->
+<ng-template #mainTaskFilters>
+    <div [formGroup]="taskService.filterForm" class="flexed column gap15">
+        <div class="flexed column gap5">
+            <span class="caption-header">Тип задачи</span>
+            <p-listbox [checkbox]="true" [filter]="true"
+                       [listStyle]="{'max-height':'20vh'}" [multiple]="true"
+                       [options]="taskService.templatesOptions" class="indent1" filterBy="name"
+                       formControlName="template" optionLabel="name" optionValue="wireframeId"></p-listbox>
+        </div>
+        <div class="flexed column gap5">
+            <span class="caption-header">Статус задачи</span>
+            <app-task-status-chooser formControlName="status"></app-task-status-chooser>
+        </div>
+        <p-dropdown [options]="(employees$ | async)??[]" [showClear]="true"
+                    appendTo="body" formControlName="author" placeholder="Автор задачи"
+                    styleClass="full-width"></p-dropdown>
+        <p-calendar [readonlyInput]="true" [showClear]="true" appendTo="body"
+                    formControlName="dateOfCreation" placeholder="Дата создания" selectionMode="range"
+                    styleClass="full-width"></p-calendar>
+        <app-task-tag-filter-input class="full-width" formControlName="tags"></app-task-tag-filter-input>
+    </div>
+</ng-template>

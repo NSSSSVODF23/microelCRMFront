@@ -1,0 +1,197 @@
+<div [ngSwitch]="constructStage" appExtendPageHeight class="flexed hcenter column gap20 p20 bg-white">
+    <ng-container *ngSwitchCase="'FIELDS'">
+        <div class="flexed column gap10">
+            <div class="gap15 flexed hend">
+                <div class="input-label-wrapper">
+                    <label>Название шаблона задачи</label>
+                    <input [(ngModel)]="wireframe.name" [disabled]="editingId!==undefined" pInputText>
+                </div>
+                <app-button (onClick)="createStep()" icon="post_add" label="Добавить этап"
+                            model="p-button-success"></app-button>
+                <app-button (onClick)="changeStagesSettingsStep()" [disabled]="!wireframe.name" icon="navigate_next"
+                            label="Далее: Настройка стадий задачи"></app-button>
+            </div>
+            <div class="flexed">
+                <div class="input-label-wrapper stretched">
+                    <label>Описание шаблона задачи</label>
+                    <textarea [(ngModel)]="wireframe.description" [autoResize]="true" pInputTextarea></textarea>
+                </div>
+            </div>
+            <div class="input-label-wrapper">
+                <label>Ответственные по умолчанию</label>
+                <p-multiSelect [(ngModel)]="wireframe.defaultObservers"
+                               [options]="(responsible$|async)??[]"></p-multiSelect>
+            </div>
+            <p-steps [activeIndex]="activeStepIndex" [model]="stepsArray" [readonly]="false"
+                     class="stretched"></p-steps>
+        </div>
+        <div class="flexed hcenter column stretched">
+            <div class="step-construct-view panel">
+                <div class="step-construct-view-header">
+                    <span class="step-construct-view-header-step-number">Этап {{activeStepIndex + 1}}:</span>
+                    <app-editing-caption
+                            (captionChange)="stepsPanelCaptionUpdate($event)"
+                            (onStopEditing)="fillingEmptyStepName()"
+                            [(caption)]="this.wireframe.steps[activeStepIndex].name"
+                            class="step-construct-view-header-caption">
+                    </app-editing-caption>
+                </div>
+                <div class="flexed column p10 gap10">
+                    <div *ngFor="let field of this.wireframe.steps[activeStepIndex].fields" class="flexed gap5 hcenter">
+                        <app-task-template-input [field]="field" [isExample]="true"
+                                                             class="stretched"></app-task-template-input>
+                        <app-icon-button (click)="deleteField(field.id)" [style.transform]="'translateY(.5rem)'"
+                                         icon="delete"
+                                         model="danger"></app-icon-button>
+                    </div>
+                    <app-button (onClick)="chooseFieldTypeDialogVisible = true" icon="add" label="Добавить поле"
+                                model="p-button-success"></app-button>
+                </div>
+            </div>
+        </div>
+    </ng-container>
+    <ng-container *ngSwitchCase="'STAGES'">
+        <div class="flexed column gap10">
+            <div class="gap15 flexed hend">
+                <app-button (onClick)="this.constructStage = 'FIELDS'" [disabled]="!wireframe.name"
+                            icon="arrow_back_ios" label="Назад"
+                            model="p-button-secondary p-button-text"></app-button>
+                <app-button (onClick)="changeViewSettingsStep()" [disabled]="!wireframe.name" icon="navigate_next"
+                            label="Далее: Настройка отображения"></app-button>
+            </div>
+        </div>
+        <div class="flexed hcenter column stretched">
+            <p-panel class="stage-list-panel" header="Стадии задачи">
+                <div class="flexed column gap10">
+                    <app-button (onClick)="createStage()" icon="add" label="Добавить стадию"
+                                model="p-button-success"></app-button>
+                    <p-orderList (onReorder)="reorderStages()" [dragdrop]="true" [value]="this.wireframe.stages??[]">
+                        <ng-template let-stage pTemplate="item">
+                            <div class="flexed hcenter gap5 caption-main">
+                                <span class="material-icons-round drag-icon">drag_indicator</span>
+                                <span class="caption-sub-header">{{stage.orderIndex+1}}.</span>
+                                <input (mousedown)="mouseDown($event)" [(ngModel)]="stage.label" class="inline-input">
+                                <div class="stretched"></div>
+                                <app-icon-button (mousedown)="mouseDown($event)" (onClick)="removeStage(stage.stageId)" [size]="1.4"
+                                                 icon="delete"
+                                                 model="danger"></app-icon-button>
+                            </div>
+                        </ng-template>
+                    </p-orderList>
+                </div>
+            </p-panel>
+        </div>
+    </ng-container>
+    <ng-container *ngSwitchCase="'VIEW'">
+        <div class="flexed column gap20">
+            <div class="gap15 flexed hend vend">
+                <app-button (onClick)="this.constructStage = 'STAGES'" [disabled]="!wireframe.name"
+                            icon="arrow_back_ios" label="Назад"
+                            model="p-button-secondary p-button-text"></app-button>
+                <app-button (onClick)="createWireframe()" *ngIf="editingId===undefined" [disabled]="!wireframe.name"
+                            icon="save"
+                            label="Сохранить шаблон задачи"></app-button>
+                <app-button (onClick)="updateWireframe()" *ngIf="editingId!==undefined" icon="edit"
+                            label="Редактировать шаблон задачи"></app-button>
+            </div>
+            <div class="gap5 flexed column">
+                <span class="header400">
+                    Элемент списка
+                </span>
+                <div class="gap10 flexed column">
+                    <div class="input-label-wrapper">
+                        <label>
+                            Вариант отображения
+                        </label>
+                        <p-dropdown [(ngModel)]="_wireframe.listViewType" [options]="listItemViewOptions"></p-dropdown>
+                    </div>
+                    <app-task-list-element (selectFieldToView)="selectFieldToView($event)" [item]="taskItemForView()"
+                                           [viewExample]="true" [isHover]="false"
+                                           [wireframeFieldsList]="wireframeFieldsList"></app-task-list-element>
+                </div>
+            </div>
+            <div class="gap5 flexed column">
+                <span class="header400">
+                    Порядок полей
+                </span>
+                <div class="gap5 flexed column overflow">
+                    <p-orderList (onReorder)="reorderFields()" [dragdrop]="true" [value]="wireframeFieldsList">
+                        <ng-template let-field pTemplate="item">
+                            <div>
+                                {{field.label}}
+                            </div>
+                        </ng-template>
+                    </p-orderList>
+                </div>
+            </div>
+        </div>
+    </ng-container>
+</div>
+
+<p-menu #stepsContextMenuElem [model]="stepsContextMenu" [popup]="true"></p-menu>
+<p-dialog [(visible)]="chooseFieldTypeDialogVisible" [modal]="true" [style]="{width:'30vw'}" header="Выбор типа данных">
+    <ng-template pTemplate="content">
+        <div class="flexed column p10 gap10">
+            <p-dropdown [(ngModel)]="createFieldType" [options]="fieldTypeOptions" appendTo="body"
+                        styleClass="full-width"></p-dropdown>
+            <app-button (onClick)="createField(createFieldType)" icon="add" label="Добавить"></app-button>
+        </div>
+    </ng-template>
+</p-dialog>
+
+<ng-template #listElementTemplate>
+    <ng-container [ngSwitch]="wireframe.listViewType">
+        <div *ngSwitchCase="'SIMPLE'" class="flexed p8 hcenter item-example">
+            <app-select-field-to-view-button (selectView)="selectFieldToView($event)"
+                                             [fields]="wireframeFieldsList"
+                                             [index]="1"
+                                             classes="caption-main"></app-select-field-to-view-button>
+            <div class="stretched"></div>
+            <div class="flexed gap5">
+                <app-avatar [size]="1.8"></app-avatar>
+                <span class="caption-main">Creator</span>
+            </div>
+        </div>
+        <div *ngSwitchCase="'COMPOSITE'" class="flexed p8 hcenter item-example">
+            <div class="flexed column gap5">
+                <app-select-field-to-view-button (selectView)="selectFieldToView($event)"
+                                                 [fields]="wireframeFieldsList"
+                                                 [index]="1"
+                                                 classes="caption-main"></app-select-field-to-view-button>
+                <app-select-field-to-view-button (selectView)="selectFieldToView($event)"
+                                                 [fields]="wireframeFieldsList"
+                                                 [index]="2"
+                                                 classes="caption-secondary"></app-select-field-to-view-button>
+            </div>
+            <div class="stretched"></div>
+            <div class="flexed gap5">
+                <app-avatar [size]="1.8"></app-avatar>
+                <span class="caption-main">Creator</span>
+            </div>
+        </div>
+        <div *ngSwitchCase="'DETAILED'" class="flexed p8 hcenter item-example">
+            <div class="flexed column gap5">
+                <div class="flexed gap5 hcenter">
+                    <app-select-field-to-view-button (selectView)="selectFieldToView($event)"
+                                                     [fields]="wireframeFieldsList"
+                                                     [index]="1"
+                                                     classes="caption-main"></app-select-field-to-view-button>
+                    <span class="caption-main">-</span>
+                    <app-select-field-to-view-button (selectView)="selectFieldToView($event)"
+                                                     [fields]="wireframeFieldsList"
+                                                     [index]="2"
+                                                     classes="caption-main-small"></app-select-field-to-view-button>
+                </div>
+                <app-select-field-to-view-button (selectView)="selectFieldToView($event)"
+                                                 [fields]="wireframeFieldsList"
+                                                 [index]="3"
+                                                 classes="caption-secondary"></app-select-field-to-view-button>
+            </div>
+            <div class="stretched"></div>
+            <div class="flexed gap5">
+                <app-avatar [size]="1.8"></app-avatar>
+                <span class="caption-main">Creator</span>
+            </div>
+        </div>
+    </ng-container>
+</ng-template>

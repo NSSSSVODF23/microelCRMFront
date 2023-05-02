@@ -1,0 +1,18 @@
+<div class="flexed column gap5" [formGroup]="templateLinkToBindsForm">
+    <fieldset class="node flexed gap5 column">
+        <legend>Выбор шаблонов под типы задач</legend>
+        <p-dropdown *ngFor="let control of controls" [formControlName]="control.name"
+                    [options]="(templates$ | async) ?? []" [placeholder]="control.name"
+                    appendTo="body" optionLabel="name"></p-dropdown>
+    </fieldset>
+</div>
+<div class="flexed column gap5" [formGroup]="bindingsForm">
+    <ng-container >
+        <fieldset class="node flexed gap5 column" *ngFor="let control of controls" [formGroupName]="control.name">
+            <legend>Шаблон: {{control.name}}</legend>
+            <p-dropdown *ngFor="let bind of control.fields" [formControlName]="bind"
+                        [options]="fieldOfWireframe(((templateBinds$ | async)??{})[control.name])"
+                        [placeholder]="bind" appendTo="body" optionLabel="name" optionValue="id"></p-dropdown>
+        </fieldset>
+    </ng-container>
+</div>

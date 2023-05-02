@@ -1,0 +1,24 @@
+.expand-button {
+    cursor: pointer;
+    display: inline-flex;
+    font-size: .8rem;
+    font-weight: 600;
+    color: var(--mc);
+    line-height: normal;
+    padding: .3rem .5rem;
+    border-radius: .3rem;
+    align-self: center;
+    align-items: center;
+    justify-content: center;
+    gap: .2rem;
+    transition: background-color .2s ease-out;
+
+    span {
+        font-size: .75rem;
+        color: var(--mc);
+    }
+
+    &:hover {
+        background-color: var(--mc-100);
+    }
+}

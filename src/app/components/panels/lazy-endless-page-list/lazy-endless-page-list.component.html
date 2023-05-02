@@ -1,0 +1,7 @@
+<div #endlessWrapper class="endless-list-wrapper">
+    <div #dynamicTopPlaceholder></div>
+    <ng-container *ngFor="let item of viewItems" >
+        <ng-container *ngTemplateOutlet="itemTemplate; context:{$implicit:item}"></ng-container>
+    </ng-container>
+    <div #dynamicBottomPlaceholder></div>
+</div>

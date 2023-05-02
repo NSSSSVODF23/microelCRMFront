@@ -1,0 +1,17 @@
+<ng-container *ngIf="filesLoaded>0; then hasFile else noFile">
+</ng-container>
+
+<ng-template #noFile>
+    <p-button (onClick)="openFileManager()" [disabled]="disabled || loading"
+              [label]="label" [styleClass]="style" icon="mdi-attach_file"></p-button>
+</ng-template>
+
+<ng-template #hasFile>
+    <p-splitButton (onClick)="openFileManager()" [disabled]="disabled || loading" [label]="label"
+                   [model]="menuItems"
+                   [pTooltip]="'Файлов загружено ' + filesLoaded+'/'+filesCatching +'\n' + 'Последний загруженный: \n' + lastFileName" [styleClass]="style" [tooltipDisabled]="filesLoaded === 0"
+                   [value]="filesLoaded.toString()" appendTo="body"
+                   icon="mdi-attach_file" pBadge
+                   tooltipPosition="left"></p-splitButton>
+</ng-template>
+<input #fileManager (change)="catchFiles($event)" [multiple]="true" [style.display]="'none'" type="file">

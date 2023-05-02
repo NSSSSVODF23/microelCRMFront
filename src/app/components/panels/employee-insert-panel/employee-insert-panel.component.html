@@ -1,0 +1,10 @@
+<div #target class="overlay-target" [style]="targetPosition"></div>
+<p-overlayPanel #panel [dismissable]="true" appCloseIfScroll showTransitionOptions="0ms" hideTransitionOptions="0ms">
+    <ng-template pTemplate="content">
+        <div #list class="list-view" [tabIndex]="0" (keydown)="navigate($event)">
+            <div class="p5" (click)="this.panel?.hide(); onSelect.emit(employee)" (mouseenter)="selectedEmployeeIndex=i" [ngClass]="{selected: selectedEmployeeIndex === i}" *ngFor="let employee of employees; let i = index;">
+                <app-employee-label [employee]="employee"></app-employee-label>
+            </div>
+        </div>
+    </ng-template>
+</p-overlayPanel>

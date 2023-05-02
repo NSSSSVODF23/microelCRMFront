@@ -1,4 +1,4 @@
-.panel{
+.menu-panel{
   display: flex;
   flex-direction: column;
   background-color: var(--bgc-200);
@@ -7,4 +7,20 @@
   min-width: 20rem;
   padding: 1rem;
   gap: 1rem;
+}
+
+.back-button {
+  //flexed gap5 hcenter caption-main
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+  cursor: pointer;
+  padding: .5rem;
+  border-radius: .5rem;
+  color: var(--tc-800);
+  font-size: 1.2rem;
+
+  &:hover {
+    background-color: var(--bgc-300);
+  }
 }

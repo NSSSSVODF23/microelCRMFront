@@ -1,0 +1,9 @@
+<fieldset class="node flexed octet-wrapper" (blur)="onBlur.emit()">
+    <input #one (focus)="octetFocus($event)" (input)="octetChange(0, $event)" (keyup)="octetKeyUp(0, $event)" class="octet-input">
+    <span>.</span>
+    <input #two (focus)="octetFocus($event)" (input)="octetChange(1, $event)" (keyup)="octetKeyUp(1, $event)" class="octet-input">
+    <span>.</span>
+    <input #three (focus)="octetFocus($event)" (input)="octetChange(2, $event)" (keyup)="octetKeyUp(2, $event)" class="octet-input">
+    <span>.</span>
+    <input #four (focus)="octetFocus($event)" (input)="octetChange(3, $event)" (keyup)="octetKeyUp(3, $event)" class="octet-input">
+</fieldset>

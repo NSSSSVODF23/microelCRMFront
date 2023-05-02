@@ -1,0 +1,123 @@
+<section (load)="loadComments()" [(loading)]="loading" appLazyPageLoader class="journal">
+
+    <div *ngFor="let entry of entries" @fade [ngClass]="{event:!isComment(entry), reply:isHasReply(entry)}"
+         class="journal-item">
+        <ng-container *ngTemplateOutlet="eventIcon; context:{$implicit:entry}"></ng-container>
+        <div class="vertical-line"></div>
+        <div class="employee-avatar-wrapper">
+            <app-avatar [src]="entry.creator?.avatar" [name]="entry.creator | eplName" [size]="2.8"></app-avatar>
+        </div>
+        <ng-container *ngTemplateOutlet="eventHeader; context:{$implicit:entry,reply:false}"></ng-container>
+        <div [ngClass]="{event:!isComment(entry), reply:isHasReply(entry)}" class="journal-event-body">
+            <quill-view-html *ngIf="isComment(entry)" [content]="entry.message" appTextRevival></quill-view-html>
+            <div *ngIf="!isComment(entry)" class="flexed gap5 hcenter">
+                <span>{{entry | taskEventTranslate}}</span>
+                <span *ngIf="entry.message" appTextRevival>{{entry.message}}</span>
+            </div>
+            <div *ngIf="hasAttachments(entry)" class="attachments-list">
+                <app-attachment-link *ngFor="let attachment of getAttachments(entry); trackBy: trackByAttachment"
+                                     [attachment]="attachment"></app-attachment-link>
+                <app-expanding-panel *ngIf="getAttachmentsCount(entry) > 3"
+                                     [buttonCaption]="'Показать '+(getAttachmentsCount(entry)-3)+'+'">
+                <app-attachment-link
+                        *ngFor="let attachment of getAttachments(entry,false); trackBy: trackByAttachment"
+                        [attachment]="attachment"></app-attachment-link>
+                </app-expanding-panel>
+            </div>
+        </div>
+        <div *ngIf="isHasReply(entry)" class="reply-comment">
+            <div class="reply-marker"></div>
+            <div class="employee-avatar-wrapper">
+                <app-avatar [name]="getReplyComment(entry)?.creator | eplName" [src]="getReplyComment(entry)?.creator?.avatar" [size]="2.8"></app-avatar>
+            </div>
+            <ng-container
+                    *ngTemplateOutlet="eventHeader; context:{$implicit:getReplyComment(entry),reply:true}"></ng-container>
+            <div class="journal-event-body">
+                <markdown [data]="getReplyComment(entry)?.message"></markdown>
+
+                <div *ngIf="hasAttachments(getReplyComment(entry))" class="attachments-list">
+                    <app-attachment-link
+                            *ngFor="let attachment of getAttachments(getReplyComment(entry)); trackBy: trackByAttachment"
+                            [attachment]="attachment"></app-attachment-link>
+                    <app-expanding-panel
+                            *ngIf="getAttachmentsCount(getReplyComment(entry)) > 3"
+                            [buttonCaption]="'Показать '+(getAttachmentsCount(getReplyComment(entry))-3)+'+'">
+                        <app-attachment-link
+                                *ngFor="let attachment of getAttachments(getReplyComment(entry),false); trackBy: trackByAttachment"
+                                [attachment]="attachment"></app-attachment-link>
+                    </app-expanding-panel>
+                </div>
+            </div>
+        </div>
+        <div *ngIf="!isComment(entry)" class="event-footer"></div>
+    </div>
+
+    <ng-container *ngIf="loading">
+        <div *ngFor="let s of skeletons" class="journal-item skeleton">
+            <p-skeleton class="event-type-wrapper skeleton" shape="circle" size="2rem"></p-skeleton>
+            <p-skeleton class="employee-avatar-wrapper" shape="circle" size="2.8rem"></p-skeleton>
+            <div class="journal-event-header">
+                <div class="basic-information">
+                    <p-skeleton [style.padding-bottom]="'.5rem'" height="1rem" width="10rem"></p-skeleton>
+                    <p-skeleton height=".8rem" width="7rem"></p-skeleton>
+                </div>
+            </div>
+            <p-skeleton class="journal-event-body" height="6rem"></p-skeleton>
+        </div>
+    </ng-container>
+</section>
+
+<ng-template #eventIcon let-entry>
+    <span [style.background-color]="getEventColor(entry)" class="event-type-wrapper">
+        <span class="material-icons-round">{{getEventIcon(entry)}}</span>
+    </span>
+</ng-template>
+
+<ng-template #eventHeader let-entry let-reply="reply">
+    <div class="journal-event-header">
+        <div class="basic-information">
+            <span class="employee-name">{{entry.creator | eplName}}</span>
+            <span class="creation-time">{{entry.created | elapsedTime:!entry.type ? "написал(а) " : '' : " назад"}}</span>
+        </div>
+        <app-button (onClick)="selectCommentToReply(entry)"
+                    *ngIf="isComment(entry) && !reply" [disabled]="isAnActionOnComments()" icon="reply"
+                    label="Ответить" model="p-button-text"></app-button>
+        <app-icon-button (onClick)="ownCommentMenu.toggle($event)" *ngIf="isMyComment(entry) && !reply"
+                         [disabled]="isAnActionOnComments()" icon="more_vert"></app-icon-button>
+        <p-overlayPanel #ownCommentMenu appendTo="body">
+            <ng-template pTemplate="content">
+                <app-button (onClick)="selectCommentToEdit(entry); ownCommentMenu.hide()"
+                            *ngIf="isMyComment(entry) && !reply" [disabled]="isAnActionOnComments()" icon="edit"
+                            label="Редактировать" model="p-button-text p-button-warn"></app-button>
+                <app-button (onClick)="confirmToDeleteComment(entry); ownCommentMenu.hide()"
+                            *ngIf="isMyComment(entry) && !reply" [disabled]="isAnActionOnComments()" icon="delete"
+                            label="Удалить" model="p-button-text p-button-danger"></app-button>
+            </ng-template>
+        </p-overlayPanel>
+    </div>
+</ng-template>
+
+<!--<ng-template #additionalInfo let-entry>-->
+<!--    <ng-container *ngIf="!isComment(entry)" [ngSwitch]="entry.type">-->
+<!--        <span *ngSwitchCase="'CREATE_WORK_LOG'" class="flexed hcenter gap8 p10">-->
+<!--            <span *ngFor="let employee of entry.workLog.employees" class="flexed hcenter gap3">-->
+<!--                <app-avatar [employee]="employee" [size]="1.9"></app-avatar>-->
+<!--                <span class="caption-main-small one-line">{{employee|eplName}}</span>-->
+<!--            </span>-->
+<!--        </span>-->
+<!--        <app-task-link *ngSwitchCase="'LINKED_TO_PARENT_TASK'" [task]="entry.eventTask"></app-task-link>-->
+<!--        <app-task-link *ngSwitchCase="'UNLINKED_FROM_PARENT_TASK'" [task]="entry.eventTask"></app-task-link>-->
+<!--        <ng-container *ngSwitchCase="'UNLINK_CHILD_TASK'">-->
+<!--            <app-task-link  [task]="task" *ngFor="let task of entry.tasks"></app-task-link>-->
+<!--        </ng-container>-->
+<!--        <ng-container   *ngSwitchCase="'LINKED_TO_CHILD_TASKS'">-->
+<!--            <app-task-link [task]="task" *ngFor="let task of entry.tasks"></app-task-link>-->
+<!--        </ng-container>-->
+<!--        <ng-container *ngSwitchCase="'CHANGE_RESPONSIBILITY'">-->
+<!--            <span class="flexed hcenter gap3">-->
+<!--                <app-avatar [employee]="entry.employee" [size]="1.9"></app-avatar>-->
+<!--                <span class="caption-main-small one-line">{{entry.employee|eplName}}</span>-->
+<!--            </span>-->
+<!--        </ng-container>-->
+<!--    </ng-container>-->
+<!--</ng-template>-->

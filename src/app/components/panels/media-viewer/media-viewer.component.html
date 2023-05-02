@@ -1,0 +1,86 @@
+<div (click)="hide($event)" *ngIf="showFullscreen" class="page-cover">
+    <ng-container *ngTemplateOutlet="content"></ng-container>
+</div>
+
+<ng-template #content [ngSwitch]="media?.type">
+    <div *ngSwitchCase="'PHOTO'" class="photo-view">
+        <div *ngIf="imageLoadingIndicator" class="image-loading-indicator">
+            <p-progressSpinner></p-progressSpinner>
+        </div>
+        <img (error)="imageLoadError($event)" (load)="imageLoad($event)" [src]="'/api/private/attachment/'+media?.name">
+        <div (mouseenter)="showNavigation='unfade'" (mouseleave)="showNavigation='fade'"
+             *ngIf="mediaAlbum && mediaAlbum.length>1"
+             class="navigation">
+            <div (click)="goPrev()" [@fadeAlt]="showNavigation" class="navigation-button back">
+                <span class="material-icons-round">arrow_back_ios</span>
+            </div>
+            <div [@fadeFullAlt]="showNavigation" class="navigation-counter">
+                {{albumIndex + 1}} / {{mediaAlbum.length}}
+            </div>
+            <div (click)="goNext()" [@fadeAlt]="showNavigation" class="navigation-button forward">
+                <span class="material-icons-round">arrow_forward_ios</span>
+            </div>
+        </div>
+        <ng-component *ngTemplateOutlet="metadata"></ng-component>
+    </div>
+    <div *ngSwitchCase="'VIDEO'" class="video-view">
+        <div class="video-wrapper">
+            <video [ngClass]="{'controls-out':!(mediaAlbum && mediaAlbum.length>1)}" [controls]="true" [src]="'/api/private/attachment/'+media?.name"></video>
+            <div class="video-navigation" *ngIf="mediaAlbum && mediaAlbum.length>1">
+                <div (click)="goPrev()" class="video-navigation-button back">
+                    <span class="material-icons-round">arrow_back_ios</span>
+                </div>
+                <div class="video-navigation-counter">
+                    {{albumIndex + 1}} / {{mediaAlbum.length}}
+                </div>
+                <div (click)="goNext()" class="video-navigation-button forward">
+                    <span class="material-icons-round">arrow_forward_ios</span>
+                </div>
+            </div>
+        </div>
+        <ng-component *ngTemplateOutlet="metadata"></ng-component>
+    </div>
+    <div *ngSwitchCase="'AUDIO'" class="audio-view">
+        <audio [controls]="true" [src]="'/api/private/attachment/'+media?.name"></audio>
+        <div class="audio-navigation" *ngIf="mediaAlbum && mediaAlbum.length>1">
+            <div (click)="goPrev()" class="audio-navigation-button back">
+                <span class="material-icons-round">arrow_back_ios</span>
+            </div>
+            <div class="audio-navigation-counter">
+                {{albumIndex + 1}} / {{mediaAlbum.length}}
+            </div>
+            <div (click)="goNext()" class="audio-navigation-button forward">
+                <span class="material-icons-round">arrow_forward_ios</span>
+            </div>
+        </div>
+        <ng-component *ngTemplateOutlet="metadata"></ng-component>
+    </div>
+</ng-template>
+
+<ng-template #metadata>
+    <div class="metadata">
+        <span class="caption-header">Информация о файле</span>
+        <div class="flexed column gap3 p5">
+            <div class="flexed hcenter gap3">
+                <span class="caption-secondary">Имя</span>
+                <span class="caption-main">{{media?.name}}</span>
+            </div>
+            <div class="flexed hcenter gap3">
+                <span class="caption-secondary">Размер файла</span>
+                <span class="caption-main">{{((media?.size ?? 0) / 1048576).toFixed(2)}} Мбайт</span>
+            </div>
+            <div class="flexed hcenter gap3">
+                <span class="caption-secondary">Дата создания</span>
+                <span class="caption-main">{{media?.modified|date}}</span>
+            </div>
+            <div class="flexed hcenter gap3">
+                <span class="caption-secondary">Дата добавления</span>
+                <span class="caption-main">{{media?.created|date}}</span>
+            </div>
+        </div>
+        <div class="stretched"></div>
+        <app-button (onClick)="downloadLink.click()" icon="download" label="Скачать"
+                    model="p-button-success"></app-button>
+        <a #downloadLink [download]="media?.name" [style.display]="'none'" href="/api/private/attachment/"></a>
+    </div>
+</ng-template>

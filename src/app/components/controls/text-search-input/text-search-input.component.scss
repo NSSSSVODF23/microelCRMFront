@@ -1,0 +1,35 @@
+.search-wrapper {
+  display: flex;
+  gap: .3rem;
+  align-items: center;
+  padding: 0 1rem 0 1rem;
+  border-radius: 999px;
+  border: 1px solid var(--bgc-400);
+  width: 100%;
+  background-color: white;
+  transition: border-color .2s ease-out;
+
+  .search-input {
+    border: 0;
+    outline: 0;
+    background-color: transparent;
+    flex: 1;
+    font-size: 1.2rem;
+    min-width: 5rem;
+    padding: .9rem .3rem;
+    color: var(--tc-700);
+  }
+}
+
+.search-wrapper:hover {
+  border-color: var(--tc-500);
+}
+
+.focused {
+  border-color: var(--mc) !important;
+}
+
+:host{
+  max-width: 30rem;
+  width: 100%;
+}

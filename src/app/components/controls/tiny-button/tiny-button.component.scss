@@ -1,0 +1,80 @@
+.t-button {
+  display: flex;
+  gap: .2rem;
+  align-items: center;
+  padding: .3rem;
+  transition: background-color .2s ease-in;
+  cursor: pointer;
+  color: var(--mc);
+  font-weight: bold;
+  border-radius: .3rem;
+
+  &.disabled{
+    cursor: default;
+    background-color: var(--bgc-200) !important;
+    color: var(--tc-400) !important;
+  }
+
+  &.iconed{
+    padding-right: .6rem;
+  }
+
+  &.primary{
+    color: var(--mc);
+    &:hover:not(.disabled){
+      background-color: var(--mc-100);
+    }
+  }
+
+  &.secondary{
+    color: var(--text-color-secondary);
+    &:hover:not(.disabled){
+      background-color: var(--mc-100);
+    }
+  }
+
+  &.success{
+    color: var(--green-500);
+    &:hover:not(.disabled){
+      background-color: var(--green-100);
+    }
+  }
+
+  &.danger{
+    color: #EF4444;
+    &:hover:not(.disabled){
+      background-color: var(--red-100);
+    }
+  }
+
+  &.warn{
+    color: #F59E0B;
+    &:hover:not(.disabled){
+      background-color: var(--yellow-100);
+    }
+  }
+
+  &.info{
+    color: var(--blue-500);
+    &:hover:not(.disabled){
+      background-color: var(--blue-100);
+    }
+  }
+
+  &:hover:not(.disabled) {
+    background-color: var(--mc-100);
+  }
+
+  &-icon {
+    color: inherit;
+    font-size: 1.3em;
+    //line-height: normal;
+  }
+
+  &-label {
+    color: inherit;
+    font-size: inherit;
+    line-height: normal;
+    white-space: nowrap;
+  }
+}

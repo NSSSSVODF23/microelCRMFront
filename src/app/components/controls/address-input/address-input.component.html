@@ -1,0 +1,30 @@
+<div class="flexed gap5 column" (blur)="onBlur.emit()">
+    <div class="flexed gap5 hcenter">
+        <p-dropdown [(ngModel)]="city" [options]="(cities$ | async)??[]" appendTo="body"
+                    optionLabel="name" optionValue="cityId" placeholder="Город"></p-dropdown>
+
+        <p-dropdown [(ngModel)]="street" [filter]="true" [options]="(streets$ | async)??[]"
+                    appendTo="body" optionLabel="name"
+                    optionValue="streetId" placeholder="Улица"></p-dropdown>
+
+        <input [(ngModel)]="houseNum" [size]="2" appRegexPatternChecker pInputText patternRx="^[1-9]\d{0,2}$"
+               placeholder="Дом">
+    </div>
+    <div class="flexed gap5 hcenter">
+        <input [(ngModel)]="fraction" [size]="4" appRegexPatternChecker pInputText patternRx="^[1-9]\d{0,2}$"
+               placeholder="Дробь">
+        <input [(ngModel)]="letter" [size]="5" appRegexPatternChecker pInputText patternRx="^[а-я]$"
+               placeholder="Литера">
+        <input [(ngModel)]="build" [size]="7" appRegexPatternChecker pInputText patternRx="^[1-9]$"
+               placeholder="Строение">
+    </div>
+    <div class="flexed gap5 hcenter">
+        <input [(ngModel)]="entrance" [size]="6" appRegexPatternChecker pInputText patternRx="^[1-9]\d?$"
+               placeholder="Подъезд">
+        <input [(ngModel)]="floor" [size]="3" appRegexPatternChecker pInputText patternRx="^[1-9]\d?$"
+               placeholder="Этаж">
+        <input [(ngModel)]="apartmentNum" [size]="6" appRegexPatternChecker pInputText patternRx="^[1-9]\d{0,2}$"
+               placeholder="Квартира">
+        <input [(ngModel)]="apartmentMod" [size]="10" pInputText placeholder="Комната/Мод.">
+    </div>
+</div>

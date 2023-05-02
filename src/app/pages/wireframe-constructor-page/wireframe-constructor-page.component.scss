@@ -1,0 +1,65 @@
+.item-example {
+  box-shadow: 0 0 2px rgba(0, 0, 0, 0.2), 0 .5rem 1rem rgba(0, 0, 0, 0.1);
+}
+
+.step-enumerator-wrapper {
+  display: flex;
+  flex-direction: column;
+  width: min-content;
+  min-width: 40rem;
+}
+
+.step-construct-view {
+  min-width: 40rem;
+  width: max-content;
+  //height: 30rem;
+
+  &-header {
+    display: flex;
+    padding: 1.2rem 1.6rem;
+    gap: .5rem;
+    align-items: center;
+
+    &-step-number {
+      font-size: 1.2rem;
+      font-weight: 500;
+      color: var(--tc-500);
+    }
+
+    &-caption {
+      font-size: 1.2rem;
+      font-weight: 500;
+      color: var(--tc-700)
+    }
+
+    &-edit-button {
+      font-size: 1.3rem;
+      color: var(--mc);
+      transform: translateY(.15rem);
+    }
+  }
+
+  &-content {
+    display: flex;
+  }
+}
+
+.stage-list-panel {
+  min-width: 30rem;
+}
+
+.inline-input {
+  border: 0;
+  outline: 0;
+  background-color: transparent;
+  color: var(--tc-600);
+  transition: color 0.2s ease-in-out;
+
+  &:hover {
+    color: var(--tc-900);
+  }
+}
+
+.drag-icon {
+  color: var(--tc-300)
+}

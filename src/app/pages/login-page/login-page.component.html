@@ -1,0 +1,18 @@
+<div class="page-wrapper">
+    <form (keyup.enter)="signIn()" [formGroup]="loginForm" class="login-panel">
+        <span class="caption-main">
+            <img src="assets/logo-dark.svg">
+        </span>
+        <span class="input-label-wrapper full-width">
+            <label>Логин</label>
+            <input [autocomplete]="'off'" formControlName="login" pInputText>
+        </span>
+        <span class="input-label-wrapper full-width">
+            <label>Пароль</label>
+            <input [autocomplete]="'off'" formControlName="password" pInputText type="password">
+        </span>
+        <span></span>
+        <p-button (onClick)="signIn()" class="full-width" icon="mdi-login" label="Войти"></p-button>
+    </form>
+    <span *ngIf="isWrongCredentials" @fade class="error-message">Логин или пароль не верны</span>
+</div>

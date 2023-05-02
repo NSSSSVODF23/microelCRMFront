@@ -1,0 +1,45 @@
+.flexed-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  overflow-x: auto;
+  width: 50vw;
+  max-height: 40vh;
+  min-width: 100%;
+}
+
+.list-item {
+  width: 19%;
+  aspect-ratio: 1;
+  border: 1px solid var(--bgc-300);
+  max-width: 15rem;
+  min-width: 7rem;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  align-items: center;
+  justify-content: center;
+  user-select: none;
+  cursor: pointer;
+
+  img{
+    min-width: 100%;
+    min-height: 100%;
+    object-fit: cover;
+    width: auto;
+    height: auto;
+  }
+}
+
+.filename{
+  display: inline-block;
+  color: var(--tc-500);
+  font-size: .8rem;
+  font-weight: 500;
+  white-space: nowrap;
+  width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-align: center;
+}

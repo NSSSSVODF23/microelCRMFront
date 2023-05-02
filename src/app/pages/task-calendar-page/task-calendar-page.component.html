@@ -1,0 +1,21 @@
+<div appExtendPageHeight class="flexed">
+    <app-main-menu-panel></app-main-menu-panel>
+    <div [style.padding]="'2rem'" class="flexed gap10 stretched">
+        <ng-container *ngTemplateOutlet="calendar"></ng-container>
+    </div>
+</div>
+
+<ng-template #calendar>
+    <div class="stretched">
+        <full-calendar [events]="taskEvent" [options]="calendarOptions"></full-calendar>
+    </div>
+</ng-template>
+
+<p-overlayPanel #taskPanel showTransitionOptions="0ms" hideTransitionOptions="0ms" [dismissable]="true" appendTo="body">
+    <app-task-list-element *ngIf="hoveredTask" [style]="{width:'40vw',minWidth:'min-content'}" [isHover]="false"
+                           [item]="(api.getTask(hoveredTask, true) | async)??undefined"></app-task-list-element>
+</p-overlayPanel>
+
+<p-contextMenu #eventMenu [model]="eventMenuModel" appendTo="body"></p-contextMenu>
+
+<app-task-selecting-dialog #scheduleTaskDialog header="Запланировать задачу" [onlyMy]="true" (onSelected)="confirmScheduleTask($event)"></app-task-selecting-dialog>

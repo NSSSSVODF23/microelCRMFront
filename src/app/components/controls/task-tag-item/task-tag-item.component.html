@@ -1,0 +1,32 @@
+<div  class="task-tags-list-item">
+    <span class="name" [style.background-color]="tag?.color">
+        {{tag?.name}}
+    </span>
+    <span class="time" [style.background-color]="tag?.color">
+        {{tag?.created | date:'dd MMM yyyy HH:mm'}}
+    </span>
+    <span class="creator">
+        <app-employee-label [employee]="tag?.creator"></app-employee-label>
+    </span>
+    <div class="edit-menu">
+        <app-icon-button model="light" (onClick)="openEditTagDialog()" icon="edit"></app-icon-button>
+        <app-icon-button model="light" (onClick)="deleteTag($event)" icon="delete"></app-icon-button>
+    </div>
+</div>
+
+<p-confirmPopup [key]="(this.tag?.taskTagId ?? '').toString()"></p-confirmPopup>
+
+<p-dialog [(visible)]="showEditTagDialog" [breakpoints]="{'960px': '75vw'}" [draggable]="false" [modal]="true"
+          [resizable]="false" [style]="{width: 'max-content'}" header="Редактировать тег">
+    <div class="flexed column gap10 p3">
+        <div class="flexed hcenter gap15">
+            <input [(ngModel)]="tagNameToEdit" pInputText placeholder="Введите название тега" type="text"/>
+            <span class="flexed hcenter gap3">
+                <span>Фон тега</span>
+                <p-colorPicker [(ngModel)]="tagColorToEdit" appendTo="body"></p-colorPicker>
+            </span>
+        </div>
+        <app-button (onClick)="editTag()" [disabled]="!tagNameToEdit && !tagColorToEdit" [loading]="isTagEditing"
+                    icon="check" label="Сохранить"></app-button>
+    </div>
+</p-dialog>

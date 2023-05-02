@@ -1,0 +1,9 @@
+<ng-container>
+    <span class="expand-button" *ngIf="!display" (click)="showContent()">
+        <span class="material-icons-round parent-inherit">visibility</span>
+        {{buttonCaption}}
+    </span>
+    <ng-container *ngIf="display">
+        <ng-content></ng-content>
+    </ng-container>
+</ng-container>

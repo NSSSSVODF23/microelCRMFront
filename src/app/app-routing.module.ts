@@ -1,12 +1,11 @@
 import {NgModule} from '@angular/core';
 import {RouterModule, Routes} from '@angular/router';
-import {TasksPageComponent} from "./pages/tasks-page/tasks-page.component";
-import { TemplatesPageComponent } from './pages/templates-page/templates-page.component';
+import {AuthGuard} from "./guards/auth.guard";
 
 const routes: Routes = [
-    {path: "tasks", component: TasksPageComponent},
-    {path: "templates", component: TemplatesPageComponent},
-    {path: '**', redirectTo: 'tasks', pathMatch: 'full'},
+    {path: '', loadChildren: ()=> import('./moduls/main/main.module').then(m => m.MainModule), canActivate:[AuthGuard], canActivateChild:[AuthGuard]},
+    {path: 'login', loadChildren: () => import('./moduls/login/login.module').then(m => m.LoginModule)},
+    // {path: "**", redirectTo: "", pathMatch: "full"},
 ];
 
 @NgModule({

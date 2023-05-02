@@ -1,0 +1,18 @@
+<span (click)="hidePreview()"
+      (mouseenter)="showPreview($event)"
+      (mouseleave)="hidePreview()"
+      *ngIf="task.taskId !== 0"
+      [routerLink]="['/task', task.taskId]"
+      class="like-link">#{{task.taskId}}</span>
+
+<p-skeleton [style.display]="'inline-block'" *ngIf="task.taskId === 0 && !failed" width="4rem" height=".8rem"></p-skeleton>
+
+<span *ngIf="failed">#{{_taskId}}</span>
+
+<!--Панель для предварительного просмотра связанной задачи-->
+<p-overlayPanel #previewConnectedTask appendTo="body" showTransitionOptions="0ms" hideTransitionOptions="0ms">
+    <ng-template pTemplate="content">
+        <app-task-list-element [isHover]="false" *ngIf="task.taskId" [item]="task" [fullDate]="true"
+                               [style]="{width:'40vw',minWidth:'min-content'}"></app-task-list-element>
+    </ng-template>
+</p-overlayPanel>

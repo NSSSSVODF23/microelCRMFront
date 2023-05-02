@@ -1,0 +1,118 @@
+<ng-container [ngSwitch]="type">
+
+    <div *ngSwitchCase="'BOOLEAN'" class="input-label-wrapper">
+        <ng-container *ngTemplateOutlet="label"></ng-container>
+        <p-dropdown
+                (ngModelChange)="onChange($event)"
+                [(ngModel)]="controlValue"
+                (onBlur)="onTouched()"
+                [options]="[
+                    {label:'Да',value:true},
+                    {label:'Нет',value:false},
+                    {label:'Не выбрано',value:null}
+                ]"
+        ></p-dropdown>
+    </div>
+
+    <div *ngSwitchCase="'SMALL_TEXT'" class="input-label-wrapper">
+        <ng-container *ngTemplateOutlet="label"></ng-container>
+        <input (ngModelChange)="onChange($event)"
+               (blur)="onTouched()"
+               [(ngModel)]="controlValue" pInputText>
+    </div>
+
+    <div *ngSwitchCase="'LARGE_TEXT'" class="input-label-wrapper">
+        <ng-container *ngTemplateOutlet="label"></ng-container>
+        <textarea (ngModelChange)="onChange($event)" (blur)="onTouched()"
+                  [(ngModel)]="controlValue" [autoResize]="true"
+                  [rows]="7" pInputTextarea></textarea>
+    </div>
+
+    <div *ngSwitchCase="'INTEGER'" class="input-label-wrapper">
+        <ng-container *ngTemplateOutlet="label"></ng-container>
+        <p-inputNumber (ngModelChange)="onChange($event)" (onBlur)="onTouched()"
+                       [(ngModel)]="controlValue"></p-inputNumber>
+    </div>
+
+    <div *ngSwitchCase="'FLOAT'" class="input-label-wrapper">
+        <ng-container *ngTemplateOutlet="label"></ng-container>
+        <p-inputNumber (ngModelChange)="onChange($event)" (onBlur)="onTouched()"
+                       [(ngModel)]="controlValue"
+                       [minFractionDigits]="1"></p-inputNumber>
+    </div>
+
+    <div *ngSwitchCase="'ADDRESS'" class="input-label-wrapper">
+        <fieldset class="node flexed gap5 column">
+            <legend>
+                <ng-container *ngTemplateOutlet="label"></ng-container>
+            </legend>
+            <app-address-input (ngModelChange)="onChange($event)" (onBlur)="onTouched()"
+                               [(ngModel)]="controlValue"></app-address-input>
+        </fieldset>
+    </div>
+
+    <div *ngSwitchCase="'LOGIN'" class="input-label-wrapper">
+        <ng-container *ngTemplateOutlet="label"></ng-container>
+        <input (ngModelChange)="onChange($event)" [(ngModel)]="controlValue" (blur)="onTouched()"
+               appRegexPatternChecker pInputText patternRx="^[\dA-z_]+$">
+    </div>
+
+    <div *ngSwitchCase="'AD_SOURCE'" class="input-label-wrapper">
+        <ng-container *ngTemplateOutlet="label"></ng-container>
+        <input (ngModelChange)="onChange($event)" [(ngModel)]="controlValue" (blur)="onTouched()"
+               appRegexPatternChecker pInputText patternRx="^[\dA-z_]+$">
+    </div>
+
+    <div *ngSwitchCase="'REQUEST_INITIATOR'" class="input-label-wrapper">
+        <ng-container *ngTemplateOutlet="label"></ng-container>
+        <input (ngModelChange)="onChange($event)" [(ngModel)]="controlValue" (blur)="onTouched()"
+               appRegexPatternChecker pInputText patternRx="^[\dA-z_]+$">
+    </div>
+
+    <div *ngSwitchCase="'IP'" class="input-label-wrapper">
+        <ng-container *ngTemplateOutlet="label"></ng-container>
+        <app-ip-input (ngModelChange)="onChange($event)" (onBlur)="onTouched()"
+                      [(ngModel)]="controlValue"></app-ip-input>
+    </div>
+
+    <div *ngSwitchCase="'EQUIPMENTS'" class="input-label-wrapper">
+        <ng-container *ngTemplateOutlet="label"></ng-container>
+        <input (ngModelChange)="onChange($event)" [(ngModel)]="controlValue" (blur)="onTouched()"
+               appRegexPatternChecker pInputText patternRx="^[\dA-z_]+$">
+    </div>
+
+    <div *ngSwitchCase="'CONNECTION_SERVICES'" class="input-label-wrapper">
+        <ng-container *ngTemplateOutlet="label"></ng-container>
+        <input (ngModelChange)="onChange($event)" [(ngModel)]="controlValue" (blur)="onTouched()"
+               appRegexPatternChecker pInputText patternRx="^[\dA-z_]+$">
+    </div>
+
+    <div *ngSwitchCase="'PHONE_ARRAY'" class="input-label-wrapper">
+        <fieldset class="node flexed gap5 column">
+            <legend>
+                <ng-container *ngTemplateOutlet="label"></ng-container>
+            </legend>
+            <app-phone-list-input (ngModelChange)="onChange($event)" (onBlur)="onTouched()"
+                                  [(ngModel)]="controlValue"></app-phone-list-input>
+        </fieldset>
+    </div>
+
+    <div *ngSwitchDefault [style.background-color]="'red'"></div>
+</ng-container>
+
+
+<ng-template #editedLabel>
+    <label>
+        <app-editing-caption [caption]="field?.name" (captionChange)="setName($event)"></app-editing-caption>
+    </label>
+</ng-template>
+
+<ng-template #staticLabel>
+    <label>
+        {{field?.name}}
+    </label>
+</ng-template>
+
+<ng-template #label>
+    <ng-container *ngIf="isExample; then editedLabel else staticLabel"></ng-container>
+</ng-template>

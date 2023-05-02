@@ -1,15 +1,8 @@
-import {
-    AfterContentInit,
-    AfterViewInit,
-    Component,
-    ContentChild,
-    ElementRef,
-    Input,
-    OnInit,
-    ViewChild
-} from '@angular/core';
+import {AfterViewInit, Component, ContentChild, ElementRef, Input, OnInit, ViewChild} from '@angular/core';
+import {ActivatedRoute} from '@angular/router';
+import {map} from "rxjs";
 
-export type ExtendedMenuModel = {label: string, link: string}
+export type ExtendedMenuModel = { label: string, link: string[], children?: ExtendedMenuModel[], nestingLevel?: number, extended: boolean };
 
 @Component({
     selector: 'app-extended-menu-item',
@@ -18,41 +11,68 @@ export type ExtendedMenuModel = {label: string, link: string}
 })
 export class ExtendedMenuItemComponent implements OnInit, AfterViewInit {
 
-    @ViewChild('titleElem') titleElem?: ElementRef<HTMLDivElement>;
-    @ViewChild('wrapperElem') wrapperElem?: ElementRef<HTMLDivElement>;
+    @ViewChild('titleElem') titleElem!: ElementRef<HTMLDivElement>;
+    @ViewChild('wrapperElem') wrapperElem!: ElementRef<HTMLDivElement>;
     @ViewChild('childElem') childElem?: ContentChild;
-    extended = false;
+    _isExtended = false;
+    @Input() set isExtended(value: boolean) {
+        this._isExtended = value;
+        this.extending();
+    }
     @Input() icon = '';
     @Input() caption: string = '';
     @Input() elements: ExtendedMenuModel[] = [];
-    @Input() link?:any;
+    @Input() link?: string[];
+    @Input() badge?: string;
 
-    constructor() {
+    animationTimer?: any;
+
+    constructor(readonly route: ActivatedRoute) {
     }
 
     ngAfterViewInit(): void {
-        this.doExtend();
+        this.extending();
     }
 
     ngOnInit(): void {
+        // this.route.url.pipe(map(url => url.map(u => u.path))).subscribe(path => {
+        //     console.log(this.caption)
+        //     setTimeout(() => {
+        //         this.elements.forEach(elm => {
+        //             if (elm.link[1].replace(/\W/g, '') === path[1].replace(/\W/g, '')) {
+        //                 this.isExtended = true;
+        //             }
+        //             this.extending();
+        //         })
+        //     }, 500);
+        // })
     }
 
     toggle() {
-        if(!this.hasChild()) return;
-        this.extended = !this.extended;
-        this.doExtend();
+        if (!this.hasChild()) return;
+        this.isExtended = !this._isExtended;
     }
 
-    private doExtend() {
-        if (!this.wrapperElem || !this.titleElem) return;
-        if (this.extended) {
-            this.wrapperElem.nativeElement.style.height = this.wrapperElem.nativeElement.scrollHeight + 'px';
-        } else {
-            this.wrapperElem.nativeElement.style.height = this.titleElem.nativeElement.offsetHeight + 'px';
-        }
-    }
-
-    hasChild(){
+    hasChild() {
         return this.elements && this.elements.length > 0;
+    }
+
+    private extending() {
+        if (!this.wrapperElem || !this.titleElem) return;
+        if (this._isExtended) {
+            this.wrapperElem.nativeElement.style.height = this.wrapperElem.nativeElement.scrollHeight + 'px';
+            this.animationTimer = setTimeout(() => {
+                if (this._isExtended) {
+                    this.wrapperElem.nativeElement.style.height = 'auto';
+                }
+                this.animationTimer = undefined;
+            }, 200)
+        } else {
+            if (this.animationTimer) clearTimeout(this.animationTimer);
+            this.wrapperElem.nativeElement.style.height = this.wrapperElem.nativeElement.scrollHeight + 'px';
+            setTimeout(() => {
+                this.wrapperElem.nativeElement.style.height = this.titleElem.nativeElement.offsetHeight + 'px'
+            })
+        }
     }
 }

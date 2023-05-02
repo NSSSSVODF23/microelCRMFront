@@ -1,0 +1,87 @@
+<p-dialog (visibleChange)="showChange.emit($event)" [draggable]="false"
+          [(visible)]="show" [modal]="true" [resizable]="false" header="Файлы в задаче">
+    <p-tabView>
+        <p-tabPanel header="Фото">
+            <ng-template pTemplate="header">
+                <div class="flexed hcenter gap3">
+                    <span class="caption-sub-header">Фото</span>
+                    <p-badge [value]="images.length.toString()"></p-badge>
+                </div>
+            </ng-template>
+            <div class="flexed-list">
+                <div (click)="viewerService.showMediaAlbum(i, images)" *ngFor="let image of images; let i = index"
+                     class="list-item">
+                    <img [src]="baseUrl+image.name"/>
+                </div>
+            </div>
+        </p-tabPanel>
+        <p-tabPanel header="Видео">
+            <ng-template pTemplate="header">
+                <div class="flexed hcenter gap3">
+                    <span class="caption-sub-header">Видео</span>
+                    <p-badge [value]="videos.length.toString()"></p-badge>
+                </div>
+            </ng-template>
+            <div class="flexed-list">
+                <div (click)="viewerService.showMediaAlbum(i, videos)" *ngFor="let video of videos; let i = index"
+                     class="list-item p5">
+                    <span class="material-icons-round">movie</span>
+                    <span class="filename">
+                        {{video.name}}
+                    </span>
+                </div>
+            </div>
+        </p-tabPanel>
+        <p-tabPanel header="Аудио">
+            <ng-template pTemplate="header">
+                <div class="flexed hcenter gap3">
+                    <span class="caption-sub-header">Аудио</span>
+                    <p-badge [value]="audios.length.toString()"></p-badge>
+                </div>
+            </ng-template>
+            <div class="flexed-list">
+                <div (click)="viewerService.showMediaAlbum(i, audios)" *ngFor="let audio of audios; let i = index"
+                     class="list-item p5">
+                    <span class="material-icons-round">music_note</span>
+                    <span class="filename">
+                        {{audio.name}}
+                    </span>
+                </div>
+            </div>
+        </p-tabPanel>
+        <p-tabPanel header="Документы">
+            <ng-template pTemplate="header">
+                <div class="flexed hcenter gap3">
+                    <span class="caption-sub-header">Документы</span>
+                    <p-badge [value]="documents.length.toString()"></p-badge>
+                </div>
+            </ng-template>
+            <div class="flexed-list">
+                <div (click)="link.click()" *ngFor="let document of documents" class="list-item p5">
+                    <span class="material-icons-round">picture_as_pdf</span>
+                    <span class="filename">
+                        {{document.name}}
+                    </span>
+                    <a #link [href]="baseUrl+document.name+'/'" [style.display]="'none'" target="_blank"></a>
+                </div>
+            </div>
+        </p-tabPanel>
+        <p-tabPanel header="Файлы">
+            <ng-template pTemplate="header">
+                <div class="flexed hcenter gap3">
+                    <span class="caption-sub-header">Файлы</span>
+                    <p-badge [value]="files.length.toString()"></p-badge>
+                </div>
+            </ng-template>
+            <div class="flexed-list">
+                <div (click)="link.click()" *ngFor="let file of files" class="list-item p5">
+                    <span class="material-icons-round">description</span>
+                    <span class="filename">
+                        {{file.name}}
+                    </span>
+                    <a #link [download]="file.name" [href]="baseUrl+file.name+'/'" [style.display]="'none'"></a>
+                </div>
+            </div>
+        </p-tabPanel>
+    </p-tabView>
+</p-dialog>

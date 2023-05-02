@@ -1,3 +1,12 @@
-<div class="item" [routerLink]="link" routerLinkActive="active">
-    {{caption}}
+<div #parentWrapper class="parent-wrapper">
+    <div [ngClass]="{'can-extend':children}" class="flexed title">
+        <span (click)="toggleExtend()" *ngIf="children"
+              [ngClass]="{rotated:_isExtended}" class="material-icons-round title-expanded-icon">expand_more</span>
+        <div #titleElement [routerLink]="link" class="item" routerLinkActive="active">
+            {{caption}}
+        </div>
+    </div>
+    <div [ngClass]="{show:_isExtended}" class="child-wrapper">
+        <app-sub-extended-menu-item *ngFor="let el of children??[]" [caption]="el.label" [link]="el.link" [children]="el.children" [nLevel]="(el.nestingLevel??0)+1"></app-sub-extended-menu-item>
+    </div>
 </div>

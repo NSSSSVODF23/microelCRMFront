@@ -1,0 +1,47 @@
+.loading-indicator {
+  display: flex;
+  justify-content: center;
+}
+
+.circle {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  margin: 0 5px;
+  background-color: gray;
+}
+
+.first {
+  animation: 1s pulse ease-in-out 0s infinite;
+}
+
+.second {
+  animation: 1s pulse ease-in-out .1s infinite;
+}
+
+.third {
+  animation: 1s pulse ease-in-out .3s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+    background-color: gray;
+  }
+  20% {
+    transform: scale(1.2);
+    background-color: lightgray;
+  }
+  40% {
+    transform: scale(1);
+    background-color: gray;
+  }
+  60% {
+    transform: scale(1.2);
+    background-color: lightgray;
+  }
+  80% {
+    transform: scale(1);
+    background-color: gray;
+  }
+}

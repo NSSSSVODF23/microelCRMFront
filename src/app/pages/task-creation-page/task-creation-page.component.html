@@ -1,0 +1,69 @@
+<div appExtendPageHeight class="flexed p20 gap20 column">
+    <ng-container *ngIf="isTemplateSelected; then selectedTemplatePanel else unselectedTemplatePanel"></ng-container>
+    <div *ngIf="isTemplateSelected" @flow class="stage-view">
+        <div class="caption-main">Этап {{this.currentStep + 1}}
+            : {{this.selectedTemplate ? this.selectedTemplate.steps[currentStep].name : ""}}</div>
+        <div [@swipeChild]="currentStepFields.length" [formGroup]="currentStepForm" class="flexed column p10 gap10">
+            <app-task-template-input *ngFor="let field of currentStepFields" [formControlName]="field.id" [field]="field"
+                                     class="stretched"></app-task-template-input>
+        </div>
+        <ng-container *ngTemplateOutlet="controls"></ng-container>
+    </div>
+</div>
+
+<ng-template #controls>
+    <ng-container [ngSwitch]="controlsType()">
+        <div *ngSwitchCase="'NEXT_ONLY'" class="flexed">
+            <div class="stretched"></div>
+            <app-button (onClick)="changeCreationStep(1)" [disabled]="!isValidCurrentStep" icon="navigate_next"
+                        iconPos="right" label="Далее"></app-button>
+        </div>
+        <div *ngSwitchCase="'BOTH'" class="flexed">
+            <app-button (onClick)="changeCreationStep(-1)" icon="navigate_before"
+                        label="Назад" model="p-button-text p-button-secondary"></app-button>
+            <div class="stretched"></div>
+            <app-button (onClick)="changeCreationStep(1)" [disabled]="!isValidCurrentStep" icon="navigate_next"
+                        iconPos="right" label="Далее"></app-button>
+        </div>
+        <div *ngSwitchCase="'PREV_FIN'" class="flexed">
+            <app-button (onClick)="changeCreationStep(-1)" icon="navigate_before"
+                        label="Назад" model="p-button-text p-button-secondary"></app-button>
+            <div class="stretched"></div>
+            <app-button (onClick)="createTask()" [disabled]="!taskCreationForm.valid" icon="add_circle_outline"
+                        label="Создать"></app-button>
+        </div>
+        <div *ngSwitchCase="'FIN_ONLY'" class="flexed">
+            <div class="stretched"></div>
+            <app-button (onClick)="createTask()" [disabled]="!taskCreationForm.valid" icon="add_circle_outline"
+                        label="Создать"></app-button>
+        </div>
+    </ng-container>
+</ng-template>
+
+<ng-template #unselectedTemplatePanel>
+    <div class="flexed gap10 column">
+        <span class="header400">Выбор шаблона задачи</span>
+        <div class="flexed gap5 hcenter">
+            <p-dropdown [(ngModel)]="selectedTemplate" [disabled]="isTemplateSelected"
+                        [options]="(templateOptionsList$ | async) ?? []" optionLabel="name"
+                        placeholder="Шаблоны задач"></p-dropdown>
+            <app-button (onClick)="selectTemplateForTask()" [disabled]="isTemplateSelected" icon="done"
+                        label="Выбрать"
+                        model="fit-content p-button-success"></app-button>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #selectedTemplatePanel>
+    <div class="flexed hcenter gap5">
+        <span class="header300">Выбранный шаблон:</span>
+        <span class="header400">{{selectedTemplate?.name}}</span>
+        <app-button (onClick)="unselectTemplateForTask()" [disabled]="!isTemplateSelected" icon="published_with_changes"
+                    label="Изменить выбор"
+                    model="p-button-text p-button-danger fit-content"></app-button>
+    </div>
+</ng-template>
+
+<div *ngIf="isCreatedTask" class="stub-when-creating-a-task">
+    <p-progressSpinner></p-progressSpinner>
+</div>

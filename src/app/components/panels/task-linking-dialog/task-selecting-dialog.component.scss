@@ -1,0 +1,43 @@
+.filters{
+  grid-area: filter;
+  display: flex;
+  flex-direction: column;
+  gap: .5rem;
+  position: sticky;
+  top: 0;
+  height: max-content;
+  padding-bottom: 1rem;
+}
+
+.list{
+  grid-area: list;
+  display: flex;
+  flex-direction: column;
+}
+
+.paginator{
+  grid-area: paginator;
+  position: sticky;
+  bottom: 0;
+}
+
+.loading-shader{
+  position: absolute;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  background-color: rgb(255 255 255 / 60%);
+  top: 0;
+  left: 0;
+  backdrop-filter: blur(7px);
+  border-radius: 1rem;
+}
+
+.float-button{
+  position: absolute;
+  bottom: 1rem;
+  right: 1rem;
+}

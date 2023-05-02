@@ -1,0 +1,18 @@
+.overlay-target{
+  width: 1px;
+  height: 13px;
+  //background-color: red;
+  position: absolute;
+  user-select: none;
+}
+
+.list-view{
+  outline: 0;
+  *{
+    cursor: pointer;
+    user-select: none;
+  }
+  *.selected{
+    background-color: var(--gray-200);
+  }
+}

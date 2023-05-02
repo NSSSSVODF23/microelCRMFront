@@ -1,0 +1,7 @@
+.highlight{
+  cursor: pointer;
+  transition: color .2s ease-out;
+}
+.highlight:hover {
+  color: var(--mc);
+}

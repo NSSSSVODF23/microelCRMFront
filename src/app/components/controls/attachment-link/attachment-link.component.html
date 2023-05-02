@@ -1,0 +1,27 @@
+<a *ngIf="attachment?.type==='FILE'" [download]="download()" [href]="url()" class="attachment-wrapper">
+    <ng-container *ngTemplateOutlet="content"></ng-container>
+</a>
+<div (click)="attachmentOpen()" (mouseenter)="hovered=true" (mouseleave)="hovered=false; previewLoading=false"
+     *ngIf="attachment?.type!=='FILE'"
+     class="attachment-wrapper">
+    <ng-container *ngTemplateOutlet="content"></ng-container>
+</div>
+
+
+<ng-template #content>
+    <span [style.font-size]="'1.4rem'" class="material-icons-round">
+        {{attachmentIconName()}}
+    </span>
+    <span>
+        {{attachment?.name}}
+    </span>
+    <span class="caption-secondary">
+        {{((attachment?.size ?? 0) / 1048576).toFixed(2)}} Мбайт
+    </span>
+    <div *ngIf="attachment?.type==='PHOTO' && hovered" class="photo-preview-panel">
+        <div class="preview-loading-indicator flexed vcenter hcenter" *ngIf="!previewLoading">
+            <app-circle-loading-indicator></app-circle-loading-indicator>
+        </div>
+        <img [src]="'/api/private/attachment/'+attachment?.name" class="preview-image" (load)="previewLoading=true">
+    </div>
+</ng-template>

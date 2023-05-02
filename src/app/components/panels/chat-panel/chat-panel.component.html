@@ -1,0 +1,39 @@
+<p-dialog [(visible)]="isShow"
+          [contentStyle]="{display:'flex', flexDirection:'column', padding: '1rem'}"
+          [style]="{minWidth:'30rem', width:'50rem', minHeight: '40rem'}">
+    <ng-template pTemplate="header">
+    </ng-template>
+    <ng-template pTemplate="content">
+        <div class="common-wrapper">
+            <div class="chat-view" appScrollToBottomEmitter (onScrollToBottom)="loadMessages()">
+                <div *ngFor="let message of messages; trackBy: trackMessages" class="message-wrapper">
+                    <app-avatar [deleted]="message.author.deleted"
+                                [size]="2.3"
+                                [src]="message.author.avatar"
+                                [status]="message.author.status"
+                                name="{{message.author | eplName}}"
+                    ></app-avatar>
+                    <div [ngClass]="{my:isMy(message.author)}" class="chat-message">
+                        <div class="message-header">
+                            {{message.author | eplName}}
+                        </div>
+                        <div class="message-text">
+                            <span class="content">{{message.text}}</span>
+                            <div class="message-footer">
+                                <span>{{message.sendAt | date:"HH:mm"}}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="chat-input">
+                <textarea pInputTextarea [(ngModel)]="sendingText" [autoResize]="true" [rows]="1"
+                          [style]="{flex: 1, minHeight:'41px'}"></textarea>
+                <div class="button-block">
+                    <app-file-input [(files)]="sendingFiles" [short]="true"></app-file-input>
+                    <p-button styleClass="p-button-text p-button-icon" icon="mdi-send" (onClick)="sendMessage()"></p-button>
+                </div>
+            </div>
+        </div>
+    </ng-template>
+</p-dialog>

@@ -1,0 +1,27 @@
+<p-multiSelect [(ngModel)]="selectedTags" (ngModelChange)="selectedTagsChange.emit(selectedTags)" (onFocus)="onTouched()" [filter]="true" filterBy="name" [options]="availableTags" (onChange)="onChange($event.value)"
+               appendTo="body" defaultLabel="Выберете теги">
+    <ng-template let-value pTemplate="selectedItems">
+        <div *ngIf="!selectedTags || selectedTags.length === 0" class="tags-view-placeholder">Выберете теги</div>
+        <div class="tags-view">
+            <div *ngFor="let tag of selectedTags|slice:0:2" [style.background-color]="tag.color" class="tags-view-item">
+                {{tag.name}}
+            </div>
+            <div class="tags-view-item" *ngIf="selectedTags.length>2" (mouseenter)="extraPreview.show($event)" (mouseleave)="extraPreview.hide()">
+                И еще {{selectedTags.length-2}}
+            </div>
+        </div>
+    </ng-template>
+    <ng-template let-tag pTemplate="item">
+        <div [style.background-color]="tag.color" class="tags-view-item">
+            {{tag.name}}
+        </div>
+    </ng-template>
+</p-multiSelect>
+
+<p-overlayPanel #extraPreview showTransitionOptions="0ms" hideTransitionOptions="0ms">
+    <div class="tags-view wrap max">
+        <div *ngFor="let tag of selectedTags|slice:2" [style.background-color]="tag.color" class="tags-view-item">
+            {{tag.name}}
+        </div>
+    </div>
+</p-overlayPanel>

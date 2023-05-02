@@ -1,0 +1,100 @@
+<ng-container [ngSwitch]="field?.type">
+
+    <div *ngSwitchCase="'BOOLEAN'" class="input-label-wrapper">
+        <ng-container *ngTemplateOutlet="label"></ng-container>
+        <p-dropdown
+                [(ngModel)]="controlValue"
+                (ngModelChange)="onChange($event)"
+                [options]="[
+                    {label:'Да',value:true},
+                    {label:'Нет',value:false},
+                    {label:'Не выбрано',value:null}
+                ]"
+        ></p-dropdown>
+    </div>
+
+    <div *ngSwitchCase="'SMALL_TEXT'" class="input-label-wrapper">
+        <ng-container *ngTemplateOutlet="label"></ng-container>
+        <input [(ngModel)]="controlValue"
+               (ngModelChange)="onChange($event)" pInputText>
+    </div>
+
+    <div *ngSwitchCase="'LARGE_TEXT'" class="input-label-wrapper">
+        <ng-container *ngTemplateOutlet="label"></ng-container>
+        <input [(ngModel)]="controlValue"
+               (ngModelChange)="onChange($event)" pInputText>
+    </div>
+
+    <div *ngSwitchCase="'INTEGER'" class="input-label-wrapper">
+        <ng-container *ngTemplateOutlet="label"></ng-container>
+        <p-inputNumber [(ngModel)]="controlValue"
+                       (ngModelChange)="onChange($event)"></p-inputNumber>
+    </div>
+
+    <div *ngSwitchCase="'FLOAT'" class="input-label-wrapper">
+        <ng-container *ngTemplateOutlet="label"></ng-container>
+        <p-inputNumber [(ngModel)]="controlValue"
+                       (ngModelChange)="onChange($event)" [minFractionDigits]="1"></p-inputNumber>
+    </div>
+
+    <div *ngSwitchCase="'ADDRESS'" class="input-label-wrapper">
+        <fieldset class="node flexed gap5 column">
+            <legend>
+                <ng-container *ngTemplateOutlet="label"></ng-container>
+            </legend>
+            <app-address-input [(ngModel)]="controlValue"
+                               (ngModelChange)="onChange($event)"></app-address-input>
+        </fieldset>
+    </div>
+
+    <div *ngSwitchCase="'LOGIN'" class="input-label-wrapper">
+        <ng-container *ngTemplateOutlet="label"></ng-container>
+        <input [(ngModel)]="controlValue"
+               (ngModelChange)="onChange($event)" appRegexPatternChecker pInputText patternRx="^[\dA-z_]+$">
+    </div>
+
+    <div *ngSwitchCase="'AD_SOURCE'" class="input-label-wrapper">
+        <ng-container *ngTemplateOutlet="label"></ng-container>
+        <input [(ngModel)]="controlValue"
+               (ngModelChange)="onChange($event)" appRegexPatternChecker pInputText patternRx="^[\dA-z_]+$">
+    </div>
+
+    <div *ngSwitchCase="'REQUEST_INITIATOR'" class="input-label-wrapper">
+        <ng-container *ngTemplateOutlet="label"></ng-container>
+        <input [(ngModel)]="controlValue"
+               (ngModelChange)="onChange($event)" appRegexPatternChecker pInputText patternRx="^[\dA-z_]+$">
+    </div>
+
+    <div *ngSwitchCase="'IP'" class="input-label-wrapper">
+        <ng-container *ngTemplateOutlet="label"></ng-container>
+        <input [(ngModel)]="controlValue"
+               (ngModelChange)="onChange($event)" appRegexPatternChecker pInputText patternRx="^[\d\.]+$">
+    </div>
+
+    <div *ngSwitchCase="'EQUIPMENTS'" class="input-label-wrapper">
+        <ng-container *ngTemplateOutlet="label"></ng-container>
+        <input [(ngModel)]="controlValue"
+               (ngModelChange)="onChange($event)" appRegexPatternChecker pInputText patternRx="^[\dA-z_]+$">
+    </div>
+
+    <div *ngSwitchCase="'CONNECTION_SERVICES'" class="input-label-wrapper">
+        <ng-container *ngTemplateOutlet="label"></ng-container>
+        <input [(ngModel)]="controlValue"
+               (ngModelChange)="onChange($event)" appRegexPatternChecker pInputText patternRx="^[\dA-z_]+$">
+    </div>
+
+    <div *ngSwitchCase="'PHONE_ARRAY'" class="input-label-wrapper">
+        <ng-container *ngTemplateOutlet="label"></ng-container>
+        <input [(ngModel)]="controlValue"
+               (ngModelChange)="onChange($event)" appRegexPatternChecker pInputText patternRx="^[1-9]\d{0,10}$">
+    </div>
+
+    <div *ngSwitchDefault [style.background-color]="'red'"></div>
+
+</ng-container>
+
+<ng-template #label>
+    <label>
+        {{field?.name}}
+    </label>
+</ng-template>

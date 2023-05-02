@@ -1,0 +1,31 @@
+<div appExtendPageHeight class="flexed">
+    <app-main-menu-panel></app-main-menu-panel>
+    <div class="flexed gap10 stretched" [style.padding]="'1rem 2rem 0 2rem'">
+        <ng-container *ngTemplateOutlet="taskList"></ng-container>
+        <ng-container *ngTemplateOutlet="filters"></ng-container>
+    </div>
+</div>
+
+<ng-template #taskList>
+    <div class="flexed column stretched">
+        <app-task-list-element [item]="item" *ngFor="let item of tasks; let i = index; trackBy: taskTrack" [fullDate]="true"></app-task-list-element>
+        <div [style]="{flex:'1', minHeight: '2rem'}"></div>
+        <div class="sticky bottom0">
+            <p-paginator #paginator (onPageChange)="changePage($event)" [alwaysShow]="false"
+                         [rows]="PAGE_SIZE" [showCurrentPageReport]="true"
+                         [totalRecords]="taskPage?.totalElements ?? 0"
+                         currentPageReportTemplate="Показано с {first} по {last} из {totalRecords} задач"
+                         styleClass="back-blured"></p-paginator>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #filters>
+    <div [formGroup]="filtersForm" class="filter-panel" appExtendPageHeight [limited]="true">
+        <span class="caption-header">Тип задачи</span>
+        <p-listbox [checkbox]="true" [filter]="true"
+                   [listStyle]="{'max-height':'20vh'}" [multiple]="true"
+                   [options]="(templates$ | async) ?? []" class="indent1" filterBy="name"
+                   formControlName="template" optionLabel="name" optionValue="wireframeId"></p-listbox>
+    </div>
+</ng-template>

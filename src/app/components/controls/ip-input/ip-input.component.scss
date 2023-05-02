@@ -1,0 +1,23 @@
+.octet-wrapper {
+  width: max-content;
+  padding: .7rem !important;
+  transition: border-color .15s ease-in-out;
+
+  &:focus-within{
+    border: 1px solid var(--primary-color) !important;
+    box-shadow: var(--focus-ring);
+  }
+
+  &:hover{
+    border: 1px solid var(--primary-color) !important;
+  }
+}
+
+.octet-input {
+  padding: 0;
+  border: none;
+  outline: none;
+  width: 3rem;
+  text-align: center;
+  font-size: 1.1rem;
+}

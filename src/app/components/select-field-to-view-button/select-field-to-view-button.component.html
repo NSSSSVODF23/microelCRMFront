@@ -1,0 +1,7 @@
+<span (click)="openContextMenu($event)" *ngIf="!selectedField" class="caption-main highlight">
+    Выбрать
+</span>
+<span (click)="openContextMenu($event)" *ngIf="selectedField" [class]="classes+' highlight'">
+    {{selectedField.label}}
+</span>
+<p-menu #menu [model]="fields" [popup]="true"></p-menu>

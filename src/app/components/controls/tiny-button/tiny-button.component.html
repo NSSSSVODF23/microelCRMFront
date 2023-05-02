@@ -1,0 +1,4 @@
+<div (click)="clickHandler($event)" [ngClass]="{disabled:disabled, iconed:icon&&label}" [style.font-size]="size+'rem'" [class]="'t-button '+model">
+    <span *ngIf="icon" class="material-icons-round t-button-icon">{{icon}}</span>
+    <span *ngIf="label" class="t-button-label">{{label}}</span>
+</div>

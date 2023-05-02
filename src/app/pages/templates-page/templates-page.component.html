@@ -1,11 +1,58 @@
 <div appExtendPageHeight class="flexed">
     <app-main-menu-panel></app-main-menu-panel>
-    <div class="flexed column stretched p10">
-        <h2>Шаблоны</h2>
-        <virtual-scroller #templatesScroll [items]="testitems">
-            <div *ngFor="let item of templatesScroll.viewPortItems">
-                {{item.info}}
-            </div>
-        </virtual-scroller>
+    <div class="flexed column stretched gap10" [style.padding-top]="'1rem'">
+        <ng-container *ngTemplateOutlet="tabview"></ng-container>
     </div>
 </div>
+
+<ng-template #tabview>
+    <p-tabView>
+        <p-tabPanel header="Шаблоны" leftIcon="mdi-list_alt">
+            <ng-container *ngFor="let item of templateItems">
+                <ng-container *ngTemplateOutlet="templateItem; context:{$implicit:item}"></ng-container>
+            </ng-container>
+            <div [routerLink]="['constructor']" class="template-create-button">
+                <i class="mdi-add"></i> Создать
+            </div>
+        </p-tabPanel>
+        <p-tabPanel header="Теги" leftIcon="mdi-local_offer">
+            <div class="task-tags-list">
+                <app-task-tag-item *ngFor="let tag of availableTags" [tag]="tag"></app-task-tag-item>
+                <div class="append-tag-button" (click)="openCreateTagDialog()"><i class="mdi-add"></i> Создать</div>
+            </div>
+        </p-tabPanel>
+    </p-tabView>
+</ng-template>
+
+<ng-template #templateItem let-item>
+    <div [queryParams]="{editingId:item.wireframeId}"
+         [routerLink]="['constructor']" class="template-item flexed">
+        <div class="template-item-main-info flexed column gap2 stretched">
+                <span class="template-item-main-info-name">
+                    {{item.name}}
+                </span>
+            <span class="template-item-main-info-description">
+                    {{item.description}}
+                </span>
+        </div>
+        <div class="template-item-created-date" *ngIf="item.wireframeId">
+            {{item.created | date:"dd-MM-yy HH:mm"}}
+            <p-button (onClick)="confirmDeleteWireframe($event, item.wireframeId)" styleClass="p-button-danger p-button-text" icon="mdi-delete" label="Удалить"></p-button>
+        </div>
+    </div>
+</ng-template>
+
+<p-dialog [(visible)]="showCreateTagDialog" [breakpoints]="{'960px': '75vw'}" [draggable]="false" [modal]="true" [resizable]="false"
+          [style]="{width: 'max-content'}" header="Создать тег">
+    <div class="flexed column gap10 p3">
+        <div class="flexed hcenter gap15">
+            <input [(ngModel)]="tagNameToCreate" pInputText placeholder="Введите название тега" type="text"/>
+            <span class="flexed hcenter gap3">
+                <span>Фон тега</span>
+                <p-colorPicker [(ngModel)]="tagColorToCreate" appendTo="body"></p-colorPicker>
+            </span>
+        </div>
+        <app-button (onClick)="createTag()" [disabled]="!tagNameToCreate && !tagColorToCreate" [loading]="isTagCreating"
+                    icon="check" label="Создать"></app-button>
+    </div>
+</p-dialog>

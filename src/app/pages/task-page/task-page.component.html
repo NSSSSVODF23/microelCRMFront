@@ -1,0 +1,410 @@
+<div appExtendPageHeight class="flexed p20 gap10 column">
+    <p-menubar [model]="managementMenu">
+        <ng-template pTemplate="start">
+            <div class="flexed gap10 p5 indent1 hcenter">
+                <p-button (onClick)="customNav.backOrDefault(['/tasks','list'])" icon="mdi-chevron_left"
+                          pTooltip="Назад" styleClass="p-button-icon p-button-text" tooltipPosition="bottom"></p-button>
+                <div class="flexed column ">
+                    <span class="header400">{{currentTask?.modelWireframe?.name ?? ''}}</span>
+                    <div class="flexed bline gap5 caption-sub-header">
+                        <span>Стадия:</span>
+                        <app-tiny-button (onClick)="stageMenu.toggle($event)" [disabled]="!currentTask?.currentStage"
+                                         [label]="currentTask?.currentStage?.label ?? 'не установлена'"
+                                         [size]=".9"
+                                         pTooltip="Изменить" tooltipPosition="bottom"></app-tiny-button>
+                        <span (click)="moveToNextStage()" *ngIf="!isLastStage() && currentTask?.currentStage"
+                              class="next-stage-button">
+                        Следующая <i class="mdi-chevron_right"></i>
+                    </span>
+                    </div>
+                </div>
+            </div>
+        </ng-template>
+        <ng-template pTemplate="end">
+            <ng-container *ngIf="currentTask?.actualTo || (currentTask?.actualFrom && (isBeforeActualFrom$|async))">
+                <ng-container *ngIf="isBeforeActualFrom$|async; then actualFromLabel else actualToLabel"></ng-container>
+            </ng-container>
+        </ng-template>
+    </p-menubar>
+    <div class="flexed gap5 column">
+        <div class="flexed hcenter gap20 indent2">
+            <app-task-tags-view *ngIf="currentTask" [disabled]="isTaskClose()"
+                                [task]="currentTask"></app-task-tags-view>
+        </div>
+        <div class="flexed gap10 spbtw p20">
+            <div class="flexed gap7 column ">
+                <div *ngFor="let field of currentTask?.fields ?? []" class="flexed gap1 column">
+                    <div class="caption-secondary">{{field.name}}</div>
+                    <div class="caption-main">
+                        <app-task-field-view [item]="field"></app-task-field-view>
+                    </div>
+                </div>
+            </div>
+            <div class="task-control-panel">
+                <div class="task-control-panel-item">
+                    <i class="mdi-person"></i>
+                    <span class="task-control-panel-item-name">
+                        Автор
+                    </span>
+                    <span class="task-control-panel-item-value">
+                        <app-employee-label [employee]="currentTask?.creator"></app-employee-label>
+                    </span>
+                </div>
+                <div class="task-control-panel-item">
+                    <i class="mdi-event"></i>
+                    <span class="task-control-panel-item-name">
+                        Создана
+                    </span>
+                    <span class="task-control-panel-item-value">
+                        {{currentTask?.created | date:'dd MMM yyyy HH:mm'}}
+                    </span>
+                </div>
+                <div class="task-control-panel-item">
+                    <i class="mdi-flag"></i>
+                    <span class="task-control-panel-item-name">
+                        Статус
+                    </span>
+                    <span class="task-control-panel-item-value">
+                        {{currentTask | taskStatus}}
+                    </span>
+                </div>
+                <div *ngIf="currentTask?.responsible" class="task-control-panel-item">
+                    <i class="mdi-person"></i>
+                    <span class="task-control-panel-item-name">
+                        Ответственный
+                    </span>
+                    <span class="task-control-panel-item-value">
+                        <app-employee-label [employee]="currentTask?.responsible"></app-employee-label>
+                    </span>
+                </div>
+                <div *ngIf="isTaskHasObservers()" class="dedicated-panel">
+                    <div class="title">
+                        <i class="mdi-groups"></i>
+                        <span class="caption">
+                            Наблюдатели
+                        </span>
+                    </div>
+                    <div class="list">
+                        <div *ngFor="let department of currentTask?.departmentsObservers" class="flexed hcenter gap5">
+                            <app-department-label [department]="department"></app-department-label>
+                        </div>
+                        <span *ngFor="let employee of currentTask?.employeesObservers" class="flexed hcenter gap5">
+                            <app-employee-label [employee]="employee"></app-employee-label>
+                        </span>
+                    </div>
+                </div>
+                <div *ngIf="isTaskHasParent() || isTaskHasChilds()" class="dedicated-panel">
+                    <div class="title">
+                        <i class="mdi-account_tree"></i>
+                        <span class="caption">
+                            Связанные задачи
+                        </span>
+                        <app-tiny-button (onClick)="openTaskChainDialog()" icon="account_tree" pTooltip="Показать схему"
+                                         tooltipPosition="bottom"></app-tiny-button>
+                    </div>
+                    <div class="list">
+                        <div *ngIf="isTaskHasParent()" class="flexed hcenter gap3">
+                            <span class="caption-sub-header">Родительская:</span>
+                            <app-task-link [taskId]="currentTask?.parent ?? 0"></app-task-link>
+                            <app-tiny-button (onClick)="unlinkParentTask()"
+                                             *ngIf="!!currentTask?.parent"
+                                             icon="link_off"
+                                             model="danger"
+                                             pTooltip="Отсоединить задачу"
+                                             tooltipPosition="bottom"></app-tiny-button>
+                        </div>
+                        <div *ngIf="isTaskHasChilds()" class="flexed gap5 caption-sub-header">
+                            <span>Дочерние:</span>
+                            <div class="flexed column gap3">
+                                <span *ngFor="let taskCld of currentTask?.children" class="flexed gap3 hcenter">
+                                    <app-task-link [task]="taskCld"></app-task-link>
+                                    <app-tiny-button (onClick)="unlinkParentTask(taskCld.taskId)" icon="link_off"
+                                                     model="danger" pTooltip="Отсоединить задачу"
+                                                     tooltipPosition="bottom"></app-tiny-button>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <span class="header500 indent1">Комментарии</span>
+    <app-task-journal (editCommentChange)="editCommentChanged($event)" [(editComment)]="editComment"
+                      [(replyComment)]="replyComment" [taskId]="taskId"
+                      class="indent2"></app-task-journal>
+</div>
+<div *ngIf="!isTaskClose()" class="comment-input-wrapper flexed gap10 column full-width">
+    <div class="flexed column">
+        <div class="edit-reply-preview">
+            <div *ngIf="replyComment" class="reply-comment-preview">
+                <span class="material-icons-round preview-icon">reply</span>
+                <span class="whose-comment">{{replyComment.creator | eplName}}</span>
+                <quill-view-html [content]="replyComment.message" class="comment-text"></quill-view-html>
+                <app-icon-button (onClick)="replyComment=undefined" class="cancel-button" icon="close"
+                                 model="secondary"></app-icon-button>
+            </div>
+            <div *ngIf="editComment" class="reply-comment-preview">
+                <span class="material-icons-round preview-icon">edit</span>
+                <quill-view-html [content]="editComment.message" class="comment-text"></quill-view-html>
+                <app-icon-button (onClick)="editComment=undefined; commentInputControl.reset()"
+                                 class="cancel-button" icon="close" model="secondary"></app-icon-button>
+            </div>
+        </div>
+        <quill-editor #commentEditor (onContentChanged)="empInsertPanel.setQuillEvent($event)" (keydown)="sendCommentByEnter($event)" [formControl]="commentInputControl" [modules]="quillModules"
+                      [styles]="{maxHeight:'30vh', minHeight:'10rem', overflow:'auto'}" class="input"
+                      placeholder="Комментарий..."></quill-editor>
+    </div>
+    <div class="flexed hcenter gap10 vend">
+        <app-file-input #filesInput [(files)]="attachedFiles" [disabled]="commentSending"
+                        class="attach-button"></app-file-input>
+        <p-button (onClick)="sendComment()" [disabled]="!commentInputControl.valid && attachedFiles.length === 0"
+                  [loading]="commentSending" class="send-button" icon="mdi-send" iconPos="right"
+                  label="Отправить"></p-button>
+    </div>
+</div>
+
+
+<app-media-viewer></app-media-viewer>
+
+<app-attachments-history-dialog [(show)]="showFilesHistory" [taskId]="taskId"></app-attachments-history-dialog>
+
+<!--Диалог назначения монтажников-->
+<p-dialog [(visible)]="showAppointInstallersMenu" [breakpoints]="{'960px': '75vw', '640px': '100vw'}"
+          [draggable]="false" [modal]="true" [resizable]="false"
+          [style]="{width: '50vw'}" header="Назначение монтажников">
+    <div class="flexed column gap10">
+        <p-pickList [dragdrop]="true" [showSourceControls]="false" [showTargetControls]="false"
+                    [sourceStyle]="{height: '40vh'}" [source]="sourceInstallers" [targetStyle]="{height:'40vh'}"
+                    [target]="targetInstallers" sourceHeader="Доступные"
+                    targetHeader="Назначенные">
+            <ng-template let-installer pTemplate="item">
+                <div class="flexed hcenter gap5">
+                    <app-employee-label [employee]="installer" [size]="1.9"></app-employee-label>
+                </div>
+            </ng-template>
+        </p-pickList>
+        <div class="flexed gap5 vend">
+            <app-button (onClick)="resetListAppointedInstallers()"
+                        [disabled]="targetInstallers.length === 0 || appointmentRequested"
+                        icon="delete" label="Сбросить" model="p-button-text p-button-secondary"></app-button>
+            <app-button (onClick)="sendListAppointedInstallers()" [disabled]="targetInstallers.length === 0"
+                        [loading]="appointmentRequested"
+                        icon="assignment" label="Назначить"></app-button>
+        </div>
+    </div>
+</p-dialog>
+
+<!--Диалог назначения наблюдателей-->
+<p-dialog [(visible)]="showChangeObserversDialog" [breakpoints]="{'960px': '75vw', '640px': '100vw'}"
+          [draggable]="false" [modal]="true" [resizable]="false"
+          [style]="{width: '50vw'}" header="Изменить ответственных">
+    <p-tabView>
+        <p-tabPanel header="Отделы">
+            <div [style.max-height]="'50vh'" class="list-view">
+                <div *ngFor="let dep of departmentList" class="list-view-item bordered flexed hcenter gap10">
+                    <p-checkbox [(ngModel)]="selectedDepartmentObservers" [value]="dep.departmentId"
+                                name="dep"></p-checkbox>
+                    <span appColorize class="caption-main">{{dep.name}}</span>
+                </div>
+            </div>
+        </p-tabPanel>
+        <p-tabPanel header="Сотрудники">
+            <div [style.max-height]="'50vh'" class="list-view">
+                <div *ngFor="let emp of employeeList" class="list-view-item bordered flexed hcenter gap10">
+                    <p-checkbox [(ngModel)]="selectedEmployeeObservers" [value]="emp.login" name="emp"></p-checkbox>
+                    <app-employee-label [employee]="emp" [size]="2.3"></app-employee-label>
+                </div>
+            </div>
+        </p-tabPanel>
+    </p-tabView>
+    <div class="flexed gap10 hcenter vend">
+        <app-button (onClick)="updateObservableList()" icon="cancel" label="Сбросить"
+                    model="p-button-text p-button-secondary"></app-button>
+        <app-button (onClick)="sendObservableList()" [loading]="changingTaskObservers" icon="assignment"
+                    label="Назначить"
+                    model="p-button-success"></app-button>
+    </div>
+</p-dialog>
+
+<!--Диалог назначения ответственного-->
+<p-dialog [(visible)]="showChangeResponsibleDialog" [breakpoints]="{'960px': '50vw', '640px': '100vw'}"
+          [draggable]="false" [modal]="true" [resizable]="false"
+          [style]="{width: '35rem', height: '50vh'}" header="Изменить ответственного">
+    <div class="flexed column gap10 full-height">
+        <div class="list-view stretched p5 gap5">
+            <div (click)="selectedEmployeeAsResponsible = emp" *ngFor="let emp of employeeList"
+                 [ngClass]="{selected:selectedEmployeeAsResponsible?.login === emp.login}"
+                 class="list-view-item hovered bordered flexed hcenter gap10">
+                <app-avatar [name]="emp | eplName" [src]="emp.avatar" [size]="2.3"></app-avatar>
+                <div class="flexed column">
+                    <span class="caption-main">{{emp | eplName}}</span>
+                    <span class="caption-secondary">{{emp.department?.name}}</span>
+                </div>
+                <span *ngIf="selectedEmployeeAsResponsible?.login === emp.login" class="caption-active">(Выбран)</span>
+            </div>
+        </div>
+        <div class="flexed vend hcenter gap10">
+            <app-button (onClick)="changeResponsible()" [disabled]="!selectedEmployeeAsResponsible"
+                        [loading]="selectingResponsible" icon="check" label="Изменить"></app-button>
+        </div>
+    </div>
+</p-dialog>
+
+<!--Диалог присвоения задачи-->
+<app-task-selecting-dialog #taskLinkingDialog header="Связать задачи" (onMultiplySelected)="linkToChildTasks($event)"
+                         (onSelected)="linkToParentTask($event)" [excludedTasks]="excludedTasks"
+></app-task-selecting-dialog>
+
+<!--Диалог просмотра цепочки задач-->
+<p-dialog [(visible)]="showTaskChainDialog" [breakpoints]="{'960px': '75vw', '640px': '100vw'}"
+          [draggable]="false" [maximizable]="true" [modal]="true" [resizable]="false"
+          [style]="{width: '60vw'}" header="Цепочка заявок">
+    <div [style]="{overflow:'auto',minHeight:'100%'}" appDragScrolling>
+        <p-organizationChart [value]="taskChain">
+            <ng-template let-node pTemplate="task">
+                <app-task-list-element [fullDate]="true" [item]="node.data"
+                                       [style]="{maxWidth:'45rem',minWidth:'35rem'}"></app-task-list-element>
+            </ng-template>
+        </p-organizationChart>
+    </div>
+</p-dialog>
+
+<!--Диалог редактирования информации в задаче-->
+<p-dialog [(visible)]="isShowEditTaskDialog" [breakpoints]="{'960px': '75vw', '640px': '100vw'}"
+          [draggable]="false" [modal]="true" [resizable]="false"
+          [style]="{width: '50vw', maxHeight: '70vh'}" header="Редактирование информации в задаче">
+    <div class="flexed column gap10">
+        <div [formGroup]="editTaskForm" class="flexed gap7 column">
+            <app-task-template-input *ngFor="let field of taskFields"
+                                     [field]="field" [formControlName]="field.modelItemId"
+                                     class="stretched"></app-task-template-input>
+        </div>
+        <div class="stretched"></div>
+        <div class="flexed vend hcenter sticky bottom0">
+            <app-button (onClick)="doEditTask()" [disabled]="!editTaskForm.valid" [loading]="editBlocked" icon="save"
+                        label="Сохранить" model="p-button-raised"></app-button>
+        </div>
+    </div>
+</p-dialog>
+
+<!--Диалог просмотра истории редактирования информации в задаче-->
+<p-dialog [(visible)]="isShowEditHistoryDialog" [breakpoints]="{'960px': '85vw', '640px': '100vw'}"
+          [draggable]="false" [modal]="true" [resizable]="false"
+          [style]="{width: '75vw', maxHeight: '70vh'}" header="История редактирования задачи">
+    <div class="flexed column gap10">
+        <div class="flexed hcenter vcenter gap20 p5">
+            <app-button (onClick)="changeCurrentSnapshot(-1)" icon="chevron_left" label="Предыдущий"
+                        model="p-button-text"></app-button>
+            <div *ngIf="editTaskSnapshots?.length" class="flexed column hcenter vcenter gap5">
+                <span class="flexed hcenter gap3">
+                    Время:
+                    <span class="caption-main-small">
+                        {{editTaskSnapshots[indexEditSnapshot].whenEdited | date: 'dd MMMM yyyy HH:mm'}}
+                    </span>
+                </span>
+                <span class="flexed hcenter gap6">
+                    Редактор:
+                    <app-employee-label
+                            [employee]="editTaskSnapshots[indexEditSnapshot].whoEdited"></app-employee-label>
+                </span>
+                <span class="caption-main-small">
+                    Снимок {{indexEditSnapshot + 1}} из {{editTaskSnapshots.length}}
+                </span>
+            </div>
+            <app-button (onClick)="changeCurrentSnapshot(1)" icon="chevron_right" iconPos="right" label="Следующий"
+                        model="p-button-text"></app-button>
+        </div>
+        <table class="change-comparison-table">
+            <thead>
+            <tr>
+                <th>
+                        <span class="one-line">
+                            Название поля
+                        </span>
+                </th>
+                <th>
+                        <span class="one-line">
+                            Значение до
+                        </span>
+                </th>
+                <th>
+                </th>
+                <th>
+                        <span class="one-line">
+                            Значение после
+                        </span>
+                </th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr *ngFor="let fieldPair of snapshotFieldPairs(editTaskSnapshots[indexEditSnapshot]); trackBy: trackSnapshotPair">
+                <td>
+                        <span class="caption-header one-line">
+                            {{fieldPair.before.name}}
+                        </span>
+                </td>
+                <td>
+                    <app-task-field-view [item]="fieldPair.before"></app-task-field-view>
+                </td>
+                <td>
+                        <span *ngIf="!areFieldsEqual(fieldPair.before,fieldPair.after)"
+                              class="material-icons-round caption-active">keyboard_double_arrow_right</span>
+                </td>
+                <td>
+                    <app-task-field-view [item]="fieldPair.after"></app-task-field-view>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</p-dialog>
+
+<!--Диалог для установки даты и времени актуальности задачи-->
+<p-dialog [(visible)]="isShowSchedulingDialog"
+          [draggable]="false" [modal]="true" [resizable]="false"
+          [style]="{maxHeight: '70vh'}" header="Планирование задачи">
+    <ng-template pTemplate="content">
+        <div class="flexed column gap10">
+            <p-calendar [(ngModel)]="selectedTaskDateTime" [inline]="true" [selectOtherMonths]="true"
+                        [showTime]="true"></p-calendar>
+            <app-button (onClick)="setDateTimeOfTaskRelevance()" [loading]="changingTaskDateTime"
+                        label="Установить"></app-button>
+        </div>
+    </ng-template>
+</p-dialog>
+
+<!--Диалог с активным чатом по задаче-->
+<app-chat-panel #activeChat></app-chat-panel>
+
+<p-menu #stageMenu [model]="stageMenuItems" [popup]="true" appendTo="body"></p-menu>
+
+<p-confirmPopup key="popup"></p-confirmPopup>
+
+<app-employee-insert-panel #empInsertPanel (onSelect)="insertEmployeeToCommentEditor($event)" (onReturnFocus)="forceFocusCommentInput()"></app-employee-insert-panel>
+
+<ng-template #actualFromLabel>
+    <div [pTooltip]="(currentTask?.actualFrom | date:'dd MMMM yyyy HH:mm')??''"
+         [style.color]="'#f7ce2a'" class="flexed gap3 caption-main hcenter p10" tooltipPosition="bottom">
+        <i class="mdi-today parent-inherit"></i>
+        <span>
+            Запланирована через
+        </span>
+        <span>
+            {{actualFromTime$ | async}}
+        </span>
+    </div>
+</ng-template>
+
+<ng-template #actualToLabel>
+    <div [pTooltip]="(currentTask?.actualTo | date:'dd MMMM yyyy HH:mm')??''"
+         [style.color]="'#ff512a'" class="flexed gap3 caption-main hcenter p10" tooltipPosition="bottom">
+        <i class="mdi-today parent-inherit"></i>
+        <span>
+            Срок выполнения
+        </span>
+        <span>
+            {{actualToTime$ | async}}
+        </span>
+    </div>
+</ng-template>

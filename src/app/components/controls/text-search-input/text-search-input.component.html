@@ -1,0 +1,6 @@
+<div [ngClass]="{focused:isInputFocus}" class="search-wrapper">
+    <input placeholder="Общий текстовый поиск..." (blur)="isInputFocus=false" (focus)="isInputFocus=true" (keyup)="$event.key==='Enter' && onSearch.emit(value)" (ngModelChange)="valueChange.emit($event)"
+           [(ngModel)]="value" class="search-input" type="text">
+    <app-icon-button (onClick)="clear()" [size]="1.4" icon="clear" *ngIf="value"></app-icon-button>
+    <app-icon-button (onClick)="onSearch.emit(value)" [size]="1.4" icon="search" [disabled]="!value"></app-icon-button>
+</div>

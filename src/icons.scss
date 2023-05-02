@@ -1,0 +1,6623 @@
+@mixin mdi($name) {
+  font-family: "Material Icons Round";
+  font-weight: normal;
+  font-style: normal;
+  font-size: 1.5em;
+  line-height: 1 !important;
+  letter-spacing: normal;
+  text-transform: none;
+  display: inline-block;
+  white-space: nowrap;
+  word-wrap: normal;
+  direction: ltr;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  font-feature-settings: "liga";
+  &:before {
+    content: $name;
+  }
+}
+
+.mdi{
+  &-10k{
+    @include mdi("10k");
+  }
+  &-10mp{
+    @include mdi("10mp");
+  }
+  &-11mp{
+    @include mdi("11mp");
+  }
+  &-123{
+    @include mdi("123");
+  }
+  &-12mp{
+    @include mdi("12mp");
+  }
+  &-13mp{
+    @include mdi("13mp");
+  }
+  &-14mp{
+    @include mdi("14mp");
+  }
+  &-15mp{
+    @include mdi("15mp");
+  }
+  &-16mp{
+    @include mdi("16mp");
+  }
+  &-17mp{
+    @include mdi("17mp");
+  }
+  &-18-up-rating{
+    @include mdi("18-up-rating");
+  }
+  &-18mp{
+    @include mdi("18mp");
+  }
+  &-19mp{
+    @include mdi("19mp");
+  }
+  &-1k{
+    @include mdi("1k");
+  }
+  &-1k-plus{
+    @include mdi("1k-plus");
+  }
+  &-1x_mobiledata{
+    @include mdi("1x_mobiledata");
+  }
+  &-20mp{
+    @include mdi("20mp");
+  }
+  &-21mp{
+    @include mdi("21mp");
+  }
+  &-22mp{
+    @include mdi("22mp");
+  }
+  &-23mp{
+    @include mdi("23mp");
+  }
+  &-24mp{
+    @include mdi("24mp");
+  }
+  &-2k{
+    @include mdi("2k");
+  }
+  &-2k-plus{
+    @include mdi("2k-plus");
+  }
+  &-2mp{
+    @include mdi("2mp");
+  }
+  &-30fps{
+    @include mdi("30fps");
+  }
+  &-30fps_select{
+    @include mdi("30fps_select");
+  }
+  &-360{
+    @include mdi("360");
+  }
+  &-3d_rotation{
+    @include mdi("3d_rotation");
+  }
+  &-3g_mobiledata{
+    @include mdi("3g_mobiledata");
+  }
+  &-3k{
+    @include mdi("3k");
+  }
+  &-3k_plus{
+    @include mdi("3k_plus");
+  }
+  &-3mp{
+    @include mdi("3mp");
+  }
+  &-3p{
+    @include mdi("3p");
+  }
+  &-4g_mobiledata{
+    @include mdi("4g_mobiledata");
+  }
+  &-4g_plus_mobiledata{
+    @include mdi("4g_plus_mobiledata");
+  }
+  &-4k{
+    @include mdi("4k");
+  }
+  &-4k_plus{
+    @include mdi("4k_plus");
+  }
+  &-4mp{
+    @include mdi("4mp");
+  }
+  &-5g{
+    @include mdi("5g");
+  }
+  &-5k{
+    @include mdi("5k");
+  }
+  &-5k_plus{
+    @include mdi("5k_plus");
+  }
+  &-5mp{
+    @include mdi("5mp");
+  }
+  &-60fps{
+    @include mdi("60fps");
+  }
+  &-60fps_select{
+    @include mdi("60fps_select");
+  }
+  &-6_ft_apart{
+    @include mdi("6_ft_apart");
+  }
+  &-6k{
+    @include mdi("6k");
+  }
+  &-6k_plus{
+    @include mdi("6k_plus");
+  }
+  &-6mp{
+    @include mdi("6mp");
+  }
+  &-7k{
+    @include mdi("7k");
+  }
+  &-7k_plus{
+    @include mdi("7k_plus");
+  }
+  &-7mp{
+    @include mdi("7mp");
+  }
+  &-8k{
+    @include mdi("8k");
+  }
+  &-8k_plus{
+    @include mdi("8k_plus");
+  }
+  &-8mp{
+    @include mdi("8mp");
+  }
+  &-9k{
+    @include mdi("9k");
+  }
+  &-9k_plus{
+    @include mdi("9k_plus");
+  }
+  &-9mp{
+    @include mdi("9mp");
+  }
+  &-abc{
+    @include mdi("abc");
+  }
+  &-ac_unit{
+    @include mdi("ac_unit");
+  }
+  &-access_alarm{
+    @include mdi("access_alarm");
+  }
+  &-access_alarms{
+    @include mdi("access_alarms");
+  }
+  &-access_time{
+    @include mdi("access_time");
+  }
+  &-access_time_filled{
+    @include mdi("access_time_filled");
+  }
+  &-accessibility{
+    @include mdi("accessibility");
+  }
+  &-accessibility_new{
+    @include mdi("accessibility_new");
+  }
+  &-accessible{
+    @include mdi("accessible");
+  }
+  &-accessible_forward{
+    @include mdi("accessible_forward");
+  }
+  &-account_balance{
+    @include mdi("account_balance");
+  }
+  &-account_balance_wallet{
+    @include mdi("account_balance_wallet");
+  }
+  &-account_box{
+    @include mdi("account_box");
+  }
+  &-account_circle{
+    @include mdi("account_circle");
+  }
+  &-account_tree{
+    @include mdi("account_tree");
+  }
+  &-ad_units{
+    @include mdi("ad_units");
+  }
+  &-adb{
+    @include mdi("adb");
+  }
+  &-add{
+    @include mdi("add");
+  }
+  &-add_a_photo{
+    @include mdi("add_a_photo");
+  }
+  &-add_alarm{
+    @include mdi("add_alarm");
+  }
+  &-add_alert{
+    @include mdi("add_alert");
+  }
+  &-add_box{
+    @include mdi("add_box");
+  }
+  &-add_business{
+    @include mdi("add_business");
+  }
+  &-add_card{
+    @include mdi("add_card");
+  }
+  &-add_chart{
+    @include mdi("add_chart");
+  }
+  &-add_circle{
+    @include mdi("add_circle");
+  }
+  &-add_circle_outline{
+    @include mdi("add_circle_outline");
+  }
+  &-add_comment{
+    @include mdi("add_comment");
+  }
+  &-add_home{
+    @include mdi("add_home");
+  }
+  &-add_home_work{
+    @include mdi("add_home_work");
+  }
+  &-add_ic_call{
+    @include mdi("add_ic_call");
+  }
+  &-add_link{
+    @include mdi("add_link");
+  }
+  &-add_location{
+    @include mdi("add_location");
+  }
+  &-add_location_alt{
+    @include mdi("add_location_alt");
+  }
+  &-add_moderator{
+    @include mdi("add_moderator");
+  }
+  &-add_photo_alternate{
+    @include mdi("add_photo_alternate");
+  }
+  &-add_reaction{
+    @include mdi("add_reaction");
+  }
+  &-add_road{
+    @include mdi("add_road");
+  }
+  &-add_shopping_cart{
+    @include mdi("add_shopping_cart");
+  }
+  &-add_task{
+    @include mdi("add_task");
+  }
+  &-add_to_drive{
+    @include mdi("add_to_drive");
+  }
+  &-add_to_home_screen{
+    @include mdi("add_to_home_screen");
+  }
+  &-add_to_photos{
+    @include mdi("add_to_photos");
+  }
+  &-add_to_queue{
+    @include mdi("add_to_queue");
+  }
+  &-addchart{
+    @include mdi("addchart");
+  }
+  &-adf_scanner{
+    @include mdi("adf_scanner");
+  }
+  &-adjust{
+    @include mdi("adjust");
+  }
+  &-admin_panel_settings{
+    @include mdi("admin_panel_settings");
+  }
+  &-adobe{
+    @include mdi("adobe");
+  }
+  &-ads_click{
+    @include mdi("ads_click");
+  }
+  &-agriculture{
+    @include mdi("agriculture");
+  }
+  &-air{
+    @include mdi("air");
+  }
+  &-airline_seat_flat{
+    @include mdi("airline_seat_flat");
+  }
+  &-airline_seat_flat_angled{
+    @include mdi("airline_seat_flat_angled");
+  }
+  &-airline_seat_individual_suite{
+    @include mdi("airline_seat_individual_suite");
+  }
+  &-airline_seat_legroom_extra{
+    @include mdi("airline_seat_legroom_extra");
+  }
+  &-airline_seat_legroom_normal{
+    @include mdi("airline_seat_legroom_normal");
+  }
+  &-airline_seat_legroom_reduced{
+    @include mdi("airline_seat_legroom_reduced");
+  }
+  &-airline_seat_recline_extra{
+    @include mdi("airline_seat_recline_extra");
+  }
+  &-airline_seat_recline_normal{
+    @include mdi("airline_seat_recline_normal");
+  }
+  &-airline_stops{
+    @include mdi("airline_stops");
+  }
+  &-airlines{
+    @include mdi("airlines");
+  }
+  &-airplane_ticket{
+    @include mdi("airplane_ticket");
+  }
+  &-airplanemode_active{
+    @include mdi("airplanemode_active");
+  }
+  &-airplanemode_inactive{
+    @include mdi("airplanemode_inactive");
+  }
+  &-airplanemode_off{
+    @include mdi("airplanemode_off");
+  }
+  &-airplanemode_on{
+    @include mdi("airplanemode_on");
+  }
+  &-airplay{
+    @include mdi("airplay");
+  }
+  &-airport_shuttle{
+    @include mdi("airport_shuttle");
+  }
+  &-alarm{
+    @include mdi("alarm");
+  }
+  &-alarm_add{
+    @include mdi("alarm_add");
+  }
+  &-alarm_off{
+    @include mdi("alarm_off");
+  }
+  &-alarm_on{
+    @include mdi("alarm_on");
+  }
+  &-album{
+    @include mdi("album");
+  }
+  &-align_horizontal_center{
+    @include mdi("align_horizontal_center");
+  }
+  &-align_horizontal_left{
+    @include mdi("align_horizontal_left");
+  }
+  &-align_horizontal_right{
+    @include mdi("align_horizontal_right");
+  }
+  &-align_vertical_bottom{
+    @include mdi("align_vertical_bottom");
+  }
+  &-align_vertical_center{
+    @include mdi("align_vertical_center");
+  }
+  &-align_vertical_top{
+    @include mdi("align_vertical_top");
+  }
+  &-all_inbox{
+    @include mdi("all_inbox");
+  }
+  &-all_inclusive{
+    @include mdi("all_inclusive");
+  }
+  &-all_out{
+    @include mdi("all_out");
+  }
+  &-alt_route{
+    @include mdi("alt_route");
+  }
+  &-alternate_email{
+    @include mdi("alternate_email");
+  }
+  &-amp_stories{
+    @include mdi("amp_stories");
+  }
+  &-analytics{
+    @include mdi("analytics");
+  }
+  &-anchor{
+    @include mdi("anchor");
+  }
+  &-android{
+    @include mdi("android");
+  }
+  &-animation{
+    @include mdi("animation");
+  }
+  &-announcement{
+    @include mdi("announcement");
+  }
+  &-aod{
+    @include mdi("aod");
+  }
+  &-apartment{
+    @include mdi("apartment");
+  }
+  &-api{
+    @include mdi("api");
+  }
+  &-app_blocking{
+    @include mdi("app_blocking");
+  }
+  &-app_registration{
+    @include mdi("app_registration");
+  }
+  &-app_settings_alt{
+    @include mdi("app_settings_alt");
+  }
+  &-app_shortcut{
+    @include mdi("app_shortcut");
+  }
+  &-apple{
+    @include mdi("apple");
+  }
+  &-approval{
+    @include mdi("approval");
+  }
+  &-apps{
+    @include mdi("apps");
+  }
+  &-apps_outage{
+    @include mdi("apps_outage");
+  }
+  &-architecture{
+    @include mdi("architecture");
+  }
+  &-archive{
+    @include mdi("archive");
+  }
+  &-area_chart{
+    @include mdi("area_chart");
+  }
+  &-arrow_back{
+    @include mdi("arrow_back");
+  }
+  &-arrow_back_ios{
+    @include mdi("arrow_back_ios");
+  }
+  &-arrow_back_ios_new{
+    @include mdi("arrow_back_ios_new");
+  }
+  &-arrow_circle_down{
+    @include mdi("arrow_circle_down");
+  }
+  &-arrow_circle_left{
+    @include mdi("arrow_circle_left");
+  }
+  &-arrow_circle_right{
+    @include mdi("arrow_circle_right");
+  }
+  &-arrow_circle_up{
+    @include mdi("arrow_circle_up");
+  }
+  &-arrow_downward{
+    @include mdi("arrow_downward");
+  }
+  &-arrow_drop_down{
+    @include mdi("arrow_drop_down");
+  }
+  &-arrow_drop_down_circle{
+    @include mdi("arrow_drop_down_circle");
+  }
+  &-arrow_drop_up{
+    @include mdi("arrow_drop_up");
+  }
+  &-arrow_forward{
+    @include mdi("arrow_forward");
+  }
+  &-arrow_forward_ios{
+    @include mdi("arrow_forward_ios");
+  }
+  &-arrow_left{
+    @include mdi("arrow_left");
+  }
+  &-arrow_outward{
+    @include mdi("arrow_outward");
+  }
+  &-arrow_right{
+    @include mdi("arrow_right");
+  }
+  &-arrow_right_alt{
+    @include mdi("arrow_right_alt");
+  }
+  &-arrow_upward{
+    @include mdi("arrow_upward");
+  }
+  &-art_track{
+    @include mdi("art_track");
+  }
+  &-article{
+    @include mdi("article");
+  }
+  &-aspect_ratio{
+    @include mdi("aspect_ratio");
+  }
+  &-assessment{
+    @include mdi("assessment");
+  }
+  &-assignment{
+    @include mdi("assignment");
+  }
+  &-assignment_ind{
+    @include mdi("assignment_ind");
+  }
+  &-assignment_late{
+    @include mdi("assignment_late");
+  }
+  &-assignment_return{
+    @include mdi("assignment_return");
+  }
+  &-assignment_returned{
+    @include mdi("assignment_returned");
+  }
+  &-assignment_turned_in{
+    @include mdi("assignment_turned_in");
+  }
+  &-assist_walker{
+    @include mdi("assist_walker");
+  }
+  &-assistant{
+    @include mdi("assistant");
+  }
+  &-assistant_direction{
+    @include mdi("assistant_direction");
+  }
+  &-assistant_photo{
+    @include mdi("assistant_photo");
+  }
+  &-assured_workload{
+    @include mdi("assured_workload");
+  }
+  &-atm{
+    @include mdi("atm");
+  }
+  &-attach_email{
+    @include mdi("attach_email");
+  }
+  &-attach_file{
+    @include mdi("attach_file");
+  }
+  &-attach_money{
+    @include mdi("attach_money");
+  }
+  &-attachment{
+    @include mdi("attachment");
+  }
+  &-attractions{
+    @include mdi("attractions");
+  }
+  &-attribution{
+    @include mdi("attribution");
+  }
+  &-audio_file{
+    @include mdi("audio_file");
+  }
+  &-audiotrack{
+    @include mdi("audiotrack");
+  }
+  &-auto_awesome{
+    @include mdi("auto_awesome");
+  }
+  &-auto_awesome_mosaic{
+    @include mdi("auto_awesome_mosaic");
+  }
+  &-auto_awesome_motion{
+    @include mdi("auto_awesome_motion");
+  }
+  &-auto_delete{
+    @include mdi("auto_delete");
+  }
+  &-auto_fix_high{
+    @include mdi("auto_fix_high");
+  }
+  &-auto_fix_normal{
+    @include mdi("auto_fix_normal");
+  }
+  &-auto_fix_off{
+    @include mdi("auto_fix_off");
+  }
+  &-auto_graph{
+    @include mdi("auto_graph");
+  }
+  &-auto_mode{
+    @include mdi("auto_mode");
+  }
+  &-auto_stories{
+    @include mdi("auto_stories");
+  }
+  &-autofps_select{
+    @include mdi("autofps_select");
+  }
+  &-autorenew{
+    @include mdi("autorenew");
+  }
+  &-av_timer{
+    @include mdi("av_timer");
+  }
+  &-baby_changing_station{
+    @include mdi("baby_changing_station");
+  }
+  &-back_hand{
+    @include mdi("back_hand");
+  }
+  &-backpack{
+    @include mdi("backpack");
+  }
+  &-backspace{
+    @include mdi("backspace");
+  }
+  &-backup{
+    @include mdi("backup");
+  }
+  &-backup_table{
+    @include mdi("backup_table");
+  }
+  &-badge{
+    @include mdi("badge");
+  }
+  &-bakery_dining{
+    @include mdi("bakery_dining");
+  }
+  &-balance{
+    @include mdi("balance");
+  }
+  &-balcony{
+    @include mdi("balcony");
+  }
+  &-ballot{
+    @include mdi("ballot");
+  }
+  &-bar_chart{
+    @include mdi("bar_chart");
+  }
+  &-batch_prediction{
+    @include mdi("batch_prediction");
+  }
+  &-bathroom{
+    @include mdi("bathroom");
+  }
+  &-bathtub{
+    @include mdi("bathtub");
+  }
+  &-battery_0_bar{
+    @include mdi("battery_0_bar");
+  }
+  &-battery_1_bar{
+    @include mdi("battery_1_bar");
+  }
+  &-battery_2_bar{
+    @include mdi("battery_2_bar");
+  }
+  &-battery_3_bar{
+    @include mdi("battery_3_bar");
+  }
+  &-battery_4_bar{
+    @include mdi("battery_4_bar");
+  }
+  &-battery_5_bar{
+    @include mdi("battery_5_bar");
+  }
+  &-battery_6_bar{
+    @include mdi("battery_6_bar");
+  }
+  &-battery_alert{
+    @include mdi("battery_alert");
+  }
+  &-battery_charging_full{
+    @include mdi("battery_charging_full");
+  }
+  &-battery_full{
+    @include mdi("battery_full");
+  }
+  &-battery_saver{
+    @include mdi("battery_saver");
+  }
+  &-battery_std{
+    @include mdi("battery_std");
+  }
+  &-battery_unknown{
+    @include mdi("battery_unknown");
+  }
+  &-beach_access{
+    @include mdi("beach_access");
+  }
+  &-bed{
+    @include mdi("bed");
+  }
+  &-bedroom_baby{
+    @include mdi("bedroom_baby");
+  }
+  &-bedroom_child{
+    @include mdi("bedroom_child");
+  }
+  &-bedroom_parent{
+    @include mdi("bedroom_parent");
+  }
+  &-bedtime{
+    @include mdi("bedtime");
+  }
+  &-bedtime_off{
+    @include mdi("bedtime_off");
+  }
+  &-beenhere{
+    @include mdi("beenhere");
+  }
+  &-bento{
+    @include mdi("bento");
+  }
+  &-bike_scooter{
+    @include mdi("bike_scooter");
+  }
+  &-biotech{
+    @include mdi("biotech");
+  }
+  &-blender{
+    @include mdi("blender");
+  }
+  &-blind{
+    @include mdi("blind");
+  }
+  &-blinds{
+    @include mdi("blinds");
+  }
+  &-blinds_closed{
+    @include mdi("blinds_closed");
+  }
+  &-block{
+    @include mdi("block");
+  }
+  &-bloodtype{
+    @include mdi("bloodtype");
+  }
+  &-bluetooth{
+    @include mdi("bluetooth");
+  }
+  &-bluetooth_audio{
+    @include mdi("bluetooth_audio");
+  }
+  &-bluetooth_connected{
+    @include mdi("bluetooth_connected");
+  }
+  &-bluetooth_disabled{
+    @include mdi("bluetooth_disabled");
+  }
+  &-bluetooth_drive{
+    @include mdi("bluetooth_drive");
+  }
+  &-bluetooth_searching{
+    @include mdi("bluetooth_searching");
+  }
+  &-blur_circular{
+    @include mdi("blur_circular");
+  }
+  &-blur_linear{
+    @include mdi("blur_linear");
+  }
+  &-blur_off{
+    @include mdi("blur_off");
+  }
+  &-blur_on{
+    @include mdi("blur_on");
+  }
+  &-bolt{
+    @include mdi("bolt");
+  }
+  &-book{
+    @include mdi("book");
+  }
+  &-book_online{
+    @include mdi("book_online");
+  }
+  &-bookmark{
+    @include mdi("bookmark");
+  }
+  &-bookmark_add{
+    @include mdi("bookmark_add");
+  }
+  &-bookmark_added{
+    @include mdi("bookmark_added");
+  }
+  &-bookmark_border{
+    @include mdi("bookmark_border");
+  }
+  &-bookmark_outline{
+    @include mdi("bookmark_outline");
+  }
+  &-bookmark_remove{
+    @include mdi("bookmark_remove");
+  }
+  &-bookmarks{
+    @include mdi("bookmarks");
+  }
+  &-border_all{
+    @include mdi("border_all");
+  }
+  &-border_bottom{
+    @include mdi("border_bottom");
+  }
+  &-border_clear{
+    @include mdi("border_clear");
+  }
+  &-border_color{
+    @include mdi("border_color");
+  }
+  &-border_horizontal{
+    @include mdi("border_horizontal");
+  }
+  &-border_inner{
+    @include mdi("border_inner");
+  }
+  &-border_left{
+    @include mdi("border_left");
+  }
+  &-border_outer{
+    @include mdi("border_outer");
+  }
+  &-border_right{
+    @include mdi("border_right");
+  }
+  &-border_style{
+    @include mdi("border_style");
+  }
+  &-border_top{
+    @include mdi("border_top");
+  }
+  &-border_vertical{
+    @include mdi("border_vertical");
+  }
+  &-boy{
+    @include mdi("boy");
+  }
+  &-branding_watermark{
+    @include mdi("branding_watermark");
+  }
+  &-breakfast_dining{
+    @include mdi("breakfast_dining");
+  }
+  &-brightness_1{
+    @include mdi("brightness_1");
+  }
+  &-brightness_2{
+    @include mdi("brightness_2");
+  }
+  &-brightness_3{
+    @include mdi("brightness_3");
+  }
+  &-brightness_4{
+    @include mdi("brightness_4");
+  }
+  &-brightness_5{
+    @include mdi("brightness_5");
+  }
+  &-brightness_6{
+    @include mdi("brightness_6");
+  }
+  &-brightness_7{
+    @include mdi("brightness_7");
+  }
+  &-brightness_auto{
+    @include mdi("brightness_auto");
+  }
+  &-brightness_high{
+    @include mdi("brightness_high");
+  }
+  &-brightness_low{
+    @include mdi("brightness_low");
+  }
+  &-brightness_medium{
+    @include mdi("brightness_medium");
+  }
+  &-broadcast_on_home{
+    @include mdi("broadcast_on_home");
+  }
+  &-broadcast_on_personal{
+    @include mdi("broadcast_on_personal");
+  }
+  &-broken_image{
+    @include mdi("broken_image");
+  }
+  &-browse_gallery{
+    @include mdi("browse_gallery");
+  }
+  &-browser_not_supported{
+    @include mdi("browser_not_supported");
+  }
+  &-browser_updated{
+    @include mdi("browser_updated");
+  }
+  &-brunch_dining{
+    @include mdi("brunch_dining");
+  }
+  &-brush{
+    @include mdi("brush");
+  }
+  &-bubble_chart{
+    @include mdi("bubble_chart");
+  }
+  &-bug_report{
+    @include mdi("bug_report");
+  }
+  &-build{
+    @include mdi("build");
+  }
+  &-build_circle{
+    @include mdi("build_circle");
+  }
+  &-bungalow{
+    @include mdi("bungalow");
+  }
+  &-burst_mode{
+    @include mdi("burst_mode");
+  }
+  &-bus_alert{
+    @include mdi("bus_alert");
+  }
+  &-business{
+    @include mdi("business");
+  }
+  &-business_center{
+    @include mdi("business_center");
+  }
+  &-cabin{
+    @include mdi("cabin");
+  }
+  &-cable{
+    @include mdi("cable");
+  }
+  &-cached{
+    @include mdi("cached");
+  }
+  &-cake{
+    @include mdi("cake");
+  }
+  &-calculate{
+    @include mdi("calculate");
+  }
+  &-calendar_month{
+    @include mdi("calendar_month");
+  }
+  &-calendar_today{
+    @include mdi("calendar_today");
+  }
+  &-calendar_view_day{
+    @include mdi("calendar_view_day");
+  }
+  &-calendar_view_month{
+    @include mdi("calendar_view_month");
+  }
+  &-calendar_view_week{
+    @include mdi("calendar_view_week");
+  }
+  &-call{
+    @include mdi("call");
+  }
+  &-call_end{
+    @include mdi("call_end");
+  }
+  &-call_made{
+    @include mdi("call_made");
+  }
+  &-call_merge{
+    @include mdi("call_merge");
+  }
+  &-call_missed{
+    @include mdi("call_missed");
+  }
+  &-call_missed_outgoing{
+    @include mdi("call_missed_outgoing");
+  }
+  &-call_received{
+    @include mdi("call_received");
+  }
+  &-call_split{
+    @include mdi("call_split");
+  }
+  &-call_to_action{
+    @include mdi("call_to_action");
+  }
+  &-camera{
+    @include mdi("camera");
+  }
+  &-camera_alt{
+    @include mdi("camera_alt");
+  }
+  &-camera_enhance{
+    @include mdi("camera_enhance");
+  }
+  &-camera_front{
+    @include mdi("camera_front");
+  }
+  &-camera_indoor{
+    @include mdi("camera_indoor");
+  }
+  &-camera_outdoor{
+    @include mdi("camera_outdoor");
+  }
+  &-camera_rear{
+    @include mdi("camera_rear");
+  }
+  &-camera_roll{
+    @include mdi("camera_roll");
+  }
+  &-cameraswitch{
+    @include mdi("cameraswitch");
+  }
+  &-campaign{
+    @include mdi("campaign");
+  }
+  &-cancel{
+    @include mdi("cancel");
+  }
+  &-cancel_presentation{
+    @include mdi("cancel_presentation");
+  }
+  &-cancel_schedule_send{
+    @include mdi("cancel_schedule_send");
+  }
+  &-candlestick_chart{
+    @include mdi("candlestick_chart");
+  }
+  &-car_crash{
+    @include mdi("car_crash");
+  }
+  &-car_rental{
+    @include mdi("car_rental");
+  }
+  &-car_repair{
+    @include mdi("car_repair");
+  }
+  &-card_giftcard{
+    @include mdi("card_giftcard");
+  }
+  &-card_membership{
+    @include mdi("card_membership");
+  }
+  &-card_travel{
+    @include mdi("card_travel");
+  }
+  &-carpenter{
+    @include mdi("carpenter");
+  }
+  &-cases{
+    @include mdi("cases");
+  }
+  &-casino{
+    @include mdi("casino");
+  }
+  &-cast{
+    @include mdi("cast");
+  }
+  &-cast_connected{
+    @include mdi("cast_connected");
+  }
+  &-cast_for_education{
+    @include mdi("cast_for_education");
+  }
+  &-castle{
+    @include mdi("castle");
+  }
+  &-catching_pokemon{
+    @include mdi("catching_pokemon");
+  }
+  &-category{
+    @include mdi("category");
+  }
+  &-celebration{
+    @include mdi("celebration");
+  }
+  &-cell_tower{
+    @include mdi("cell_tower");
+  }
+  &-cell_wifi{
+    @include mdi("cell_wifi");
+  }
+  &-center_focus_strong{
+    @include mdi("center_focus_strong");
+  }
+  &-center_focus_weak{
+    @include mdi("center_focus_weak");
+  }
+  &-chair{
+    @include mdi("chair");
+  }
+  &-chair_alt{
+    @include mdi("chair_alt");
+  }
+  &-chalet{
+    @include mdi("chalet");
+  }
+  &-change_circle{
+    @include mdi("change_circle");
+  }
+  &-change_history{
+    @include mdi("change_history");
+  }
+  &-charging_station{
+    @include mdi("charging_station");
+  }
+  &-chat{
+    @include mdi("chat");
+  }
+  &-chat_bubble{
+    @include mdi("chat_bubble");
+  }
+  &-chat_bubble_outline{
+    @include mdi("chat_bubble_outline");
+  }
+  &-check{
+    @include mdi("check");
+  }
+  &-check_box{
+    @include mdi("check_box");
+  }
+  &-check_box_outline_blank{
+    @include mdi("check_box_outline_blank");
+  }
+  &-check_circle{
+    @include mdi("check_circle");
+  }
+  &-check_circle_outline{
+    @include mdi("check_circle_outline");
+  }
+  &-checklist{
+    @include mdi("checklist");
+  }
+  &-checklist_rtl{
+    @include mdi("checklist_rtl");
+  }
+  &-checkroom{
+    @include mdi("checkroom");
+  }
+  &-chevron_left{
+    @include mdi("chevron_left");
+  }
+  &-chevron_right{
+    @include mdi("chevron_right");
+  }
+  &-child_care{
+    @include mdi("child_care");
+  }
+  &-child_friendly{
+    @include mdi("child_friendly");
+  }
+  &-chrome_reader_mode{
+    @include mdi("chrome_reader_mode");
+  }
+  &-church{
+    @include mdi("church");
+  }
+  &-circle{
+    @include mdi("circle");
+  }
+  &-circle_notifications{
+    @include mdi("circle_notifications");
+  }
+  &-class{
+    @include mdi("class");
+  }
+  &-clean_hands{
+    @include mdi("clean_hands");
+  }
+  &-cleaning_services{
+    @include mdi("cleaning_services");
+  }
+  &-clear{
+    @include mdi("clear");
+  }
+  &-clear_all{
+    @include mdi("clear_all");
+  }
+  &-close{
+    @include mdi("close");
+  }
+  &-close_fullscreen{
+    @include mdi("close_fullscreen");
+  }
+  &-closed_caption{
+    @include mdi("closed_caption");
+  }
+  &-closed_caption_disabled{
+    @include mdi("closed_caption_disabled");
+  }
+  &-closed_caption_off{
+    @include mdi("closed_caption_off");
+  }
+  &-cloud{
+    @include mdi("cloud");
+  }
+  &-cloud_circle{
+    @include mdi("cloud_circle");
+  }
+  &-cloud_done{
+    @include mdi("cloud_done");
+  }
+  &-cloud_download{
+    @include mdi("cloud_download");
+  }
+  &-cloud_off{
+    @include mdi("cloud_off");
+  }
+  &-cloud_queue{
+    @include mdi("cloud_queue");
+  }
+  &-cloud_sync{
+    @include mdi("cloud_sync");
+  }
+  &-cloud_upload{
+    @include mdi("cloud_upload");
+  }
+  &-co2{
+    @include mdi("co2");
+  }
+  &-co_present{
+    @include mdi("co_present");
+  }
+  &-code{
+    @include mdi("code");
+  }
+  &-code_off{
+    @include mdi("code_off");
+  }
+  &-coffee{
+    @include mdi("coffee");
+  }
+  &-coffee_maker{
+    @include mdi("coffee_maker");
+  }
+  &-collections{
+    @include mdi("collections");
+  }
+  &-collections_bookmark{
+    @include mdi("collections_bookmark");
+  }
+  &-color_lens{
+    @include mdi("color_lens");
+  }
+  &-colorize{
+    @include mdi("colorize");
+  }
+  &-comment{
+    @include mdi("comment");
+  }
+  &-comment_bank{
+    @include mdi("comment_bank");
+  }
+  &-comments_disabled{
+    @include mdi("comments_disabled");
+  }
+  &-commit{
+    @include mdi("commit");
+  }
+  &-commute{
+    @include mdi("commute");
+  }
+  &-compare{
+    @include mdi("compare");
+  }
+  &-compare_arrows{
+    @include mdi("compare_arrows");
+  }
+  &-compass_calibration{
+    @include mdi("compass_calibration");
+  }
+  &-compost{
+    @include mdi("compost");
+  }
+  &-compress{
+    @include mdi("compress");
+  }
+  &-computer{
+    @include mdi("computer");
+  }
+  &-confirmation_num{
+    @include mdi("confirmation_num");
+  }
+  &-confirmation_number{
+    @include mdi("confirmation_number");
+  }
+  &-connect_without_contact{
+    @include mdi("connect_without_contact");
+  }
+  &-connected_tv{
+    @include mdi("connected_tv");
+  }
+  &-connecting_airports{
+    @include mdi("connecting_airports");
+  }
+  &-construction{
+    @include mdi("construction");
+  }
+  &-contact_emergency{
+    @include mdi("contact_emergency");
+  }
+  &-contact_mail{
+    @include mdi("contact_mail");
+  }
+  &-contact_page{
+    @include mdi("contact_page");
+  }
+  &-contact_phone{
+    @include mdi("contact_phone");
+  }
+  &-contact_support{
+    @include mdi("contact_support");
+  }
+  &-contactless{
+    @include mdi("contactless");
+  }
+  &-contacts{
+    @include mdi("contacts");
+  }
+  &-content_copy{
+    @include mdi("content_copy");
+  }
+  &-content_cut{
+    @include mdi("content_cut");
+  }
+  &-content_paste{
+    @include mdi("content_paste");
+  }
+  &-content_paste_go{
+    @include mdi("content_paste_go");
+  }
+  &-content_paste_off{
+    @include mdi("content_paste_off");
+  }
+  &-content_paste_search{
+    @include mdi("content_paste_search");
+  }
+  &-contrast{
+    @include mdi("contrast");
+  }
+  &-control_camera{
+    @include mdi("control_camera");
+  }
+  &-control_point{
+    @include mdi("control_point");
+  }
+  &-control_point_duplicate{
+    @include mdi("control_point_duplicate");
+  }
+  &-cookie{
+    @include mdi("cookie");
+  }
+  &-copy{
+    @include mdi("copy");
+  }
+  &-copy_all{
+    @include mdi("copy_all");
+  }
+  &-copyright{
+    @include mdi("copyright");
+  }
+  &-coronavirus{
+    @include mdi("coronavirus");
+  }
+  &-corporate_fare{
+    @include mdi("corporate_fare");
+  }
+  &-cottage{
+    @include mdi("cottage");
+  }
+  &-countertops{
+    @include mdi("countertops");
+  }
+  &-create{
+    @include mdi("create");
+  }
+  &-create_new_folder{
+    @include mdi("create_new_folder");
+  }
+  &-credit_card{
+    @include mdi("credit_card");
+  }
+  &-credit_card_off{
+    @include mdi("credit_card_off");
+  }
+  &-credit_score{
+    @include mdi("credit_score");
+  }
+  &-crib{
+    @include mdi("crib");
+  }
+  &-crisis_alert{
+    @include mdi("crisis_alert");
+  }
+  &-crop{
+    @include mdi("crop");
+  }
+  &-crop_16_9{
+    @include mdi("crop_16_9");
+  }
+  &-crop_3_2{
+    @include mdi("crop_3_2");
+  }
+  &-crop_5_4{
+    @include mdi("crop_5_4");
+  }
+  &-crop_7_5{
+    @include mdi("crop_7_5");
+  }
+  &-crop_din{
+    @include mdi("crop_din");
+  }
+  &-crop_free{
+    @include mdi("crop_free");
+  }
+  &-crop_landscape{
+    @include mdi("crop_landscape");
+  }
+  &-crop_original{
+    @include mdi("crop_original");
+  }
+  &-crop_portrait{
+    @include mdi("crop_portrait");
+  }
+  &-crop_rotate{
+    @include mdi("crop_rotate");
+  }
+  &-crop_square{
+    @include mdi("crop_square");
+  }
+  &-cruelty_free{
+    @include mdi("cruelty_free");
+  }
+  &-css{
+    @include mdi("css");
+  }
+  &-currency_bitcoin{
+    @include mdi("currency_bitcoin");
+  }
+  &-currency_exchange{
+    @include mdi("currency_exchange");
+  }
+  &-currency_franc{
+    @include mdi("currency_franc");
+  }
+  &-currency_lira{
+    @include mdi("currency_lira");
+  }
+  &-currency_pound{
+    @include mdi("currency_pound");
+  }
+  &-currency_ruble{
+    @include mdi("currency_ruble");
+  }
+  &-currency_rupee{
+    @include mdi("currency_rupee");
+  }
+  &-currency_yen{
+    @include mdi("currency_yen");
+  }
+  &-currency_yuan{
+    @include mdi("currency_yuan");
+  }
+  &-curtains{
+    @include mdi("curtains");
+  }
+  &-curtains_closed{
+    @include mdi("curtains_closed");
+  }
+  &-cut{
+    @include mdi("cut");
+  }
+  &-cyclone{
+    @include mdi("cyclone");
+  }
+  &-dangerous{
+    @include mdi("dangerous");
+  }
+  &-dark_mode{
+    @include mdi("dark_mode");
+  }
+  &-dashboard{
+    @include mdi("dashboard");
+  }
+  &-dashboard_customize{
+    @include mdi("dashboard_customize");
+  }
+  &-data_array{
+    @include mdi("data_array");
+  }
+  &-data_exploration{
+    @include mdi("data_exploration");
+  }
+  &-data_object{
+    @include mdi("data_object");
+  }
+  &-data_saver_off{
+    @include mdi("data_saver_off");
+  }
+  &-data_saver_on{
+    @include mdi("data_saver_on");
+  }
+  &-data_thresholding{
+    @include mdi("data_thresholding");
+  }
+  &-data_usage{
+    @include mdi("data_usage");
+  }
+  &-dataset{
+    @include mdi("dataset");
+  }
+  &-dataset_linked{
+    @include mdi("dataset_linked");
+  }
+  &-date_range{
+    @include mdi("date_range");
+  }
+  &-deblur{
+    @include mdi("deblur");
+  }
+  &-deck{
+    @include mdi("deck");
+  }
+  &-dehaze{
+    @include mdi("dehaze");
+  }
+  &-delete{
+    @include mdi("delete");
+  }
+  &-delete_forever{
+    @include mdi("delete_forever");
+  }
+  &-delete_outline{
+    @include mdi("delete_outline");
+  }
+  &-delete_sweep{
+    @include mdi("delete_sweep");
+  }
+  &-delivery_dining{
+    @include mdi("delivery_dining");
+  }
+  &-density_large{
+    @include mdi("density_large");
+  }
+  &-density_medium{
+    @include mdi("density_medium");
+  }
+  &-density_small{
+    @include mdi("density_small");
+  }
+  &-departure_board{
+    @include mdi("departure_board");
+  }
+  &-description{
+    @include mdi("description");
+  }
+  &-deselect{
+    @include mdi("deselect");
+  }
+  &-design_services{
+    @include mdi("design_services");
+  }
+  &-desk{
+    @include mdi("desk");
+  }
+  &-desktop_access_disabled{
+    @include mdi("desktop_access_disabled");
+  }
+  &-desktop_mac{
+    @include mdi("desktop_mac");
+  }
+  &-desktop_windows{
+    @include mdi("desktop_windows");
+  }
+  &-details{
+    @include mdi("details");
+  }
+  &-developer_board{
+    @include mdi("developer_board");
+  }
+  &-developer_board_off{
+    @include mdi("developer_board_off");
+  }
+  &-developer_mode{
+    @include mdi("developer_mode");
+  }
+  &-device_hub{
+    @include mdi("device_hub");
+  }
+  &-device_thermostat{
+    @include mdi("device_thermostat");
+  }
+  &-device_unknown{
+    @include mdi("device_unknown");
+  }
+  &-devices{
+    @include mdi("devices");
+  }
+  &-devices_fold{
+    @include mdi("devices_fold");
+  }
+  &-devices_other{
+    @include mdi("devices_other");
+  }
+  &-dialer_sip{
+    @include mdi("dialer_sip");
+  }
+  &-dialpad{
+    @include mdi("dialpad");
+  }
+  &-diamond{
+    @include mdi("diamond");
+  }
+  &-difference{
+    @include mdi("difference");
+  }
+  &-dining{
+    @include mdi("dining");
+  }
+  &-dinner_dining{
+    @include mdi("dinner_dining");
+  }
+  &-directions{
+    @include mdi("directions");
+  }
+  &-directions_bike{
+    @include mdi("directions_bike");
+  }
+  &-directions_boat{
+    @include mdi("directions_boat");
+  }
+  &-directions_boat_filled{
+    @include mdi("directions_boat_filled");
+  }
+  &-directions_bus{
+    @include mdi("directions_bus");
+  }
+  &-directions_bus_filled{
+    @include mdi("directions_bus_filled");
+  }
+  &-directions_car{
+    @include mdi("directions_car");
+  }
+  &-directions_car_filled{
+    @include mdi("directions_car_filled");
+  }
+  &-directions_ferry{
+    @include mdi("directions_ferry");
+  }
+  &-directions_off{
+    @include mdi("directions_off");
+  }
+  &-directions_railway{
+    @include mdi("directions_railway");
+  }
+  &-directions_railway_filled{
+    @include mdi("directions_railway_filled");
+  }
+  &-directions_run{
+    @include mdi("directions_run");
+  }
+  &-directions_subway{
+    @include mdi("directions_subway");
+  }
+  &-directions_subway_filled{
+    @include mdi("directions_subway_filled");
+  }
+  &-directions_train{
+    @include mdi("directions_train");
+  }
+  &-directions_transit{
+    @include mdi("directions_transit");
+  }
+  &-directions_transit_filled{
+    @include mdi("directions_transit_filled");
+  }
+  &-directions_walk{
+    @include mdi("directions_walk");
+  }
+  &-dirty_lens{
+    @include mdi("dirty_lens");
+  }
+  &-disabled_by_default{
+    @include mdi("disabled_by_default");
+  }
+  &-disabled_visible{
+    @include mdi("disabled_visible");
+  }
+  &-disc_full{
+    @include mdi("disc_full");
+  }
+  &-discord{
+    @include mdi("discord");
+  }
+  &-discount{
+    @include mdi("discount");
+  }
+  &-display_settings{
+    @include mdi("display_settings");
+  }
+  &-diversity_1{
+    @include mdi("diversity_1");
+  }
+  &-diversity_2{
+    @include mdi("diversity_2");
+  }
+  &-diversity_3{
+    @include mdi("diversity_3");
+  }
+  &-dnd_forwardslash{
+    @include mdi("dnd_forwardslash");
+  }
+  &-dns{
+    @include mdi("dns");
+  }
+  &-do_disturb{
+    @include mdi("do_disturb");
+  }
+  &-do_disturb_alt{
+    @include mdi("do_disturb_alt");
+  }
+  &-do_disturb_off{
+    @include mdi("do_disturb_off");
+  }
+  &-do_disturb_on{
+    @include mdi("do_disturb_on");
+  }
+  &-do_not_disturb{
+    @include mdi("do_not_disturb");
+  }
+  &-do_not_disturb_alt{
+    @include mdi("do_not_disturb_alt");
+  }
+  &-do_not_disturb_off{
+    @include mdi("do_not_disturb_off");
+  }
+  &-do_not_disturb_on{
+    @include mdi("do_not_disturb_on");
+  }
+  &-do_not_disturb_on_total_silence{
+    @include mdi("do_not_disturb_on_total_silence");
+  }
+  &-do_not_step{
+    @include mdi("do_not_step");
+  }
+  &-do_not_touch{
+    @include mdi("do_not_touch");
+  }
+  &-dock{
+    @include mdi("dock");
+  }
+  &-document_scanner{
+    @include mdi("document_scanner");
+  }
+  &-domain{
+    @include mdi("domain");
+  }
+  &-domain_add{
+    @include mdi("domain_add");
+  }
+  &-domain_disabled{
+    @include mdi("domain_disabled");
+  }
+  &-domain_verification{
+    @include mdi("domain_verification");
+  }
+  &-done{
+    @include mdi("done");
+  }
+  &-done_all{
+    @include mdi("done_all");
+  }
+  &-done_outline{
+    @include mdi("done_outline");
+  }
+  &-donut_large{
+    @include mdi("donut_large");
+  }
+  &-donut_small{
+    @include mdi("donut_small");
+  }
+  &-door_back{
+    @include mdi("door_back");
+  }
+  &-door_front{
+    @include mdi("door_front");
+  }
+  &-door_sliding{
+    @include mdi("door_sliding");
+  }
+  &-doorbell{
+    @include mdi("doorbell");
+  }
+  &-double_arrow{
+    @include mdi("double_arrow");
+  }
+  &-downhill_skiing{
+    @include mdi("downhill_skiing");
+  }
+  &-download{
+    @include mdi("download");
+  }
+  &-download_done{
+    @include mdi("download_done");
+  }
+  &-download_for_offline{
+    @include mdi("download_for_offline");
+  }
+  &-downloading{
+    @include mdi("downloading");
+  }
+  &-drafts{
+    @include mdi("drafts");
+  }
+  &-drag_handle{
+    @include mdi("drag_handle");
+  }
+  &-drag_indicator{
+    @include mdi("drag_indicator");
+  }
+  &-draw{
+    @include mdi("draw");
+  }
+  &-drive_eta{
+    @include mdi("drive_eta");
+  }
+  &-drive_file_move{
+    @include mdi("drive_file_move");
+  }
+  &-drive_file_move_rtl{
+    @include mdi("drive_file_move_rtl");
+  }
+  &-drive_file_rename_outline{
+    @include mdi("drive_file_rename_outline");
+  }
+  &-drive_folder_upload{
+    @include mdi("drive_folder_upload");
+  }
+  &-dry{
+    @include mdi("dry");
+  }
+  &-dry_cleaning{
+    @include mdi("dry_cleaning");
+  }
+  &-duo{
+    @include mdi("duo");
+  }
+  &-dvr{
+    @include mdi("dvr");
+  }
+  &-dynamic_feed{
+    @include mdi("dynamic_feed");
+  }
+  &-dynamic_form{
+    @include mdi("dynamic_form");
+  }
+  &-e_mobiledata{
+    @include mdi("e_mobiledata");
+  }
+  &-earbuds{
+    @include mdi("earbuds");
+  }
+  &-earbuds_battery{
+    @include mdi("earbuds_battery");
+  }
+  &-east{
+    @include mdi("east");
+  }
+  &-eco{
+    @include mdi("eco");
+  }
+  &-edgesensor_high{
+    @include mdi("edgesensor_high");
+  }
+  &-edgesensor_low{
+    @include mdi("edgesensor_low");
+  }
+  &-edit{
+    @include mdi("edit");
+  }
+  &-edit_attributes{
+    @include mdi("edit_attributes");
+  }
+  &-edit_calendar{
+    @include mdi("edit_calendar");
+  }
+  &-edit_location{
+    @include mdi("edit_location");
+  }
+  &-edit_location_alt{
+    @include mdi("edit_location_alt");
+  }
+  &-edit_note{
+    @include mdi("edit_note");
+  }
+  &-edit_notifications{
+    @include mdi("edit_notifications");
+  }
+  &-edit_off{
+    @include mdi("edit_off");
+  }
+  &-edit_road{
+    @include mdi("edit_road");
+  }
+  &-egg{
+    @include mdi("egg");
+  }
+  &-egg_alt{
+    @include mdi("egg_alt");
+  }
+  &-eject{
+    @include mdi("eject");
+  }
+  &-elderly{
+    @include mdi("elderly");
+  }
+  &-elderly_woman{
+    @include mdi("elderly_woman");
+  }
+  &-electric_bike{
+    @include mdi("electric_bike");
+  }
+  &-electric_bolt{
+    @include mdi("electric_bolt");
+  }
+  &-electric_car{
+    @include mdi("electric_car");
+  }
+  &-electric_meter{
+    @include mdi("electric_meter");
+  }
+  &-electric_moped{
+    @include mdi("electric_moped");
+  }
+  &-electric_rickshaw{
+    @include mdi("electric_rickshaw");
+  }
+  &-electric_scooter{
+    @include mdi("electric_scooter");
+  }
+  &-electrical_services{
+    @include mdi("electrical_services");
+  }
+  &-elevator{
+    @include mdi("elevator");
+  }
+  &-email{
+    @include mdi("email");
+  }
+  &-emergency{
+    @include mdi("emergency");
+  }
+  &-emergency_recording{
+    @include mdi("emergency_recording");
+  }
+  &-emergency_share{
+    @include mdi("emergency_share");
+  }
+  &-emoji_emotions{
+    @include mdi("emoji_emotions");
+  }
+  &-emoji_events{
+    @include mdi("emoji_events");
+  }
+  &-emoji_flags{
+    @include mdi("emoji_flags");
+  }
+  &-emoji_food_beverage{
+    @include mdi("emoji_food_beverage");
+  }
+  &-emoji_nature{
+    @include mdi("emoji_nature");
+  }
+  &-emoji_objects{
+    @include mdi("emoji_objects");
+  }
+  &-emoji_people{
+    @include mdi("emoji_people");
+  }
+  &-emoji_symbols{
+    @include mdi("emoji_symbols");
+  }
+  &-emoji_transportation{
+    @include mdi("emoji_transportation");
+  }
+  &-energy_savings_leaf{
+    @include mdi("energy_savings_leaf");
+  }
+  &-engineering{
+    @include mdi("engineering");
+  }
+  &-enhance_photo_translate{
+    @include mdi("enhance_photo_translate");
+  }
+  &-enhanced_encryption{
+    @include mdi("enhanced_encryption");
+  }
+  &-equalizer{
+    @include mdi("equalizer");
+  }
+  &-error{
+    @include mdi("error");
+  }
+  &-error_outline{
+    @include mdi("error_outline");
+  }
+  &-escalator{
+    @include mdi("escalator");
+  }
+  &-escalator_warning{
+    @include mdi("escalator_warning");
+  }
+  &-euro{
+    @include mdi("euro");
+  }
+  &-euro_symbol{
+    @include mdi("euro_symbol");
+  }
+  &-ev_station{
+    @include mdi("ev_station");
+  }
+  &-event{
+    @include mdi("event");
+  }
+  &-event_available{
+    @include mdi("event_available");
+  }
+  &-event_busy{
+    @include mdi("event_busy");
+  }
+  &-event_note{
+    @include mdi("event_note");
+  }
+  &-event_repeat{
+    @include mdi("event_repeat");
+  }
+  &-event_seat{
+    @include mdi("event_seat");
+  }
+  &-exit_to_app{
+    @include mdi("exit_to_app");
+  }
+  &-expand{
+    @include mdi("expand");
+  }
+  &-expand_circle_down{
+    @include mdi("expand_circle_down");
+  }
+  &-expand_less{
+    @include mdi("expand_less");
+  }
+  &-expand_more{
+    @include mdi("expand_more");
+  }
+  &-explicit{
+    @include mdi("explicit");
+  }
+  &-explore{
+    @include mdi("explore");
+  }
+  &-explore_off{
+    @include mdi("explore_off");
+  }
+  &-exposure{
+    @include mdi("exposure");
+  }
+  &-exposure_minus_1{
+    @include mdi("exposure_minus_1");
+  }
+  &-exposure_minus_2{
+    @include mdi("exposure_minus_2");
+  }
+  &-exposure_neg_1{
+    @include mdi("exposure_neg_1");
+  }
+  &-exposure_neg_2{
+    @include mdi("exposure_neg_2");
+  }
+  &-exposure_plus_1{
+    @include mdi("exposure_plus_1");
+  }
+  &-exposure_plus_2{
+    @include mdi("exposure_plus_2");
+  }
+  &-exposure_zero{
+    @include mdi("exposure_zero");
+  }
+  &-extension{
+    @include mdi("extension");
+  }
+  &-extension_off{
+    @include mdi("extension_off");
+  }
+  &-face{
+    @include mdi("face");
+  }
+  &-face_2{
+    @include mdi("face_2");
+  }
+  &-face_3{
+    @include mdi("face_3");
+  }
+  &-face_4{
+    @include mdi("face_4");
+  }
+  &-face_5{
+    @include mdi("face_5");
+  }
+  &-face_6{
+    @include mdi("face_6");
+  }
+  &-face_retouching_natural{
+    @include mdi("face_retouching_natural");
+  }
+  &-face_retouching_off{
+    @include mdi("face_retouching_off");
+  }
+  &-face_unlock{
+    @include mdi("face_unlock");
+  }
+  &-facebook{
+    @include mdi("facebook");
+  }
+  &-fact_check{
+    @include mdi("fact_check");
+  }
+  &-factory{
+    @include mdi("factory");
+  }
+  &-family_restroom{
+    @include mdi("family_restroom");
+  }
+  &-fast_forward{
+    @include mdi("fast_forward");
+  }
+  &-fast_rewind{
+    @include mdi("fast_rewind");
+  }
+  &-fastfood{
+    @include mdi("fastfood");
+  }
+  &-favorite{
+    @include mdi("favorite");
+  }
+  &-favorite_border{
+    @include mdi("favorite_border");
+  }
+  &-favorite_outline{
+    @include mdi("favorite_outline");
+  }
+  &-fax{
+    @include mdi("fax");
+  }
+  &-featured_play_list{
+    @include mdi("featured_play_list");
+  }
+  &-featured_video{
+    @include mdi("featured_video");
+  }
+  &-feed{
+    @include mdi("feed");
+  }
+  &-feedback{
+    @include mdi("feedback");
+  }
+  &-female{
+    @include mdi("female");
+  }
+  &-fence{
+    @include mdi("fence");
+  }
+  &-festival{
+    @include mdi("festival");
+  }
+  &-fiber_dvr{
+    @include mdi("fiber_dvr");
+  }
+  &-fiber_manual_record{
+    @include mdi("fiber_manual_record");
+  }
+  &-fiber_new{
+    @include mdi("fiber_new");
+  }
+  &-fiber_pin{
+    @include mdi("fiber_pin");
+  }
+  &-fiber_smart_record{
+    @include mdi("fiber_smart_record");
+  }
+  &-file_copy{
+    @include mdi("file_copy");
+  }
+  &-file_download{
+    @include mdi("file_download");
+  }
+  &-file_download_done{
+    @include mdi("file_download_done");
+  }
+  &-file_download_off{
+    @include mdi("file_download_off");
+  }
+  &-file_open{
+    @include mdi("file_open");
+  }
+  &-file_present{
+    @include mdi("file_present");
+  }
+  &-file_upload{
+    @include mdi("file_upload");
+  }
+  &-filter{
+    @include mdi("filter");
+  }
+  &-filter_1{
+    @include mdi("filter_1");
+  }
+  &-filter_2{
+    @include mdi("filter_2");
+  }
+  &-filter_3{
+    @include mdi("filter_3");
+  }
+  &-filter_4{
+    @include mdi("filter_4");
+  }
+  &-filter_5{
+    @include mdi("filter_5");
+  }
+  &-filter_6{
+    @include mdi("filter_6");
+  }
+  &-filter_7{
+    @include mdi("filter_7");
+  }
+  &-filter_8{
+    @include mdi("filter_8");
+  }
+  &-filter_9{
+    @include mdi("filter_9");
+  }
+  &-filter_9_plus{
+    @include mdi("filter_9_plus");
+  }
+  &-filter_alt{
+    @include mdi("filter_alt");
+  }
+  &-filter_alt_off{
+    @include mdi("filter_alt_off");
+  }
+  &-filter_b_and_w{
+    @include mdi("filter_b_and_w");
+  }
+  &-filter_center_focus{
+    @include mdi("filter_center_focus");
+  }
+  &-filter_drama{
+    @include mdi("filter_drama");
+  }
+  &-filter_frames{
+    @include mdi("filter_frames");
+  }
+  &-filter_hdr{
+    @include mdi("filter_hdr");
+  }
+  &-filter_list{
+    @include mdi("filter_list");
+  }
+  &-filter_list_off{
+    @include mdi("filter_list_off");
+  }
+  &-filter_none{
+    @include mdi("filter_none");
+  }
+  &-filter_tilt_shift{
+    @include mdi("filter_tilt_shift");
+  }
+  &-filter_vintage{
+    @include mdi("filter_vintage");
+  }
+  &-find_in_page{
+    @include mdi("find_in_page");
+  }
+  &-find_replace{
+    @include mdi("find_replace");
+  }
+  &-fingerprint{
+    @include mdi("fingerprint");
+  }
+  &-fire_extinguisher{
+    @include mdi("fire_extinguisher");
+  }
+  &-fire_hydrant_alt{
+    @include mdi("fire_hydrant_alt");
+  }
+  &-fire_truck{
+    @include mdi("fire_truck");
+  }
+  &-fireplace{
+    @include mdi("fireplace");
+  }
+  &-first_page{
+    @include mdi("first_page");
+  }
+  &-fit_screen{
+    @include mdi("fit_screen");
+  }
+  &-fitbit{
+    @include mdi("fitbit");
+  }
+  &-fitness_center{
+    @include mdi("fitness_center");
+  }
+  &-flag{
+    @include mdi("flag");
+  }
+  &-flag_circle{
+    @include mdi("flag_circle");
+  }
+  &-flaky{
+    @include mdi("flaky");
+  }
+  &-flare{
+    @include mdi("flare");
+  }
+  &-flash_auto{
+    @include mdi("flash_auto");
+  }
+  &-flash_off{
+    @include mdi("flash_off");
+  }
+  &-flash_on{
+    @include mdi("flash_on");
+  }
+  &-flashlight_off{
+    @include mdi("flashlight_off");
+  }
+  &-flashlight_on{
+    @include mdi("flashlight_on");
+  }
+  &-flatware{
+    @include mdi("flatware");
+  }
+  &-flight{
+    @include mdi("flight");
+  }
+  &-flight_class{
+    @include mdi("flight_class");
+  }
+  &-flight_land{
+    @include mdi("flight_land");
+  }
+  &-flight_takeoff{
+    @include mdi("flight_takeoff");
+  }
+  &-flip{
+    @include mdi("flip");
+  }
+  &-flip_camera_android{
+    @include mdi("flip_camera_android");
+  }
+  &-flip_camera_ios{
+    @include mdi("flip_camera_ios");
+  }
+  &-flip_to_back{
+    @include mdi("flip_to_back");
+  }
+  &-flip_to_front{
+    @include mdi("flip_to_front");
+  }
+  &-flood{
+    @include mdi("flood");
+  }
+  &-flourescent{
+    @include mdi("flourescent");
+  }
+  &-fluorescent{
+    @include mdi("fluorescent");
+  }
+  &-flutter_dash{
+    @include mdi("flutter_dash");
+  }
+  &-fmd_bad{
+    @include mdi("fmd_bad");
+  }
+  &-fmd_good{
+    @include mdi("fmd_good");
+  }
+  &-folder{
+    @include mdi("folder");
+  }
+  &-folder_copy{
+    @include mdi("folder_copy");
+  }
+  &-folder_delete{
+    @include mdi("folder_delete");
+  }
+  &-folder_off{
+    @include mdi("folder_off");
+  }
+  &-folder_open{
+    @include mdi("folder_open");
+  }
+  &-folder_shared{
+    @include mdi("folder_shared");
+  }
+  &-folder_special{
+    @include mdi("folder_special");
+  }
+  &-folder_zip{
+    @include mdi("folder_zip");
+  }
+  &-follow_the_signs{
+    @include mdi("follow_the_signs");
+  }
+  &-font_download{
+    @include mdi("font_download");
+  }
+  &-font_download_off{
+    @include mdi("font_download_off");
+  }
+  &-food_bank{
+    @include mdi("food_bank");
+  }
+  &-forest{
+    @include mdi("forest");
+  }
+  &-fork_left{
+    @include mdi("fork_left");
+  }
+  &-fork_right{
+    @include mdi("fork_right");
+  }
+  &-format_align_center{
+    @include mdi("format_align_center");
+  }
+  &-format_align_justify{
+    @include mdi("format_align_justify");
+  }
+  &-format_align_left{
+    @include mdi("format_align_left");
+  }
+  &-format_align_right{
+    @include mdi("format_align_right");
+  }
+  &-format_bold{
+    @include mdi("format_bold");
+  }
+  &-format_clear{
+    @include mdi("format_clear");
+  }
+  &-format_color_fill{
+    @include mdi("format_color_fill");
+  }
+  &-format_color_reset{
+    @include mdi("format_color_reset");
+  }
+  &-format_color_text{
+    @include mdi("format_color_text");
+  }
+  &-format_indent_decrease{
+    @include mdi("format_indent_decrease");
+  }
+  &-format_indent_increase{
+    @include mdi("format_indent_increase");
+  }
+  &-format_italic{
+    @include mdi("format_italic");
+  }
+  &-format_line_spacing{
+    @include mdi("format_line_spacing");
+  }
+  &-format_list_bulleted{
+    @include mdi("format_list_bulleted");
+  }
+  &-format_list_numbered{
+    @include mdi("format_list_numbered");
+  }
+  &-format_list_numbered_rtl{
+    @include mdi("format_list_numbered_rtl");
+  }
+  &-format_overline{
+    @include mdi("format_overline");
+  }
+  &-format_paint{
+    @include mdi("format_paint");
+  }
+  &-format_quote{
+    @include mdi("format_quote");
+  }
+  &-format_shapes{
+    @include mdi("format_shapes");
+  }
+  &-format_size{
+    @include mdi("format_size");
+  }
+  &-format_strikethrough{
+    @include mdi("format_strikethrough");
+  }
+  &-format_textdirection_l_to_r{
+    @include mdi("format_textdirection_l_to_r");
+  }
+  &-format_textdirection_r_to_l{
+    @include mdi("format_textdirection_r_to_l");
+  }
+  &-format_underline{
+    @include mdi("format_underline");
+  }
+  &-format_underlined{
+    @include mdi("format_underlined");
+  }
+  &-fort{
+    @include mdi("fort");
+  }
+  &-forum{
+    @include mdi("forum");
+  }
+  &-forward{
+    @include mdi("forward");
+  }
+  &-forward_10{
+    @include mdi("forward_10");
+  }
+  &-forward_30{
+    @include mdi("forward_30");
+  }
+  &-forward_5{
+    @include mdi("forward_5");
+  }
+  &-forward_to_inbox{
+    @include mdi("forward_to_inbox");
+  }
+  &-foundation{
+    @include mdi("foundation");
+  }
+  &-free_breakfast{
+    @include mdi("free_breakfast");
+  }
+  &-free_cancellation{
+    @include mdi("free_cancellation");
+  }
+  &-front_hand{
+    @include mdi("front_hand");
+  }
+  &-fullscreen{
+    @include mdi("fullscreen");
+  }
+  &-fullscreen_exit{
+    @include mdi("fullscreen_exit");
+  }
+  &-functions{
+    @include mdi("functions");
+  }
+  &-g_mobiledata{
+    @include mdi("g_mobiledata");
+  }
+  &-g_translate{
+    @include mdi("g_translate");
+  }
+  &-gamepad{
+    @include mdi("gamepad");
+  }
+  &-games{
+    @include mdi("games");
+  }
+  &-garage{
+    @include mdi("garage");
+  }
+  &-gas_meter{
+    @include mdi("gas_meter");
+  }
+  &-gavel{
+    @include mdi("gavel");
+  }
+  &-generating_tokens{
+    @include mdi("generating_tokens");
+  }
+  &-gesture{
+    @include mdi("gesture");
+  }
+  &-get_app{
+    @include mdi("get_app");
+  }
+  &-gif{
+    @include mdi("gif");
+  }
+  &-gif_box{
+    @include mdi("gif_box");
+  }
+  &-girl{
+    @include mdi("girl");
+  }
+  &-gite{
+    @include mdi("gite");
+  }
+  &-golf_course{
+    @include mdi("golf_course");
+  }
+  &-gpp_bad{
+    @include mdi("gpp_bad");
+  }
+  &-gpp_good{
+    @include mdi("gpp_good");
+  }
+  &-gpp_maybe{
+    @include mdi("gpp_maybe");
+  }
+  &-gps_fixed{
+    @include mdi("gps_fixed");
+  }
+  &-gps_not_fixed{
+    @include mdi("gps_not_fixed");
+  }
+  &-gps_off{
+    @include mdi("gps_off");
+  }
+  &-grade{
+    @include mdi("grade");
+  }
+  &-gradient{
+    @include mdi("gradient");
+  }
+  &-grading{
+    @include mdi("grading");
+  }
+  &-grain{
+    @include mdi("grain");
+  }
+  &-graphic_eq{
+    @include mdi("graphic_eq");
+  }
+  &-grass{
+    @include mdi("grass");
+  }
+  &-grid_3x3{
+    @include mdi("grid_3x3");
+  }
+  &-grid_4x4{
+    @include mdi("grid_4x4");
+  }
+  &-grid_goldenratio{
+    @include mdi("grid_goldenratio");
+  }
+  &-grid_off{
+    @include mdi("grid_off");
+  }
+  &-grid_on{
+    @include mdi("grid_on");
+  }
+  &-grid_view{
+    @include mdi("grid_view");
+  }
+  &-group{
+    @include mdi("group");
+  }
+  &-group_add{
+    @include mdi("group_add");
+  }
+  &-group_off{
+    @include mdi("group_off");
+  }
+  &-group_remove{
+    @include mdi("group_remove");
+  }
+  &-group_work{
+    @include mdi("group_work");
+  }
+  &-groups{
+    @include mdi("groups");
+  }
+  &-groups_2{
+    @include mdi("groups_2");
+  }
+  &-groups_3{
+    @include mdi("groups_3");
+  }
+  &-h_mobiledata{
+    @include mdi("h_mobiledata");
+  }
+  &-h_plus_mobiledata{
+    @include mdi("h_plus_mobiledata");
+  }
+  &-hail{
+    @include mdi("hail");
+  }
+  &-handshake{
+    @include mdi("handshake");
+  }
+  &-handyman{
+    @include mdi("handyman");
+  }
+  &-hardware{
+    @include mdi("hardware");
+  }
+  &-hd{
+    @include mdi("hd");
+  }
+  &-hdr_auto{
+    @include mdi("hdr_auto");
+  }
+  &-hdr_auto_select{
+    @include mdi("hdr_auto_select");
+  }
+  &-hdr_enhanced_select{
+    @include mdi("hdr_enhanced_select");
+  }
+  &-hdr_off{
+    @include mdi("hdr_off");
+  }
+  &-hdr_off_select{
+    @include mdi("hdr_off_select");
+  }
+  &-hdr_on{
+    @include mdi("hdr_on");
+  }
+  &-hdr_on_select{
+    @include mdi("hdr_on_select");
+  }
+  &-hdr_plus{
+    @include mdi("hdr_plus");
+  }
+  &-hdr_strong{
+    @include mdi("hdr_strong");
+  }
+  &-hdr_weak{
+    @include mdi("hdr_weak");
+  }
+  &-headphones{
+    @include mdi("headphones");
+  }
+  &-headphones_battery{
+    @include mdi("headphones_battery");
+  }
+  &-headset{
+    @include mdi("headset");
+  }
+  &-headset_mic{
+    @include mdi("headset_mic");
+  }
+  &-headset_off{
+    @include mdi("headset_off");
+  }
+  &-healing{
+    @include mdi("healing");
+  }
+  &-health_and_safety{
+    @include mdi("health_and_safety");
+  }
+  &-hearing{
+    @include mdi("hearing");
+  }
+  &-hearing_disabled{
+    @include mdi("hearing_disabled");
+  }
+  &-heart_broken{
+    @include mdi("heart_broken");
+  }
+  &-heat_pump{
+    @include mdi("heat_pump");
+  }
+  &-height{
+    @include mdi("height");
+  }
+  &-help{
+    @include mdi("help");
+  }
+  &-help_center{
+    @include mdi("help_center");
+  }
+  &-help_outline{
+    @include mdi("help_outline");
+  }
+  &-hevc{
+    @include mdi("hevc");
+  }
+  &-hexagon{
+    @include mdi("hexagon");
+  }
+  &-hide_image{
+    @include mdi("hide_image");
+  }
+  &-hide_source{
+    @include mdi("hide_source");
+  }
+  &-high_quality{
+    @include mdi("high_quality");
+  }
+  &-highlight{
+    @include mdi("highlight");
+  }
+  &-highlight_alt{
+    @include mdi("highlight_alt");
+  }
+  &-highlight_off{
+    @include mdi("highlight_off");
+  }
+  &-highlight_remove{
+    @include mdi("highlight_remove");
+  }
+  &-hiking{
+    @include mdi("hiking");
+  }
+  &-history{
+    @include mdi("history");
+  }
+  &-history_edu{
+    @include mdi("history_edu");
+  }
+  &-history_toggle_off{
+    @include mdi("history_toggle_off");
+  }
+  &-hive{
+    @include mdi("hive");
+  }
+  &-hls{
+    @include mdi("hls");
+  }
+  &-hls_off{
+    @include mdi("hls_off");
+  }
+  &-holiday_village{
+    @include mdi("holiday_village");
+  }
+  &-home{
+    @include mdi("home");
+  }
+  &-home_max{
+    @include mdi("home_max");
+  }
+  &-home_mini{
+    @include mdi("home_mini");
+  }
+  &-home_repair_service{
+    @include mdi("home_repair_service");
+  }
+  &-home_work{
+    @include mdi("home_work");
+  }
+  &-horizontal_distribute{
+    @include mdi("horizontal_distribute");
+  }
+  &-horizontal_rule{
+    @include mdi("horizontal_rule");
+  }
+  &-horizontal_split{
+    @include mdi("horizontal_split");
+  }
+  &-hot_tub{
+    @include mdi("hot_tub");
+  }
+  &-hotel{
+    @include mdi("hotel");
+  }
+  &-hotel_class{
+    @include mdi("hotel_class");
+  }
+  &-hourglass_bottom{
+    @include mdi("hourglass_bottom");
+  }
+  &-hourglass_disabled{
+    @include mdi("hourglass_disabled");
+  }
+  &-hourglass_empty{
+    @include mdi("hourglass_empty");
+  }
+  &-hourglass_full{
+    @include mdi("hourglass_full");
+  }
+  &-hourglass_top{
+    @include mdi("hourglass_top");
+  }
+  &-house{
+    @include mdi("house");
+  }
+  &-house_siding{
+    @include mdi("house_siding");
+  }
+  &-houseboat{
+    @include mdi("houseboat");
+  }
+  &-how_to_reg{
+    @include mdi("how_to_reg");
+  }
+  &-how_to_vote{
+    @include mdi("how_to_vote");
+  }
+  &-html{
+    @include mdi("html");
+  }
+  &-http{
+    @include mdi("http");
+  }
+  &-https{
+    @include mdi("https");
+  }
+  &-hub{
+    @include mdi("hub");
+  }
+  &-hvac{
+    @include mdi("hvac");
+  }
+  &-ice_skating{
+    @include mdi("ice_skating");
+  }
+  &-icecream{
+    @include mdi("icecream");
+  }
+  &-image{
+    @include mdi("image");
+  }
+  &-image_aspect_ratio{
+    @include mdi("image_aspect_ratio");
+  }
+  &-image_not_supported{
+    @include mdi("image_not_supported");
+  }
+  &-image_search{
+    @include mdi("image_search");
+  }
+  &-imagesearch_roller{
+    @include mdi("imagesearch_roller");
+  }
+  &-import_contacts{
+    @include mdi("import_contacts");
+  }
+  &-import_export{
+    @include mdi("import_export");
+  }
+  &-important_devices{
+    @include mdi("important_devices");
+  }
+  &-inbox{
+    @include mdi("inbox");
+  }
+  &-incomplete_circle{
+    @include mdi("incomplete_circle");
+  }
+  &-indeterminate_check_box{
+    @include mdi("indeterminate_check_box");
+  }
+  &-info{
+    @include mdi("info");
+  }
+  &-info_outline{
+    @include mdi("info_outline");
+  }
+  &-input{
+    @include mdi("input");
+  }
+  &-insert_chart{
+    @include mdi("insert_chart");
+  }
+  &-insert_chart_outlined{
+    @include mdi("insert_chart_outlined");
+  }
+  &-insert_comment{
+    @include mdi("insert_comment");
+  }
+  &-insert_drive_file{
+    @include mdi("insert_drive_file");
+  }
+  &-insert_emoticon{
+    @include mdi("insert_emoticon");
+  }
+  &-insert_invitation{
+    @include mdi("insert_invitation");
+  }
+  &-insert_link{
+    @include mdi("insert_link");
+  }
+  &-insert_page_break{
+    @include mdi("insert_page_break");
+  }
+  &-insert_photo{
+    @include mdi("insert_photo");
+  }
+  &-insights{
+    @include mdi("insights");
+  }
+  &-install_desktop{
+    @include mdi("install_desktop");
+  }
+  &-install_mobile{
+    @include mdi("install_mobile");
+  }
+  &-integration_instructions{
+    @include mdi("integration_instructions");
+  }
+  &-interests{
+    @include mdi("interests");
+  }
+  &-interpreter_mode{
+    @include mdi("interpreter_mode");
+  }
+  &-inventory{
+    @include mdi("inventory");
+  }
+  &-inventory_2{
+    @include mdi("inventory_2");
+  }
+  &-invert_colors{
+    @include mdi("invert_colors");
+  }
+  &-invert_colors_off{
+    @include mdi("invert_colors_off");
+  }
+  &-invert_colors_on{
+    @include mdi("invert_colors_on");
+  }
+  &-ios_share{
+    @include mdi("ios_share");
+  }
+  &-iron{
+    @include mdi("iron");
+  }
+  &-iso{
+    @include mdi("iso");
+  }
+  &-javascript{
+    @include mdi("javascript");
+  }
+  &-join_full{
+    @include mdi("join_full");
+  }
+  &-join_inner{
+    @include mdi("join_inner");
+  }
+  &-join_left{
+    @include mdi("join_left");
+  }
+  &-join_right{
+    @include mdi("join_right");
+  }
+  &-kayaking{
+    @include mdi("kayaking");
+  }
+  &-kebab_dining{
+    @include mdi("kebab_dining");
+  }
+  &-key{
+    @include mdi("key");
+  }
+  &-key_off{
+    @include mdi("key_off");
+  }
+  &-keyboard{
+    @include mdi("keyboard");
+  }
+  &-keyboard_alt{
+    @include mdi("keyboard_alt");
+  }
+  &-keyboard_arrow_down{
+    @include mdi("keyboard_arrow_down");
+  }
+  &-keyboard_arrow_left{
+    @include mdi("keyboard_arrow_left");
+  }
+  &-keyboard_arrow_right{
+    @include mdi("keyboard_arrow_right");
+  }
+  &-keyboard_arrow_up{
+    @include mdi("keyboard_arrow_up");
+  }
+  &-keyboard_backspace{
+    @include mdi("keyboard_backspace");
+  }
+  &-keyboard_capslock{
+    @include mdi("keyboard_capslock");
+  }
+  &-keyboard_command_key{
+    @include mdi("keyboard_command_key");
+  }
+  &-keyboard_control{
+    @include mdi("keyboard_control");
+  }
+  &-keyboard_control_key{
+    @include mdi("keyboard_control_key");
+  }
+  &-keyboard_double_arrow_down{
+    @include mdi("keyboard_double_arrow_down");
+  }
+  &-keyboard_double_arrow_left{
+    @include mdi("keyboard_double_arrow_left");
+  }
+  &-keyboard_double_arrow_right{
+    @include mdi("keyboard_double_arrow_right");
+  }
+  &-keyboard_double_arrow_up{
+    @include mdi("keyboard_double_arrow_up");
+  }
+  &-keyboard_hide{
+    @include mdi("keyboard_hide");
+  }
+  &-keyboard_option_key{
+    @include mdi("keyboard_option_key");
+  }
+  &-keyboard_return{
+    @include mdi("keyboard_return");
+  }
+  &-keyboard_tab{
+    @include mdi("keyboard_tab");
+  }
+  &-keyboard_voice{
+    @include mdi("keyboard_voice");
+  }
+  &-king_bed{
+    @include mdi("king_bed");
+  }
+  &-kitchen{
+    @include mdi("kitchen");
+  }
+  &-kitesurfing{
+    @include mdi("kitesurfing");
+  }
+  &-label{
+    @include mdi("label");
+  }
+  &-label_important{
+    @include mdi("label_important");
+  }
+  &-label_important_outline{
+    @include mdi("label_important_outline");
+  }
+  &-label_off{
+    @include mdi("label_off");
+  }
+  &-label_outline{
+    @include mdi("label_outline");
+  }
+  &-lan{
+    @include mdi("lan");
+  }
+  &-landscape{
+    @include mdi("landscape");
+  }
+  &-landslide{
+    @include mdi("landslide");
+  }
+  &-language{
+    @include mdi("language");
+  }
+  &-laptop{
+    @include mdi("laptop");
+  }
+  &-laptop_chromebook{
+    @include mdi("laptop_chromebook");
+  }
+  &-laptop_mac{
+    @include mdi("laptop_mac");
+  }
+  &-laptop_windows{
+    @include mdi("laptop_windows");
+  }
+  &-last_page{
+    @include mdi("last_page");
+  }
+  &-launch{
+    @include mdi("launch");
+  }
+  &-layers{
+    @include mdi("layers");
+  }
+  &-layers_clear{
+    @include mdi("layers_clear");
+  }
+  &-leaderboard{
+    @include mdi("leaderboard");
+  }
+  &-leak_add{
+    @include mdi("leak_add");
+  }
+  &-leak_remove{
+    @include mdi("leak_remove");
+  }
+  &-leave_bags_at_home{
+    @include mdi("leave_bags_at_home");
+  }
+  &-legend_toggle{
+    @include mdi("legend_toggle");
+  }
+  &-lens{
+    @include mdi("lens");
+  }
+  &-lens_blur{
+    @include mdi("lens_blur");
+  }
+  &-library_add{
+    @include mdi("library_add");
+  }
+  &-library_add_check{
+    @include mdi("library_add_check");
+  }
+  &-library_books{
+    @include mdi("library_books");
+  }
+  &-library_music{
+    @include mdi("library_music");
+  }
+  &-light{
+    @include mdi("light");
+  }
+  &-light_mode{
+    @include mdi("light_mode");
+  }
+  &-lightbulb{
+    @include mdi("lightbulb");
+  }
+  &-lightbulb_circle{
+    @include mdi("lightbulb_circle");
+  }
+  &-lightbulb_outline{
+    @include mdi("lightbulb_outline");
+  }
+  &-line_axis{
+    @include mdi("line_axis");
+  }
+  &-line_style{
+    @include mdi("line_style");
+  }
+  &-line_weight{
+    @include mdi("line_weight");
+  }
+  &-linear_scale{
+    @include mdi("linear_scale");
+  }
+  &-link{
+    @include mdi("link");
+  }
+  &-link_off{
+    @include mdi("link_off");
+  }
+  &-linked_camera{
+    @include mdi("linked_camera");
+  }
+  &-liquor{
+    @include mdi("liquor");
+  }
+  &-list{
+    @include mdi("list");
+  }
+  &-list_alt{
+    @include mdi("list_alt");
+  }
+  &-live_help{
+    @include mdi("live_help");
+  }
+  &-live_tv{
+    @include mdi("live_tv");
+  }
+  &-living{
+    @include mdi("living");
+  }
+  &-local_activity{
+    @include mdi("local_activity");
+  }
+  &-local_airport{
+    @include mdi("local_airport");
+  }
+  &-local_atm{
+    @include mdi("local_atm");
+  }
+  &-local_attraction{
+    @include mdi("local_attraction");
+  }
+  &-local_bar{
+    @include mdi("local_bar");
+  }
+  &-local_cafe{
+    @include mdi("local_cafe");
+  }
+  &-local_car_wash{
+    @include mdi("local_car_wash");
+  }
+  &-local_convenience_store{
+    @include mdi("local_convenience_store");
+  }
+  &-local_dining{
+    @include mdi("local_dining");
+  }
+  &-local_drink{
+    @include mdi("local_drink");
+  }
+  &-local_fire_department{
+    @include mdi("local_fire_department");
+  }
+  &-local_florist{
+    @include mdi("local_florist");
+  }
+  &-local_gas_station{
+    @include mdi("local_gas_station");
+  }
+  &-local_grocery_store{
+    @include mdi("local_grocery_store");
+  }
+  &-local_hospital{
+    @include mdi("local_hospital");
+  }
+  &-local_hotel{
+    @include mdi("local_hotel");
+  }
+  &-local_laundry_service{
+    @include mdi("local_laundry_service");
+  }
+  &-local_library{
+    @include mdi("local_library");
+  }
+  &-local_mall{
+    @include mdi("local_mall");
+  }
+  &-local_movies{
+    @include mdi("local_movies");
+  }
+  &-local_offer{
+    @include mdi("local_offer");
+  }
+  &-local_parking{
+    @include mdi("local_parking");
+  }
+  &-local_pharmacy{
+    @include mdi("local_pharmacy");
+  }
+  &-local_phone{
+    @include mdi("local_phone");
+  }
+  &-local_pizza{
+    @include mdi("local_pizza");
+  }
+  &-local_play{
+    @include mdi("local_play");
+  }
+  &-local_police{
+    @include mdi("local_police");
+  }
+  &-local_post_office{
+    @include mdi("local_post_office");
+  }
+  &-local_print_shop{
+    @include mdi("local_print_shop");
+  }
+  &-local_printshop{
+    @include mdi("local_printshop");
+  }
+  &-local_restaurant{
+    @include mdi("local_restaurant");
+  }
+  &-local_see{
+    @include mdi("local_see");
+  }
+  &-local_shipping{
+    @include mdi("local_shipping");
+  }
+  &-local_taxi{
+    @include mdi("local_taxi");
+  }
+  &-location_city{
+    @include mdi("location_city");
+  }
+  &-location_disabled{
+    @include mdi("location_disabled");
+  }
+  &-location_history{
+    @include mdi("location_history");
+  }
+  &-location_off{
+    @include mdi("location_off");
+  }
+  &-location_on{
+    @include mdi("location_on");
+  }
+  &-location_searching{
+    @include mdi("location_searching");
+  }
+  &-lock{
+    @include mdi("lock");
+  }
+  &-lock_clock{
+    @include mdi("lock_clock");
+  }
+  &-lock_open{
+    @include mdi("lock_open");
+  }
+  &-lock_outline{
+    @include mdi("lock_outline");
+  }
+  &-lock_person{
+    @include mdi("lock_person");
+  }
+  &-lock_reset{
+    @include mdi("lock_reset");
+  }
+  &-login{
+    @include mdi("login");
+  }
+  &-logo_dev{
+    @include mdi("logo_dev");
+  }
+  &-logout{
+    @include mdi("logout");
+  }
+  &-looks{
+    @include mdi("looks");
+  }
+  &-looks_3{
+    @include mdi("looks_3");
+  }
+  &-looks_4{
+    @include mdi("looks_4");
+  }
+  &-looks_5{
+    @include mdi("looks_5");
+  }
+  &-looks_6{
+    @include mdi("looks_6");
+  }
+  &-looks_one{
+    @include mdi("looks_one");
+  }
+  &-looks_two{
+    @include mdi("looks_two");
+  }
+  &-loop{
+    @include mdi("loop");
+  }
+  &-loupe{
+    @include mdi("loupe");
+  }
+  &-low_priority{
+    @include mdi("low_priority");
+  }
+  &-loyalty{
+    @include mdi("loyalty");
+  }
+  &-lte_mobiledata{
+    @include mdi("lte_mobiledata");
+  }
+  &-lte_plus_mobiledata{
+    @include mdi("lte_plus_mobiledata");
+  }
+  &-luggage{
+    @include mdi("luggage");
+  }
+  &-lunch_dining{
+    @include mdi("lunch_dining");
+  }
+  &-lyrics{
+    @include mdi("lyrics");
+  }
+  &-macro_off{
+    @include mdi("macro_off");
+  }
+  &-mail{
+    @include mdi("mail");
+  }
+  &-mail_lock{
+    @include mdi("mail_lock");
+  }
+  &-mail_outline{
+    @include mdi("mail_outline");
+  }
+  &-male{
+    @include mdi("male");
+  }
+  &-man{
+    @include mdi("man");
+  }
+  &-man_2{
+    @include mdi("man_2");
+  }
+  &-man_3{
+    @include mdi("man_3");
+  }
+  &-man_4{
+    @include mdi("man_4");
+  }
+  &-manage_accounts{
+    @include mdi("manage_accounts");
+  }
+  &-manage_history{
+    @include mdi("manage_history");
+  }
+  &-manage_search{
+    @include mdi("manage_search");
+  }
+  &-map{
+    @include mdi("map");
+  }
+  &-maps_home_work{
+    @include mdi("maps_home_work");
+  }
+  &-maps_ugc{
+    @include mdi("maps_ugc");
+  }
+  &-margin{
+    @include mdi("margin");
+  }
+  &-mark_as_unread{
+    @include mdi("mark_as_unread");
+  }
+  &-mark_chat_read{
+    @include mdi("mark_chat_read");
+  }
+  &-mark_chat_unread{
+    @include mdi("mark_chat_unread");
+  }
+  &-mark_email_read{
+    @include mdi("mark_email_read");
+  }
+  &-mark_email_unread{
+    @include mdi("mark_email_unread");
+  }
+  &-mark_unread_chat_alt{
+    @include mdi("mark_unread_chat_alt");
+  }
+  &-markunread{
+    @include mdi("markunread");
+  }
+  &-markunread_mailbox{
+    @include mdi("markunread_mailbox");
+  }
+  &-masks{
+    @include mdi("masks");
+  }
+  &-maximize{
+    @include mdi("maximize");
+  }
+  &-media_bluetooth_off{
+    @include mdi("media_bluetooth_off");
+  }
+  &-media_bluetooth_on{
+    @include mdi("media_bluetooth_on");
+  }
+  &-mediation{
+    @include mdi("mediation");
+  }
+  &-medical_information{
+    @include mdi("medical_information");
+  }
+  &-medical_services{
+    @include mdi("medical_services");
+  }
+  &-medication{
+    @include mdi("medication");
+  }
+  &-medication_liquid{
+    @include mdi("medication_liquid");
+  }
+  &-meeting_room{
+    @include mdi("meeting_room");
+  }
+  &-memory{
+    @include mdi("memory");
+  }
+  &-menu{
+    @include mdi("menu");
+  }
+  &-menu_book{
+    @include mdi("menu_book");
+  }
+  &-menu_open{
+    @include mdi("menu_open");
+  }
+  &-merge{
+    @include mdi("merge");
+  }
+  &-merge_type{
+    @include mdi("merge_type");
+  }
+  &-message{
+    @include mdi("message");
+  }
+  &-messenger{
+    @include mdi("messenger");
+  }
+  &-messenger_outline{
+    @include mdi("messenger_outline");
+  }
+  &-mic{
+    @include mdi("mic");
+  }
+  &-mic_external_off{
+    @include mdi("mic_external_off");
+  }
+  &-mic_external_on{
+    @include mdi("mic_external_on");
+  }
+  &-mic_none{
+    @include mdi("mic_none");
+  }
+  &-mic_off{
+    @include mdi("mic_off");
+  }
+  &-microwave{
+    @include mdi("microwave");
+  }
+  &-military_tech{
+    @include mdi("military_tech");
+  }
+  &-minimize{
+    @include mdi("minimize");
+  }
+  &-minor_crash{
+    @include mdi("minor_crash");
+  }
+  &-miscellaneous_services{
+    @include mdi("miscellaneous_services");
+  }
+  &-missed_video_call{
+    @include mdi("missed_video_call");
+  }
+  &-mms{
+    @include mdi("mms");
+  }
+  &-mobile_friendly{
+    @include mdi("mobile_friendly");
+  }
+  &-mobile_off{
+    @include mdi("mobile_off");
+  }
+  &-mobile_screen_share{
+    @include mdi("mobile_screen_share");
+  }
+  &-mobiledata_off{
+    @include mdi("mobiledata_off");
+  }
+  &-mode{
+    @include mdi("mode");
+  }
+  &-mode_comment{
+    @include mdi("mode_comment");
+  }
+  &-mode_edit{
+    @include mdi("mode_edit");
+  }
+  &-mode_edit_outline{
+    @include mdi("mode_edit_outline");
+  }
+  &-mode_fan_off{
+    @include mdi("mode_fan_off");
+  }
+  &-mode_night{
+    @include mdi("mode_night");
+  }
+  &-mode_of_travel{
+    @include mdi("mode_of_travel");
+  }
+  &-mode_standby{
+    @include mdi("mode_standby");
+  }
+  &-model_training{
+    @include mdi("model_training");
+  }
+  &-monetization_on{
+    @include mdi("monetization_on");
+  }
+  &-money{
+    @include mdi("money");
+  }
+  &-money_off{
+    @include mdi("money_off");
+  }
+  &-money_off_csred{
+    @include mdi("money_off_csred");
+  }
+  &-monitor{
+    @include mdi("monitor");
+  }
+  &-monitor_heart{
+    @include mdi("monitor_heart");
+  }
+  &-monitor_weight{
+    @include mdi("monitor_weight");
+  }
+  &-monochrome_photos{
+    @include mdi("monochrome_photos");
+  }
+  &-mood{
+    @include mdi("mood");
+  }
+  &-mood_bad{
+    @include mdi("mood_bad");
+  }
+  &-moped{
+    @include mdi("moped");
+  }
+  &-more{
+    @include mdi("more");
+  }
+  &-more_horiz{
+    @include mdi("more_horiz");
+  }
+  &-more_time{
+    @include mdi("more_time");
+  }
+  &-more_vert{
+    @include mdi("more_vert");
+  }
+  &-mosque{
+    @include mdi("mosque");
+  }
+  &-motion_photos_auto{
+    @include mdi("motion_photos_auto");
+  }
+  &-motion_photos_off{
+    @include mdi("motion_photos_off");
+  }
+  &-motion_photos_on{
+    @include mdi("motion_photos_on");
+  }
+  &-motion_photos_pause{
+    @include mdi("motion_photos_pause");
+  }
+  &-motion_photos_paused{
+    @include mdi("motion_photos_paused");
+  }
+  &-motorcycle{
+    @include mdi("motorcycle");
+  }
+  &-mouse{
+    @include mdi("mouse");
+  }
+  &-move_down{
+    @include mdi("move_down");
+  }
+  &-move_to_inbox{
+    @include mdi("move_to_inbox");
+  }
+  &-move_up{
+    @include mdi("move_up");
+  }
+  &-movie{
+    @include mdi("movie");
+  }
+  &-movie_creation{
+    @include mdi("movie_creation");
+  }
+  &-movie_filter{
+    @include mdi("movie_filter");
+  }
+  &-moving{
+    @include mdi("moving");
+  }
+  &-mp{
+    @include mdi("mp");
+  }
+  &-multiline_chart{
+    @include mdi("multiline_chart");
+  }
+  &-multiple_stop{
+    @include mdi("multiple_stop");
+  }
+  &-multitrack_audio{
+    @include mdi("multitrack_audio");
+  }
+  &-museum{
+    @include mdi("museum");
+  }
+  &-music_note{
+    @include mdi("music_note");
+  }
+  &-music_off{
+    @include mdi("music_off");
+  }
+  &-music_video{
+    @include mdi("music_video");
+  }
+  &-my_library_add{
+    @include mdi("my_library_add");
+  }
+  &-my_library_books{
+    @include mdi("my_library_books");
+  }
+  &-my_library_music{
+    @include mdi("my_library_music");
+  }
+  &-my_location{
+    @include mdi("my_location");
+  }
+  &-nat{
+    @include mdi("nat");
+  }
+  &-nature{
+    @include mdi("nature");
+  }
+  &-nature_people{
+    @include mdi("nature_people");
+  }
+  &-navigate_before{
+    @include mdi("navigate_before");
+  }
+  &-navigate_next{
+    @include mdi("navigate_next");
+  }
+  &-navigation{
+    @include mdi("navigation");
+  }
+  &-near_me{
+    @include mdi("near_me");
+  }
+  &-near_me_disabled{
+    @include mdi("near_me_disabled");
+  }
+  &-nearby_error{
+    @include mdi("nearby_error");
+  }
+  &-nearby_off{
+    @include mdi("nearby_off");
+  }
+  &-nest_cam_wired_stand{
+    @include mdi("nest_cam_wired_stand");
+  }
+  &-network_cell{
+    @include mdi("network_cell");
+  }
+  &-network_check{
+    @include mdi("network_check");
+  }
+  &-network_locked{
+    @include mdi("network_locked");
+  }
+  &-network_ping{
+    @include mdi("network_ping");
+  }
+  &-network_wifi{
+    @include mdi("network_wifi");
+  }
+  &-network_wifi_1_bar{
+    @include mdi("network_wifi_1_bar");
+  }
+  &-network_wifi_2_bar{
+    @include mdi("network_wifi_2_bar");
+  }
+  &-network_wifi_3_bar{
+    @include mdi("network_wifi_3_bar");
+  }
+  &-new_label{
+    @include mdi("new_label");
+  }
+  &-new_releases{
+    @include mdi("new_releases");
+  }
+  &-newspaper{
+    @include mdi("newspaper");
+  }
+  &-next_plan{
+    @include mdi("next_plan");
+  }
+  &-next_week{
+    @include mdi("next_week");
+  }
+  &-nfc{
+    @include mdi("nfc");
+  }
+  &-night_shelter{
+    @include mdi("night_shelter");
+  }
+  &-nightlife{
+    @include mdi("nightlife");
+  }
+  &-nightlight{
+    @include mdi("nightlight");
+  }
+  &-nightlight_round{
+    @include mdi("nightlight_round");
+  }
+  &-nights_stay{
+    @include mdi("nights_stay");
+  }
+  &-no_accounts{
+    @include mdi("no_accounts");
+  }
+  &-no_adult_content{
+    @include mdi("no_adult_content");
+  }
+  &-no_backpack{
+    @include mdi("no_backpack");
+  }
+  &-no_cell{
+    @include mdi("no_cell");
+  }
+  &-no_crash{
+    @include mdi("no_crash");
+  }
+  &-no_drinks{
+    @include mdi("no_drinks");
+  }
+  &-no_encryption{
+    @include mdi("no_encryption");
+  }
+  &-no_encryption_gmailerrorred{
+    @include mdi("no_encryption_gmailerrorred");
+  }
+  &-no_flash{
+    @include mdi("no_flash");
+  }
+  &-no_food{
+    @include mdi("no_food");
+  }
+  &-no_luggage{
+    @include mdi("no_luggage");
+  }
+  &-no_meals{
+    @include mdi("no_meals");
+  }
+  &-no_meeting_room{
+    @include mdi("no_meeting_room");
+  }
+  &-no_photography{
+    @include mdi("no_photography");
+  }
+  &-no_sim{
+    @include mdi("no_sim");
+  }
+  &-no_stroller{
+    @include mdi("no_stroller");
+  }
+  &-no_transfer{
+    @include mdi("no_transfer");
+  }
+  &-noise_aware{
+    @include mdi("noise_aware");
+  }
+  &-noise_control_off{
+    @include mdi("noise_control_off");
+  }
+  &-nordic_walking{
+    @include mdi("nordic_walking");
+  }
+  &-north{
+    @include mdi("north");
+  }
+  &-north_east{
+    @include mdi("north_east");
+  }
+  &-north_west{
+    @include mdi("north_west");
+  }
+  &-not_accessible{
+    @include mdi("not_accessible");
+  }
+  &-not_interested{
+    @include mdi("not_interested");
+  }
+  &-not_listed_location{
+    @include mdi("not_listed_location");
+  }
+  &-not_started{
+    @include mdi("not_started");
+  }
+  &-note{
+    @include mdi("note");
+  }
+  &-note_add{
+    @include mdi("note_add");
+  }
+  &-note_alt{
+    @include mdi("note_alt");
+  }
+  &-notes{
+    @include mdi("notes");
+  }
+  &-notification_add{
+    @include mdi("notification_add");
+  }
+  &-notification_important{
+    @include mdi("notification_important");
+  }
+  &-notifications{
+    @include mdi("notifications");
+  }
+  &-notifications_active{
+    @include mdi("notifications_active");
+  }
+  &-notifications_none{
+    @include mdi("notifications_none");
+  }
+  &-notifications_off{
+    @include mdi("notifications_off");
+  }
+  &-notifications_on{
+    @include mdi("notifications_on");
+  }
+  &-notifications_paused{
+    @include mdi("notifications_paused");
+  }
+  &-now_wallpaper{
+    @include mdi("now_wallpaper");
+  }
+  &-now_widgets{
+    @include mdi("now_widgets");
+  }
+  &-numbers{
+    @include mdi("numbers");
+  }
+  &-offline_bolt{
+    @include mdi("offline_bolt");
+  }
+  &-offline_pin{
+    @include mdi("offline_pin");
+  }
+  &-offline_share{
+    @include mdi("offline_share");
+  }
+  &-oil_barrel{
+    @include mdi("oil_barrel");
+  }
+  &-on_device_training{
+    @include mdi("on_device_training");
+  }
+  &-ondemand_video{
+    @include mdi("ondemand_video");
+  }
+  &-online_prediction{
+    @include mdi("online_prediction");
+  }
+  &-opacity{
+    @include mdi("opacity");
+  }
+  &-open_in_browser{
+    @include mdi("open_in_browser");
+  }
+  &-open_in_full{
+    @include mdi("open_in_full");
+  }
+  &-open_in_new{
+    @include mdi("open_in_new");
+  }
+  &-open_in_new_off{
+    @include mdi("open_in_new_off");
+  }
+  &-open_with{
+    @include mdi("open_with");
+  }
+  &-other_houses{
+    @include mdi("other_houses");
+  }
+  &-outbond{
+    @include mdi("outbond");
+  }
+  &-outbound{
+    @include mdi("outbound");
+  }
+  &-outbox{
+    @include mdi("outbox");
+  }
+  &-outdoor_grill{
+    @include mdi("outdoor_grill");
+  }
+  &-outlet{
+    @include mdi("outlet");
+  }
+  &-outlined_flag{
+    @include mdi("outlined_flag");
+  }
+  &-output{
+    @include mdi("output");
+  }
+  &-padding{
+    @include mdi("padding");
+  }
+  &-pages{
+    @include mdi("pages");
+  }
+  &-pageview{
+    @include mdi("pageview");
+  }
+  &-paid{
+    @include mdi("paid");
+  }
+  &-palette{
+    @include mdi("palette");
+  }
+  &-pan_tool{
+    @include mdi("pan_tool");
+  }
+  &-pan_tool_alt{
+    @include mdi("pan_tool_alt");
+  }
+  &-panorama{
+    @include mdi("panorama");
+  }
+  &-panorama_fish_eye{
+    @include mdi("panorama_fish_eye");
+  }
+  &-panorama_fisheye{
+    @include mdi("panorama_fisheye");
+  }
+  &-panorama_horizontal{
+    @include mdi("panorama_horizontal");
+  }
+  &-panorama_horizontal_select{
+    @include mdi("panorama_horizontal_select");
+  }
+  &-panorama_photosphere{
+    @include mdi("panorama_photosphere");
+  }
+  &-panorama_photosphere_select{
+    @include mdi("panorama_photosphere_select");
+  }
+  &-panorama_vertical{
+    @include mdi("panorama_vertical");
+  }
+  &-panorama_vertical_select{
+    @include mdi("panorama_vertical_select");
+  }
+  &-panorama_wide_angle{
+    @include mdi("panorama_wide_angle");
+  }
+  &-panorama_wide_angle_select{
+    @include mdi("panorama_wide_angle_select");
+  }
+  &-paragliding{
+    @include mdi("paragliding");
+  }
+  &-park{
+    @include mdi("park");
+  }
+  &-party_mode{
+    @include mdi("party_mode");
+  }
+  &-password{
+    @include mdi("password");
+  }
+  &-paste{
+    @include mdi("paste");
+  }
+  &-pattern{
+    @include mdi("pattern");
+  }
+  &-pause{
+    @include mdi("pause");
+  }
+  &-pause_circle{
+    @include mdi("pause_circle");
+  }
+  &-pause_circle_filled{
+    @include mdi("pause_circle_filled");
+  }
+  &-pause_circle_outline{
+    @include mdi("pause_circle_outline");
+  }
+  &-pause_presentation{
+    @include mdi("pause_presentation");
+  }
+  &-payment{
+    @include mdi("payment");
+  }
+  &-payments{
+    @include mdi("payments");
+  }
+  &-paypal{
+    @include mdi("paypal");
+  }
+  &-pedal_bike{
+    @include mdi("pedal_bike");
+  }
+  &-pending{
+    @include mdi("pending");
+  }
+  &-pending_actions{
+    @include mdi("pending_actions");
+  }
+  &-pentagon{
+    @include mdi("pentagon");
+  }
+  &-people{
+    @include mdi("people");
+  }
+  &-people_alt{
+    @include mdi("people_alt");
+  }
+  &-people_outline{
+    @include mdi("people_outline");
+  }
+  &-percent{
+    @include mdi("percent");
+  }
+  &-perm_camera_mic{
+    @include mdi("perm_camera_mic");
+  }
+  &-perm_contact_cal{
+    @include mdi("perm_contact_cal");
+  }
+  &-perm_contact_calendar{
+    @include mdi("perm_contact_calendar");
+  }
+  &-perm_data_setting{
+    @include mdi("perm_data_setting");
+  }
+  &-perm_device_info{
+    @include mdi("perm_device_info");
+  }
+  &-perm_device_information{
+    @include mdi("perm_device_information");
+  }
+  &-perm_identity{
+    @include mdi("perm_identity");
+  }
+  &-perm_media{
+    @include mdi("perm_media");
+  }
+  &-perm_phone_msg{
+    @include mdi("perm_phone_msg");
+  }
+  &-perm_scan_wifi{
+    @include mdi("perm_scan_wifi");
+  }
+  &-person{
+    @include mdi("person");
+  }
+  &-person_2{
+    @include mdi("person_2");
+  }
+  &-person_3{
+    @include mdi("person_3");
+  }
+  &-person_4{
+    @include mdi("person_4");
+  }
+  &-person_add{
+    @include mdi("person_add");
+  }
+  &-person_add_alt{
+    @include mdi("person_add_alt");
+  }
+  &-person_add_alt_1{
+    @include mdi("person_add_alt_1");
+  }
+  &-person_add_disabled{
+    @include mdi("person_add_disabled");
+  }
+  &-person_off{
+    @include mdi("person_off");
+  }
+  &-person_outline{
+    @include mdi("person_outline");
+  }
+  &-person_pin{
+    @include mdi("person_pin");
+  }
+  &-person_pin_circle{
+    @include mdi("person_pin_circle");
+  }
+  &-person_remove{
+    @include mdi("person_remove");
+  }
+  &-person_remove_alt_1{
+    @include mdi("person_remove_alt_1");
+  }
+  &-person_search{
+    @include mdi("person_search");
+  }
+  &-personal_injury{
+    @include mdi("personal_injury");
+  }
+  &-personal_video{
+    @include mdi("personal_video");
+  }
+  &-pest_control{
+    @include mdi("pest_control");
+  }
+  &-pest_control_rodent{
+    @include mdi("pest_control_rodent");
+  }
+  &-pets{
+    @include mdi("pets");
+  }
+  &-phishing{
+    @include mdi("phishing");
+  }
+  &-phone{
+    @include mdi("phone");
+  }
+  &-phone_android{
+    @include mdi("phone_android");
+  }
+  &-phone_bluetooth_speaker{
+    @include mdi("phone_bluetooth_speaker");
+  }
+  &-phone_callback{
+    @include mdi("phone_callback");
+  }
+  &-phone_disabled{
+    @include mdi("phone_disabled");
+  }
+  &-phone_enabled{
+    @include mdi("phone_enabled");
+  }
+  &-phone_forwarded{
+    @include mdi("phone_forwarded");
+  }
+  &-phone_in_talk{
+    @include mdi("phone_in_talk");
+  }
+  &-phone_iphone{
+    @include mdi("phone_iphone");
+  }
+  &-phone_locked{
+    @include mdi("phone_locked");
+  }
+  &-phone_missed{
+    @include mdi("phone_missed");
+  }
+  &-phone_paused{
+    @include mdi("phone_paused");
+  }
+  &-phonelink{
+    @include mdi("phonelink");
+  }
+  &-phonelink_erase{
+    @include mdi("phonelink_erase");
+  }
+  &-phonelink_lock{
+    @include mdi("phonelink_lock");
+  }
+  &-phonelink_off{
+    @include mdi("phonelink_off");
+  }
+  &-phonelink_ring{
+    @include mdi("phonelink_ring");
+  }
+  &-phonelink_setup{
+    @include mdi("phonelink_setup");
+  }
+  &-photo{
+    @include mdi("photo");
+  }
+  &-photo_album{
+    @include mdi("photo_album");
+  }
+  &-photo_camera{
+    @include mdi("photo_camera");
+  }
+  &-photo_camera_back{
+    @include mdi("photo_camera_back");
+  }
+  &-photo_camera_front{
+    @include mdi("photo_camera_front");
+  }
+  &-photo_filter{
+    @include mdi("photo_filter");
+  }
+  &-photo_library{
+    @include mdi("photo_library");
+  }
+  &-photo_size_select_actual{
+    @include mdi("photo_size_select_actual");
+  }
+  &-photo_size_select_large{
+    @include mdi("photo_size_select_large");
+  }
+  &-photo_size_select_small{
+    @include mdi("photo_size_select_small");
+  }
+  &-php{
+    @include mdi("php");
+  }
+  &-piano{
+    @include mdi("piano");
+  }
+  &-piano_off{
+    @include mdi("piano_off");
+  }
+  &-picture_as_pdf{
+    @include mdi("picture_as_pdf");
+  }
+  &-picture_in_picture{
+    @include mdi("picture_in_picture");
+  }
+  &-picture_in_picture_alt{
+    @include mdi("picture_in_picture_alt");
+  }
+  &-pie_chart{
+    @include mdi("pie_chart");
+  }
+  &-pie_chart_outline{
+    @include mdi("pie_chart_outline");
+  }
+  &-pin{
+    @include mdi("pin");
+  }
+  &-pin_drop{
+    @include mdi("pin_drop");
+  }
+  &-pin_end{
+    @include mdi("pin_end");
+  }
+  &-pin_invoke{
+    @include mdi("pin_invoke");
+  }
+  &-pinch{
+    @include mdi("pinch");
+  }
+  &-pivot_table_chart{
+    @include mdi("pivot_table_chart");
+  }
+  &-pix{
+    @include mdi("pix");
+  }
+  &-place{
+    @include mdi("place");
+  }
+  &-plagiarism{
+    @include mdi("plagiarism");
+  }
+  &-play_arrow{
+    @include mdi("play_arrow");
+  }
+  &-play_circle{
+    @include mdi("play_circle");
+  }
+  &-play_circle_fill{
+    @include mdi("play_circle_fill");
+  }
+  &-play_circle_filled{
+    @include mdi("play_circle_filled");
+  }
+  &-play_circle_outline{
+    @include mdi("play_circle_outline");
+  }
+  &-play_disabled{
+    @include mdi("play_disabled");
+  }
+  &-play_for_work{
+    @include mdi("play_for_work");
+  }
+  &-play_lesson{
+    @include mdi("play_lesson");
+  }
+  &-playlist_add{
+    @include mdi("playlist_add");
+  }
+  &-playlist_add_check{
+    @include mdi("playlist_add_check");
+  }
+  &-playlist_add_check_circle{
+    @include mdi("playlist_add_check_circle");
+  }
+  &-playlist_add_circle{
+    @include mdi("playlist_add_circle");
+  }
+  &-playlist_play{
+    @include mdi("playlist_play");
+  }
+  &-playlist_remove{
+    @include mdi("playlist_remove");
+  }
+  &-plumbing{
+    @include mdi("plumbing");
+  }
+  &-plus_one{
+    @include mdi("plus_one");
+  }
+  &-podcasts{
+    @include mdi("podcasts");
+  }
+  &-point_of_sale{
+    @include mdi("point_of_sale");
+  }
+  &-policy{
+    @include mdi("policy");
+  }
+  &-poll{
+    @include mdi("poll");
+  }
+  &-polyline{
+    @include mdi("polyline");
+  }
+  &-polymer{
+    @include mdi("polymer");
+  }
+  &-pool{
+    @include mdi("pool");
+  }
+  &-portable_wifi_off{
+    @include mdi("portable_wifi_off");
+  }
+  &-portrait{
+    @include mdi("portrait");
+  }
+  &-post_add{
+    @include mdi("post_add");
+  }
+  &-power{
+    @include mdi("power");
+  }
+  &-power_input{
+    @include mdi("power_input");
+  }
+  &-power_off{
+    @include mdi("power_off");
+  }
+  &-power_settings_new{
+    @include mdi("power_settings_new");
+  }
+  &-precision_manufacturing{
+    @include mdi("precision_manufacturing");
+  }
+  &-pregnant_woman{
+    @include mdi("pregnant_woman");
+  }
+  &-present_to_all{
+    @include mdi("present_to_all");
+  }
+  &-preview{
+    @include mdi("preview");
+  }
+  &-price_change{
+    @include mdi("price_change");
+  }
+  &-price_check{
+    @include mdi("price_check");
+  }
+  &-print{
+    @include mdi("print");
+  }
+  &-print_disabled{
+    @include mdi("print_disabled");
+  }
+  &-priority_high{
+    @include mdi("priority_high");
+  }
+  &-privacy_tip{
+    @include mdi("privacy_tip");
+  }
+  &-private_connectivity{
+    @include mdi("private_connectivity");
+  }
+  &-production_quantity_limits{
+    @include mdi("production_quantity_limits");
+  }
+  &-propane{
+    @include mdi("propane");
+  }
+  &-propane_tank{
+    @include mdi("propane_tank");
+  }
+  &-psychology{
+    @include mdi("psychology");
+  }
+  &-psychology_alt{
+    @include mdi("psychology_alt");
+  }
+  &-public{
+    @include mdi("public");
+  }
+  &-public_off{
+    @include mdi("public_off");
+  }
+  &-publish{
+    @include mdi("publish");
+  }
+  &-published_with_changes{
+    @include mdi("published_with_changes");
+  }
+  &-punch_clock{
+    @include mdi("punch_clock");
+  }
+  &-push_pin{
+    @include mdi("push_pin");
+  }
+  &-qr_code{
+    @include mdi("qr_code");
+  }
+  &-qr_code_2{
+    @include mdi("qr_code_2");
+  }
+  &-qr_code_scanner{
+    @include mdi("qr_code_scanner");
+  }
+  &-query_builder{
+    @include mdi("query_builder");
+  }
+  &-query_stats{
+    @include mdi("query_stats");
+  }
+  &-question_answer{
+    @include mdi("question_answer");
+  }
+  &-question_mark{
+    @include mdi("question_mark");
+  }
+  &-queue{
+    @include mdi("queue");
+  }
+  &-queue_music{
+    @include mdi("queue_music");
+  }
+  &-queue_play_next{
+    @include mdi("queue_play_next");
+  }
+  &-quick_contacts_dialer{
+    @include mdi("quick_contacts_dialer");
+  }
+  &-quick_contacts_mail{
+    @include mdi("quick_contacts_mail");
+  }
+  &-quickreply{
+    @include mdi("quickreply");
+  }
+  &-quiz{
+    @include mdi("quiz");
+  }
+  &-quora{
+    @include mdi("quora");
+  }
+  &-r_mobiledata{
+    @include mdi("r_mobiledata");
+  }
+  &-radar{
+    @include mdi("radar");
+  }
+  &-radio{
+    @include mdi("radio");
+  }
+  &-radio_button_checked{
+    @include mdi("radio_button_checked");
+  }
+  &-radio_button_off{
+    @include mdi("radio_button_off");
+  }
+  &-radio_button_on{
+    @include mdi("radio_button_on");
+  }
+  &-radio_button_unchecked{
+    @include mdi("radio_button_unchecked");
+  }
+  &-railway_alert{
+    @include mdi("railway_alert");
+  }
+  &-ramen_dining{
+    @include mdi("ramen_dining");
+  }
+  &-ramp_left{
+    @include mdi("ramp_left");
+  }
+  &-ramp_right{
+    @include mdi("ramp_right");
+  }
+  &-rate_review{
+    @include mdi("rate_review");
+  }
+  &-raw_off{
+    @include mdi("raw_off");
+  }
+  &-raw_on{
+    @include mdi("raw_on");
+  }
+  &-read_more{
+    @include mdi("read_more");
+  }
+  &-real_estate_agent{
+    @include mdi("real_estate_agent");
+  }
+  &-receipt{
+    @include mdi("receipt");
+  }
+  &-receipt_long{
+    @include mdi("receipt_long");
+  }
+  &-recent_actors{
+    @include mdi("recent_actors");
+  }
+  &-recommend{
+    @include mdi("recommend");
+  }
+  &-record_voice_over{
+    @include mdi("record_voice_over");
+  }
+  &-rectangle{
+    @include mdi("rectangle");
+  }
+  &-recycling{
+    @include mdi("recycling");
+  }
+  &-reddit{
+    @include mdi("reddit");
+  }
+  &-redeem{
+    @include mdi("redeem");
+  }
+  &-redo{
+    @include mdi("redo");
+  }
+  &-reduce_capacity{
+    @include mdi("reduce_capacity");
+  }
+  &-refresh{
+    @include mdi("refresh");
+  }
+  &-remember_me{
+    @include mdi("remember_me");
+  }
+  &-remove{
+    @include mdi("remove");
+  }
+  &-remove_circle{
+    @include mdi("remove_circle");
+  }
+  &-remove_circle_outline{
+    @include mdi("remove_circle_outline");
+  }
+  &-remove_done{
+    @include mdi("remove_done");
+  }
+  &-remove_from_queue{
+    @include mdi("remove_from_queue");
+  }
+  &-remove_moderator{
+    @include mdi("remove_moderator");
+  }
+  &-remove_red_eye{
+    @include mdi("remove_red_eye");
+  }
+  &-remove_road{
+    @include mdi("remove_road");
+  }
+  &-remove_shopping_cart{
+    @include mdi("remove_shopping_cart");
+  }
+  &-reorder{
+    @include mdi("reorder");
+  }
+  &-repartition{
+    @include mdi("repartition");
+  }
+  &-repeat{
+    @include mdi("repeat");
+  }
+  &-repeat_on{
+    @include mdi("repeat_on");
+  }
+  &-repeat_one{
+    @include mdi("repeat_one");
+  }
+  &-repeat_one_on{
+    @include mdi("repeat_one_on");
+  }
+  &-replay{
+    @include mdi("replay");
+  }
+  &-replay_10{
+    @include mdi("replay_10");
+  }
+  &-replay_30{
+    @include mdi("replay_30");
+  }
+  &-replay_5{
+    @include mdi("replay_5");
+  }
+  &-replay_circle_filled{
+    @include mdi("replay_circle_filled");
+  }
+  &-reply{
+    @include mdi("reply");
+  }
+  &-reply_all{
+    @include mdi("reply_all");
+  }
+  &-report{
+    @include mdi("report");
+  }
+  &-report_gmailerrorred{
+    @include mdi("report_gmailerrorred");
+  }
+  &-report_off{
+    @include mdi("report_off");
+  }
+  &-report_problem{
+    @include mdi("report_problem");
+  }
+  &-request_page{
+    @include mdi("request_page");
+  }
+  &-request_quote{
+    @include mdi("request_quote");
+  }
+  &-reset_tv{
+    @include mdi("reset_tv");
+  }
+  &-restart_alt{
+    @include mdi("restart_alt");
+  }
+  &-restaurant{
+    @include mdi("restaurant");
+  }
+  &-restaurant_menu{
+    @include mdi("restaurant_menu");
+  }
+  &-restore{
+    @include mdi("restore");
+  }
+  &-restore_from_trash{
+    @include mdi("restore_from_trash");
+  }
+  &-restore_page{
+    @include mdi("restore_page");
+  }
+  &-reviews{
+    @include mdi("reviews");
+  }
+  &-rice_bowl{
+    @include mdi("rice_bowl");
+  }
+  &-ring_volume{
+    @include mdi("ring_volume");
+  }
+  &-rocket{
+    @include mdi("rocket");
+  }
+  &-rocket_launch{
+    @include mdi("rocket_launch");
+  }
+  &-roller_shades{
+    @include mdi("roller_shades");
+  }
+  &-roller_shades_closed{
+    @include mdi("roller_shades_closed");
+  }
+  &-roller_skating{
+    @include mdi("roller_skating");
+  }
+  &-roofing{
+    @include mdi("roofing");
+  }
+  &-room{
+    @include mdi("room");
+  }
+  &-room_preferences{
+    @include mdi("room_preferences");
+  }
+  &-room_service{
+    @include mdi("room_service");
+  }
+  &-rotate_90_degrees_ccw{
+    @include mdi("rotate_90_degrees_ccw");
+  }
+  &-rotate_90_degrees_cw{
+    @include mdi("rotate_90_degrees_cw");
+  }
+  &-rotate_left{
+    @include mdi("rotate_left");
+  }
+  &-rotate_right{
+    @include mdi("rotate_right");
+  }
+  &-roundabout_left{
+    @include mdi("roundabout_left");
+  }
+  &-roundabout_right{
+    @include mdi("roundabout_right");
+  }
+  &-rounded_corner{
+    @include mdi("rounded_corner");
+  }
+  &-route{
+    @include mdi("route");
+  }
+  &-router{
+    @include mdi("router");
+  }
+  &-rowing{
+    @include mdi("rowing");
+  }
+  &-rss_feed{
+    @include mdi("rss_feed");
+  }
+  &-rsvp{
+    @include mdi("rsvp");
+  }
+  &-rtt{
+    @include mdi("rtt");
+  }
+  &-rule{
+    @include mdi("rule");
+  }
+  &-rule_folder{
+    @include mdi("rule_folder");
+  }
+  &-run_circle{
+    @include mdi("run_circle");
+  }
+  &-running_with_errors{
+    @include mdi("running_with_errors");
+  }
+  &-rv_hookup{
+    @include mdi("rv_hookup");
+  }
+  &-safety_check{
+    @include mdi("safety_check");
+  }
+  &-safety_divider{
+    @include mdi("safety_divider");
+  }
+  &-sailing{
+    @include mdi("sailing");
+  }
+  &-sanitizer{
+    @include mdi("sanitizer");
+  }
+  &-satellite{
+    @include mdi("satellite");
+  }
+  &-satellite_alt{
+    @include mdi("satellite_alt");
+  }
+  &-save{
+    @include mdi("save");
+  }
+  &-save_alt{
+    @include mdi("save_alt");
+  }
+  &-save_as{
+    @include mdi("save_as");
+  }
+  &-saved_search{
+    @include mdi("saved_search");
+  }
+  &-savings{
+    @include mdi("savings");
+  }
+  &-scale{
+    @include mdi("scale");
+  }
+  &-scanner{
+    @include mdi("scanner");
+  }
+  &-scatter_plot{
+    @include mdi("scatter_plot");
+  }
+  &-schedule{
+    @include mdi("schedule");
+  }
+  &-schedule_send{
+    @include mdi("schedule_send");
+  }
+  &-schema{
+    @include mdi("schema");
+  }
+  &-school{
+    @include mdi("school");
+  }
+  &-science{
+    @include mdi("science");
+  }
+  &-score{
+    @include mdi("score");
+  }
+  &-scoreboard{
+    @include mdi("scoreboard");
+  }
+  &-screen_lock_landscape{
+    @include mdi("screen_lock_landscape");
+  }
+  &-screen_lock_portrait{
+    @include mdi("screen_lock_portrait");
+  }
+  &-screen_lock_rotation{
+    @include mdi("screen_lock_rotation");
+  }
+  &-screen_rotation{
+    @include mdi("screen_rotation");
+  }
+  &-screen_rotation_alt{
+    @include mdi("screen_rotation_alt");
+  }
+  &-screen_search_desktop{
+    @include mdi("screen_search_desktop");
+  }
+  &-screen_share{
+    @include mdi("screen_share");
+  }
+  &-screenshot{
+    @include mdi("screenshot");
+  }
+  &-screenshot_monitor{
+    @include mdi("screenshot_monitor");
+  }
+  &-scuba_diving{
+    @include mdi("scuba_diving");
+  }
+  &-sd{
+    @include mdi("sd");
+  }
+  &-sd_card{
+    @include mdi("sd_card");
+  }
+  &-sd_card_alert{
+    @include mdi("sd_card_alert");
+  }
+  &-sd_storage{
+    @include mdi("sd_storage");
+  }
+  &-search{
+    @include mdi("search");
+  }
+  &-search_off{
+    @include mdi("search_off");
+  }
+  &-security{
+    @include mdi("security");
+  }
+  &-security_update{
+    @include mdi("security_update");
+  }
+  &-security_update_good{
+    @include mdi("security_update_good");
+  }
+  &-security_update_warning{
+    @include mdi("security_update_warning");
+  }
+  &-segment{
+    @include mdi("segment");
+  }
+  &-select_all{
+    @include mdi("select_all");
+  }
+  &-self_improvement{
+    @include mdi("self_improvement");
+  }
+  &-sell{
+    @include mdi("sell");
+  }
+  &-send{
+    @include mdi("send");
+  }
+  &-send_and_archive{
+    @include mdi("send_and_archive");
+  }
+  &-send_time_extension{
+    @include mdi("send_time_extension");
+  }
+  &-send_to_mobile{
+    @include mdi("send_to_mobile");
+  }
+  &-sensor_door{
+    @include mdi("sensor_door");
+  }
+  &-sensor_occupied{
+    @include mdi("sensor_occupied");
+  }
+  &-sensor_window{
+    @include mdi("sensor_window");
+  }
+  &-sensors{
+    @include mdi("sensors");
+  }
+  &-sensors_off{
+    @include mdi("sensors_off");
+  }
+  &-sentiment_dissatisfied{
+    @include mdi("sentiment_dissatisfied");
+  }
+  &-sentiment_neutral{
+    @include mdi("sentiment_neutral");
+  }
+  &-sentiment_satisfied{
+    @include mdi("sentiment_satisfied");
+  }
+  &-sentiment_satisfied_alt{
+    @include mdi("sentiment_satisfied_alt");
+  }
+  &-sentiment_very_dissatisfied{
+    @include mdi("sentiment_very_dissatisfied");
+  }
+  &-sentiment_very_satisfied{
+    @include mdi("sentiment_very_satisfied");
+  }
+  &-set_meal{
+    @include mdi("set_meal");
+  }
+  &-settings{
+    @include mdi("settings");
+  }
+  &-settings_accessibility{
+    @include mdi("settings_accessibility");
+  }
+  &-settings_applications{
+    @include mdi("settings_applications");
+  }
+  &-settings_backup_restore{
+    @include mdi("settings_backup_restore");
+  }
+  &-settings_bluetooth{
+    @include mdi("settings_bluetooth");
+  }
+  &-settings_brightness{
+    @include mdi("settings_brightness");
+  }
+  &-settings_cell{
+    @include mdi("settings_cell");
+  }
+  &-settings_display{
+    @include mdi("settings_display");
+  }
+  &-settings_ethernet{
+    @include mdi("settings_ethernet");
+  }
+  &-settings_input_antenna{
+    @include mdi("settings_input_antenna");
+  }
+  &-settings_input_component{
+    @include mdi("settings_input_component");
+  }
+  &-settings_input_composite{
+    @include mdi("settings_input_composite");
+  }
+  &-settings_input_hdmi{
+    @include mdi("settings_input_hdmi");
+  }
+  &-settings_input_svideo{
+    @include mdi("settings_input_svideo");
+  }
+  &-settings_overscan{
+    @include mdi("settings_overscan");
+  }
+  &-settings_phone{
+    @include mdi("settings_phone");
+  }
+  &-settings_power{
+    @include mdi("settings_power");
+  }
+  &-settings_remote{
+    @include mdi("settings_remote");
+  }
+  &-settings_suggest{
+    @include mdi("settings_suggest");
+  }
+  &-settings_system_daydream{
+    @include mdi("settings_system_daydream");
+  }
+  &-settings_voice{
+    @include mdi("settings_voice");
+  }
+  &-severe_cold{
+    @include mdi("severe_cold");
+  }
+  &-shape_line{
+    @include mdi("shape_line");
+  }
+  &-share{
+    @include mdi("share");
+  }
+  &-share_arrival_time{
+    @include mdi("share_arrival_time");
+  }
+  &-share_location{
+    @include mdi("share_location");
+  }
+  &-shield{
+    @include mdi("shield");
+  }
+  &-shield_moon{
+    @include mdi("shield_moon");
+  }
+  &-shop{
+    @include mdi("shop");
+  }
+  &-shop_2{
+    @include mdi("shop_2");
+  }
+  &-shop_two{
+    @include mdi("shop_two");
+  }
+  &-shopify{
+    @include mdi("shopify");
+  }
+  &-shopping_bag{
+    @include mdi("shopping_bag");
+  }
+  &-shopping_basket{
+    @include mdi("shopping_basket");
+  }
+  &-shopping_cart{
+    @include mdi("shopping_cart");
+  }
+  &-shopping_cart_checkout{
+    @include mdi("shopping_cart_checkout");
+  }
+  &-short_text{
+    @include mdi("short_text");
+  }
+  &-shortcut{
+    @include mdi("shortcut");
+  }
+  &-show_chart{
+    @include mdi("show_chart");
+  }
+  &-shower{
+    @include mdi("shower");
+  }
+  &-shuffle{
+    @include mdi("shuffle");
+  }
+  &-shuffle_on{
+    @include mdi("shuffle_on");
+  }
+  &-shutter_speed{
+    @include mdi("shutter_speed");
+  }
+  &-sick{
+    @include mdi("sick");
+  }
+  &-sign_language{
+    @include mdi("sign_language");
+  }
+  &-signal_cellular_0_bar{
+    @include mdi("signal_cellular_0_bar");
+  }
+  &-signal_cellular_4_bar{
+    @include mdi("signal_cellular_4_bar");
+  }
+  &-signal_cellular_alt{
+    @include mdi("signal_cellular_alt");
+  }
+  &-signal_cellular_alt_1_bar{
+    @include mdi("signal_cellular_alt_1_bar");
+  }
+  &-signal_cellular_alt_2_bar{
+    @include mdi("signal_cellular_alt_2_bar");
+  }
+  &-signal_cellular_connected_no_internet_0_bar{
+    @include mdi("signal_cellular_connected_no_internet_0_bar");
+  }
+  &-signal_cellular_connected_no_internet_4_bar{
+    @include mdi("signal_cellular_connected_no_internet_4_bar");
+  }
+  &-signal_cellular_no_sim{
+    @include mdi("signal_cellular_no_sim");
+  }
+  &-signal_cellular_nodata{
+    @include mdi("signal_cellular_nodata");
+  }
+  &-signal_cellular_null{
+    @include mdi("signal_cellular_null");
+  }
+  &-signal_cellular_off{
+    @include mdi("signal_cellular_off");
+  }
+  &-signal_wifi_0_bar{
+    @include mdi("signal_wifi_0_bar");
+  }
+  &-signal_wifi_4_bar{
+    @include mdi("signal_wifi_4_bar");
+  }
+  &-signal_wifi_4_bar_lock{
+    @include mdi("signal_wifi_4_bar_lock");
+  }
+  &-signal_wifi_bad{
+    @include mdi("signal_wifi_bad");
+  }
+  &-signal_wifi_connected_no_internet_4{
+    @include mdi("signal_wifi_connected_no_internet_4");
+  }
+  &-signal_wifi_off{
+    @include mdi("signal_wifi_off");
+  }
+  &-signal_wifi_statusbar_4_bar{
+    @include mdi("signal_wifi_statusbar_4_bar");
+  }
+  &-signal_wifi_statusbar_connected_no_internet_4{
+    @include mdi("signal_wifi_statusbar_connected_no_internet_4");
+  }
+  &-signal_wifi_statusbar_null{
+    @include mdi("signal_wifi_statusbar_null");
+  }
+  &-signpost{
+    @include mdi("signpost");
+  }
+  &-sim_card{
+    @include mdi("sim_card");
+  }
+  &-sim_card_alert{
+    @include mdi("sim_card_alert");
+  }
+  &-sim_card_download{
+    @include mdi("sim_card_download");
+  }
+  &-single_bed{
+    @include mdi("single_bed");
+  }
+  &-sip{
+    @include mdi("sip");
+  }
+  &-skateboarding{
+    @include mdi("skateboarding");
+  }
+  &-skip_next{
+    @include mdi("skip_next");
+  }
+  &-skip_previous{
+    @include mdi("skip_previous");
+  }
+  &-sledding{
+    @include mdi("sledding");
+  }
+  &-slideshow{
+    @include mdi("slideshow");
+  }
+  &-slow_motion_video{
+    @include mdi("slow_motion_video");
+  }
+  &-smart_button{
+    @include mdi("smart_button");
+  }
+  &-smart_display{
+    @include mdi("smart_display");
+  }
+  &-smart_screen{
+    @include mdi("smart_screen");
+  }
+  &-smart_toy{
+    @include mdi("smart_toy");
+  }
+  &-smartphone{
+    @include mdi("smartphone");
+  }
+  &-smoke_free{
+    @include mdi("smoke_free");
+  }
+  &-smoking_rooms{
+    @include mdi("smoking_rooms");
+  }
+  &-sms{
+    @include mdi("sms");
+  }
+  &-sms_failed{
+    @include mdi("sms_failed");
+  }
+  &-snapchat{
+    @include mdi("snapchat");
+  }
+  &-snippet_folder{
+    @include mdi("snippet_folder");
+  }
+  &-snooze{
+    @include mdi("snooze");
+  }
+  &-snowboarding{
+    @include mdi("snowboarding");
+  }
+  &-snowmobile{
+    @include mdi("snowmobile");
+  }
+  &-snowshoeing{
+    @include mdi("snowshoeing");
+  }
+  &-soap{
+    @include mdi("soap");
+  }
+  &-social_distance{
+    @include mdi("social_distance");
+  }
+  &-solar_power{
+    @include mdi("solar_power");
+  }
+  &-sort{
+    @include mdi("sort");
+  }
+  &-sort_by_alpha{
+    @include mdi("sort_by_alpha");
+  }
+  &-sos{
+    @include mdi("sos");
+  }
+  &-soup_kitchen{
+    @include mdi("soup_kitchen");
+  }
+  &-source{
+    @include mdi("source");
+  }
+  &-south{
+    @include mdi("south");
+  }
+  &-south_america{
+    @include mdi("south_america");
+  }
+  &-south_east{
+    @include mdi("south_east");
+  }
+  &-south_west{
+    @include mdi("south_west");
+  }
+  &-spa{
+    @include mdi("spa");
+  }
+  &-space_bar{
+    @include mdi("space_bar");
+  }
+  &-space_dashboard{
+    @include mdi("space_dashboard");
+  }
+  &-spatial_audio{
+    @include mdi("spatial_audio");
+  }
+  &-spatial_audio_off{
+    @include mdi("spatial_audio_off");
+  }
+  &-spatial_tracking{
+    @include mdi("spatial_tracking");
+  }
+  &-speaker{
+    @include mdi("speaker");
+  }
+  &-speaker_group{
+    @include mdi("speaker_group");
+  }
+  &-speaker_notes{
+    @include mdi("speaker_notes");
+  }
+  &-speaker_notes_off{
+    @include mdi("speaker_notes_off");
+  }
+  &-speaker_phone{
+    @include mdi("speaker_phone");
+  }
+  &-speed{
+    @include mdi("speed");
+  }
+  &-spellcheck{
+    @include mdi("spellcheck");
+  }
+  &-splitscreen{
+    @include mdi("splitscreen");
+  }
+  &-spoke{
+    @include mdi("spoke");
+  }
+  &-sports{
+    @include mdi("sports");
+  }
+  &-sports_bar{
+    @include mdi("sports_bar");
+  }
+  &-sports_baseball{
+    @include mdi("sports_baseball");
+  }
+  &-sports_basketball{
+    @include mdi("sports_basketball");
+  }
+  &-sports_cricket{
+    @include mdi("sports_cricket");
+  }
+  &-sports_esports{
+    @include mdi("sports_esports");
+  }
+  &-sports_football{
+    @include mdi("sports_football");
+  }
+  &-sports_golf{
+    @include mdi("sports_golf");
+  }
+  &-sports_gymnastics{
+    @include mdi("sports_gymnastics");
+  }
+  &-sports_handball{
+    @include mdi("sports_handball");
+  }
+  &-sports_hockey{
+    @include mdi("sports_hockey");
+  }
+  &-sports_kabaddi{
+    @include mdi("sports_kabaddi");
+  }
+  &-sports_martial_arts{
+    @include mdi("sports_martial_arts");
+  }
+  &-sports_mma{
+    @include mdi("sports_mma");
+  }
+  &-sports_motorsports{
+    @include mdi("sports_motorsports");
+  }
+  &-sports_rugby{
+    @include mdi("sports_rugby");
+  }
+  &-sports_score{
+    @include mdi("sports_score");
+  }
+  &-sports_soccer{
+    @include mdi("sports_soccer");
+  }
+  &-sports_tennis{
+    @include mdi("sports_tennis");
+  }
+  &-sports_volleyball{
+    @include mdi("sports_volleyball");
+  }
+  &-square{
+    @include mdi("square");
+  }
+  &-square_foot{
+    @include mdi("square_foot");
+  }
+  &-ssid_chart{
+    @include mdi("ssid_chart");
+  }
+  &-stacked_bar_chart{
+    @include mdi("stacked_bar_chart");
+  }
+  &-stacked_line_chart{
+    @include mdi("stacked_line_chart");
+  }
+  &-stadium{
+    @include mdi("stadium");
+  }
+  &-stairs{
+    @include mdi("stairs");
+  }
+  &-star{
+    @include mdi("star");
+  }
+  &-star_border{
+    @include mdi("star_border");
+  }
+  &-star_border_purple500{
+    @include mdi("star_border_purple500");
+  }
+  &-star_half{
+    @include mdi("star_half");
+  }
+  &-star_outline{
+    @include mdi("star_outline");
+  }
+  &-star_purple500{
+    @include mdi("star_purple500");
+  }
+  &-star_rate{
+    @include mdi("star_rate");
+  }
+  &-stars{
+    @include mdi("stars");
+  }
+  &-start{
+    @include mdi("start");
+  }
+  &-stay_current_landscape{
+    @include mdi("stay_current_landscape");
+  }
+  &-stay_current_portrait{
+    @include mdi("stay_current_portrait");
+  }
+  &-stay_primary_landscape{
+    @include mdi("stay_primary_landscape");
+  }
+  &-stay_primary_portrait{
+    @include mdi("stay_primary_portrait");
+  }
+  &-sticky_note_2{
+    @include mdi("sticky_note_2");
+  }
+  &-stop{
+    @include mdi("stop");
+  }
+  &-stop_circle{
+    @include mdi("stop_circle");
+  }
+  &-stop_screen_share{
+    @include mdi("stop_screen_share");
+  }
+  &-storage{
+    @include mdi("storage");
+  }
+  &-store{
+    @include mdi("store");
+  }
+  &-store_mall_directory{
+    @include mdi("store_mall_directory");
+  }
+  &-storefront{
+    @include mdi("storefront");
+  }
+  &-storm{
+    @include mdi("storm");
+  }
+  &-straight{
+    @include mdi("straight");
+  }
+  &-straighten{
+    @include mdi("straighten");
+  }
+  &-stream{
+    @include mdi("stream");
+  }
+  &-streetview{
+    @include mdi("streetview");
+  }
+  &-strikethrough_s{
+    @include mdi("strikethrough_s");
+  }
+  &-stroller{
+    @include mdi("stroller");
+  }
+  &-style{
+    @include mdi("style");
+  }
+  &-subdirectory_arrow_left{
+    @include mdi("subdirectory_arrow_left");
+  }
+  &-subdirectory_arrow_right{
+    @include mdi("subdirectory_arrow_right");
+  }
+  &-subject{
+    @include mdi("subject");
+  }
+  &-subscript{
+    @include mdi("subscript");
+  }
+  &-subscriptions{
+    @include mdi("subscriptions");
+  }
+  &-subtitles{
+    @include mdi("subtitles");
+  }
+  &-subtitles_off{
+    @include mdi("subtitles_off");
+  }
+  &-subway{
+    @include mdi("subway");
+  }
+  &-summarize{
+    @include mdi("summarize");
+  }
+  &-superscript{
+    @include mdi("superscript");
+  }
+  &-supervised_user_circle{
+    @include mdi("supervised_user_circle");
+  }
+  &-supervisor_account{
+    @include mdi("supervisor_account");
+  }
+  &-support{
+    @include mdi("support");
+  }
+  &-support_agent{
+    @include mdi("support_agent");
+  }
+  &-surfing{
+    @include mdi("surfing");
+  }
+  &-surround_sound{
+    @include mdi("surround_sound");
+  }
+  &-swap_calls{
+    @include mdi("swap_calls");
+  }
+  &-swap_horiz{
+    @include mdi("swap_horiz");
+  }
+  &-swap_horizontal_circle{
+    @include mdi("swap_horizontal_circle");
+  }
+  &-swap_vert{
+    @include mdi("swap_vert");
+  }
+  &-swap_vert_circle{
+    @include mdi("swap_vert_circle");
+  }
+  &-swap_vertical_circle{
+    @include mdi("swap_vertical_circle");
+  }
+  &-swipe{
+    @include mdi("swipe");
+  }
+  &-swipe_down{
+    @include mdi("swipe_down");
+  }
+  &-swipe_down_alt{
+    @include mdi("swipe_down_alt");
+  }
+  &-swipe_left{
+    @include mdi("swipe_left");
+  }
+  &-swipe_left_alt{
+    @include mdi("swipe_left_alt");
+  }
+  &-swipe_right{
+    @include mdi("swipe_right");
+  }
+  &-swipe_right_alt{
+    @include mdi("swipe_right_alt");
+  }
+  &-swipe_up{
+    @include mdi("swipe_up");
+  }
+  &-swipe_up_alt{
+    @include mdi("swipe_up_alt");
+  }
+  &-swipe_vertical{
+    @include mdi("swipe_vertical");
+  }
+  &-switch_access_shortcut{
+    @include mdi("switch_access_shortcut");
+  }
+  &-switch_access_shortcut_add{
+    @include mdi("switch_access_shortcut_add");
+  }
+  &-switch_account{
+    @include mdi("switch_account");
+  }
+  &-switch_camera{
+    @include mdi("switch_camera");
+  }
+  &-switch_left{
+    @include mdi("switch_left");
+  }
+  &-switch_right{
+    @include mdi("switch_right");
+  }
+  &-switch_video{
+    @include mdi("switch_video");
+  }
+  &-synagogue{
+    @include mdi("synagogue");
+  }
+  &-sync{
+    @include mdi("sync");
+  }
+  &-sync_alt{
+    @include mdi("sync_alt");
+  }
+  &-sync_disabled{
+    @include mdi("sync_disabled");
+  }
+  &-sync_lock{
+    @include mdi("sync_lock");
+  }
+  &-sync_problem{
+    @include mdi("sync_problem");
+  }
+  &-system_security_update{
+    @include mdi("system_security_update");
+  }
+  &-system_security_update_good{
+    @include mdi("system_security_update_good");
+  }
+  &-system_security_update_warning{
+    @include mdi("system_security_update_warning");
+  }
+  &-system_update{
+    @include mdi("system_update");
+  }
+  &-system_update_alt{
+    @include mdi("system_update_alt");
+  }
+  &-system_update_tv{
+    @include mdi("system_update_tv");
+  }
+  &-tab{
+    @include mdi("tab");
+  }
+  &-tab_unselected{
+    @include mdi("tab_unselected");
+  }
+  &-table_bar{
+    @include mdi("table_bar");
+  }
+  &-table_chart{
+    @include mdi("table_chart");
+  }
+  &-table_restaurant{
+    @include mdi("table_restaurant");
+  }
+  &-table_rows{
+    @include mdi("table_rows");
+  }
+  &-table_view{
+    @include mdi("table_view");
+  }
+  &-tablet{
+    @include mdi("tablet");
+  }
+  &-tablet_android{
+    @include mdi("tablet_android");
+  }
+  &-tablet_mac{
+    @include mdi("tablet_mac");
+  }
+  &-tag{
+    @include mdi("tag");
+  }
+  &-tag_faces{
+    @include mdi("tag_faces");
+  }
+  &-takeout_dining{
+    @include mdi("takeout_dining");
+  }
+  &-tap_and_play{
+    @include mdi("tap_and_play");
+  }
+  &-tapas{
+    @include mdi("tapas");
+  }
+  &-task{
+    @include mdi("task");
+  }
+  &-task_alt{
+    @include mdi("task_alt");
+  }
+  &-taxi_alert{
+    @include mdi("taxi_alert");
+  }
+  &-telegram{
+    @include mdi("telegram");
+  }
+  &-temple_buddhist{
+    @include mdi("temple_buddhist");
+  }
+  &-temple_hindu{
+    @include mdi("temple_hindu");
+  }
+  &-terminal{
+    @include mdi("terminal");
+  }
+  &-terrain{
+    @include mdi("terrain");
+  }
+  &-text_decrease{
+    @include mdi("text_decrease");
+  }
+  &-text_fields{
+    @include mdi("text_fields");
+  }
+  &-text_format{
+    @include mdi("text_format");
+  }
+  &-text_increase{
+    @include mdi("text_increase");
+  }
+  &-text_rotate_up{
+    @include mdi("text_rotate_up");
+  }
+  &-text_rotate_vertical{
+    @include mdi("text_rotate_vertical");
+  }
+  &-text_rotation_angledown{
+    @include mdi("text_rotation_angledown");
+  }
+  &-text_rotation_angleup{
+    @include mdi("text_rotation_angleup");
+  }
+  &-text_rotation_down{
+    @include mdi("text_rotation_down");
+  }
+  &-text_rotation_none{
+    @include mdi("text_rotation_none");
+  }
+  &-text_snippet{
+    @include mdi("text_snippet");
+  }
+  &-textsms{
+    @include mdi("textsms");
+  }
+  &-texture{
+    @include mdi("texture");
+  }
+  &-theater_comedy{
+    @include mdi("theater_comedy");
+  }
+  &-theaters{
+    @include mdi("theaters");
+  }
+  &-thermostat{
+    @include mdi("thermostat");
+  }
+  &-thermostat_auto{
+    @include mdi("thermostat_auto");
+  }
+  &-thumb_down{
+    @include mdi("thumb_down");
+  }
+  &-thumb_down_alt{
+    @include mdi("thumb_down_alt");
+  }
+  &-thumb_down_off_alt{
+    @include mdi("thumb_down_off_alt");
+  }
+  &-thumb_up{
+    @include mdi("thumb_up");
+  }
+  &-thumb_up_alt{
+    @include mdi("thumb_up_alt");
+  }
+  &-thumb_up_off_alt{
+    @include mdi("thumb_up_off_alt");
+  }
+  &-thumbs_up_down{
+    @include mdi("thumbs_up_down");
+  }
+  &-thunderstorm{
+    @include mdi("thunderstorm");
+  }
+  &-tiktok{
+    @include mdi("tiktok");
+  }
+  &-time_to_leave{
+    @include mdi("time_to_leave");
+  }
+  &-timelapse{
+    @include mdi("timelapse");
+  }
+  &-timeline{
+    @include mdi("timeline");
+  }
+  &-timer{
+    @include mdi("timer");
+  }
+  &-timer_10{
+    @include mdi("timer_10");
+  }
+  &-timer_10_select{
+    @include mdi("timer_10_select");
+  }
+  &-timer_3{
+    @include mdi("timer_3");
+  }
+  &-timer_3_select{
+    @include mdi("timer_3_select");
+  }
+  &-timer_off{
+    @include mdi("timer_off");
+  }
+  &-tips_and_updates{
+    @include mdi("tips_and_updates");
+  }
+  &-tire_repair{
+    @include mdi("tire_repair");
+  }
+  &-title{
+    @include mdi("title");
+  }
+  &-toc{
+    @include mdi("toc");
+  }
+  &-today{
+    @include mdi("today");
+  }
+  &-toggle_off{
+    @include mdi("toggle_off");
+  }
+  &-toggle_on{
+    @include mdi("toggle_on");
+  }
+  &-token{
+    @include mdi("token");
+  }
+  &-toll{
+    @include mdi("toll");
+  }
+  &-tonality{
+    @include mdi("tonality");
+  }
+  &-topic{
+    @include mdi("topic");
+  }
+  &-tornado{
+    @include mdi("tornado");
+  }
+  &-touch_app{
+    @include mdi("touch_app");
+  }
+  &-tour{
+    @include mdi("tour");
+  }
+  &-toys{
+    @include mdi("toys");
+  }
+  &-track_changes{
+    @include mdi("track_changes");
+  }
+  &-traffic{
+    @include mdi("traffic");
+  }
+  &-train{
+    @include mdi("train");
+  }
+  &-tram{
+    @include mdi("tram");
+  }
+  &-transcribe{
+    @include mdi("transcribe");
+  }
+  &-transfer_within_a_station{
+    @include mdi("transfer_within_a_station");
+  }
+  &-transform{
+    @include mdi("transform");
+  }
+  &-transgender{
+    @include mdi("transgender");
+  }
+  &-transit_enterexit{
+    @include mdi("transit_enterexit");
+  }
+  &-translate{
+    @include mdi("translate");
+  }
+  &-travel_explore{
+    @include mdi("travel_explore");
+  }
+  &-trending_down{
+    @include mdi("trending_down");
+  }
+  &-trending_flat{
+    @include mdi("trending_flat");
+  }
+  &-trending_neutral{
+    @include mdi("trending_neutral");
+  }
+  &-trending_up{
+    @include mdi("trending_up");
+  }
+  &-trip_origin{
+    @include mdi("trip_origin");
+  }
+  &-troubleshoot{
+    @include mdi("troubleshoot");
+  }
+  &-try{
+    @include mdi("try");
+  }
+  &-tsunami{
+    @include mdi("tsunami");
+  }
+  &-tty{
+    @include mdi("tty");
+  }
+  &-tune{
+    @include mdi("tune");
+  }
+  &-tungsten{
+    @include mdi("tungsten");
+  }
+  &-turn_left{
+    @include mdi("turn_left");
+  }
+  &-turn_right{
+    @include mdi("turn_right");
+  }
+  &-turn_sharp_left{
+    @include mdi("turn_sharp_left");
+  }
+  &-turn_sharp_right{
+    @include mdi("turn_sharp_right");
+  }
+  &-turn_slight_left{
+    @include mdi("turn_slight_left");
+  }
+  &-turn_slight_right{
+    @include mdi("turn_slight_right");
+  }
+  &-turned_in{
+    @include mdi("turned_in");
+  }
+  &-turned_in_not{
+    @include mdi("turned_in_not");
+  }
+  &-tv{
+    @include mdi("tv");
+  }
+  &-tv_off{
+    @include mdi("tv_off");
+  }
+  &-two_wheeler{
+    @include mdi("two_wheeler");
+  }
+  &-type_specimen{
+    @include mdi("type_specimen");
+  }
+  &-u_turn_left{
+    @include mdi("u_turn_left");
+  }
+  &-u_turn_right{
+    @include mdi("u_turn_right");
+  }
+  &-umbrella{
+    @include mdi("umbrella");
+  }
+  &-unarchive{
+    @include mdi("unarchive");
+  }
+  &-undo{
+    @include mdi("undo");
+  }
+  &-unfold_less{
+    @include mdi("unfold_less");
+  }
+  &-unfold_less_double{
+    @include mdi("unfold_less_double");
+  }
+  &-unfold_more{
+    @include mdi("unfold_more");
+  }
+  &-unfold_more_double{
+    @include mdi("unfold_more_double");
+  }
+  &-unpublished{
+    @include mdi("unpublished");
+  }
+  &-unsubscribe{
+    @include mdi("unsubscribe");
+  }
+  &-upcoming{
+    @include mdi("upcoming");
+  }
+  &-update{
+    @include mdi("update");
+  }
+  &-update_disabled{
+    @include mdi("update_disabled");
+  }
+  &-upgrade{
+    @include mdi("upgrade");
+  }
+  &-upload{
+    @include mdi("upload");
+  }
+  &-upload_file{
+    @include mdi("upload_file");
+  }
+  &-usb{
+    @include mdi("usb");
+  }
+  &-usb_off{
+    @include mdi("usb_off");
+  }
+  &-vaccines{
+    @include mdi("vaccines");
+  }
+  &-vape_free{
+    @include mdi("vape_free");
+  }
+  &-vaping_rooms{
+    @include mdi("vaping_rooms");
+  }
+  &-verified{
+    @include mdi("verified");
+  }
+  &-verified_user{
+    @include mdi("verified_user");
+  }
+  &-vertical_align_bottom{
+    @include mdi("vertical_align_bottom");
+  }
+  &-vertical_align_center{
+    @include mdi("vertical_align_center");
+  }
+  &-vertical_align_top{
+    @include mdi("vertical_align_top");
+  }
+  &-vertical_distribute{
+    @include mdi("vertical_distribute");
+  }
+  &-vertical_shades{
+    @include mdi("vertical_shades");
+  }
+  &-vertical_shades_closed{
+    @include mdi("vertical_shades_closed");
+  }
+  &-vertical_split{
+    @include mdi("vertical_split");
+  }
+  &-vibration{
+    @include mdi("vibration");
+  }
+  &-video_call{
+    @include mdi("video_call");
+  }
+  &-video_camera_back{
+    @include mdi("video_camera_back");
+  }
+  &-video_camera_front{
+    @include mdi("video_camera_front");
+  }
+  &-video_chat{
+    @include mdi("video_chat");
+  }
+  &-video_collection{
+    @include mdi("video_collection");
+  }
+  &-video_file{
+    @include mdi("video_file");
+  }
+  &-video_label{
+    @include mdi("video_label");
+  }
+  &-video_library{
+    @include mdi("video_library");
+  }
+  &-video_settings{
+    @include mdi("video_settings");
+  }
+  &-video_stable{
+    @include mdi("video_stable");
+  }
+  &-videocam{
+    @include mdi("videocam");
+  }
+  &-videocam_off{
+    @include mdi("videocam_off");
+  }
+  &-videogame_asset{
+    @include mdi("videogame_asset");
+  }
+  &-videogame_asset_off{
+    @include mdi("videogame_asset_off");
+  }
+  &-view_agenda{
+    @include mdi("view_agenda");
+  }
+  &-view_array{
+    @include mdi("view_array");
+  }
+  &-view_carousel{
+    @include mdi("view_carousel");
+  }
+  &-view_column{
+    @include mdi("view_column");
+  }
+  &-view_comfortable{
+    @include mdi("view_comfortable");
+  }
+  &-view_comfy{
+    @include mdi("view_comfy");
+  }
+  &-view_comfy_alt{
+    @include mdi("view_comfy_alt");
+  }
+  &-view_compact{
+    @include mdi("view_compact");
+  }
+  &-view_compact_alt{
+    @include mdi("view_compact_alt");
+  }
+  &-view_cozy{
+    @include mdi("view_cozy");
+  }
+  &-view_day{
+    @include mdi("view_day");
+  }
+  &-view_headline{
+    @include mdi("view_headline");
+  }
+  &-view_in_ar{
+    @include mdi("view_in_ar");
+  }
+  &-view_kanban{
+    @include mdi("view_kanban");
+  }
+  &-view_list{
+    @include mdi("view_list");
+  }
+  &-view_module{
+    @include mdi("view_module");
+  }
+  &-view_quilt{
+    @include mdi("view_quilt");
+  }
+  &-view_sidebar{
+    @include mdi("view_sidebar");
+  }
+  &-view_stream{
+    @include mdi("view_stream");
+  }
+  &-view_timeline{
+    @include mdi("view_timeline");
+  }
+  &-view_week{
+    @include mdi("view_week");
+  }
+  &-vignette{
+    @include mdi("vignette");
+  }
+  &-villa{
+    @include mdi("villa");
+  }
+  &-visibility{
+    @include mdi("visibility");
+  }
+  &-visibility_off{
+    @include mdi("visibility_off");
+  }
+  &-voice_chat{
+    @include mdi("voice_chat");
+  }
+  &-voice_over_off{
+    @include mdi("voice_over_off");
+  }
+  &-voicemail{
+    @include mdi("voicemail");
+  }
+  &-volcano{
+    @include mdi("volcano");
+  }
+  &-volume_down{
+    @include mdi("volume_down");
+  }
+  &-volume_mute{
+    @include mdi("volume_mute");
+  }
+  &-volume_off{
+    @include mdi("volume_off");
+  }
+  &-volume_up{
+    @include mdi("volume_up");
+  }
+  &-volunteer_activism{
+    @include mdi("volunteer_activism");
+  }
+  &-vpn_key{
+    @include mdi("vpn_key");
+  }
+  &-vpn_key_off{
+    @include mdi("vpn_key_off");
+  }
+  &-vpn_lock{
+    @include mdi("vpn_lock");
+  }
+  &-vrpano{
+    @include mdi("vrpano");
+  }
+  &-wallet{
+    @include mdi("wallet");
+  }
+  &-wallet_giftcard{
+    @include mdi("wallet_giftcard");
+  }
+  &-wallet_membership{
+    @include mdi("wallet_membership");
+  }
+  &-wallet_travel{
+    @include mdi("wallet_travel");
+  }
+  &-wallpaper{
+    @include mdi("wallpaper");
+  }
+  &-warehouse{
+    @include mdi("warehouse");
+  }
+  &-warning{
+    @include mdi("warning");
+  }
+  &-warning_amber{
+    @include mdi("warning_amber");
+  }
+  &-wash{
+    @include mdi("wash");
+  }
+  &-watch{
+    @include mdi("watch");
+  }
+  &-watch_later{
+    @include mdi("watch_later");
+  }
+  &-watch_off{
+    @include mdi("watch_off");
+  }
+  &-water{
+    @include mdi("water");
+  }
+  &-water_damage{
+    @include mdi("water_damage");
+  }
+  &-water_drop{
+    @include mdi("water_drop");
+  }
+  &-waterfall_chart{
+    @include mdi("waterfall_chart");
+  }
+  &-waves{
+    @include mdi("waves");
+  }
+  &-waving_hand{
+    @include mdi("waving_hand");
+  }
+  &-wb_auto{
+    @include mdi("wb_auto");
+  }
+  &-wb_cloudy{
+    @include mdi("wb_cloudy");
+  }
+  &-wb_incandescent{
+    @include mdi("wb_incandescent");
+  }
+  &-wb_iridescent{
+    @include mdi("wb_iridescent");
+  }
+  &-wb_shade{
+    @include mdi("wb_shade");
+  }
+  &-wb_sunny{
+    @include mdi("wb_sunny");
+  }
+  &-wb_twilight{
+    @include mdi("wb_twilight");
+  }
+  &-wc{
+    @include mdi("wc");
+  }
+  &-web{
+    @include mdi("web");
+  }
+  &-web_asset{
+    @include mdi("web_asset");
+  }
+  &-web_asset_off{
+    @include mdi("web_asset_off");
+  }
+  &-web_stories{
+    @include mdi("web_stories");
+  }
+  &-webhook{
+    @include mdi("webhook");
+  }
+  &-wechat{
+    @include mdi("wechat");
+  }
+  &-weekend{
+    @include mdi("weekend");
+  }
+  &-west{
+    @include mdi("west");
+  }
+  &-whatshot{
+    @include mdi("whatshot");
+  }
+  &-wheelchair_pickup{
+    @include mdi("wheelchair_pickup");
+  }
+  &-where_to_vote{
+    @include mdi("where_to_vote");
+  }
+  &-widgets{
+    @include mdi("widgets");
+  }
+  &-width_full{
+    @include mdi("width_full");
+  }
+  &-width_normal{
+    @include mdi("width_normal");
+  }
+  &-width_wide{
+    @include mdi("width_wide");
+  }
+  &-wifi{
+    @include mdi("wifi");
+  }
+  &-wifi_1_bar{
+    @include mdi("wifi_1_bar");
+  }
+  &-wifi_2_bar{
+    @include mdi("wifi_2_bar");
+  }
+  &-wifi_calling{
+    @include mdi("wifi_calling");
+  }
+  &-wifi_calling_3{
+    @include mdi("wifi_calling_3");
+  }
+  &-wifi_channel{
+    @include mdi("wifi_channel");
+  }
+  &-wifi_find{
+    @include mdi("wifi_find");
+  }
+  &-wifi_lock{
+    @include mdi("wifi_lock");
+  }
+  &-wifi_off{
+    @include mdi("wifi_off");
+  }
+  &-wifi_password{
+    @include mdi("wifi_password");
+  }
+  &-wifi_protected_setup{
+    @include mdi("wifi_protected_setup");
+  }
+  &-wifi_tethering{
+    @include mdi("wifi_tethering");
+  }
+  &-wifi_tethering_error{
+    @include mdi("wifi_tethering_error");
+  }
+  &-wifi_tethering_error_rounded{
+    @include mdi("wifi_tethering_error_rounded");
+  }
+  &-wifi_tethering_off{
+    @include mdi("wifi_tethering_off");
+  }
+  &-wind_power{
+    @include mdi("wind_power");
+  }
+  &-window{
+    @include mdi("window");
+  }
+  &-wine_bar{
+    @include mdi("wine_bar");
+  }
+  &-woman{
+    @include mdi("woman");
+  }
+  &-woman_2{
+    @include mdi("woman_2");
+  }
+  &-woo_commerce{
+    @include mdi("woo_commerce");
+  }
+  &-wordpress{
+    @include mdi("wordpress");
+  }
+  &-work{
+    @include mdi("work");
+  }
+  &-work_history{
+    @include mdi("work_history");
+  }
+  &-work_off{
+    @include mdi("work_off");
+  }
+  &-work_outline{
+    @include mdi("work_outline");
+  }
+  &-workspace_premium{
+    @include mdi("workspace_premium");
+  }
+  &-workspaces{
+    @include mdi("workspaces");
+  }
+  &-wrap_text{
+    @include mdi("wrap_text");
+  }
+  &-wrong_location{
+    @include mdi("wrong_location");
+  }
+  &-wysiwyg{
+    @include mdi("wysiwyg");
+  }
+  &-yard{
+    @include mdi("yard");
+  }
+  &-youtube_searched_for{
+    @include mdi("youtube_searched_for");
+  }
+  &-zoom_in{
+    @include mdi("zoom_in");
+  }
+  &-zoom_in_map{
+    @include mdi("zoom_in_map");
+  }
+  &-zoom_out{
+    @include mdi("zoom_out");
+  }
+  &-zoom_out_map{
+    @include mdi("zoom_out_map");
+  }
+}
