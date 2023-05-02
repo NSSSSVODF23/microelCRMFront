@@ -1,0 +1,63 @@
+<!--<code>-->
+<!--    {{parserState | json}}-->
+<!--</code>-->
+<div class="flexed gap10 p20" appExtendPageHeight>
+    <div [formGroup]="settingsForm" class="flexed column gap10">
+        <input formControlName="trackerUrl" pInputText placeholder="Url Трекера" type="text">
+        <input formControlName="trackerLogin" pInputText placeholder="Логин" type="text">
+        <input formControlName="trackerPassword" pInputText placeholder="Пароль" type="text">
+        <p-inputNumber formControlName="startId" placeholder="Стартовый id"></p-inputNumber>
+        <p-inputNumber formControlName="endId" placeholder="Конечный id"></p-inputNumber>
+        <p-button icon="mdi-save" label="Сохранить" [disabled]="!!parserState && parserState.isRunning" (onClick)="submitSaveSettings()"></p-button>
+        <app-tracker-bindings-input formControlName="bindings"></app-tracker-bindings-input>
+    </div>
+    <div class="flexed column stretched gap10">
+        <p-virtualScroller #vs class="console" [value]="messages" [itemSize]="29" [scrollHeight]="'715px'">
+            <ng-template let-item pTemplate="item">
+                <div [class]="messageClass(item)">
+                    {{item.message}}
+                </div>
+            </ng-template>
+        </p-virtualScroller>
+        <div class="flexed gap10">
+            <div class="stretched flexed column gap3 vcenter">
+                <span class="caption-active" *ngIf="parserState?.remainingTime">
+                    {{parserState?.elapsedTime | elapsedTime:'Прошло ':'':true}}
+                    / {{parserState?.averageTimePerTask | elapsedTime:'На задачу ':'':true}}
+                    / {{parserState?.remainingTime | elapsedTime:'Осталось ':'':true}}
+                </span>
+                <p-progressBar class="full-width" [value]="progress"></p-progressBar>
+            </div>
+            <span>
+                <p-button label="Старт" *ngIf="parserState && !parserState.isRunning" (onClick)="startParsing()"></p-button>
+                <p-button label="Остановить" styleClass="p-button-text p-button-secondary" *ngIf="parserState && parserState.isRunning" (onClick)="stopParsing()"></p-button>
+            </span>
+        </div>
+        <div class="flexed gap10">
+            <div class="flexed column gap5" *ngIf="streetToCorrect[0]" [style.width]="'max-content'">
+                <div class="flexed hcenter vcenter caption-header">{{streetToCorrect[0]}}</div>
+                <div class="flexed hcenter vcenter caption-active">{{streetToCorrect[1]?.streetRaw}} {{streetToCorrect[1]?.houseRaw}} {{streetToCorrect[1]?.apartRaw}}</div>
+                <app-address-input [ngModel]="streetToCorrect[1]?.address" (ngModelChange)="currentCorrectingStreetAddress=$event"></app-address-input>
+                <p-button label="Откорректировать" (onClick)="correctStreet(streetToCorrect)"></p-button>
+            </div>
+            <div class="flexed column gap5" *ngIf="houseToCorrect[0]" [style.width]="'max-content'">
+                <div class="flexed hcenter vcenter caption-header">{{houseToCorrect[0]}}</div>
+                <div class="flexed hcenter vcenter caption-active">{{houseToCorrect[1]?.streetRaw}} {{houseToCorrect[1]?.houseRaw}} {{houseToCorrect[1]?.apartRaw}}</div>
+                <app-address-input [ngModel]="houseToCorrect[1]?.address" (ngModelChange)="currentCorrectingHouseAddress=$event"></app-address-input>
+                <p-button label="Откорректировать" (onClick)="correctHouse(houseToCorrect)"></p-button>
+            </div>
+            <div class="flexed column gap5" *ngIf="apartmentToCorrect[0]" [style.width]="'max-content'">
+                <div class="flexed hcenter vcenter caption-header">{{apartmentToCorrect[0]}}</div>
+                <div class="flexed hcenter vcenter caption-active">{{apartmentToCorrect[1]?.streetRaw}} {{apartmentToCorrect[1]?.houseRaw}} {{apartmentToCorrect[1]?.apartRaw}}</div>
+                <app-address-input [ngModel]="apartmentToCorrect[1]?.address" (ngModelChange)="currentCorrectingApartAddress=$event"></app-address-input>
+                <p-button label="Откорректировать" (onClick)="correctApart(apartmentToCorrect)"></p-button>
+            </div>
+        </div>
+<!--        <div class="flexed gap10 v-scroll column" [style.height]="'40rem'">-->
+<!--            <div class="flexed gap2 column" *ngFor="let entry of addressCorrectingPool | keyvalue">-->
+<!--                <span class="caption-main">{{entry.key}}</span>-->
+<!--                <span class="caption-main-small">{{entry.value | json}}</span>-->
+<!--            </div>-->
+<!--        </div>-->
+    </div>
+</div>

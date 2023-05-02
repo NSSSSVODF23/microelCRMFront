@@ -1,0 +1,18 @@
+<div class="flexed hcenter gap2">
+    <span>
+        <ng-container *ngIf="!editing">{{caption}}</ng-container>
+        <input (blur)="stopEditing()"
+               (keyup)="stopEditing($event)"
+               (ngModelChange)="captionChange.emit($event)"
+               *ngIf="editing"
+               [(ngModel)]="caption"
+               [autofocus]="true"
+               class="caption-input"
+               pAutoFocus
+               type="text">
+    </span>
+    <app-icon-button (click)="editing=true" *ngIf="!editing" [size]="1.2"
+                     icon="edit"></app-icon-button>
+    <app-icon-button (click)="stopEditing()" *ngIf="editing" [size]="1.2"
+                     icon="check"></app-icon-button>
+</div>

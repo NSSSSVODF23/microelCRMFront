@@ -1,0 +1,22 @@
+<div class="flexed hcenter gap5 wrapper">
+    <app-avatar [name]="personality.me | eplName" [src]="personality.me?.avatar" [size]="3"></app-avatar>
+    <div class="flexed column account">
+        <span class="account-name">{{personality.me | eplName}}</span>
+        <span class="account-position">{{personality.me?.position?.name}}</span>
+    </div>
+    <p-button styleClass="p-button-text p-button-icon p-button-rounded" icon="mdi-more_vert" (onClick)="menu.toggle($event)"></p-button>
+    <ng-container *ngIf="notifyService.isHasUnread; then fullNoti else emptyNoti"></ng-container>
+</div>
+
+<p-menu #menu [model]="controls" [popup]="true"></p-menu>
+
+
+<ng-template #emptyNoti>
+    <p-button styleClass="p-button-text p-button-icon p-button-rounded" icon="mdi-notifications_none" (onClick)="notifyService.showSideBar()"></p-button>
+</ng-template>
+
+<ng-template #fullNoti>
+    <span pBadge severity="warning" [value]="notifyService.unreadCount.toString()">
+        <p-button styleClass="p-button-text p-button-icon p-button-rounded" icon="mdi-notifications_active" (onClick)="notifyService.showSideBar()"></p-button>
+    </span>
+</ng-template>

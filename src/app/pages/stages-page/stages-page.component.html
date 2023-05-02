@@ -1,0 +1,61 @@
+<div [limited]="true" appExtendPageHeight class="flexed">
+    <app-main-menu-panel></app-main-menu-panel>
+    <div class="flexed column gap5 overflow">
+        <div class="caption-header p10 flexed hcenter gap5">
+            <span class="material-icons-round">checklist</span>
+            <span>
+                Стадии задач: {{wireframe?.name}}
+            </span>
+            <div class="stretched"></div>
+            <ng-container *ngIf="checkedTasks.length>0">
+                <app-button @fade label="Снять выделение" icon="deselect" model="p-button-secondary p-button-outlined" (onClick)="checkedTasks=[]"></app-button>
+                <app-button @fade label="Переместить" icon="swap_horiz" model="p-button-outlined p-button-help" (onClick)="taskMovePanel.toggle($event)" [disabled]="!wireframe?.stages || wireframe?.stages?.length === 0"></app-button>
+            </ng-container>
+        </div>
+        <div class="stages-wrapper">
+            <app-list-panel (onScrollDown)="stageScrollDown('null-pointer')"
+                            *ngIf="tasksCount['null-pointer']>0"
+                            [headerTemplate]="header" [itemTemplate]="taskElem"
+                            [items]="tasks['null-pointer']">
+                <ng-template #header>
+                    <div class="flexed hcenter stretched spbtw">
+                        <p-checkbox (onChange)="allTaskChecked('null-pointer', $event)" [binary]="true"></p-checkbox>
+                        <span appColorize>
+                            Без стадии
+                        </span>
+                        <app-colored-tag captionForColor="Без стадии"
+                                         [caption]="getCount('null-pointer')"></app-colored-tag>
+                    </div>
+                </ng-template>
+                <ng-template #taskElem let-item>
+                    <app-task-list-element [(check)]="checkedTasks" [item]="item"></app-task-list-element>
+                </ng-template>
+            </app-list-panel>
+            <app-list-panel (onScrollDown)="stageScrollDown(stage.stageId)" *ngFor="let stage of wireframe?.stages"
+                            [headerTemplate]="header" [itemTemplate]="taskElem"
+                            [items]="tasks[stage.stageId]">
+                <ng-template #header>
+                    <div class="flexed hcenter stretched spbtw">
+                        <p-checkbox (onChange)="allTaskChecked(stage.stageId, $event)" [binary]="true"></p-checkbox>
+                        <span appColorize>
+                            {{stage.label}}
+                        </span>
+                        <app-colored-tag [captionForColor]="stage.label"
+                                         [caption]="getCount(stage.stageId)"></app-colored-tag>
+                    </div>
+                </ng-template>
+                <ng-template #taskElem let-item>
+                    <app-task-list-element [(check)]="checkedTasks" [item]="item"></app-task-list-element>
+                </ng-template>
+            </app-list-panel>
+        </div>
+    </div>
+</div>
+
+<p-overlayPanel #taskMovePanel>
+    <div class="flexed gap10 column">
+        <span>Выберите стадию для перемещения {{checkedTasks.length}} {{declineTask(checkedTasks.length)}}</span>
+        <p-dropdown [options]="wireframe?.stages ?? []" optionLabel="label" optionValue="stageId" [(ngModel)]="selectedStageToMove" appendTo="body"></p-dropdown>
+        <app-button label="Применить" [loading]="taskMoving" (onClick)="taskMoveApply()"></app-button>
+    </div>
+</p-overlayPanel>

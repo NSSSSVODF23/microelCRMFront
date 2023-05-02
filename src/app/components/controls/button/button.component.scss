@@ -1,0 +1,70 @@
+.button-content {
+  font-size: 1.1rem;
+  white-space: nowrap;
+
+  & > span.left {
+    font-size: 1.35rem !important;
+    transform: translateX(-.3rem);
+  }
+
+  & > span.right {
+    font-size: 1.35rem !important;
+    transform: translateX(.3rem);
+  }
+}
+
+.loading-indicator {
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &__spinner {
+    width: 20px;
+    height: 20px;
+    border: 2px solid rgba(0, 0, 0, 0);
+    border-top-color: #ffffff;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+
+    &.p-button-text, &.p-button-outlined, &.p-button-raised {
+      &.p-button-primary {
+        border-top-color: var(--mc);
+      }
+
+      &.p-button-success {
+        border-top-color: #22C55E;
+      }
+
+      &.p-button-secondary {
+        border-top-color: #64748B;
+      }
+
+      &.p-button-info {
+        border-top-color: #3B82F6;
+      }
+
+      &.p-button-danger {
+        border-top-color: #EF4444;
+      }
+
+      &.p-button-warning {
+        border-top-color: #F59E0B;
+      }
+
+      &.p-button-help {
+        border-top-color: #A855F7;
+      }
+    }
+  }
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}

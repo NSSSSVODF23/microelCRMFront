@@ -1,0 +1,29 @@
+<ng-container  [ngSwitch]="item.wireframeFieldType" *ngIf="item">
+    <ng-container *ngSwitchCase="'BOOLEAN'">
+        {{item.booleanData?'Да':'Нет'}}
+    </ng-container>
+    <ng-container *ngSwitchCase="'SMALL_TEXT'">
+        {{item.stringData ?? "Пусто"}}
+    </ng-container>
+    <ng-container *ngSwitchCase="'LARGE_TEXT'">
+        {{item.stringData ?? "Пусто"}}
+    </ng-container>
+    <ng-container *ngSwitchCase="'INTEGER'">
+        {{item.integerData}}
+    </ng-container>
+    <ng-container *ngSwitchCase="'FLOAT'">
+        {{item.floatData}}
+    </ng-container>
+    <ng-container *ngSwitchCase="'ADDRESS'">
+        {{item.addressData?.city?.name ?? ""}} {{item.addressData?.street?.name ?? "Ареса нет"}} {{item.addressData?.houseNum}}{{item.addressData?.fraction ? '/' + item.addressData?.fraction : ''}}{{item.addressData?.letter ?? ''}}{{item.addressData?.build ? ' стр.' + item.addressData?.build : ''}} {{item.addressData?.apartmentNum ? 'кв. ' + item.addressData?.apartmentNum : ''}}
+    </ng-container>
+    <ng-container *ngSwitchCase="'PHONE_ARRAY'">
+        <span *ngFor="let phone of item.phoneData | keyvalue">
+            {{phone.value}}
+        </span>
+    </ng-container>
+    <ng-container *ngSwitchDefault [style.background-color]="'red'"></ng-container>
+</ng-container>
+<ng-container *ngIf="!item">
+    Нет данных
+</ng-container>

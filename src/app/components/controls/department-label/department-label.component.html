@@ -1,0 +1,39 @@
+<span *ngIf="!inline" class="flexed gap2 one-line hcenter">
+    <ng-container *ngIf="department && department?.departmentId; then info"></ng-container>
+    <ng-container *ngIf="!(department && department?.departmentId) && !failed; then loading"></ng-container>
+    <ng-container *ngIf="failed">${{_departmentId}}</ng-container>
+</span>
+
+<ng-container *ngIf="inline">
+    <span *ngIf="department && department?.name" class="like-link" (mouseenter)="showPreview($event)" (mouseleave)="hidePreview()">{{department.name}}</span>
+    <span *ngIf="failed">
+        {{_departmentId}}
+    </span>
+    <p-skeleton *ngIf="!(department && department?.name) && !failed" height=".9rem" width="5rem"></p-skeleton>
+</ng-container>
+
+<ng-template #loading>
+    <p-skeleton [shape]="inline?'square':'circle'" size="1.7rem"></p-skeleton>
+    <p-skeleton width="8rem" height=".8rem"></p-skeleton>
+</ng-template>
+
+<ng-template #info>
+    <app-avatar [name]="department?.name"  [size]="size" [shape]="inline?'square':'circle'"></app-avatar>
+    <span class="caption-main-small">
+        {{department?.name}}
+    </span>
+</ng-template>
+
+<!--Панель для предварительного просмотра карточки сотрудника в inline режиме-->
+<p-overlayPanel #preview appendTo="body" showTransitionOptions="0ms" hideTransitionOptions="0ms">
+    <ng-template pTemplate="content">
+        <div class="department-preview">
+            <app-avatar class="avatar" [size]="6" shape="square" [deleted]="department?.deleted"
+                [name]="department?.name"></app-avatar>
+            <div class="name caption-header">
+                {{department?.name}}
+            </div>
+            <div class="description caption-sub-header">{{department?.description}}</div>
+        </div>
+    </ng-template>
+</p-overlayPanel>

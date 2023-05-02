@@ -1,0 +1,8 @@
+<div (click)="clickHandler($event)" [class]="'button '+model" [ngClass]="{disabled:disabled}">
+    <span [style.font-size]="size+'rem'" class="material-icons-round" *ngIf="!loading">{{icon}}</span>
+    <div class="flexed hcenter vcenter" *ngIf="loading">
+        <div class="loading-indicator">
+            <div [class]="'loading-indicator__spinner '+model"></div>
+        </div>
+    </div>
+</div>

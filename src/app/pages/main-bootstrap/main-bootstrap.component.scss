@@ -1,0 +1,13 @@
+.top-panel{
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  padding: 1.5rem 1.5rem 1.5rem 2rem;
+  background-color: var(--bgc-000);
+  border-bottom: 1px solid var(--bgc-300);
+  box-shadow: 0 4px 10px #00000010;
+  position: sticky;
+  top: 0;
+  height: var(--top-panel-height);
+  z-index: 1009;
+}

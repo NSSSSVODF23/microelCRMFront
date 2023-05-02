@@ -1,0 +1,30 @@
+.employee-preview{
+  display: grid;
+  grid: repeat(3, min-content) 1fr/repeat(2, max-content);
+  grid-template-areas: 'avatar name'
+                        'avatar status'
+                        'avatar department'
+                        'avatar position';
+  column-gap: 1rem;
+  //row-gap: .2rem;
+
+  .avatar{
+    grid-area: avatar;
+  }
+
+  .name{
+    grid-area: name;
+  }
+
+  .status{
+    grid-area: status;
+  }
+
+  .department{
+    grid-area: department;
+  }
+
+  .position{
+    grid-area: position;
+  }
+}

@@ -1,0 +1,23 @@
+.employee-list{
+  display: flex;
+  flex-direction: column;
+  //gap: .5rem;
+  padding: 1rem;
+
+  &-item{
+    display: flex;
+    cursor: pointer;
+    padding: 1rem;
+    gap: 1rem;
+    align-items: center;
+    transition: background-color .2s ease-out;
+
+    &:hover{
+      background-color: var(--bgc-100);
+    }
+  }
+}
+
+.department-menu{
+  border-left: 1px solid var(--bgc-300);
+}

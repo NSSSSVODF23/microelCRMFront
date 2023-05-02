@@ -1,0 +1,14 @@
+<p-button #button [styleClass]="'button '+model" [disabled]="disabled" (onClick)="!loading && onClick.emit($event)">
+    <ng-template pTemplate="content">
+        <div class="flexed hcenter gap1 button-content" *ngIf="!loading">
+            <span *ngIf="icon && iconPos==='left'" class="material-icons-round left">{{icon}}</span>
+            {{label}}
+            <span *ngIf="icon && iconPos==='right'" class="material-icons-round right">{{icon}}</span>
+        </div>
+        <div class="flexed hcenter vcenter" *ngIf="loading">
+            <div class="loading-indicator">
+                <div [class]="'loading-indicator__spinner '+model"></div>
+            </div>
+        </div>
+    </ng-template>
+</p-button>

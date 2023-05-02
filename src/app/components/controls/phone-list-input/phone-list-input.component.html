@@ -1,0 +1,10 @@
+<div class="flexed gap5 column">
+    <div *ngFor="let entry of (controlValue | keyvalue); trackBy: valuesTrack" class="p-inputgroup">
+        <p-inputMask [(ngModel)]="controlValue[entry.key]" (ngModelChange)="controlValue[entry.key]=$event; onChange(controlValue)" [style]="{width:'100%'}" (onBlur)="onBlur.emit()"
+                     mask="8 (999) 999-99-99"></p-inputMask>
+        <button (click)="removePhone(entry.key)" [disabled]="count<2" class="p-button-danger"
+                icon="pi pi-trash"
+                pButton type="button"></button>
+    </div>
+    <app-button (onClick)="appendPhone()" icon="add" label="Добавить номер"></app-button>
+</div>

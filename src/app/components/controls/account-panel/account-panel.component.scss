@@ -1,0 +1,60 @@
+.wrapper {
+
+}
+
+.account {
+  &-name {
+    color: var(--tc-700);
+    font-size: 1.1rem;
+    white-space: nowrap;
+  }
+
+  &-position {
+    color: var(--tc-500);
+    font-size: .9rem;
+  }
+}
+
+.cropper-style {
+  min-width: 20rem;
+  min-height: 20rem;
+  max-width: 50vw;
+  max-height: 50vh;
+  border: 1px solid var(--bgc-300);
+  border-radius: .5rem;
+  overflow: hidden;
+}
+
+.avatar-preview {
+  width: 10rem;
+  height: 10rem;
+  margin-top: .5rem;
+  overflow: hidden;
+  border-radius: 50%;
+  display: grid;
+  grid: 1fr/1fr;
+  outline: var(--bgc-300) solid 2px;
+  outline-offset: 1px;
+
+  & > .ph {
+    background-color: var(--bgc-500);
+    color: white;
+    font-weight: 500;
+  }
+
+  & > * {
+    grid-area: 1/1/2/2;
+    width: inherit;
+    height: inherit;
+  }
+
+  &-image {
+    width: inherit;
+    height: inherit;
+    z-index: 1;
+  }
+}
+
+.noti {
+  margin: 0;
+}

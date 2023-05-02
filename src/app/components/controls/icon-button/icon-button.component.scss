@@ -1,0 +1,136 @@
+.button {
+  display: flex;
+  padding: .2rem;
+  user-select: none;
+  cursor: pointer;
+  border-radius: .4rem;
+  transition: color .2s ease-out;
+
+  .material-icons-round{
+    line-height: normal !important;
+  }
+
+  &.primary {
+    color: var(--mc);
+
+    &:hover {
+      color: #2542a4;
+    }
+  }
+
+  &.danger {
+    color: #EF4444;
+
+    &:hover {
+      color: #b73030;
+    }
+  }
+
+  &.success {
+    color: #22C55E;
+
+    &:hover {
+      color: #1ba94f;
+    }
+  }
+
+  &.secondary {
+    color: #64748B;
+
+    &:hover {
+      color: #4d5a6c;
+    }
+  }
+
+  &.info {
+    color: #3B82F6;
+
+    &:hover {
+      color: #2c61b7;
+    }
+  }
+
+  &.warning {
+    color: #F59E0B;
+
+    &:hover {
+      color: #c07d09;
+    }
+  }
+
+  &.help {
+    color: #A855F7;
+
+    &:hover {
+      color: #7b3db6;
+    }
+  }
+
+  &.light {
+    color: var(--tc-100);
+
+    &:hover {
+      color: var(--tc-300);
+    }
+  }
+}
+
+.disabled {
+  color: var(--bgc-300) !important;
+  cursor: default;
+}
+
+.loading-indicator {
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &__spinner {
+    width: 20px;
+    height: 20px;
+    border: 2px solid rgba(0, 0, 0, 0);
+    border-top-color: #ffffff;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+
+    &.primary {
+      border-top-color: var(--mc);
+    }
+
+    &.success {
+      border-top-color: #22C55E;
+    }
+
+    &.secondary {
+      border-top-color: #64748B;
+    }
+
+    &.info {
+      border-top-color: #3B82F6;
+    }
+
+    &.danger {
+      border-top-color: #EF4444;
+    }
+
+    &.warning {
+      border-top-color: #F59E0B;
+    }
+
+    &.help {
+      border-top-color: #A855F7;
+    }
+
+  }
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}

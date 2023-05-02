@@ -1,0 +1,15 @@
+<div class="notification" [ngClass]="{unread: notification.unread}">
+
+    <i [class]="getIcon(notification.type)"></i>
+    <span class="title header">
+        {{getTitle(notification.type)}}
+    </span>
+
+    <div class="description indent05" appTextRevival>
+        {{notification.message}}
+    </div>
+    <span class="timestamp">
+        {{notification.created | date:'dd MMMM yyyy HH:mm'}}
+    </span>
+
+</div>
