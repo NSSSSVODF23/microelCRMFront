@@ -1,3 +1,4 @@
 export const environment = {
-  production: true
+  production: true,
+  wsHost: "ws://10.128.227.39/socket"
 };

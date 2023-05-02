@@ -1,10 +1,11 @@
 import {StompClientService} from "./services/stomp-client.service";
+import {environment} from "../environments/environment";
 
 export const rxStompConfig = () => {
     console.log(localStorage.getItem('token'));
     return {
         // Which server?
-        brokerURL: 'ws://localhost:8080/socket',
+        brokerURL: environment.wsHost,
 
         // Headers
         // Typical keys: login, passcode, host
