@@ -2,16 +2,15 @@ server {
  listen 80;
  root /var/www/10.128.227.39;
  index index.html;
+ client_max_body_size 100M;
  location / {
     try_files $uri $uri/ /index.html?$args;
  }
  location /api/public {
     proxy_pass http://127.0.0.1:8080;
-    client_max_body_size 100M;
  }
  location /api/private {
     proxy_pass http://127.0.0.1:8080;
-    client_max_body_size 100M;
  }
  location /socket {
     proxy_pass http://10.128.227.39:8080;
