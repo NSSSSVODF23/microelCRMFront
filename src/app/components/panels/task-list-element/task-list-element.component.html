@@ -89,19 +89,15 @@
 
 <ng-container *ngIf="isLoading">
     <div class="task-item detailed-layout">
-        <p-skeleton class="main-caption" width="6rem" height=".9rem"></p-skeleton>
+        <p-skeleton class="main-caption" width="5rem" height=".9rem"></p-skeleton>
         <span class="splitter">-</span>
-        <p-skeleton class="second-caption" width="12rem" height=".9rem"></p-skeleton>
-        <div class="additional-caption" [style]="{display:'flex', flexWrap:'wrap', gap:'.3rem'}">
-            <p-skeleton width="13rem" height=".8rem"></p-skeleton>
-            <p-skeleton width="20rem" height=".8rem"></p-skeleton>
-            <p-skeleton width="5rem" height=".8rem"></p-skeleton>
-            <p-skeleton width="25rem" height=".8rem"></p-skeleton>
-            <p-skeleton width="17rem" height=".8rem"></p-skeleton>
-            <p-skeleton width="3rem" height=".8rem"></p-skeleton>
-            <p-skeleton width="7rem" height=".8rem"></p-skeleton>
+        <p-skeleton class="second-caption" width="25%" height=".9rem"></p-skeleton>
+        <div class="additional-caption" [style]="{display:'flex', flexDirection:'column', gap:'.3rem'}">
+            <p-skeleton width="70%" height=".8rem"></p-skeleton>
+            <p-skeleton width="56%" height=".8rem"></p-skeleton>
+            <p-skeleton width="44%" height=".8rem"></p-skeleton>
         </div>
-        <p-skeleton class="meta-info" width="6rem" height="3rem"></p-skeleton>
+        <p-skeleton class="meta-info" width="5rem" height="2rem"></p-skeleton>
     </div>
 </ng-container>
 

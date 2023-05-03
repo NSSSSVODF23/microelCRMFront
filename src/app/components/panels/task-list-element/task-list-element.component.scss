@@ -30,7 +30,7 @@
   &.simple-layout {
     grid-template-rows: min-content;
     grid-template-columns: min-content 1fr min-content;
-    grid-template-areas: "checkbox mcap meta-info"
+    grid-template-areas: "checkbox stags meta-info"
                           "checkbox mcap meta-info";
   }
 

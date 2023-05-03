@@ -2,7 +2,7 @@
     <app-main-menu-panel></app-main-menu-panel>
     <div class="flexed column gap10 p10 stretched">
         <div class="flexed gap10">
-            <div #taskListView class="stretched relative">
+            <div #taskListView class="flexed column stretched relative">
                 <div class="global-filters">
                     <app-text-search-input (onSearch)="taskService.contextSearch()"
                                            [(value)]="taskService.contextSearchString"></app-text-search-input>
@@ -18,12 +18,10 @@
                 </ng-container>
 
                 <div *ngIf="!taskService.taskItemsLoading && taskService.taskItems.length === 0"
-                     class="flexed vcenter p10">
-                    <div class="header400 flexed hcenter gap3">
-                        <i class="mdi-manage_search"></i>
-                        Задачи не найдены
-                    </div>
+                     class="flexed stretched hcenter vcenter">
+                    <span class="caption-header">Задач не найдено</span>
                 </div>
+
                 <div class="sticky bottom0">
                     <p-paginator #paginator (onPageChange)="taskService.pageChange($event)" [alwaysShow]="false"
                                  [rows]="taskService.TASK_PAGE_SIZE" [showCurrentPageReport]="true"
@@ -45,8 +43,6 @@
                 </ng-container>
                 <app-button (onClick)="taskService.filtersApply()" icon="filter_alt" label="Применить"></app-button>
             </div>
-<!--            <app-loading-panel [isShow]="taskService.taskItemsLoading"-->
-<!--                               [parentElement]="taskListView"></app-loading-panel>-->
         </div>
     </div>
 </div>

@@ -5,7 +5,7 @@ import {RealTimeUpdateService} from "../../services/real-time-update.service";
 import {Page, Task} from "../../transport-interfaces";
 import {FormControl, FormGroup} from "@angular/forms";
 import {Paginator} from "primeng/paginator";
-import {of, switchMap} from "rxjs";
+import {of, switchMap, tap} from "rxjs";
 
 @Component({
     templateUrl: './incoming-tasks-page.component.html',
@@ -16,13 +16,20 @@ export class IncomingTasksPageComponent implements OnInit {
     PAGE_SIZE = 25;
 
     taskPage?: Page<Task>;
-
-    templates$ = this.api.getWireframesNames();
-
     filtersForm = new FormGroup({
-        template: new FormControl([])
+        template: new FormControl([] as number[])
     })
-
+    loading = false;
+    loadingTasks = Array.from({length:10}).fill(null);
+    templates$ = this.api.getWireframesNames().pipe(tap(wireframes => {
+        const filters = Storage.load<any>("incomingFilters");
+        if (filters) {
+            this.filtersForm.patchValue(filters);
+        } else {
+            this.filtersForm.patchValue({template: wireframes.map(w => w.wireframeId)})
+        }
+        this.loadTasks(this.filtersForm.getRawValue());
+    }));
     @ViewChild('paginator') paginator?: Paginator;
     subscribes = new SubscriptionsHolder();
 
@@ -47,13 +54,12 @@ export class IncomingTasksPageComponent implements OnInit {
         this.subscribes.addSubscription('tskCr', this.rt.taskCreated().subscribe(this.rtCreateTask.bind(this)));
         this.subscribes.addSubscription('tskUp', this.rt.taskUpdated().subscribe(this.rtUpdateTask.bind(this)));
         this.pageNum = Storage.load<number>("incomingPageNum");
-        const filters = Storage.load<any>("incomingFilters");
-        if (filters) this.filtersForm.setValue(filters);
+        // const filters = Storage.load<any>("incomingFilters");
+        // if (filters) this.filtersForm.setValue(filters);
         this.subscribes.addSubscription('cngFltr', this.filtersForm.valueChanges.subscribe(filters => {
             this.toFirstPage();
             this.loadTasks(filters);
         }))
-        this.loadTasks(this.filtersForm.getRawValue());
     }
 
     toFirstPage() {
@@ -77,20 +83,28 @@ export class IncomingTasksPageComponent implements OnInit {
     }
 
     loadTasks(filters: any) {
+        this.loading = true;
         this.api.getIncomingTasks(this.pageNum, this.PAGE_SIZE, filters)
             .pipe(
                 switchMap(page => {
-                    if (page.pageable.pageNumber < page.totalPages) {
+                    if (page.pageable.pageNumber <= page.totalPages) {
                         return of(page);
                     } else {
                         this.toFirstPage();
                         return this.api.getIncomingTasks(this.pageNum, this.PAGE_SIZE, filters)
                     }
-                }))
-            .subscribe(page => {
-                this.taskPage = page;
-                Storage.save("incomingPageNum", this.pageNum);
-                Storage.save("incomingFilters", filters);
+                })
+            )
+            .subscribe({
+                next: page => {
+                    this.taskPage = page;
+                    Storage.save("incomingPageNum", this.pageNum);
+                    Storage.save("incomingFilters", filters);
+                    this.loading = false;
+                },
+                error: ()=>{
+                    this.loading = false;
+                }
             })
     }
 

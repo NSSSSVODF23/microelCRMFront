@@ -7,7 +7,7 @@
 </div>
 
 <ng-template #taskList>
-    <div class="flexed column stretched">
+    <div class="flexed column stretched" *ngIf="taskPage?.totalElements && !loading">
         <app-task-list-element [item]="item" *ngFor="let item of tasks; let i = index; trackBy: taskTrack" [fullDate]="true"></app-task-list-element>
         <div [style]="{flex:'1', minHeight: '2rem'}"></div>
         <div class="sticky bottom0">
@@ -17,6 +17,12 @@
                          currentPageReportTemplate="Показано с {first} по {last} из {totalRecords} задач"
                          styleClass="back-blured"></p-paginator>
         </div>
+    </div>
+    <div class="flexed column stretched" *ngIf="loading">
+        <app-task-list-element [isLoading]="true" *ngFor="let task of loadingTasks"></app-task-list-element>
+    </div>
+    <div class="flexed column stretched hcenter vcenter" *ngIf="!loading && !taskPage?.totalElements">
+        <span class="caption-header">Входящих задач нет</span>
     </div>
 </ng-template>
 
