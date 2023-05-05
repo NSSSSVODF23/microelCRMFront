@@ -117,6 +117,7 @@ import {ConfirmDialogModule} from "primeng/confirmdialog";
 import {
     TrackerBindingsInputComponent
 } from "../../components/controls/tracker-bindings-input/tracker-bindings-input.component";
+import {AdjustInputWidthDirective} from "../../directives/adjust-input-width.directive";
 
 
 @NgModule({
@@ -177,7 +178,8 @@ import {
         ScrollToBottomEmitterDirective,
         NotificationsPopupPanelComponent,
         ChatPanelComponent,
-        TrackerBindingsInputComponent
+        TrackerBindingsInputComponent,
+        AdjustInputWidthDirective
     ],
     exports: [
         AccountPanelComponent,
@@ -236,7 +238,8 @@ import {
         ScrollToBottomEmitterDirective,
         NotificationsPopupPanelComponent,
         ChatPanelComponent,
-        TrackerBindingsInputComponent
+        TrackerBindingsInputComponent,
+        AdjustInputWidthDirective
     ],
     imports: [
         CommonPipesModule,

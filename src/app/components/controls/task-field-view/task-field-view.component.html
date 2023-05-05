@@ -15,12 +15,15 @@
         {{item.floatData}}
     </ng-container>
     <ng-container *ngSwitchCase="'ADDRESS'">
-        {{item.addressData?.city?.name ?? ""}} {{item.addressData?.street?.name ?? "Ареса нет"}} {{item.addressData?.houseNum}}{{item.addressData?.fraction ? '/' + item.addressData?.fraction : ''}}{{item.addressData?.letter ?? ''}}{{item.addressData?.build ? ' стр.' + item.addressData?.build : ''}} {{item.addressData?.apartmentNum ? 'кв. ' + item.addressData?.apartmentNum : ''}}
+        {{address}}
     </ng-container>
     <ng-container *ngSwitchCase="'PHONE_ARRAY'">
         <span *ngFor="let phone of item.phoneData | keyvalue">
             {{phone.value}}
         </span>
+    </ng-container>
+    <ng-container *ngSwitchCase="'LOGIN'">
+        {{item.stringData}}
     </ng-container>
     <ng-container *ngSwitchDefault [style.background-color]="'red'"></ng-container>
 </ng-container>

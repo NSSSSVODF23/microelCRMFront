@@ -4,8 +4,8 @@
         <ng-container *ngTemplateOutlet="label"></ng-container>
         <p-dropdown
                 (ngModelChange)="onChange($event)"
-                [(ngModel)]="controlValue"
                 (onBlur)="onTouched()"
+                [(ngModel)]="controlValue"
                 [options]="[
                     {label:'Да',value:true},
                     {label:'Нет',value:false},
@@ -16,14 +16,14 @@
 
     <div *ngSwitchCase="'SMALL_TEXT'" class="input-label-wrapper">
         <ng-container *ngTemplateOutlet="label"></ng-container>
-        <input (ngModelChange)="onChange($event)"
-               (blur)="onTouched()"
+        <input (blur)="onTouched()"
+               (ngModelChange)="onChange($event)"
                [(ngModel)]="controlValue" pInputText>
     </div>
 
     <div *ngSwitchCase="'LARGE_TEXT'" class="input-label-wrapper">
         <ng-container *ngTemplateOutlet="label"></ng-container>
-        <textarea (ngModelChange)="onChange($event)" (blur)="onTouched()"
+        <textarea (blur)="onTouched()" (ngModelChange)="onChange($event)"
                   [(ngModel)]="controlValue" [autoResize]="true"
                   [rows]="7" pInputTextarea></textarea>
     </div>
@@ -42,30 +42,26 @@
     </div>
 
     <div *ngSwitchCase="'ADDRESS'" class="input-label-wrapper">
-        <fieldset class="node flexed gap5 column">
-            <legend>
-                <ng-container *ngTemplateOutlet="label"></ng-container>
-            </legend>
-            <app-address-input (ngModelChange)="onChange($event)" (onBlur)="onTouched()"
-                               [(ngModel)]="controlValue"></app-address-input>
-        </fieldset>
+        <ng-container *ngTemplateOutlet="label"></ng-container>
+        <app-address-input (ngModelChange)="onChange($event)" (onBlur)="onTouched()"
+                           [(ngModel)]="controlValue"></app-address-input>
     </div>
 
     <div *ngSwitchCase="'LOGIN'" class="input-label-wrapper">
         <ng-container *ngTemplateOutlet="label"></ng-container>
-        <input (ngModelChange)="onChange($event)" [(ngModel)]="controlValue" (blur)="onTouched()"
+        <input (blur)="onTouched()" (ngModelChange)="onChange($event)" [(ngModel)]="controlValue"
                appRegexPatternChecker pInputText patternRx="^[\dA-z_]+$">
     </div>
 
     <div *ngSwitchCase="'AD_SOURCE'" class="input-label-wrapper">
         <ng-container *ngTemplateOutlet="label"></ng-container>
-        <input (ngModelChange)="onChange($event)" [(ngModel)]="controlValue" (blur)="onTouched()"
+        <input (blur)="onTouched()" (ngModelChange)="onChange($event)" [(ngModel)]="controlValue"
                appRegexPatternChecker pInputText patternRx="^[\dA-z_]+$">
     </div>
 
     <div *ngSwitchCase="'REQUEST_INITIATOR'" class="input-label-wrapper">
         <ng-container *ngTemplateOutlet="label"></ng-container>
-        <input (ngModelChange)="onChange($event)" [(ngModel)]="controlValue" (blur)="onTouched()"
+        <input (blur)="onTouched()" (ngModelChange)="onChange($event)" [(ngModel)]="controlValue"
                appRegexPatternChecker pInputText patternRx="^[\dA-z_]+$">
     </div>
 
@@ -77,13 +73,13 @@
 
     <div *ngSwitchCase="'EQUIPMENTS'" class="input-label-wrapper">
         <ng-container *ngTemplateOutlet="label"></ng-container>
-        <input (ngModelChange)="onChange($event)" [(ngModel)]="controlValue" (blur)="onTouched()"
+        <input (blur)="onTouched()" (ngModelChange)="onChange($event)" [(ngModel)]="controlValue"
                appRegexPatternChecker pInputText patternRx="^[\dA-z_]+$">
     </div>
 
     <div *ngSwitchCase="'CONNECTION_SERVICES'" class="input-label-wrapper">
         <ng-container *ngTemplateOutlet="label"></ng-container>
-        <input (ngModelChange)="onChange($event)" [(ngModel)]="controlValue" (blur)="onTouched()"
+        <input (blur)="onTouched()" (ngModelChange)="onChange($event)" [(ngModel)]="controlValue"
                appRegexPatternChecker pInputText patternRx="^[\dA-z_]+$">
     </div>
 
@@ -103,7 +99,7 @@
 
 <ng-template #editedLabel>
     <label>
-        <app-editing-caption [caption]="field?.name" (captionChange)="setName($event)"></app-editing-caption>
+        <app-editing-caption (captionChange)="setName($event)" [caption]="field?.name"></app-editing-caption>
     </label>
 </ng-template>
 
