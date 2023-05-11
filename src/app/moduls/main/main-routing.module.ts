@@ -15,6 +15,7 @@ import {TestingPageComponent} from "../../pages/testing-page/testing-page.compon
 import {IncomingTasksPageComponent} from "../../pages/incoming-tasks-page/incoming-tasks-page.component";
 import {TaskCalendarPageComponent} from "../../pages/task-calendar-page/task-calendar-page.component";
 import {ParseTaskPageComponent} from "../../pages/parse-task-page/parse-task-page.component";
+import {ParseAddressPageComponent} from "../../pages/parse-address-page/parse-address-page.component";
 
 const routes: Routes = [
     {
@@ -32,7 +33,8 @@ const routes: Routes = [
             {path: 'tasks/templates/constructor', component: WireframeConstructorPageComponent},
             {path: 'employees', component: EmployeesPageComponent},
             {path: 'testing', component: TestingPageComponent},
-            {path: 'parser', component: ParseTaskPageComponent}
+            {path: 'parser/tracker', component: ParseTaskPageComponent},
+            {path: 'parser/address', component: ParseAddressPageComponent}
         ]
     },
     // {path: '**', redirectTo: 'tasks/status/all', pathMatch: 'full'},

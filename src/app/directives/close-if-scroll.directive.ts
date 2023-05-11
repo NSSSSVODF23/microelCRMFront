@@ -11,7 +11,8 @@ export class CloseIfScrollDirective {
 
     @HostListener('window:scroll', ['$event']) onScrollEvent(event: any) {
         if (this.element.overlayVisible) {
-            this.element.hide();
+            // this.element.hide();
+            this.element.align();
         }
     }
 

@@ -210,6 +210,7 @@ export interface Address {
     floor?: number;
     apartmentNum?: number;
     apartmentMod?: string;
+    addressName?: string;
 }
 
 export interface City {
@@ -227,6 +228,7 @@ export interface District {
 export interface Street {
     streetId?: number;
     name?: string;
+    prefix?: string;
     city?: City;
     deleted?: boolean;
 }

@@ -1,76 +1,22 @@
-<span [formGroup]="inputForm" [ngClass]="{focus}" class="input-wrapper">
-    <div>
-        <input #cityEl (blur)="blured($event,'city')" (focus)="focused($event,'city')" (input)="doInput($event, 'city')"
-               (keydown)="keyDown($event,'city')" [dfPlaceholder]="cityPrepareValue" [spellcheck]="false"
-               [value]="cityInputValue" appAdjustInputWidth
-               autocomplete="off" role="presentation" size="15" type="text">
-        <div #cityListEl *ngIf="isShowCityAC" class="autocomplete-panel">
-            <div (click)="changeSelection(i, 'city')" (mouseenter)="listItemMouseEnter(i, 'city')"
-                 (mouseleave)="listItemMouseLeave(i, 'city')"
-                 *ngFor="let city of filteredCities; let i=index" [ngClass]="{selected:i===selectedCityIndex}"
-                 class="item">{{city.name}}</div>
-        </div>
-    </div>
-    <div *ngIf="inputForm.value.city?.cityId" class="delimiter"></div>
-    <div *ngIf="inputForm.value.city?.cityId">
-        <input #streetEl (blur)="blured($event, 'street')" (focus)="focused($event,'street')"
-               (input)="doInput($event, 'street')" (keydown)="keyDown($event, 'street')"
-               [dfPlaceholder]="streetPrepareValue" [spellcheck]="false" [value]="streetInputValue" appAdjustInputWidth
-               size="15" type="text">
-        <div #streetListEl *ngIf="isShowStreetAC" class="autocomplete-panel">
-            <div (click)="changeSelection(i, 'street')" (mouseenter)="listItemMouseEnter(i, 'street')"
-                 (mouseleave)="listItemMouseLeave(i, 'street')" *ngFor="let street of filteredStreets; let i=index"
-                 [ngClass]="{selected:i===selectedStreetIndex}" class="item">{{street.name}}</div>
-        </div>
-    </div>
-    <div *ngIf="inputForm.value.street?.streetId" class="delimiter"></div>
-    <input #houseNumEl (blur)="blured($event, 'houseNum')" (focus)="focused($event, 'houseNum')"
-           (keydown)="keyDown($event, 'houseNum')"
-           *ngIf="inputForm.value.street?.streetId" [dfPlaceholder]="houseNumPh" [spellcheck]="false" appAdjustInputWidth
-           formControlName="houseNum"
-           size="3" type="text">
-    <div *ngIf="inputForm.value.fraction && isHouseSelected">/</div>
-    <div *ngIf="!inputForm.value.fraction && isHouseSelected && fractionPh" class="delimiter"></div>
-    <input #fractionEl (blur)="blured($event, 'fraction')" (focus)="focused($event, 'fraction')"
-           (input)="doInput($event, 'fraction')" (keydown)="keyDown($event, 'fraction')" *ngIf="isHouseSelected" [dfPlaceholder]="fractionPh"
-           [spellcheck]="false" appAdjustInputWidth formControlName="fraction"
-           size="2" type="text">
-    <div *ngIf="!inputForm.value.letter && isHouseSelected && letterPh" class="delimiter"></div>
-    <input #letterEl (blur)="blured($event, 'letter')" (focus)="focused($event, 'letter')"
-           (input)="doInput($event, 'letter')" (keydown)="keyDown($event, 'letter')" *ngIf="isHouseSelected"
-           [dfPlaceholder]="letterPh" [spellcheck]="false" appAdjustInputWidth formControlName="letter"
-           size="2"
-           type="text">
-    <div *ngIf="isHouseSelected && buildPh" class="delimiter"></div>
-    <div *ngIf="inputForm.value.build && isHouseSelected">стр.</div>
-    <input #buildEl (blur)="blured($event, 'build')" (focus)="focused($event, 'build')" (input)="doInput($event, 'build')"
-           (keydown)="keyDown($event, 'build')" *ngIf="isHouseSelected" [dfPlaceholder]="buildPh" [spellcheck]="false"
-           appAdjustInputWidth formControlName="build" size="5"
-           type="text">
-    <div *ngIf="isHouseSelected && entrancePh" class="delimiter"></div>
-    <div *ngIf="inputForm.value.entrance && isHouseSelected"><div class="delimiter"></div>под.</div>
-    <input #entranceEl (blur)="blured($event, 'entrance')" (focus)="focused($event, 'entrance')"
-           (input)="doInput($event, 'entrance')" (keydown)="keyDown($event, 'entrance')" *ngIf="isHouseSelected"
-           [dfPlaceholder]="entrancePh" [spellcheck]="false" appAdjustInputWidth
-           formControlName="entrance"
-           size="5" type="text">
-    <div *ngIf="isHouseSelected && floorPh" class="delimiter"></div>
-    <div *ngIf="inputForm.value.floor && isHouseSelected">эт.</div>
-    <input #floorEl (blur)="blured($event, 'floor')" (focus)="focused($event, 'floor')" (input)="doInput($event, 'floor')"
-           (keydown)="keyDown($event, 'floor')" *ngIf="isHouseSelected" [dfPlaceholder]="floorPh" [spellcheck]="false"
-           appAdjustInputWidth formControlName="floor" size="6"
-           type="text">
-    <div *ngIf="isHouseSelected && apartmentNumPh" class="delimiter"></div>
-    <div *ngIf="inputForm.value.apartmentNum && isHouseSelected">кв.</div>
-    <input #apartmentNumEl (blur)="blured($event, 'apartmentNum')" (focus)="focused($event, 'apartmentNum')"
-           (input)="doInput($event, 'apartmentNum')"
-           (keydown)="keyDown($event, 'apartmentNum')" *ngIf="isHouseSelected" [dfPlaceholder]="apartmentNumPh" [spellcheck]="false"
-           appAdjustInputWidth
-           formControlName="apartmentNum" size="5" type="text">
-    <div *ngIf="isHouseSelected && apartmentModPh" class="delimiter"></div>
-    <input #apartmentModEl (blur)="blured($event, 'apartmentMod')" (focus)="focused($event, 'apartmentMod')"
-           (input)="doInput($event, 'apartmentMod')" (keydown)="keyDown($event, 'apartmentMod')" *ngIf="isHouseSelected" [dfPlaceholder]="apartmentModPh"
-           [spellcheck]="false"
-           appAdjustInputWidth formControlName="apartmentMod"
-           size="5" type="text">
+<span class="p-input-icon-left wrapper">
+    <i [class]="(value?'mdi-domain active':'mdi-domain_disabled unactive')+' icon'"></i>
+<!--    <i class="pi pi-search"></i>-->
+    <input #inputEl [disabled]="disabled" [ngClass]="{unconfirmed:!value, confirmed:value}" [placeholder]="placeholder" [spellcheck]="false" autocomplete="off" class="address-input"
+           pInputText type="text"/>
 </span>
+<p-overlay #overlay [(visible)]="showSuggestions" [responsive]="{ breakpoint: '640px', contentStyleClass: 'h-20rem' }"
+           appendTo="body"
+           contentStyleClass="overlay">
+    <div *ngIf="isLoading" class="loading">
+        <app-circle-loading-indicator></app-circle-loading-indicator>
+    </div>
+    <div *ngIf="isEmpty" class="empty">
+        <i class="mdi-domain_disabled"></i><span>Нет подходящего адреса</span>
+    </div>
+    <div #list *ngIf="!isLoading && !isEmpty" class="overlay-list">
+        <div *ngFor="let suggestion of suggestions; let i=index" [ngClass]="{selected:i===selectedSuggestion}"
+             class="overlay-list-item" (mousemove)="selectedSuggestion = i" (mouseleave)="selectedSuggestion=-1" (click)="$event.preventDefault(); selectSuggestion()">
+            <span class="address-label">{{suggestion.addressName}}</span>
+        </div>
+    </div>
+</p-overlay>

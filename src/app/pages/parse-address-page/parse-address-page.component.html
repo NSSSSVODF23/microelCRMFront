@@ -1,0 +1,12 @@
+<div appExtendPageHeight [limited]="true" class="flexed column">
+    <div #messageListEl class="list-view p20">
+        <div *ngFor="let message of messages">
+            <div [class]="messageClass(message)">
+                {{message.message}}
+            </div>
+        </div>
+    </div>
+    <div class="flexed vend p10">
+        <p-button styleClass="p-button-success" (onClick)="startParse()" label="Собрать адреса"></p-button>
+    </div>
+</div>

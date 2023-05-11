@@ -68,6 +68,7 @@ import {ContextMenuModule} from "primeng/contextmenu";
 import {ParseTaskPageComponent} from "../../pages/parse-task-page/parse-task-page.component";
 import {VirtualScrollerModule} from "primeng/virtualscroller";
 import {ProgressBarModule} from "primeng/progressbar";
+import {ParseAddressPageComponent} from "../../pages/parse-address-page/parse-address-page.component";
 
 
 @NgModule({
@@ -83,7 +84,8 @@ import {ProgressBarModule} from "primeng/progressbar";
         TestingPageComponent,
         IncomingTasksPageComponent,
         TaskCalendarPageComponent,
-        ParseTaskPageComponent
+        ParseTaskPageComponent,
+        ParseAddressPageComponent
     ],
     imports: [
         CommonComponentsModule,

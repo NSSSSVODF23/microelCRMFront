@@ -43,10 +43,11 @@ html, body {
   width: 100%;
 }
 
-.p-button{
+.p-button {
   width: 100%;
   justify-content: center;
-  .p-button-label{
+
+  .p-button-label {
     flex: 0;
   }
 }
@@ -116,7 +117,7 @@ html, body {
 .flexed {
   display: flex;
 
-  &.inline{
+  &.inline {
     display: inline-flex;
   }
 
@@ -413,6 +414,44 @@ html, body {
   }
 }
 
+.overlay {
+  background-color: white;
+  box-shadow: 0px 0px 0.4px rgba(0, 0, 0, 0.02),
+  0px 0px 0.9px rgba(0, 0, 0, 0.028),
+  0px 0px 1.8px rgba(0, 0, 0, 0.035),
+  0px 0px 3.1px rgba(0, 0, 0, 0.042),
+  0px 0px 5.8px rgba(0, 0, 0, 0.05),
+  0px 0px 14px rgba(0, 0, 0, 0.07);
+  border-radius: .5rem;
+  overflow: hidden;
+
+  &-list {
+
+    display: flex;
+    flex-direction: column;
+    overflow: auto;
+    max-height: 15vh;
+    padding: 0.25rem 0;
+
+    &-item {
+      padding: .75rem 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      cursor: pointer;
+      transition: background-color 0.2s ease-out, color 0.2s ease-out;
+      background-color: white;
+      color: var(--tc-500);
+      font-size: .85rem;
+
+      &.selected {
+        background-color: var(--mc-100);
+        color: var(--mc);
+      }
+    }
+  }
+}
+
 .overflow {
   overflow: hidden;
 }
@@ -525,44 +564,50 @@ fieldset.node {
 
 }
 
-.caption{
-  &-common-message{
+.caption {
+  &-common-message {
     font-size: 1.2rem;
     font-weight: bold;
     color: var(--tc-500);
     line-height: normal;
   }
-  &-header{
+
+  &-header {
     font-size: 1.3rem;
     font-weight: 400;
     color: var(--tc-700);
     line-height: normal;
   }
-  &-sub-header{
+
+  &-sub-header {
     font-size: 1rem;
     font-weight: 500;
     color: var(--tc-500);
     line-height: normal;
   }
-  &-main{
+
+  &-main {
     font-size: 1rem;
     font-weight: 400;
     color: var(--tc-700);
     line-height: normal;
   }
-  &-main-small{
+
+  &-main-small {
     font-size: .9rem;
     font-weight: 400;
     color: var(--tc-700);
     line-height: normal;
   }
-  &-secondary{
+
+  &-secondary {
     font-size: .85rem;
     font-weight: 500;
     color: var(--tc-500);
     line-height: normal;
   }
-  &-active{
+
+  &-active {
     font-size: .9rem;
     font-weight: bold;
     color: var(--mc);
@@ -804,14 +849,15 @@ markdown > p:last-child {
   color: var(--tc-500);
 }
 
-.ngx-quill-view-html>.ql-editor{
+.ngx-quill-view-html > .ql-editor {
   padding: 0;
 }
-.ngx-quill-view-html.ql-container{
+
+.ngx-quill-view-html.ql-container {
   height: auto;
 }
 
-.filter-panel{
+.filter-panel {
   display: flex;
   flex-direction: column;
   gap: 1rem;
@@ -822,7 +868,7 @@ markdown > p:last-child {
   overflow-y: auto;
 }
 
-.simple-message{
+.simple-message {
   padding: .5rem;
   font-size: .9rem;
   font-weight: 500;
@@ -832,13 +878,15 @@ markdown > p:last-child {
   text-overflow: ellipsis;
   white-space: nowrap;
 
-  &.info{
+  &.info {
     color: var(--tc-600);
   }
-  &.warning{
+
+  &.warning {
     color: var(--orange-500);
   }
-  &.error{
+
+  &.error {
     color: var(--red-500);
   }
 }

@@ -2,6 +2,7 @@ import {Injectable} from '@angular/core';
 import {HttpClient} from "@angular/common/http";
 import {catchError, map, Observable, share, tap, zip} from "rxjs";
 import {
+    Address,
     Attachment,
     Chat,
     ChatMessage,
@@ -476,6 +477,14 @@ export class ApiService {
 
     sendCorrectedAddress(correctedAddress: { [p: string]: AddressCorrecting }) {
         return this.sendPost("api/private/parser/tracker/address-correcting-pool", correctedAddress);
+    }
+
+    startAddressParse() {
+        return this.sendPost("api/private/parser/addresses/start", {});
+    }
+
+    getAddressSuggestions(query: string) {
+        return this.sendGet<Address[]>("api/private/suggestions/address", {query});
     }
 
     // Результаты запросов на сервер кэшируются по таймауту, чтобы не было доп нагрузки на сервер
