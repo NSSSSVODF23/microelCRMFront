@@ -167,6 +167,7 @@ export class AddressInputComponent implements OnInit, ControlValueAccessor, Afte
 
     private applySuggestion(suggestions: Address[]) {
         this.suggestions = suggestions;
+        this.selectedSuggestion = -1;
         this.isLoading = false;
         if (suggestions.length === 0) {
             this.isEmpty = true;
