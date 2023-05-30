@@ -1,0 +1,15 @@
+<div class="flexed hend full-width gap5" [style.user-select]="'none'">
+    <div class="file-button" *ngIf="hasAttachment" (click)="open($event)">
+        <ng-container [ngSwitch]="attachmentType">
+            <i class="mdi-description" *ngSwitchCase="'DOCUMENT'"></i>
+            <i class="mdi-insert_drive_file" *ngSwitchCase="'FILE'"></i>
+        </ng-container>
+    </div>
+    <div class="file-button disabled" *ngIf="!hasAttachment">
+        <i class="mdi-warning"></i>
+    </div>
+    <div class="flexed column stretched gap3">
+        <span class="caption-main one-line">{{name}}</span>
+        <span class="caption-sub-header">{{size}}</span>
+    </div>
+</div>

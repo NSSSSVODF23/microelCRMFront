@@ -1,17 +1,12 @@
-<ng-container *ngIf="filesLoaded>0; then hasFile else noFile">
-</ng-container>
-
-<ng-template #noFile>
-    <p-button (onClick)="openFileManager()" [disabled]="disabled || loading"
-              [label]="label" [styleClass]="style" icon="mdi-attach_file"></p-button>
-</ng-template>
-
-<ng-template #hasFile>
-    <p-splitButton (onClick)="openFileManager()" [disabled]="disabled || loading" [label]="label"
-                   [model]="menuItems"
-                   [pTooltip]="'Файлов загружено ' + filesLoaded+'/'+filesCatching +'\n' + 'Последний загруженный: \n' + lastFileName" [styleClass]="style" [tooltipDisabled]="filesLoaded === 0"
-                   [value]="filesLoaded.toString()" appendTo="body"
-                   icon="mdi-attach_file" pBadge
-                   tooltipPosition="left"></p-splitButton>
-</ng-template>
+<div [pTooltip]="'Файлов загружено ' + filesLoaded+'/'+filesCatching +'\n' + 'Последний загруженный: \n' + lastFileName"
+     [tooltipDisabled]="!hasFiles" class="button-wrapper" tooltipPosition="left">
+    <p-button (onClick)="hasFiles ? menu.toggle($event) : openFileManager()"
+              [disabled]="disabled || loading" [label]="label"
+              [styleClass]="style"
+              icon="mdi-attach_file"
+    ></p-button>
+    <p-badge *ngIf="hasFiles" [style]="{fontSize:'.65rem', minWidth:'1.2rem', height:'1.2rem'}" [value]="filesLoaded.toString()"
+             class="ur-badge"></p-badge>
+    <p-menu #menu [model]="menuItems" [popup]="true" appendTo="body"></p-menu>
+</div>
 <input #fileManager (change)="catchFiles($event)" [multiple]="true" [style.display]="'none'" type="file">

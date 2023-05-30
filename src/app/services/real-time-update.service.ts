@@ -1,7 +1,17 @@
 import {Injectable} from '@angular/core';
 import {StompClientService} from "./stomp-client.service";
 import {finalize, map, Observable, share} from "rxjs";
-import {ChatMessage, Comment, Employee, Task, TaskEvent, TaskTag} from "../transport-interfaces";
+import {
+    Chat, ChatUnreadCounter,
+    Comment,
+    Department,
+    Employee,
+    Position,
+    SuperMessage,
+    Task,
+    TaskEvent,
+    TaskTag
+} from "../transport-interfaces";
 import {cyrb53} from "../util";
 import {OldTracker, SimpleMessage} from "../parsing-interfaces";
 
@@ -18,73 +28,140 @@ export class RealTimeUpdateService {
     }
 
     commentCreated(taskId: number) {
-        return this.watch<Comment>(`/task/${taskId}/comment/create`)
+        return this.watch<Comment>('task', taskId.toString(), 'comment', 'create')
     }
 
     commentUpdated(taskId: number) {
-        return this.watch<Comment>(`/task/${taskId}/comment/update`)
+        return this.watch<Comment>('task', taskId.toString(), 'comment', 'update')
     }
 
     commentDeleted(taskId: number) {
-        return this.watch<Comment>(`/task/${taskId}/comment/delete`)
+        return this.watch<Comment>('task', taskId.toString(), 'comment', 'delete')
     }
 
     taskEventCreated(taskId: number) {
-        return this.watch<TaskEvent>(`/task/${taskId}/event/create`)
+        return this.watch<TaskEvent>('task', taskId.toString(), 'event', 'create')
+    }
+
+    employeeCreated() {
+        return this.watch<Employee>('employee', 'create')
     }
 
     employeeUpdated(login?: string) {
-        if (login) return this.watch<Employee>(`/employee/${login}/update`)
-        return this.watch<Employee>(`/employee/update`)
+        if (login) return this.watch<Employee>('employee', login, 'update')
+        return this.watch<Employee>('employee', 'update')
+    }
+
+    employeeDeleted() {
+        return this.watch<Employee>('employee', 'delete')
+    }
+
+    departmentCreated() {
+        return this.watch<Department>('department', 'create')
+    }
+
+    departmentUpdated(id?: number) {
+        if (id) return this.watch<Department>('department', id.toString(), 'update')
+        return this.watch<Department>('department', 'update')
+    }
+
+    departmentDeleted() {
+        return this.watch<Department>('department', 'delete')
+    }
+
+    positionCreated() {
+        return this.watch<Position>('position', 'create')
+    }
+
+    positionUpdated(id?: number) {
+        if (id) return this.watch<Position>('position', id.toString(), 'update')
+        return this.watch<Position>('position', 'update')
+    }
+
+    positionDeleted() {
+        return this.watch<Position>('position', 'delete')
     }
 
     taskTagCreated() {
-        return this.watch<TaskTag>(`/task-tag/create`)
+        return this.watch<TaskTag>('task-tag', 'create')
     }
 
     taskTagUpdated() {
-        return this.watch<TaskTag>(`/task-tag/update`)
+        return this.watch<TaskTag>('task-tag', 'update')
     }
 
     taskTagDeleted() {
-        return this.watch<TaskTag>(`/task-tag/delete`)
+        return this.watch<TaskTag>('task-tag', 'delete')
     }
 
     taskUpdated(taskId?: number) {
-        if (taskId) return this.watch<Task>(`/task/${taskId}/update`)
-        return this.watch<Task>(`/task/update`)
+        if (taskId) return this.watch<Task>('task', taskId.toString(), 'update')
+        return this.watch<Task>('task', 'update')
     }
 
     taskDeleted(taskId?: number) {
-        if (taskId) return this.watch<Task>(`/task/${taskId}/delete`)
-        return this.watch<Task>(`/task/delete`)
+        if (taskId) return this.watch<Task>('task', taskId.toString(), 'delete')
+        return this.watch<Task>('task', 'delete')
     }
 
     taskCreated() {
-        return this.watch<Task>(`/task/create`)
+        return this.watch<Task>('task', 'create')
     }
 
     notificationCreated(login: string) {
-        return this.watch<any>(`/user/${login}/notification/create`)
+        return this.watchUnicast<any>(login, 'notification', 'create')
     }
 
     notificationUpdated(login: string) {
-        return this.watch<any>(`/user/${login}/notification/update`)
+        return this.watchUnicast<any>(login, 'notification', 'update')
     }
 
     chatMessageCreated(chatId: number) {
-        return this.watch<ChatMessage>(`/chat/${chatId}/message/create`)
+        return this.watch<SuperMessage>('chat', chatId.toString(), 'message', 'create')
+    }
+
+    chatMessageUpdated(chatId: number) {
+        return this.watch<SuperMessage>('chat', chatId.toString(), 'message', 'update')
+    }
+
+    chatMessageDeleted(chatId: number) {
+        return this.watch<SuperMessage>('chat', chatId.toString(), 'message', 'delete')
     }
 
     updateTrackerParserState() {
-        return this.watch<OldTracker>(`/parser/tracker/update`)
+        return this.watch<OldTracker>('parser', 'tracker', 'update')
     }
 
     parserMessageReceived() {
-        return this.watch<SimpleMessage>(`/parser/message`)
+        return this.watch<SimpleMessage>('parser', 'message')
     }
 
-    private watch<T>(destination: string): Observable<T> {
+    updateCountUnreadMessages(login: string) {
+        return this.watchUnicast<ChatUnreadCounter>(login, 'chat', 'message', 'unread')
+    }
+
+    chatCreated(login: string) {
+        return this.watchUnicast<Chat>(login, 'chat', 'create')
+    }
+
+    chatUpdated() {
+        return this.watch<Chat>('chat', 'update');
+    }
+
+    chatClosed() {
+        return this.watch<Chat>('chat', 'close');
+    }
+
+    private watchUnicast<T>(...path: string[]): Observable<T> {
+        return this.getObservable<T>('user', ...path);
+    }
+
+    private watch<T>(...path: string[]): Observable<T> {
+        return this.getObservable<T>('api', ...path);
+    }
+
+    private getObservable<T>(prefix: string, ...path: string[]): Observable<T> {
+        const destination = `/${prefix}/${path.join('/')}`;
         // Генерируем хэш запроса на основе конечной точки и параметров запроса
         const requestHash = this.generateHash(destination);
         // Объявляем результирующий observable
@@ -106,11 +183,13 @@ export class RealTimeUpdateService {
     }
 
     // Генерируем хэш наблюдателя по месту назначения
+
     private generateHash(destination: string) {
         return cyrb53(destination, 0);
     }
 
     // Удаляет observable из кэша
+
     private deleteFromCache(hash: string) {
         delete this.watchCacheMap[hash];
     }

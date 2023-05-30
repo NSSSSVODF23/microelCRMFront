@@ -1,35 +1,43 @@
-import {Directive, ElementRef, EventEmitter, Input, OnInit, Output} from '@angular/core';
+import {Directive, ElementRef, EventEmitter, OnInit, Output} from '@angular/core';
 
 @Directive({
     selector: '[appIntersectionObserver]'
 })
 export class IntersectionObserverDirective implements OnInit {
 
-    @Output() intersection = new EventEmitter<void>();
-    @Input() root?: HTMLElement;
-    private observer?: IntersectionObserver;
+    @Output() intersection = new EventEmitter<IntersectionObserverEntry[]>();
+    private observer = new IntersectionObserver((entries, observer) =>
+        this.intersection.emit(entries), {threshold: 0.5, root: this.root.nativeElement});
+    private childMutationObserver = new MutationObserver(this.onChildMutation.bind(this));
 
-    constructor(public el: ElementRef) {
+    constructor(public root: ElementRef) {
 
     }
 
     ngOnInit(): void {
-
-        this.observer = new IntersectionObserver(this.callback, {threshold: 0.5, root: this.root});
-        this.observer.observe(this.el.nativeElement);
+        const observerOptions = {
+            childList: true,
+            subtree: false
+        }
+        this.childMutationObserver.observe(this.root.nativeElement, observerOptions);
     }
 
-    private callback: ConstructorParameters<typeof IntersectionObserver>[0] = (entries) =>
-        entries
-            // .filter((entry) => {
-            //     return entry.isIntersecting!;
-            // })
-            .forEach((_entry) => {
-                // this.intersection.emit();
-                if(_entry.isIntersecting){
-                    this.el.nativeElement.children.forEach((c:any)=>c.style.display = undefined);
-                }else{
-                    this.el.nativeElement.children.forEach((c:any)=>c.style.display = 'none');
-                }
-            });
+    private onChildMutation(mutations: MutationRecord[]) {
+        for (const mutation of mutations) {
+            if (mutation.type === 'childList') {
+                mutation.addedNodes.forEach((node: any) => {
+                    try {
+                        this.observer.observe(node);
+                    } catch (ignore) {
+                    }
+                });
+                mutation.removedNodes.forEach((node: any) => {
+                    try {
+                        this.observer.unobserve(node);
+                    } catch (ignore) {
+                    }
+                });
+            }
+        }
+    }
 }

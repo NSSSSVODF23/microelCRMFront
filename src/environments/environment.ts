@@ -4,7 +4,8 @@
 
 export const environment = {
   production: false,
-  wsHost: "ws://localhost:8080/socket"
+  wsHost: "ws://localhost:8080/socket",
+  hmr: false
 };
 
 /*

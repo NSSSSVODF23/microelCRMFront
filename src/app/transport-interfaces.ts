@@ -61,6 +61,7 @@ export interface Employee {
     secondName?: string;
     firstName?: string;
     lastName?: string;
+    fullName?: string;
     internalPhoneNumber?: string;
     access?: number;
     password?: string;
@@ -293,6 +294,12 @@ export enum AttachmentType {
     PHOTO = "PHOTO", VIDEO = "VIDEO", DOCUMENT = "DOCUMENT", AUDIO = "AUDIO", FILE = "FILE"
 }
 
+export enum ContentType {
+    VISUAL = "VISUAL",
+    AUDIO = "AUDIO",
+    FILE = "FILE"
+}
+
 export enum TaskEventType {
     CHANGE_STAGE = "CHANGE_STAGE",
     CREATE_WORK_LOG = "CREATE_WORK_LOG",
@@ -385,15 +392,32 @@ export interface LongPollEvent<T> {
 export interface ChatMessage{
     chatMessageId: number;
     text: string;
-    attachments?: Attachment[];
+    attachment?: Attachment;
     sendAt: string;
+    readByEmployees?: Employee[];
     edited?: string;
     deleted?: string;
     author: Employee;
 }
 
+export interface SuperMessage{
+    superMessageId: number;
+    text: string;
+    attachments: Attachment[];
+    edited?: string;
+    deleted: boolean;
+    author: Employee;
+    replyTo: SuperMessage;
+    sendAt: string;
+    readByEmployees?: Employee[];
+    includedMessages: number[];
+    attachmentType?: ContentType;
+    isMediaGroup: boolean;
+}
+
 export interface Chat{
     chatId: number;
+    title?: string;
     messages: ChatMessage[];
     deleted: boolean;
     created: string;
@@ -401,6 +425,11 @@ export interface Chat{
     members: Employee[];
     updated: string;
     lastMessage: ChatMessage;
+}
+
+export interface ChatUnreadCounter{
+    chatId: number;
+    count: number;
 }
 
 export interface WorkReport{

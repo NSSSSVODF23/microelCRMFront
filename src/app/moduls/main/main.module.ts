@@ -24,7 +24,7 @@ import {
     NgStyle,
     NgSwitch,
     NgSwitchCase,
-    NgTemplateOutlet
+    NgTemplateOutlet, SlicePipe
 } from "@angular/common";
 import {TabViewModule} from "primeng/tabview";
 import {DialogModule} from "primeng/dialog";
@@ -142,7 +142,8 @@ import {ParseAddressPageComponent} from "../../pages/parse-address-page/parse-ad
         ContextMenuModule,
         VirtualScrollerModule,
         ProgressBarModule,
-        KeyValuePipe
+        KeyValuePipe,
+        SlicePipe
     ],
     providers: [MessageService, {provide: LOCALE_ID, useValue: 'ru'}, ConfirmationService]
 })

@@ -18,7 +18,7 @@ import {
     MessageData,
     ModelItem,
     Page,
-    Position,
+    Position, SuperMessage,
     Task,
     TaskEvent,
     TaskFieldsSnapshot,
@@ -410,19 +410,39 @@ export class ApiService {
     }
 
     getChatMessages(chatId: number, first: number, limit: number) {
-        return this.sendGet<Page<ChatMessage>>("api/private/chat/" + chatId + "/messages", {first, limit});
+        return this.sendGet<Page<SuperMessage>>("api/private/chat/" + chatId + "/messages", {first, limit});
+    }
+
+    setMessagesAsRead(messageIds: number[]){
+        return this.sendPatch<void>("api/private/chat/messages/read", messageIds);
     }
 
     getActiveTaskChat(taskId: number) {
         return this.sendGet<Chat>("api/private/task/" + taskId + "/active-chat");
     }
 
-    sendChatMessage(chatId: number, text: string, files: FileData[], replyMessageId: number) {
+    getChat(chatId: number) {
+        return this.sendGet<Chat>("api/private/chat/" + chatId);
+    }
+
+    sendChatMessage(chatId: number, text: string, files: FileData[], replyMessageId?: number) {
         return this.sendPost<ChatMessage>("api/private/chat/" + chatId + "/message", {
             text,
             files,
             replyMessageId
         } as MessageData);
+    }
+
+    editChatMessage(messageId: number, text: string) {
+        return this.sendPatch<ChatMessage>("api/private/chat/message/" + messageId, text);
+    }
+
+    deleteChatMessage(chatId: number, messageId: number) {
+        return this.sendDelete("api/private/chat/message/" + messageId);
+    }
+
+    getMyActiveChats() {
+        return this.sendGet<Chat[]>("api/private/chats/my/active");
     }
 
     getIncomingTasks(page: number, limit: number, filters: any) {
@@ -487,6 +507,10 @@ export class ApiService {
         return this.sendGet<Address[]>("api/private/suggestions/address", {query});
     }
 
+    getCountOfUnreadMessages(chatId: number) {
+        return this.sendGet<number>("api/private/chat/" + chatId + "/messages/unread-count");
+    }
+
     // Результаты запросов на сервер кэшируются по таймауту, чтобы не было доп нагрузки на сервер
     private sendGet<T>(uri: string, query?: any) {
         // Генерируем хэш запроса на основе конечной точки и параметров запроса
@@ -513,6 +537,7 @@ export class ApiService {
     }
 
     // Результаты запросов на сервер кэшируются по таймауту, чтобы не было доп нагрузки на сервер
+
     private sendGetSilent<T>(uri: string, query?: any) {
         const requestHash = this.generateHash(uri, query);
         let observable: Observable<T> | null = null;
@@ -528,7 +553,6 @@ export class ApiService {
         }
         return observable;
     }
-
     private sendPost<T>(uri: string, body: any) {
         return this.client.post<T>(uri, body)
             .pipe(catchError(async (err, caught) => {
@@ -545,6 +569,7 @@ export class ApiService {
             }));
     }
 
+
     private sendDelete(uri: string) {
         return this.client.delete(uri)
             .pipe(catchError(async (err, caught) => {
@@ -554,6 +579,7 @@ export class ApiService {
     }
 
     // Генерируем хэш запроса по URI и параметрам запроса
+
     private generateHash(uri: string, query: any) {
         return cyrb53(uri + JSON.stringify(query), 0);
     }

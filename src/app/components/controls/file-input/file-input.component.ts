@@ -22,29 +22,40 @@ export class FileInputComponent implements OnInit {
     @Input() disabled: boolean = false;
     menuItems: MenuItem[] = [
         {
+            label: 'Изменить',
+            icon: 'mdi-edit',
+            command: this.openFileManager.bind(this)
+        },
+        {
             label: 'Отчистить',
             icon: 'mdi-highlight_off',
             command: this.clear.bind(this)
         }
     ];
 
-    get style(){
-        if(this.short) return 'p-button-text p-button-secondary p-button-icon'
-        return 'p-button-text p-button-secondary'
-    }
-
-    get label(){
-        if(this.short) return ''
-        return 'Прикрепить'
-    }
-
     constructor(readonly toast: MessageService) {
+    }
+
+    get hasFiles() {
+        return this.files.length > 0
+    }
+
+    get style() {
+        if (this.short)
+            return 'p-button-text p-button-icon p-button-rounded' + (this.hasFiles ? ' p-button-info' : ' p-button-secondary')
+        return 'p-button-text' + (this.hasFiles ? ' p-button-info' : ' p-button-secondary')
+    }
+
+    get label() {
+        if (this.short) return ''
+        return 'Прикрепить'
     }
 
     ngOnInit(): void {
     }
 
     openFileManager() {
+        this.clear()
         this.fileManager.nativeElement.click()
     }
 

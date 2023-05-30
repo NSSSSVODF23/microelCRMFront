@@ -63,19 +63,19 @@
         <div class="flexed column gap3 p5">
             <div class="flexed hcenter gap3">
                 <span class="caption-secondary">Имя</span>
-                <span class="caption-main">{{media?.name}}</span>
+                <span class="caption-inline-param">{{media?.name}}</span>
             </div>
             <div class="flexed hcenter gap3">
                 <span class="caption-secondary">Размер файла</span>
-                <span class="caption-main">{{((media?.size ?? 0) / 1048576).toFixed(2)}} Мбайт</span>
+                <span class="caption-inline-param">{{((media?.size ?? 0) / 1048576).toFixed(2)}} Мбайт</span>
             </div>
             <div class="flexed hcenter gap3">
                 <span class="caption-secondary">Дата создания</span>
-                <span class="caption-main">{{media?.modified|date}}</span>
+                <span class="caption-inline-param">{{media?.modified|date}}</span>
             </div>
             <div class="flexed hcenter gap3">
                 <span class="caption-secondary">Дата добавления</span>
-                <span class="caption-main">{{media?.created|date}}</span>
+                <span class="caption-inline-param">{{media?.created|date}}</span>
             </div>
         </div>
         <div class="stretched"></div>

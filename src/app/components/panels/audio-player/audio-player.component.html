@@ -1,0 +1,37 @@
+<div class="flexed hend full-width gap5" [style.user-select]="'none'">
+    <div class="play-button" [ngClass]="{disabled:!url || playerState==='Loading' || playerState==='Error'}" (click)="playerButtonClick()">
+        <ng-container [ngSwitch]="playerState">
+            <i class="mdi-play_arrow" *ngSwitchCase="'Paused'"></i>
+            <i class="mdi-pause" *ngSwitchCase="'Playing'"></i>
+            <i class="mdi-downloading" *ngSwitchCase="'Loading'"></i>
+            <i class="mdi-warning" *ngSwitchCase="'Error'"></i>
+        </ng-container>
+    </div>
+    <div class="flexed column stretched gap3">
+        <div #durationControl class="timeline">
+            <p-progressBar [showValue]="false" [style]="{height:'.7rem'}" [value]="(currentTime/totalTime)*100"></p-progressBar>
+            <div class="timeline-marker" *ngIf="showTimeMarker" [style.left]="markerPosition+'px'"></div>
+            <p-overlay #timeOverlay appendTo="body" [visible]="showTimeMarker" [style]="{transform:'translate(-25%, 1rem)'}">
+                <div class="time-overlay">
+                    {{currentMinutes}}:{{currentSeconds}}
+                </div>
+            </p-overlay>
+        </div>
+        <div class="flexed hcenter gap10">
+            <span class="duration">{{currentMinutes}}:{{currentSeconds}} / {{totalMinutes}}:{{totalSeconds}}</span>
+            <div class="volume-button" (click)="openVolumeOverlay()">
+                <i class="mdi-volume_up" *ngIf="player.volume > .8"></i>
+                <i class="mdi-volume_down" *ngIf="player.volume <= .8 && player.volume > .5"></i>
+                <i class="mdi-volume_mute" *ngIf="player.volume <= .5 && player.volume > 0"></i>
+                <i class="mdi-volume_off" *ngIf="player.volume === 0"></i>
+            </div>
+            <p-overlay appendTo="body" [(visible)]="showVolumeLevel" >
+                <div #volumeOverlay class="volume-level">
+                    <p-slider [min]="0" [max]="1" [step]="0.05" (onChange)="changeVolume($event)" orientation="vertical" [ngModel]="player.volume"></p-slider>
+                    <div>{{player.volume*100 | floor}}%</div>
+                </div>
+            </p-overlay>
+        </div>
+    </div>
+</div>
+<audio #player [src]="url"></audio>

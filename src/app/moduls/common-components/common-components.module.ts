@@ -118,6 +118,20 @@ import {
     TrackerBindingsInputComponent
 } from "../../components/controls/tracker-bindings-input/tracker-bindings-input.component";
 import {AdjustInputWidthDirective} from "../../directives/adjust-input-width.directive";
+import {ProgressBarModule} from "primeng/progressbar";
+import {AudioPlayerComponent} from "../../components/panels/audio-player/audio-player.component";
+import {SliderModule} from "primeng/slider";
+import {EmojiStyleApplyDirective} from "../../directives/emoji-style-apply.directive";
+import {TextFieldModule} from "@angular/cdk/text-field";
+import {TextareaAutoresizeDirective} from "../../directives/textarea-autoresize.directive";
+import {FileAttachmentComponent} from "../../components/panels/file-attachment/file-attachment.component";
+import {EmojiPanelComponent} from "../../components/panels/emoji-panel/emoji-panel.component";
+import {RippleModule} from "primeng/ripple";
+import {AvatarListComponent} from "../../components/panels/avatar-list/avatar-list.component";
+import {AnimateModule} from "primeng/animate";
+import {PositionInScrolledViewDirective} from "../../directives/position-in-scrolled-view.directive";
+import {ContextMenuComponent} from "../../components/controls/context-menu/context-menu.component";
+import {MyActiveChatsComponent} from "../../components/panels/my-active-chats/my-active-chats.component";
 
 
 @NgModule({
@@ -179,7 +193,16 @@ import {AdjustInputWidthDirective} from "../../directives/adjust-input-width.dir
         NotificationsPopupPanelComponent,
         ChatPanelComponent,
         TrackerBindingsInputComponent,
-        AdjustInputWidthDirective
+        AdjustInputWidthDirective,
+        AudioPlayerComponent,
+        EmojiStyleApplyDirective,
+        TextareaAutoresizeDirective,
+        FileAttachmentComponent,
+        EmojiPanelComponent,
+        AvatarListComponent,
+        PositionInScrolledViewDirective,
+        ContextMenuComponent,
+        MyActiveChatsComponent
     ],
     exports: [
         AccountPanelComponent,
@@ -239,7 +262,16 @@ import {AdjustInputWidthDirective} from "../../directives/adjust-input-width.dir
         NotificationsPopupPanelComponent,
         ChatPanelComponent,
         TrackerBindingsInputComponent,
-        AdjustInputWidthDirective
+        AdjustInputWidthDirective,
+        AudioPlayerComponent,
+        EmojiStyleApplyDirective,
+        TextareaAutoresizeDirective,
+        FileAttachmentComponent,
+        EmojiPanelComponent,
+        AvatarListComponent,
+        PositionInScrolledViewDirective,
+        ContextMenuComponent,
+        MyActiveChatsComponent
     ],
     imports: [
         CommonPipesModule,
@@ -277,6 +309,11 @@ import {AdjustInputWidthDirective} from "../../directives/adjust-input-width.dir
         BlockUIModule,
         SidebarModule,
         ConfirmDialogModule,
+        ProgressBarModule,
+        SliderModule,
+        TextFieldModule,
+        RippleModule,
+        AnimateModule,
 
     ],
     providers: [

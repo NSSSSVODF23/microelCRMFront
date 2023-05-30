@@ -383,7 +383,7 @@ export function registerCustomElements(injector: Injector) {
     }
 
     for (const [name, element] of Object.entries(elements)) {
-        customElements.define(name, element);
+        customElements.get(name) || customElements.define(name, element);
     }
 }
 

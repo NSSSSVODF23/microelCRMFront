@@ -5,7 +5,7 @@
         <ng-container *ngTemplateOutlet="eventIcon; context:{$implicit:entry}"></ng-container>
         <div class="vertical-line"></div>
         <div class="employee-avatar-wrapper">
-            <app-avatar [src]="entry.creator?.avatar" [name]="entry.creator | eplName" [size]="2.8"></app-avatar>
+            <app-avatar [src]="entry.creator?.avatar" [name]="entry.creator?.fullName" [size]="2.8"></app-avatar>
         </div>
         <ng-container *ngTemplateOutlet="eventHeader; context:{$implicit:entry,reply:false}"></ng-container>
         <div [ngClass]="{event:!isComment(entry), reply:isHasReply(entry)}" class="journal-event-body">
@@ -28,7 +28,7 @@
         <div *ngIf="isHasReply(entry)" class="reply-comment">
             <div class="reply-marker"></div>
             <div class="employee-avatar-wrapper">
-                <app-avatar [name]="getReplyComment(entry)?.creator | eplName" [src]="getReplyComment(entry)?.creator?.avatar" [size]="2.8"></app-avatar>
+                <app-avatar [name]="getReplyComment(entry)?.creator?.fullName" [src]="getReplyComment(entry)?.creator?.avatar" [size]="2.8"></app-avatar>
             </div>
             <ng-container
                     *ngTemplateOutlet="eventHeader; context:{$implicit:getReplyComment(entry),reply:true}"></ng-container>
@@ -76,7 +76,7 @@
 <ng-template #eventHeader let-entry let-reply="reply">
     <div class="journal-event-header">
         <div class="basic-information">
-            <span class="employee-name">{{entry.creator | eplName}}</span>
+            <span class="employee-name">{{entry.creator?.fullName}}</span>
             <span class="creation-time">{{entry.created | elapsedTime:!entry.type ? "написал(а) " : '' : " назад"}}</span>
         </div>
         <app-button (onClick)="selectCommentToReply(entry)"

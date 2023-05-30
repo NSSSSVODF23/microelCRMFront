@@ -35,7 +35,6 @@ export class LazyPageLoader implements OnInit{
 
   @HostListener('window:resize', ['$event'])
   windowResize(event: any){
-    console.log(event);
   }
 
 }

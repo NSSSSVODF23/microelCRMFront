@@ -12,8 +12,6 @@ import {HttpClientModule} from "@angular/common/http";
 import {FormsModule} from "@angular/forms";
 import {RouterModule, RouterOutlet} from "@angular/router";
 import {ToastModule} from "primeng/toast";
-import { NotificationsPopupPanelComponent } from './components/panels/notifications-popup-panel/notifications-popup-panel.component';
-import {FullCalendarModule} from "@fullcalendar/angular";
 
 registerLocaleData(localeRu, 'ru');
 

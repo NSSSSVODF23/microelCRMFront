@@ -1,39 +1,224 @@
-<p-dialog [(visible)]="isShow"
-          [contentStyle]="{display:'flex', flexDirection:'column', padding: '1rem'}"
-          [style]="{minWidth:'30rem', width:'50rem', minHeight: '40rem'}">
+<p-dialog (onHide)="flushMessages()" (onShow)="whenOpenPanel()" [(visible)]="isShow" [contentStyle]="{display:'grid',
+ padding: '0', height: '100%', grid: '1fr min-content / 1fr'}"
+          [style]="{width:'min-content', height:'50vh', minWidth: '27rem', minHeight: '15rem', maxWidth:'70vw', maxHeight: '90vh'}"
+          appendTo="body"
+          position="bottom-right">
     <ng-template pTemplate="header">
+        <div class="flexed hcenter gap5">
+            <span class="caption-sub-header flexed hcenter gap3"><i class="mdi-chat"></i> {{currentChat?.title}}</span>
+            <app-avatar-list [employees]="currentChat?.members ?? []"></app-avatar-list>
+        </div>
     </ng-template>
     <ng-template pTemplate="content">
-        <div class="common-wrapper">
-            <div class="chat-view" appScrollToBottomEmitter (onScrollToBottom)="loadMessages()">
-                <div *ngFor="let message of messages; trackBy: trackMessages" class="message-wrapper">
-                    <app-avatar [deleted]="message.author.deleted"
-                                [size]="2.3"
-                                [src]="message.author.avatar"
-                                [status]="message.author.status"
-                                name="{{message.author | eplName}}"
-                    ></app-avatar>
-                    <div [ngClass]="{my:isMy(message.author)}" class="chat-message">
-                        <div class="message-header">
-                            {{message.author | eplName}}
-                        </div>
-                        <div class="message-text">
-                            <span class="content">{{message.text}}</span>
-                            <div class="message-footer">
-                                <span>{{message.sendAt | date:"HH:mm"}}</span>
-                            </div>
-                        </div>
-                    </div>
+        <div #list (intersection)="readMessage($event)" (onScrollToBottom)="loadMessages()"
+             (scroll)="startButtonVisibleEmitter.emit()" [ngClass]="{unread: unreadCount>0}"
+             [style.overflow]="shaderVisible ? 'hidden' : ''" appIntersectionObserver appScrollToBottomEmitter
+             class="chat-view">
+            <div (contextmenu)="showContext($event, message)" *ngFor="let message of messages; trackBy: trackMessages"
+                 @fade
+                 [attr.data-msg]="getMessagesIds(message)"
+                 [ngClass]="{shaded: messageContexted === message.superMessageId}" class="message-wrapper">
+                <app-avatar [deleted]="message.author.deleted"
+                            [name]="message.author.fullName"
+                            [size]="2.3"
+                            [src]="message.author.avatar"
+                ></app-avatar>
+                <ng-container *ngTemplateOutlet="messageBody; context: {$implicit: message}"></ng-container>
+            </div>
+            <ng-container *ngIf="isLoading">
+                <div class="message-wrapper" *ngFor="let stub of loadingsStubs">
+                    <p-skeleton size="2.3rem" shape="circle"></p-skeleton>
+                    <p-skeleton width="15rem" height="5rem" borderRadius="1rem 1rem 1rem .3rem"></p-skeleton>
+                </div>
+            </ng-container>
+            <div *ngIf="shaderVisible" @fade [style.transform]="'translateY('+list.scrollTop+'px)'"
+                 class="shader"></div>
+            <app-context-menu #contextMenu (onHide)="shaderVisible=false"
+                              (onShow)="shaderVisible = true"></app-context-menu>
+            <div (click)="list.scrollTo({top:0, behavior:'smooth'})"
+                 *ngIf="list.scrollTop < -100 && startButtonVisible && !shaderVisible"
+                 @fade [style.transform]="'translateY('+list.scrollTop+'px)'" class="scroll-to-start-button">
+                <p-badge *ngIf="unreadCount>0" [style]="{fontSize:'.65rem', minWidth:'1.2rem', height:'1.2rem'}"
+                         [value]="unreadCount.toString()"
+                         class="ur-badge"
+                         severity="warning"></p-badge>
+                <i class="mdi-arrow_downward"></i>
+            </div>
+        </div>
+        <div [ngClass]="{unread: unreadCount>0}" class="chat-input">
+            <div *ngIf="editMessage" class="preview-message-wrapper">
+                <div class="flexed hcenter gap2 caption-secondary">
+                    <i class="mdi-edit"></i> <span>Редактирование</span>
+                </div>
+                <div class="flexed hcenter gap5">
+                    <ng-container
+                            *ngTemplateOutlet="editMessagePreview; context: {$implicit: editMessage}"></ng-container>
+                    <p-button (onClick)="clearEditMessage()" icon="mdi-close"
+                              styleClass="p-button-text p-button-icon p-button-secondary p-button-rounded"></p-button>
                 </div>
             </div>
-            <div class="chat-input">
-                <textarea pInputTextarea [(ngModel)]="sendingText" [autoResize]="true" [rows]="1"
-                          [style]="{flex: 1, minHeight:'41px'}"></textarea>
+            <div *ngIf="replyMessage" class="preview-message-wrapper">
+                <div class="flexed hcenter gap2 caption-secondary">
+                    <i class="mdi-reply"></i> <span>Ответ</span>
+                </div>
+                <div class="flexed hcenter gap5">
+                    <ng-container
+                            *ngTemplateOutlet="editMessagePreview; context: {$implicit: replyMessage}"></ng-container>
+                    <p-button (onClick)="clearReplyMessage()" icon="mdi-close"
+                              styleClass="p-button-text p-button-icon p-button-secondary p-button-rounded"></p-button>
+                </div>
+            </div>
+            <div class="input-wrapper">
+                <textarea #messageInput (keydown)="messageInputKeyDown($event)" [(ngModel)]="sendingText"
+                          [disabled]="isBeginSending" appTextareaAutoresize placeholder="Сообщение"></textarea>
                 <div class="button-block">
-                    <app-file-input [(files)]="sendingFiles" [short]="true"></app-file-input>
-                    <p-button styleClass="p-button-text p-button-icon" icon="mdi-send" (onClick)="sendMessage()"></p-button>
+                    <app-emoji-panel (onChoosing)="insertEmoji($event)"></app-emoji-panel>
+                    <app-file-input [(files)]="sendingFiles" [disabled]="isBeginSending || !!editMessage"
+                                    [short]="true"></app-file-input>
+                    <p-button (onClick)="sendMessage()" [disabled]="isNotReady" [loading]="isBeginSending"
+                              icon="mdi-send"
+                              styleClass="p-button-text p-button-icon p-button-rounded"></p-button>
                 </div>
             </div>
         </div>
     </ng-template>
 </p-dialog>
+
+<ng-template #editMessagePreview let-message>
+    <div class="message-preview">
+        <app-avatar [name]="message.author.fullName" [size]="1.7" [src]="message.author.avatar" class="avatar"
+                    shape="square"></app-avatar>
+        <span class="author-name">{{message.author.fullName}}</span>
+        <span class="message-text">{{message.text}}</span>
+    </div>
+</ng-template>
+
+<ng-template #messageBody let-message>
+    <ng-container *ngIf="message.attachments.length>1">
+        <div [ngClass]="{my:isMy(message.author), unread: !readOut(message), reply: message.replyTo}"
+             class="chat-message media-group">
+            <ng-container *ngIf="message.replyTo">
+                <ng-container *ngTemplateOutlet="replyMessageTemp; context: {$implicit: message.replyTo}"></ng-container>
+            </ng-container>
+            <div class="message-header">
+                {{message.author.fullName}}
+            </div>
+            <ng-container *ngIf="message.mediaGroup" [ngSwitch]="message.attachmentType">
+                <div *ngSwitchCase="'VISUAL'" [class]="'media-grid '+'g'+message.attachments.length">
+                    <div *ngFor="let attachment of message.attachments; let i=index; trackBy: trackAttachment"
+                         [class]="'media-item i'+i"
+                         [ngSwitch]="attachment.type">
+                        <div (click)="mediaViewer.showMedia(attachment)" *ngSwitchCase="'PHOTO'" class="img-container">
+                            <img [src]="thumbnailUrl+attachment.name" alt="">
+                        </div>
+                        <div (click)="mediaViewer.showMedia(attachment)" *ngSwitchCase="'VIDEO'" class="vid-container">
+                            <img [src]="thumbnailUrl+attachment.name" alt="">
+                            <div class="play-icon">
+                                <i class="mdi-play_arrow"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div *ngSwitchCase="'AUDIO'" class="flexed column gap5">
+                    <app-audio-player *ngFor="let attach of message.attachments"
+                                      [url]="fileUrl+attach.name"></app-audio-player>
+                </div>
+                <div *ngSwitchCase="'FILE'" class="flexed column gap5">
+                    <app-file-attachment *ngFor="let attach of message.attachments"
+                                         [attachment]="attach"></app-file-attachment>
+                </div>
+            </ng-container>
+            <div class="message-text">
+                <span appEmojiStyleApply class="content">{{message.text}}</span>
+                <div class="message-footer">
+                    <span>{{message.sendAt | date:"HH:mm"}}</span>
+                </div>
+            </div>
+        </div>
+    </ng-container>
+    <ng-container *ngIf="message.attachments.length===1">
+        <div [ngClass]="{my:isMy(message.author), unread: !readOut(message), reply: message.replyTo}"
+             class="chat-message single-media">
+            <ng-container *ngIf="message.replyTo">
+                <ng-container *ngTemplateOutlet="replyMessageTemp; context: {$implicit: message.replyTo}"></ng-container>
+            </ng-container>
+            <div class="message-header">
+                {{message.author.fullName}}
+            </div>
+            <ng-container [ngSwitch]="message.attachments[0].type">
+                <div (click)="mediaViewer.showMedia(message.attachments[0])" *ngSwitchCase="'PHOTO'"
+                     class="img-container">
+                    <img [src]="thumbnailUrl+message.attachments[0].name" alt="">
+                </div>
+                <div (click)="mediaViewer.showMedia(message.attachments[0])" *ngSwitchCase="'VIDEO'"
+                     class="vid-container">
+                    <video [controls]="false" [src]="thumbnailUrl+message.attachments[0].name"></video>
+                    <div class="play-icon">
+                        <i class="mdi-play_arrow"></i>
+                    </div>
+                </div>
+                <div *ngSwitchCase="'AUDIO'" class="aud-container">
+                    <app-audio-player [url]="fileUrl+message.attachments[0].name"></app-audio-player>
+                </div>
+                <div *ngSwitchDefault class="file-container">
+                    <app-file-attachment [attachment]="message.attachments[0]"></app-file-attachment>
+                </div>
+            </ng-container>
+            <div class="message-text">
+                <span appEmojiStyleApply class="content">{{message.text}}</span>
+                <div class="message-footer">
+                    <span>{{message.sendAt | date:"HH:mm"}}</span>
+                </div>
+            </div>
+        </div>
+    </ng-container>
+    <ng-container *ngIf="message.attachments.length===0">
+        <div [ngClass]="{my:isMy(message.author), unread: !readOut(message), reply: message.replyTo}"
+             class="chat-message">
+            <ng-container *ngIf="message.replyTo">
+                <ng-container *ngTemplateOutlet="replyMessageTemp; context: {$implicit: message.replyTo}"></ng-container>
+            </ng-container>
+            <div class="message-header">
+                {{message.author.fullName}}
+            </div>
+            <div class="message-text">
+                <span appEmojiStyleApply class="content">{{message.text}}</span>
+                <div class="message-footer">
+                    <span>{{message.sendAt | date:"HH:mm"}}</span>
+                </div>
+            </div>
+        </div>
+    </ng-container>
+</ng-template>
+
+<ng-template #replyMessageTemp let-message>
+    <div class="reply-message">
+        <div class="message-header">
+            {{message.author.fullName}}
+        </div>
+        <ng-container *ngIf="message.attachments && message.attachments.length===1">
+            <ng-container [ngSwitch]="message.attachments[0].type">
+                <div (click)="mediaViewer.showMedia(message.attachments[0])" *ngSwitchCase="'PHOTO'"
+                     class="img-container">
+                    <img [src]="thumbnailUrl+message.attachments[0].name" alt="">
+                </div>
+                <div (click)="mediaViewer.showMedia(message.attachments[0])" *ngSwitchCase="'VIDEO'"
+                     class="vid-container">
+                    <video [controls]="false" [src]="thumbnailUrl+message.attachments[0].name"></video>
+                    <div class="play-icon">
+                        <i class="mdi-play_arrow"></i>
+                    </div>
+                </div>
+                <div *ngSwitchCase="'AUDIO'" class="aud-container">
+                    <app-audio-player [url]="fileUrl+message.attachments[0].name"></app-audio-player>
+                </div>
+                <div *ngSwitchDefault class="file-container">
+                    <app-file-attachment [attachment]="message.attachments[0]"></app-file-attachment>
+                </div>
+            </ng-container>
+        </ng-container>
+        <div class="message-text">
+            <span appEmojiStyleApply class="content">{{message.text}}</span>
+        </div>
+    </div>
+</ng-template>

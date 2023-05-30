@@ -2,6 +2,7 @@ import {Component, OnInit} from '@angular/core';
 import {FieldItem, WireframeFieldType} from "../../transport-interfaces";
 import {v4} from "uuid";
 import {FormControl, FormGroup} from "@angular/forms";
+import {ApiService} from "../../services/api.service";
 
 @Component({
     templateUrl: './testing-page.component.html',
@@ -21,8 +22,9 @@ export class TestingPageComponent implements OnInit {
         {name: 'Телефон', id: v4(), type: WireframeFieldType.PHONE_ARRAY, orderPosition: 1, listViewIndex: 1},
     ]
     form: FormGroup = new FormGroup({});
+    employees$ = this.api.getEmployees();
 
-    constructor() {
+    constructor(readonly api: ApiService) {
     }
 
     ngOnInit(): void {

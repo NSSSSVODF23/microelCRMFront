@@ -139,7 +139,7 @@
         <div class="edit-reply-preview">
             <div *ngIf="replyComment" class="reply-comment-preview">
                 <span class="material-icons-round preview-icon">reply</span>
-                <span class="whose-comment">{{replyComment.creator | eplName}}</span>
+                <span class="whose-comment">{{replyComment.creator?.fullName}}</span>
                 <quill-view-html [content]="replyComment.message" class="comment-text"></quill-view-html>
                 <app-icon-button (onClick)="replyComment=undefined" class="cancel-button" icon="close"
                                  model="secondary"></app-icon-button>
@@ -163,9 +163,6 @@
                   label="Отправить"></p-button>
     </div>
 </div>
-
-
-<app-media-viewer></app-media-viewer>
 
 <app-attachments-history-dialog [(show)]="showFilesHistory" [taskId]="taskId"></app-attachments-history-dialog>
 
@@ -236,9 +233,9 @@
             <div (click)="selectedEmployeeAsResponsible = emp" *ngFor="let emp of employeeList"
                  [ngClass]="{selected:selectedEmployeeAsResponsible?.login === emp.login}"
                  class="list-view-item hovered bordered flexed hcenter gap10">
-                <app-avatar [name]="emp | eplName" [src]="emp.avatar" [size]="2.3"></app-avatar>
+                <app-avatar [name]="emp.fullName" [src]="emp.avatar" [size]="2.3"></app-avatar>
                 <div class="flexed column">
-                    <span class="caption-main">{{emp | eplName}}</span>
+                    <span class="caption-main">{{emp.fullName}}</span>
                     <span class="caption-secondary">{{emp.department?.name}}</span>
                 </div>
                 <span *ngIf="selectedEmployeeAsResponsible?.login === emp.login" class="caption-active">(Выбран)</span>

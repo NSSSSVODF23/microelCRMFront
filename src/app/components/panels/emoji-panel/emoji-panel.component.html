@@ -1,0 +1,18 @@
+<p-button styleClass="p-button-secondary p-button-icon p-button-text p-button-rounded"
+          icon="mdi-sentiment_satisfied_alt" (onClick)="showPanel = true"></p-button>
+<p-overlay [(visible)]="showPanel" appendTo="body">
+    <div class="emoji-panel">
+        <div class="emoji-panel-list">
+            <div class="emoji-panel-list-item primary" pRipple (click)="choosingEventEmitter.emit(emoji)" *ngFor="let emoji of activeEmojis; trackBy: emojiTrack">
+                <span>{{emoji.code}}</span>
+            </div>
+        </div>
+        <div class="emoji-panel-categories">
+            <div class="emoji-panel-categories-category" pRipple [ngClass]="{active:activeCategory===i}"
+                 *ngFor="let category of categories; let i = index" (click)="activeCategory=i">
+                <span>{{category.titleEmoji}}</span>
+                <div>{{category.name}}</div>
+            </div>
+        </div>
+    </div>
+</p-overlay>

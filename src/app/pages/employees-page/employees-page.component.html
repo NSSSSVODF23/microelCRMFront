@@ -18,9 +18,9 @@
         </div>
         <div class="employee-list">
             <div *ngFor="let employee of employees" class="employee-list-item">
-                <app-avatar [deleted]="employee.deleted ?? false" [size]="2.5" [name]="employee | eplName" [src]="employee.avatar"></app-avatar>
+                <app-avatar [deleted]="employee.deleted ?? false" [size]="2.5" [name]="employee.fullName" [src]="employee.avatar"></app-avatar>
                 <div class="flexed column">
-                    <span class="caption-main">{{employee | eplName}}</span>
+                    <span class="caption-main">{{employee.fullName}}</span>
                     <div class="flexed gap5 hcenter">
                         <span appColorize>
                             {{employee.department?.name}}
@@ -55,7 +55,7 @@
                                 model="p-button-success"></app-button>
                 </div>
                 <div class="list-view">
-                    <div *ngFor="let department of departments$ | async" class="list-view-item bordered">
+                    <div *ngFor="let department of departments" class="list-view-item bordered">
                         <div class="flexed column gap5">
                                 <span appColorize class="caption-sub-header">
                                     {{department.name}}
@@ -94,7 +94,7 @@
                 <app-button (onClick)="openPositionCreator()" icon="add" label="Создать"
                             model="p-button-success"></app-button>
                 <div class="list-view">
-                    <div *ngFor="let position of positions$ | async" class="list-view-item bordered">
+                    <div *ngFor="let position of positions" class="list-view-item bordered">
                         <div class="flexed column gap5">
                                 <span appColorize class="caption-sub-header">
                                     {{position?.name}}
@@ -253,7 +253,7 @@
             <div class="flexed gap10 hcenter">
                 <span class="input-label-wrapper">
                     <label>Отдел</label>
-                    <p-dropdown [options]="(departments$ | async)??[]" formControlName="department"
+                    <p-dropdown [options]="departments" formControlName="department"
                                 optionLabel="name" optionValue="departmentId" placeholder="Выбрать">
                         <ng-template let-department pTemplate="selectedItem">
                             <div [colorString]="department.name" appColorize>{{department.name}}</div>
@@ -265,7 +265,7 @@
                 </span>
                 <span class="input-label-wrapper">
                     <label>Должность</label>
-                    <p-dropdown (onChange)="positionSelecting($event)" [options]="(positions$ | async)??[]" formControlName="position"
+                    <p-dropdown (onChange)="positionSelecting($event)" [options]="positions" formControlName="position"
                                 optionLabel="name" optionValue="positionId" placeholder="Выбрать">
                         <ng-template let-position pTemplate="selectedItem">
                             <div [colorString]="position.name" appColorize>
@@ -360,7 +360,7 @@
             <div class="flexed gap10 hcenter">
                 <span class="input-label-wrapper">
                     <label>Отдел</label>
-                    <p-dropdown [options]="(departments$ | async)??[]" formControlName="department"
+                    <p-dropdown [options]="departments" formControlName="department"
                                 optionLabel="name" optionValue="departmentId" placeholder="Выбрать">
                         <ng-template let-department pTemplate="selectedItem">
                             <div [colorString]="department.name" appColorize>{{department.name}}</div>
@@ -372,7 +372,7 @@
                 </span>
                 <span class="input-label-wrapper">
                     <label>Должность</label>
-                    <p-dropdown (onChange)="positionSelecting($event)" [options]="(positions$ | async)??[]" formControlName="position"
+                    <p-dropdown (onChange)="positionSelecting($event)" [options]="positions" formControlName="position"
                                 optionLabel="name" optionValue="positionId" placeholder="Выбрать">
                         <ng-template let-position pTemplate="selectedItem">
                             <div [colorString]="position.name" appColorize>

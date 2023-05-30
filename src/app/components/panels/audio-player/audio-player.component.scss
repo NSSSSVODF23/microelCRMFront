@@ -1,0 +1,87 @@
+.play-button {
+  width: 3rem;
+  height: 3rem;
+  border-radius: 50%;
+  background-color: var(--mc);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: white;
+  font-size: 1.5rem;
+  cursor: pointer;
+  transition: all .3s;
+
+  &.disabled {
+    background-color: var(--tc-300);
+    cursor: default;
+  }
+
+  &:not(.disabled):hover {
+    background-color: var(--mc-600);
+  }
+}
+
+.volume-button {
+  color: var(--tc-500);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.volume-level {
+  background-color: white;
+  border-radius: .5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: .5rem;
+  padding: 1.2rem .7rem .5rem .7rem;
+  box-shadow: 0px 0.4px 0.4px rgba(0, 0, 0, 0.02),
+  0px 1px 1px rgba(0, 0, 0, 0.028),
+  0px 1.9px 1.9px rgba(0, 0, 0, 0.035),
+  0px 3.4px 3.4px rgba(0, 0, 0, 0.042),
+  0px 6.3px 6.3px rgba(0, 0, 0, 0.05),
+  0px 15px 15px rgba(0, 0, 0, 0.07);
+
+  div {
+    font-size: .8rem;
+    font-weight: bold;
+    color: var(--tc-500);
+  }
+}
+
+.timeline {
+  position: relative;
+
+  &-marker {
+    position: absolute;
+    top: 0;
+    left: 0;
+    transform: translate(-50%, -.25rem);
+    width: 1.2rem;
+    height: 1.2rem;
+    border-radius: 50%;
+    background-color: var(--mc-300);
+    box-shadow: 0px 0px 0.4px rgba(0, 0, 0, 0.02),
+    0px 0px 1px rgba(0, 0, 0, 0.028),
+    0px 0px 1.9px rgba(0, 0, 0, 0.035),
+    0px 0px 3.4px rgba(0, 0, 0, 0.042),
+    0px 0px 6.3px rgba(0, 0, 0, 0.05),
+    0px 0px 15px rgba(0, 0, 0, 0.07);
+  }
+}
+
+.time-overlay{
+  border-radius: .3rem;
+  padding: .5rem;
+  background-color: white;
+  box-shadow: 0px 0px 0.4px rgba(0, 0, 0, 0.02),
+  0px 0px 1px rgba(0, 0, 0, 0.028),
+  0px 0px 1.9px rgba(0, 0, 0, 0.035),
+  0px 0px 3.4px rgba(0, 0, 0, 0.042),
+  0px 0px 6.3px rgba(0, 0, 0, 0.05),
+  0px 0px 15px rgba(0, 0, 0, 0.07);
+}

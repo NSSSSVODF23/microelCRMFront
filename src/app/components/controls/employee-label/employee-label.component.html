@@ -5,7 +5,7 @@
 </span>
 
 <ng-container *ngIf="inline">
-    <span *ngIf="employee && employee.login" class="like-link" (mouseenter)="showPreview($event)" (mouseleave)="hidePreview()">{{employee | eplName}}</span>
+    <span *ngIf="employee && employee.login" class="like-link" (mouseenter)="showPreview($event)" (mouseleave)="hidePreview()">{{employee.fullName}}</span>
     <span *ngIf="failed">
         {{_employeeId}}
     </span>
@@ -18,12 +18,12 @@
 </ng-template>
 
 <ng-template #info>
-    <app-avatar *ngIf="showStatus" [deleted]="employee?.deleted" [name]="employee | eplName" [shape]="'circle'" [size]="size"
+    <app-avatar *ngIf="showStatus" [deleted]="employee?.deleted" [name]="employee?.fullName ?? ''" [shape]="'circle'" [size]="size"
                 [src]="employee?.avatar" [status]="employee?.status"></app-avatar>
-    <app-avatar *ngIf="!showStatus" [deleted]="employee?.deleted" [name]="employee | eplName" [shape]="'circle'" [size]="size"
+    <app-avatar *ngIf="!showStatus" [deleted]="employee?.deleted" [name]="employee?.fullName ?? ''" [shape]="'circle'" [size]="size"
                 [src]="employee?.avatar"></app-avatar>
     <span class="caption-main-small one-line">
-        {{employee | eplName}}
+        {{employee?.fullName}}
     </span>
 </ng-template>
 
@@ -32,9 +32,9 @@
     <ng-template pTemplate="content">
         <div class="employee-preview">
             <app-avatar class="avatar" [size]="6" shape="square" [deleted]="employee?.deleted"
-                        [src]="employee?.avatar" [name]="employee | eplName" [status]="employee?.status"></app-avatar>
+                        [src]="employee?.avatar" [name]="employee?.fullName ?? ''" [status]="employee?.status"></app-avatar>
             <div class="name caption-header">
-                {{employee | eplName}}
+                {{employee?.fullName}}
             </div>
             <div class="status">
                 <span *ngIf="status" class="caption-secondary" [style]="statusStyle">{{status}}</span>

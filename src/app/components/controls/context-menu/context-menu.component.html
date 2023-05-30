@@ -1,0 +1,10 @@
+<p-overlay #contextMenu [(visible)]="contextMenuVisible" (onShow)="onShow.emit()" (onHide)="onHide.emit()" [style]="{minWidth:'max-content', transform:'translate(1rem, .3rem)'}"
+           appendTo="body">
+    <div class="context-body">
+        <div (click)="button.command(); contextMenu.hide()" *ngFor="let button of contextButtons"
+             [class]="'context-button '+button.style" pRipple>
+            <i [class]="button.icon"></i>
+            <span>{{button.label}}</span>
+        </div>
+    </div>
+</p-overlay>

@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, OnDestroy, OnInit} from '@angular/core';
 import {ApiService} from "../../services/api.service";
 import {FormControl, FormGroup, Validators} from "@angular/forms";
 import {ConfirmationService} from 'primeng/api';
@@ -45,11 +45,11 @@ class AccessFlag {
     templateUrl: './employees-page.component.html',
     styleUrls: ['./employees-page.component.scss']
 })
-export class EmployeesPageComponent implements OnInit {
+export class EmployeesPageComponent implements OnInit, OnDestroy {
 
     employees: Employee[] = [];
-    departments$ = this.api.getDepartments();
-    positions$ = this.api.getPositions();
+    departments: Department[] = [];
+    positions: Position[] = [];
     globalSearchValue: string = '';
     showDeleted: boolean = false;
     showCreateDepartmentDialog = false;
@@ -84,7 +84,7 @@ export class EmployeesPageComponent implements OnInit {
         login: new FormControl('', Validators.required),
         password: new FormControl('', Validators.required),
         telegramUserId: new FormControl(''),
-        department: new FormControl(undefined,Validators.required),
+        department: new FormControl(undefined, Validators.required),
         position: new FormControl(undefined, Validators.required),
         offsite: new FormControl(false)
     });
@@ -99,14 +99,59 @@ export class EmployeesPageComponent implements OnInit {
     constructor(readonly api: ApiService, readonly confirm: ConfirmationService, readonly rt: RealTimeUpdateService) {
     }
 
+    ngOnDestroy(): void {
+        this.subscriptions.unsubscribeAll();
+    }
+
     ngOnInit(): void {
-        this.api.getEmployees(undefined, false).subscribe(employees=>this.employees = employees);
+        this.api.getEmployees(undefined, false).subscribe(employees => this.employees = employees);
+        this.api.getDepartments().subscribe(dep => this.departments = dep);
+        this.api.getPositions().subscribe(pos => this.positions = pos);
         this.subscriptions.addSubscription('empUpd', this.rt.employeeUpdated().subscribe(value => {
-            const foundIndex = this.employees.findIndex(emp=>emp.login === value.login);
-            if(foundIndex >= 0) {
+            const foundIndex = this.employees.findIndex(emp => emp.login === value.login);
+            if (foundIndex >= 0) {
                 this.employees[foundIndex] = value;
             }
         }))
+        this.subscriptions.addSubscription('empCr', this.rt.employeeCreated().subscribe(value => {
+            this.employees.push(value);
+        }));
+        this.subscriptions.addSubscription('empDel', this.rt.employeeDeleted().subscribe(value => {
+            const foundIndex = this.employees.findIndex(emp => emp.login === value);
+            if (foundIndex >= 0) {
+                this.employees.splice(foundIndex, 1);
+            }
+        }));
+        this.subscriptions.addSubscription('depUpd', this.rt.departmentUpdated().subscribe(value => {
+            const foundIndex = this.departments.findIndex(emp => emp.departmentId === value.departmentId);
+            if (foundIndex >= 0) {
+                this.employees[foundIndex].department = value;
+            }
+        }));
+        this.subscriptions.addSubscription('depCr', this.rt.departmentCreated().subscribe(value => {
+            this.departments.push(value);
+        }));
+        this.subscriptions.addSubscription('depDel', this.rt.departmentDeleted().subscribe(value => {
+            const foundIndex = this.departments.findIndex(emp => emp.departmentId === value);
+            if (foundIndex >= 0) {
+                this.departments.splice(foundIndex, 1);
+            }
+        }));
+        this.subscriptions.addSubscription('posUpd', this.rt.positionUpdated().subscribe(value => {
+            const foundIndex = this.positions.findIndex(emp => emp.positionId === value.positionId);
+            if (foundIndex >= 0) {
+                this.positions[foundIndex] = value;
+            }
+        }));
+        this.subscriptions.addSubscription('posCr', this.rt.positionCreated().subscribe(value => {
+            this.positions.push(value);
+        }));
+        this.subscriptions.addSubscription('posDel', this.rt.positionDeleted().subscribe(value => {
+            const foundIndex = this.positions.findIndex(emp => emp.positionId === value);
+            if (foundIndex >= 0) {
+                this.positions.splice(foundIndex, 1);
+            }
+        }));
     }
 
     findGlobal() {
@@ -255,12 +300,10 @@ export class EmployeesPageComponent implements OnInit {
     }
 
     positionSelecting(event: any) {
-        this.positions$.subscribe((positions) => {
-            const position = positions.find(p => p.positionId === event.value);
-            if (position && position.access) {
-                this.accessOfSelectedPosition = AccessFlag.read(position.access);
-            }
-        })
+        const position = this.positions.find(p => p.positionId === event.value);
+        if (position && position.access) {
+            this.accessOfSelectedPosition = AccessFlag.read(position.access);
+        }
     }
 
     accessFlagTrackBy(index: number, item: any) {

@@ -1,5 +1,6 @@
 :root {
   --bgc-000: #FFFFFF;
+  --bgc-001: #fafafc;
   --bgc-100: #F6F8FA;
   --bgc-200: #edf1f6;
   --bgc-300: #dfe5ec;
@@ -22,6 +23,24 @@
   --mc-400: #5585f5;
   --mc: #2563eb;
   --mc-600: #2152be;
+  --warm-100: #ffede8;
+  --warm-200: #f6ded7;
+  --warm-300: #efc7ba;
+  --warm-400: #f6b9a8;
+  --warm-500: #f8ae9a;
+  --warm-600: #f88d6f;
+  --warm-700: #f88160;
+  --warm-800: #f66b45;
+  --warm-900: #fc5928;
+  --danger-100: #fef2f2;
+  --danger-200: #fcd9d9;
+  --danger-300: #fbb3b3;
+  --danger-400: #f99a9a;
+  --danger-500: #f87171;
+  --danger-600: #f75555;
+  --danger-700: #f63a3a;
+  --danger-800: #f5222d;
+  --danger-900: #f40a0a;
   --fast-in: cubic-bezier(.05, .72, .38, .91);
   --top-panel-height: 6.15rem;
 }
@@ -108,6 +127,14 @@ html, body {
   &:hover {
     color: var(--mc-600);
   }
+}
+
+.ur-badge{
+  position: absolute;
+  right: 0;
+  top: 0;
+  z-index: 1;
+  font-size: .85rem;
 }
 
 .relative {
@@ -566,21 +593,21 @@ fieldset.node {
 
 .caption {
   &-common-message {
-    font-size: 1.2rem;
+    font-size: 1.1rem;
     font-weight: bold;
     color: var(--tc-500);
     line-height: normal;
   }
 
   &-header {
-    font-size: 1.3rem;
+    font-size: 1.1rem;
     font-weight: 400;
     color: var(--tc-700);
     line-height: normal;
   }
 
   &-sub-header {
-    font-size: 1rem;
+    font-size: .9rem;
     font-weight: 500;
     color: var(--tc-500);
     line-height: normal;
@@ -591,6 +618,16 @@ fieldset.node {
     font-weight: 400;
     color: var(--tc-700);
     line-height: normal;
+  }
+
+  &-inline-param {
+    font-size: 0.8rem;
+    font-weight: 400;
+    color: var(--tc-700);
+    line-height: normal;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
   &-main-small {
@@ -611,6 +648,13 @@ fieldset.node {
     font-size: .9rem;
     font-weight: bold;
     color: var(--mc);
+    line-height: normal;
+  }
+
+  &-tiny{
+    font-size: .7rem;
+    font-weight: bold;
+    color: var(--tc-500);
     line-height: normal;
   }
 }
@@ -888,5 +932,52 @@ markdown > p:last-child {
 
   &.error {
     color: var(--red-500);
+  }
+}
+
+.emoji {
+  font-family: Noto Color Emoji, serif;
+  font-size: 1.2rem;
+}
+
+.p-dialog {
+  box-shadow: 0px 0.8px 1.7px rgba(0, 0, 0, 0.02),
+  0px 2px 4px rgba(0, 0, 0, 0.028),
+  0px 3.8px 7.5px rgba(0, 0, 0, 0.035),
+  0px 6.7px 13.4px rgba(0, 0, 0, 0.042),
+  0px 12.5px 25.1px rgba(0, 0, 0, 0.05),
+  0px 30px 60px rgba(0, 0, 0, 0.07) !important;
+}
+
+.p-ripple.primary .p-ink {
+  background: var(--mc-200)
+}
+
+.overlay-wrapper{
+  display: flex;
+  flex-direction: column;
+  border-radius: .5rem;
+  background-color: white;
+  width: fit-content;
+  box-shadow: 0px 0px 0.8px rgba(0, 0, 0, 0.024),
+  0px 0px 2.1px rgba(0, 0, 0, 0.035),
+  0px 0px 5.1px rgba(0, 0, 0, 0.046),
+  0px 0px 17px rgba(0, 0, 0, 0.07);
+}
+
+.p-overlay{
+  width: 20rem;
+}
+
+.p-overlaypanel{
+  display: grid !important;
+  border-radius: .5rem !important;
+  box-shadow: 0px 0px 0.8px rgba(0, 0, 0, 0.024),
+  0px 0px 2.1px rgba(0, 0, 0, 0.035),
+  0px 0px 5.1px rgba(0, 0, 0, 0.046),
+  0px 0px 17px rgba(0, 0, 0, 0.07) !important;
+  &:before, &:after{
+    display: none !important;
+    content: none !important;
   }
 }

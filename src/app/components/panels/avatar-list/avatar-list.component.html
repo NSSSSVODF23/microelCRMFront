@@ -1,0 +1,19 @@
+<div (mouseenter)="isListShow=true" (mouseleave)="isListShow=false" class="avatars">
+    <app-avatar *ngFor="let employee of sliced; let i = index; trackBy: trackByEmployee"
+                [deleted]="employee.deleted"
+                [name]="employee.fullName"
+                [size]="size" [src]="employee.avatar"
+                [style]="{marginLeft: (i>0?margin+'rem':''), mask: (i<sliced.length-1?mask:''), webkitMask: (i<sliced.length-1?mask:'')}"></app-avatar>
+    <span *ngIf="numberOfOverflowed>0">
+        +{{numberOfOverflowed}}
+    </span>
+</div>
+<p-overlay [(visible)]="isListShow" appendTo="body" [style.z-index]="'3500 !important'"
+           hideTransitionOptions="0ms" showTransitionOptions="0ms">
+    <ng-template pTemplate="content">
+        <div class="employees-overlay-list">
+            <app-employee-label *ngFor="let employee of employees; trackBy: trackByEmployee"
+                                [employee]="employee"></app-employee-label>
+        </div>
+    </ng-template>
+</p-overlay>

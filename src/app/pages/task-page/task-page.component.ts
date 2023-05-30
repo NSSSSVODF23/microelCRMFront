@@ -26,6 +26,7 @@ import {CustomNavigationService} from "../../services/custom-navigation.service"
 import {QuillEditorComponent} from "ngx-quill";
 import {TaskSelectingDialogComponent} from "../../components/panels/task-linking-dialog/task-selecting-dialog.component";
 import {ChatPanelComponent} from "../../components/panels/chat-panel/chat-panel.component";
+import {ChatService} from "../../services/chat.service";
 
 @Component({
     templateUrl: './task-page.component.html',
@@ -123,6 +124,7 @@ export class TaskPageComponent implements OnInit, OnDestroy {
 
     constructor(readonly api: ApiService,
                 readonly route: ActivatedRoute,
+                readonly chatService: ChatService,
                 readonly confirmation: ConfirmationService,
                 readonly toast: MessageService,
                 readonly customNav: CustomNavigationService,
@@ -826,7 +828,7 @@ export class TaskPageComponent implements OnInit, OnDestroy {
                 icon: 'mdi-forum',
                 label: "Активный чат",
                 visible: this.isTaskProcessing(),
-                command: () => this.api.getActiveTaskChat(this._taskId).subscribe(chat=>this.activeChat?.show(chat.chatId))
+                command: () => this.api.getActiveTaskChat(this._taskId).subscribe(chat=>this.chatService.open.emit(chat.chatId))
             }
         ];
     }

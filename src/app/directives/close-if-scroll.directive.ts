@@ -2,7 +2,7 @@ import {Directive, HostListener} from '@angular/core';
 import {OverlayPanel} from "primeng/overlaypanel";
 
 @Directive({
-    selector: 'p-overlayPanel [appCloseIfScroll]',
+    selector: 'p-overlay-panel [appCloseIfScroll]',
 })
 export class CloseIfScrollDirective {
 

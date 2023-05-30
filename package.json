@@ -5,6 +5,7 @@
     "ng": "ng",
     "start": "ng serve",
     "build": "ng build",
+    "hmr": "ng serve --hmr",
     "watch": "ng build --watch --configuration development",
     "test": "ng test"
   },
@@ -48,6 +49,7 @@
     "ngx-markdown": "^14.0.1",
     "ngx-markdown-editor": "^4.3.1",
     "ngx-quill": "^19.0.1",
+    "primeflex": "^3.3.0",
     "primeng": "^14.2.2",
     "prismjs": "^1.29.0",
     "quill": "^1.3.7",
@@ -61,6 +63,7 @@
     "@angular-devkit/build-angular": "^14.2.10",
     "@angular/cli": "^14.2.10",
     "@angular/compiler-cli": "~14.2.12",
+    "@angularclass/hmr": "^3.0.0",
     "@types/jasmine": "~3.10.0",
     "@types/marked": "^4.0.8",
     "@types/node": "^12.11.1",
