@@ -152,7 +152,7 @@
                 </div>
                 <div (click)="mediaViewer.showMedia(message.attachments[0])" *ngSwitchCase="'VIDEO'"
                      class="vid-container">
-                    <video [controls]="false" [src]="thumbnailUrl+message.attachments[0].name"></video>
+                    <img [src]="thumbnailUrl+message.attachments[0].name" alt="">
                     <div class="play-icon">
                         <i class="mdi-play_arrow"></i>
                     </div>
