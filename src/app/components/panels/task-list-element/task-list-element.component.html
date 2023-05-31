@@ -8,7 +8,7 @@
             <ng-container *ngTemplateOutlet="checkbox"></ng-container>
         </ng-container>
         <span class="main-caption" *ngIf="!viewExample">
-            {{item.listItemFields[0].textRepresentation}}
+            {{getFieldValue(0)}}
         </span>
         <app-select-field-to-view-button (selectView)="selectFieldToView.emit($event)"
                                          *ngIf="viewExample"
@@ -26,7 +26,7 @@
             <ng-container *ngTemplateOutlet="checkbox"></ng-container>
         </ng-container>
         <span class="main-caption" *ngIf="!viewExample">
-            {{item.listItemFields[0].textRepresentation}}
+            {{getFieldValue(0)}}
         </span>
         <app-select-field-to-view-button (selectView)="selectFieldToView.emit($event)"
                                          *ngIf="viewExample"
@@ -34,7 +34,7 @@
                                          [index]="1"
                                          class="main-caption"></app-select-field-to-view-button>
         <span class="additional-caption" *ngIf="!viewExample">
-            {{item.listItemFields[1].textRepresentation}}
+            {{getFieldValue(1)}}
         </span>
         <app-select-field-to-view-button (selectView)="selectFieldToView.emit($event)"
                                          *ngIf="viewExample"
@@ -52,7 +52,7 @@
             <ng-container *ngTemplateOutlet="checkbox"></ng-container>
         </ng-container>
         <span class="main-caption" *ngIf="!viewExample">
-            {{item.listItemFields[0].textRepresentation}}
+            {{getFieldValue(0)}}
         </span>
         <app-select-field-to-view-button (selectView)="selectFieldToView.emit($event)"
                                          *ngIf="viewExample"
@@ -61,7 +61,7 @@
                                          class="main-caption"></app-select-field-to-view-button>
         <span class="splitter">-</span>
         <span class="second-caption" *ngIf="!viewExample">
-            {{item.listItemFields[1].textRepresentation}}
+            {{getFieldValue(1)}}
         </span>
         <app-select-field-to-view-button (selectView)="selectFieldToView.emit($event)"
                                          *ngIf="viewExample"
@@ -69,7 +69,7 @@
                                          [index]="2"
                                          class="second-caption"></app-select-field-to-view-button>
         <span class="additional-caption" *ngIf="!viewExample">
-            {{item.listItemFields[2].textRepresentation}}
+            {{getFieldValue(2)}}
         </span>
         <app-select-field-to-view-button (selectView)="selectFieldToView.emit($event)"
                                          *ngIf="viewExample"

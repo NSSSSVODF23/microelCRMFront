@@ -59,4 +59,11 @@ export class TaskListElementComponent implements OnInit {
             this.tagsPreview?.hide()
         })
     }
+
+    getFieldValue(index: number){
+        if(!this.item || this.item.listItemFields[index] === undefined || this.item.listItemFields[index] === null){
+            return ""
+        }
+        return this.item.listItemFields[index].textRepresentation;
+    }
 }
