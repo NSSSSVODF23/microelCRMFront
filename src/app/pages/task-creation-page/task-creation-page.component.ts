@@ -1,7 +1,7 @@
 import {Component, OnInit} from '@angular/core';
 import {ApiService} from "../../services/api.service";
 import {fade, flow, swipeChild} from "../../animations";
-import {FieldItem, ModelItem, Task, Wireframe} from "../../transport-interfaces";
+import {FieldItem, ModelItem, Task, TaskCreationBody, Wireframe} from "../../transport-interfaces";
 import {ActivatedRoute} from "@angular/router";
 import {FormArray, FormControl, FormGroup} from "@angular/forms";
 import {FormToModelItemConverter} from "../../util";
@@ -29,14 +29,14 @@ export class TaskCreationPageComponent implements OnInit {
     currentStep = 0;
 
     // Дочерняя задача
-    childTask?: { taskId: any }[]
+    childId?: number;
     // Родительская задача
-    parentTask?: number;
+    parentId?: number;
 
     // Находиться ли задача в процессе создания
     isCreatedTask = false;
 
-    // Объект формы для создания задача
+    // Объект формы для создания задачи
     taskCreationForm: FormArray<FormGroup> = new FormArray([] as FormGroup[]);
 
     constructor(readonly api: ApiService, readonly route: ActivatedRoute, readonly personality: PersonalityService, readonly toast: MessageService) {
@@ -66,7 +66,7 @@ export class TaskCreationPageComponent implements OnInit {
         return this.currentStepForm.valid;
     }
 
-    get task(): Task | null {
+    get taskCreationBody(): TaskCreationBody | null {
         if(!this.selectedTemplate) return null;
 
         const rawValues = this.taskCreationForm.getRawValue().reduce((acc, curr) => {
@@ -74,10 +74,9 @@ export class TaskCreationPageComponent implements OnInit {
         },{});
 
         return {
-            taskId: 0,
-            modelWireframe: this.selectedTemplate,
-            children: this.childTask,
-            parent: this.parentTask,
+            wireframeId: this.selectedTemplate.wireframeId,
+            childId: this.childId,
+            parentId: this.parentId,
             fields: FormToModelItemConverter.convert(rawValues, this.selectedTemplate)
         };
     }
@@ -88,9 +87,9 @@ export class TaskCreationPageComponent implements OnInit {
         this.route.queryParams.subscribe(params => {
             const {child, parent} = params;
             if (child)
-                this.childTask = [{taskId: child}];
+                this.childId = parseInt(child);
             else if (parent)
-                this.parentTask = parent;
+                this.parentId = parseInt(parent);
         })
 
     }
@@ -164,15 +163,15 @@ export class TaskCreationPageComponent implements OnInit {
 
     // Создание задачи
     createTask() {
-        // Если this.task равно null, прерываем создание
-        if (!this.task) {
+        // Если this.taskCreationBody равно null, прерываем создание
+        if (!this.taskCreationBody) {
             this.toast.add({severity: 'danger', summary: 'Ошибка', detail: 'Не выбран шаблон для создания задачи'});
             return;
         }
         // Устанавливаем статус создания задачи
         this.isCreatedTask = true;
         // Отправляем запрос на сервер для создания задачи
-        this.api.createTask(this.task).subscribe({
+        this.api.createTask(this.taskCreationBody).subscribe({
             next: () => {
                 // Устанавливаем статус создания задачи
                 this.isCreatedTask = false;

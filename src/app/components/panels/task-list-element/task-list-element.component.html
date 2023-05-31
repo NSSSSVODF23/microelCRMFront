@@ -1,4 +1,4 @@
-<ng-container *ngIf="!isLoading" [ngSwitch]="item?.modelWireframe?.listViewType??''">
+<ng-container *ngIf="!isLoading && item" [ngSwitch]="item?.modelWireframe?.listViewType??''">
 
     <div (click)="onClick.emit(item)" *ngSwitchCase="'SIMPLE'"
          [ngClass]="itemClass" [routerLink]="!viewExample && !customClickHandler ? ['/task',item?.taskId] : null"
@@ -7,10 +7,9 @@
             <ng-container *ngTemplateOutlet="statusTags"></ng-container>
             <ng-container *ngTemplateOutlet="checkbox"></ng-container>
         </ng-container>
-        <app-task-field-view
-                *ngIf="!viewExample"
-                [item]="taskService.gettingFieldValueById(item, taskService.gettingFieldIdByIndex(item?.modelWireframe, 1))"
-                class="main-caption"></app-task-field-view>
+        <span class="main-caption" *ngIf="!viewExample">
+            {{item.listItemFields[0].textRepresentation}}
+        </span>
         <app-select-field-to-view-button (selectView)="selectFieldToView.emit($event)"
                                          *ngIf="viewExample"
                                          [fields]="wireframeFieldsList"
@@ -26,19 +25,17 @@
             <ng-container *ngTemplateOutlet="statusTags"></ng-container>
             <ng-container *ngTemplateOutlet="checkbox"></ng-container>
         </ng-container>
-        <app-task-field-view
-                *ngIf="!viewExample"
-                [item]="taskService.gettingFieldValueById(item, taskService.gettingFieldIdByIndex(item?.modelWireframe, 1))"
-                class="main-caption"></app-task-field-view>
+        <span class="main-caption" *ngIf="!viewExample">
+            {{item.listItemFields[0].textRepresentation}}
+        </span>
         <app-select-field-to-view-button (selectView)="selectFieldToView.emit($event)"
                                          *ngIf="viewExample"
                                          [fields]="wireframeFieldsList"
                                          [index]="1"
                                          class="main-caption"></app-select-field-to-view-button>
-        <app-task-field-view
-                *ngIf="!viewExample"
-                [item]="taskService.gettingFieldValueById(item, taskService.gettingFieldIdByIndex(item?.modelWireframe, 2))"
-                class="additional-caption"></app-task-field-view>
+        <span class="additional-caption" *ngIf="!viewExample">
+            {{item.listItemFields[1].textRepresentation}}
+        </span>
         <app-select-field-to-view-button (selectView)="selectFieldToView.emit($event)"
                                          *ngIf="viewExample"
                                          [fields]="wireframeFieldsList"
@@ -54,29 +51,26 @@
             <ng-container *ngTemplateOutlet="statusTags"></ng-container>
             <ng-container *ngTemplateOutlet="checkbox"></ng-container>
         </ng-container>
-        <app-task-field-view
-                *ngIf="!viewExample"
-                [item]="taskService.gettingFieldValueById(item, taskService.gettingFieldIdByIndex(item?.modelWireframe, 1))"
-                class="main-caption"></app-task-field-view>
+        <span class="main-caption" *ngIf="!viewExample">
+            {{item.listItemFields[0].textRepresentation}}
+        </span>
         <app-select-field-to-view-button (selectView)="selectFieldToView.emit($event)"
                                          *ngIf="viewExample"
                                          [fields]="wireframeFieldsList"
                                          [index]="1"
                                          class="main-caption"></app-select-field-to-view-button>
         <span class="splitter">-</span>
-        <app-task-field-view
-                *ngIf="!viewExample"
-                [item]="taskService.gettingFieldValueById(item, taskService.gettingFieldIdByIndex(item?.modelWireframe, 2))"
-                class="second-caption"></app-task-field-view>
+        <span class="second-caption" *ngIf="!viewExample">
+            {{item.listItemFields[1].textRepresentation}}
+        </span>
         <app-select-field-to-view-button (selectView)="selectFieldToView.emit($event)"
                                          *ngIf="viewExample"
                                          [fields]="wireframeFieldsList"
                                          [index]="2"
                                          class="second-caption"></app-select-field-to-view-button>
-        <app-task-field-view
-                *ngIf="!viewExample"
-                [item]="taskService.gettingFieldValueById(item, taskService.gettingFieldIdByIndex(item?.modelWireframe, 3))"
-                class="additional-caption"></app-task-field-view>
+        <span class="additional-caption" *ngIf="!viewExample">
+            {{item.listItemFields[2].textRepresentation}}
+        </span>
         <app-select-field-to-view-button (selectView)="selectFieldToView.emit($event)"
                                          *ngIf="viewExample"
                                          [fields]="wireframeFieldsList"

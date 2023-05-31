@@ -19,7 +19,7 @@ import {
     ModelItem,
     Page,
     Position, SuperMessage,
-    Task,
+    Task, TaskCreationBody,
     TaskEvent,
     TaskFieldsSnapshot,
     TaskTag,
@@ -69,8 +69,8 @@ export class ApiService {
         return this.sendPatch('api/private/wireframe', wireframe);
     }
 
-    createTask(task: Task): Observable<Task> {
-        return this.sendPost<Task>('api/private/task', task);
+    createTask(taskCreationBody: TaskCreationBody): Observable<Task> {
+        return this.sendPost<Task>('api/private/task', taskCreationBody);
     }
 
     deleteTask(id: number) {

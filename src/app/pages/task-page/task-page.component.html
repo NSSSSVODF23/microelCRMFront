@@ -36,7 +36,7 @@
                 <div *ngFor="let field of currentTask?.fields ?? []" class="flexed gap1 column">
                     <div class="caption-secondary">{{field.name}}</div>
                     <div class="caption-main">
-                        <app-task-field-view [item]="field"></app-task-field-view>
+                        {{field.textRepresentation}}
                     </div>
                 </div>
             </div>
@@ -342,14 +342,14 @@
                         </span>
                 </td>
                 <td>
-                    <app-task-field-view [item]="fieldPair.before"></app-task-field-view>
+                    {{fieldPair.before.textRepresentation}}
                 </td>
                 <td>
                         <span *ngIf="!areFieldsEqual(fieldPair.before,fieldPair.after)"
                               class="material-icons-round caption-active">keyboard_double_arrow_right</span>
                 </td>
                 <td>
-                    <app-task-field-view [item]="fieldPair.after"></app-task-field-view>
+                    {{fieldPair.after.textRepresentation}}
                 </td>
             </tr>
             </tbody>

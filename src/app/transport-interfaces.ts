@@ -33,6 +33,7 @@ export interface Wireframe {
     listViewType?: string;
     detailedViewType?: string;
     stages?: TaskStage[];
+    allFields?: FieldItem[];
 }
 
 export interface StepItem {
@@ -152,6 +153,19 @@ export interface Task {
     pipelines?: Pipeline[];
     parent?: number;
     children?: Task[];
+    // Список полей для отображения в элементе списка
+    listItemFields: ModelItem[];
+}
+
+/**
+ * Интерфейс для создания задачи
+ */
+
+export interface TaskCreationBody {
+    wireframeId: number;
+    fields: ModelItem[];
+    childId?: number;
+    parentId?: number;
 }
 
 export class TimestampItem {
@@ -196,6 +210,7 @@ export interface ModelItem {
     stringData?: string;
     timestampData?: string;
     phoneData?: { [id: string]: string };
+    textRepresentation?: string;
 }
 
 export interface Address {

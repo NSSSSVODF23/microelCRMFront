@@ -10,7 +10,7 @@ import {ApiService} from "../../../services/api.service";
 })
 export class TaskLinkComponent implements OnInit {
 
-    @Input() task: Task = {taskId: 0};
+    @Input() task?: Task;
     failed = false;
     @ViewChild('previewConnectedTask') previewConnectedTask?: OverlayPanel;
 

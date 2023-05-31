@@ -112,23 +112,6 @@ export class TaskSearchCacheService {
         })
     }
 
-    gettingFieldIdByIndex(wireframe: Wireframe | undefined, index: number): null | string {
-        if (!wireframe) return null;
-        for (let step of wireframe.steps) {
-            let fieldItem = step.fields.find(field => field.listViewIndex === index);
-            if (fieldItem) return fieldItem.id;
-        }
-        return null;
-    }
-
-    gettingFieldValueById(task?: Task, id?: string | null): ModelItem | undefined {
-        if (!id || !task) return undefined;
-        for (let field of task.fields ?? []) {
-            if (field.id === id) return field;
-        }
-        return undefined;
-    }
-
     // Загружает первую страницу списка задач с примененными фильтрами
     filtersApply() {
         this.loadPageOfTasks(0);
