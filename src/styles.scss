@@ -129,7 +129,7 @@ html, body {
   }
 }
 
-.ur-badge{
+.ur-badge {
   position: absolute;
   right: 0;
   top: 0;
@@ -651,7 +651,7 @@ fieldset.node {
     line-height: normal;
   }
 
-  &-tiny{
+  &-tiny {
     font-size: .7rem;
     font-weight: bold;
     color: var(--tc-500);
@@ -953,7 +953,7 @@ markdown > p:last-child {
   background: var(--mc-200)
 }
 
-.overlay-wrapper{
+.overlay-wrapper {
   display: flex;
   flex-direction: column;
   border-radius: .5rem;
@@ -965,19 +965,30 @@ markdown > p:last-child {
   0px 0px 17px rgba(0, 0, 0, 0.07);
 }
 
-.p-overlay{
+.p-overlay {
   width: 20rem;
 }
 
-.p-overlaypanel{
+.p-overlaypanel {
   display: grid !important;
   border-radius: .5rem !important;
   box-shadow: 0px 0px 0.8px rgba(0, 0, 0, 0.024),
   0px 0px 2.1px rgba(0, 0, 0, 0.035),
   0px 0px 5.1px rgba(0, 0, 0, 0.046),
   0px 0px 17px rgba(0, 0, 0, 0.07) !important;
-  &:before, &:after{
+
+  &:before, &:after {
     display: none !important;
     content: none !important;
   }
+}
+
+.p-toast-message-chatmsg {
+  background-color: white;
+  color: var(--tc-600);
+  border-radius: .5rem !important;
+  box-shadow: 0px 0.4px 0.7px rgba(0, 0, 0, 0.024),
+  0px 1.1px 2px rgba(0, 0, 0, 0.035),
+  0px 2.7px 4.8px rgba(0, 0, 0, 0.046),
+  0px 9px 16px rgba(0, 0, 0, 0.07) !important;
 }

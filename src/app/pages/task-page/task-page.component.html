@@ -151,7 +151,9 @@
                                  class="cancel-button" icon="close" model="secondary"></app-icon-button>
             </div>
         </div>
-        <quill-editor #commentEditor (onContentChanged)="empInsertPanel.setQuillEvent($event)" (keydown)="sendCommentByEnter($event)" [formControl]="commentInputControl" [modules]="quillModules"
+        <quill-editor #commentEditor (keydown)="sendCommentByEnter($event)"
+                      (onContentChanged)="empInsertPanel.setQuillEvent($event)" [formControl]="commentInputControl"
+                      [modules]="quillModules"
                       [styles]="{maxHeight:'30vh', minHeight:'10rem', overflow:'auto'}" class="input"
                       placeholder="Комментарий..."></quill-editor>
     </div>
@@ -167,12 +169,13 @@
 <app-attachments-history-dialog [(show)]="showFilesHistory" [taskId]="taskId"></app-attachments-history-dialog>
 
 <!--Диалог назначения монтажников-->
-<p-dialog [(visible)]="showAppointInstallersMenu" [breakpoints]="{'960px': '75vw', '640px': '100vw'}"
-          [draggable]="false" [modal]="true" [resizable]="false"
+<p-dialog (onHide)="clearAppointInstallers()" [(visible)]="showAppointInstallersMenu"
+          [breakpoints]="{'960px': '75vw', '640px': '100vw'}" [draggable]="false" [modal]="true" [resizable]="false"
           [style]="{width: '50vw'}" header="Назначение монтажников">
     <div class="flexed column gap10">
         <p-pickList [dragdrop]="true" [showSourceControls]="false" [showTargetControls]="false"
-                    [sourceStyle]="{height: '40vh'}" [source]="sourceInstallers" [targetStyle]="{height:'40vh'}"
+                    [sourceStyle]="{height: '40vh', maxHeight: '15rem'}" [source]="sourceInstallers"
+                    [targetStyle]="{height:'40vh', maxHeight: '15rem'}"
                     [target]="targetInstallers" sourceHeader="Доступные"
                     targetHeader="Назначенные">
             <ng-template let-installer pTemplate="item">
@@ -181,6 +184,11 @@
                 </div>
             </ng-template>
         </p-pickList>
+        <div [style]="{minHeight: '8rem'}" class="flexed column">
+            <div class="caption-sub-header">Текущая цель (необязательно)</div>
+            <textarea [(ngModel)]="targetDescription" [autoResize]="true" [rows]="3" class="stretched"
+                      pInputTextarea></textarea>
+        </div>
         <div class="flexed gap5 vend">
             <app-button (onClick)="resetListAppointedInstallers()"
                         [disabled]="targetInstallers.length === 0 || appointmentRequested"
@@ -233,7 +241,7 @@
             <div (click)="selectedEmployeeAsResponsible = emp" *ngFor="let emp of employeeList"
                  [ngClass]="{selected:selectedEmployeeAsResponsible?.login === emp.login}"
                  class="list-view-item hovered bordered flexed hcenter gap10">
-                <app-avatar [name]="emp.fullName" [src]="emp.avatar" [size]="2.3"></app-avatar>
+                <app-avatar [name]="emp.fullName" [size]="2.3" [src]="emp.avatar"></app-avatar>
                 <div class="flexed column">
                     <span class="caption-main">{{emp.fullName}}</span>
                     <span class="caption-secondary">{{emp.department?.name}}</span>
@@ -249,8 +257,8 @@
 </p-dialog>
 
 <!--Диалог присвоения задачи-->
-<app-task-selecting-dialog #taskLinkingDialog header="Связать задачи" (onMultiplySelected)="linkToChildTasks($event)"
-                         (onSelected)="linkToParentTask($event)" [excludedTasks]="excludedTasks"
+<app-task-selecting-dialog #taskLinkingDialog (onMultiplySelected)="linkToChildTasks($event)" (onSelected)="linkToParentTask($event)"
+                           [excludedTasks]="excludedTasks" header="Связать задачи"
 ></app-task-selecting-dialog>
 
 <!--Диалог просмотра цепочки задач-->
@@ -371,14 +379,34 @@
     </ng-template>
 </p-dialog>
 
-<!--Диалог с активным чатом по задаче-->
-<app-chat-panel #activeChat></app-chat-panel>
+<!--Диалог принудительного закрытия журнала работ-->
+<p-dialog [(visible)]="forceCloseWorkLogDialogVisible" [draggable]="false" [modal]="true" [resizable]="false"
+          [style]="{width: '50vw', minWidth: 'fit-content'}"
+          header="Принудительно закрыть журнал работ?">
+    <ng-template pTemplate="content">
+        <div class="flexed column gap10">
+            <div class="input-label-wrapper">
+                <label>Причина принудительного закрытия</label>
+                <textarea [(ngModel)]="forceCloseWorkLogReason" [rows]="5" class="stretched" pInputTextarea></textarea>
+            </div>
+            <div class="flexed hcenter vend">
+                <p-button icon="mdi-close" styleClass="p-button-secondary p-button-text" (onClick)="forceCloseWorkLogDialogVisible = false; forceCloseWorkLogReason=''" [disabled]="isForceClosingWorkLog"
+                          label="Отменить"></p-button>
+                <p-button icon="mdi-check" styleClass="p-button-danger" (onClick)="forceCloseWorkLog()" [disabled]="!forceCloseWorkLogReason"
+                          [loading]="isForceClosingWorkLog" label="Закрыть"></p-button>
+            </div>
+        </div>
+    </ng-template>
+</p-dialog>
+
+<app-work-logs-dialog #workLogsDialogEl></app-work-logs-dialog>
 
 <p-menu #stageMenu [model]="stageMenuItems" [popup]="true" appendTo="body"></p-menu>
 
 <p-confirmPopup key="popup"></p-confirmPopup>
 
-<app-employee-insert-panel #empInsertPanel (onSelect)="insertEmployeeToCommentEditor($event)" (onReturnFocus)="forceFocusCommentInput()"></app-employee-insert-panel>
+<app-employee-insert-panel #empInsertPanel (onReturnFocus)="forceFocusCommentInput()"
+                           (onSelect)="insertEmployeeToCommentEditor($event)"></app-employee-insert-panel>
 
 <ng-template #actualFromLabel>
     <div [pTooltip]="(currentTask?.actualFrom | date:'dd MMMM yyyy HH:mm')??''"

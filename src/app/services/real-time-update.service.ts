@@ -10,7 +10,7 @@ import {
     SuperMessage,
     Task,
     TaskEvent,
-    TaskTag
+    TaskTag, WorkLog
 } from "../transport-interfaces";
 import {cyrb53} from "../util";
 import {OldTracker, SimpleMessage} from "../parsing-interfaces";
@@ -116,7 +116,8 @@ export class RealTimeUpdateService {
         return this.watchUnicast<any>(login, 'notification', 'update')
     }
 
-    chatMessageCreated(chatId: number) {
+    chatMessageCreated(chatId?: number) {
+        if(!chatId) return this.watch<SuperMessage>('chat', 'message', 'create')
         return this.watch<SuperMessage>('chat', chatId.toString(), 'message', 'create')
     }
 
@@ -150,6 +151,20 @@ export class RealTimeUpdateService {
 
     chatClosed() {
         return this.watch<Chat>('chat', 'close');
+    }
+
+    workLogCreated() {
+        return this.watch<WorkLog>('worklog', 'create')
+    }
+
+    workLogUpdated(workLogId?: number) {
+        if(workLogId) return this.watch<WorkLog>('work-log', workLogId.toString(), 'update')
+        return this.watch<WorkLog>('worklog', 'update')
+    }
+
+    workLogDeleted(workLogId?: number) {
+        if(workLogId) return this.watch<WorkLog>('work-log', workLogId.toString(), 'delete')
+        return this.watch<WorkLog>('worklog', 'delete')
     }
 
     private watchUnicast<T>(...path: string[]): Observable<T> {

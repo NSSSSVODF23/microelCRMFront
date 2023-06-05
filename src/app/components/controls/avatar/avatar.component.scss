@@ -1,33 +1,37 @@
-:host{
-  position: relative;
+:host {
+  width: fit-content;
+  height: fit-content;
 }
 
 .avatar {
-  display: inline-flex;
-  //position: relative;
+  position: relative;
+  aspect-ratio: 1;
+  border-radius: 50%;
   overflow: hidden;
-  color: white;
-  font-weight: 500;
-  align-items: center;
-  justify-content: center;
 
-  span{
-    font-size: .40em;
-    transform: translateY(0.05em);
-    line-height: 0 !important;
+  &-caption {
+    display: inline-block;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    transform-origin: center;
+    text-transform: uppercase;
+    color: white;
+    font-size: .38em;
   }
 
-  i{
-    font-size: .55em;
-  }
-
-  img{
-    object-fit: cover;
+  &-image {
+    position: absolute;
     width: 100%;
+    height: 100%;
+    object-fit: cover;
+    top: 0;
+    left: 0;
   }
 }
 
-.status-indicator{
+.status-indicator {
   width: 30%;
   //height: 30%;
   aspect-ratio: 1;

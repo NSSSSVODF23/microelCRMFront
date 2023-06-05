@@ -1,19 +1,9 @@
-<ng-container [ngSwitch]="avatarType">
-    <div *ngSwitchCase="'deleted'" [style]="mainStyle" class="avatar">
-        <i class="mdi-person_off"></i>
+<div #wrapperEl class="avatar" [style]="wrapperStyle">
+    <div #captionEl class="avatar-caption" [style]="captionStyle">
+        <i class="mdi-person_off" *ngIf="deleted"></i>
+        <span *ngIf="!deleted">{{getInitials()}}</span>
     </div>
-    <div *ngSwitchCase="'initials'" [style]="mainStyle" class="avatar">
-        <span>
-            {{getInitials()}}
-        </span>
-    </div>
-    <div *ngSwitchCase="'image'" [style]="mainStyle" class="avatar">
-        <span>
-            <p-skeleton *ngIf="!isLoad" [size]="size+'rem'" shape="square"></p-skeleton>
-            <img (load)="imageDownloaded()" [src]="'api/private/avatar/'+src" [style.display]="isLoad?'inline':'none'"
-                 alt="avatar" class="avatar-image">
-        </span>
-    </div>
-</ng-container>
-<div class="status-indicator" *ngIf="status" [style]="indicatorStyle"></div>
+    <img *ngIf="src!=null" (load)="isLoad=true" [src]="'api/private/avatar/'+src" alt="avatar" class="avatar-image">
+    <div class="status-indicator" *ngIf="status" [style]="indicatorStyle"></div>
+</div>
 

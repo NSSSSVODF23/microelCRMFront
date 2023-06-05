@@ -1,5 +1,5 @@
 <p-dialog (onHide)="flushMessages()" (onShow)="whenOpenPanel()" [(visible)]="isShow" [contentStyle]="{display:'grid',
- padding: '0', height: '100%', grid: '1fr min-content / 1fr'}"
+          padding: '0', height: '100%', grid: '1fr min-content / 1fr'}"
           [style]="{width:'min-content', height:'50vh', minWidth: '27rem', minHeight: '15rem', maxWidth:'70vw', maxHeight: '90vh'}"
           appendTo="body"
           position="bottom-right">
@@ -11,7 +11,7 @@
     </ng-template>
     <ng-template pTemplate="content">
         <div #list (intersection)="readMessage($event)" (onScrollToBottom)="loadMessages()"
-             (scroll)="startButtonVisibleEmitter.emit()" [ngClass]="{unread: unreadCount>0}"
+             (scroll)="startButtonVisibleEmitter.emit()" [ngClass]="{unread: unreadCount>0}" *ngIf="isLoading || messages.length>0"
              [style.overflow]="shaderVisible ? 'hidden' : ''" appIntersectionObserver appScrollToBottomEmitter
              class="chat-view">
             <div (contextmenu)="showContext($event, message)" *ngFor="let message of messages; trackBy: trackMessages"
@@ -45,7 +45,13 @@
                 <i class="mdi-arrow_downward"></i>
             </div>
         </div>
-        <div [ngClass]="{unread: unreadCount>0}" class="chat-input">
+        <div *ngIf="!isLoading && messages.length===0" class="chat-view empty caption-common-message">
+            <i class="mdi-chat"></i>
+            <span>
+                Чат пуст
+            </span>
+        </div>
+        <div [ngClass]="{unread: unreadCount>0}" *ngIf="!currentChat?.closed" class="chat-input">
             <div *ngIf="editMessage" class="preview-message-wrapper">
                 <div class="flexed hcenter gap2 caption-secondary">
                     <i class="mdi-edit"></i> <span>Редактирование</span>
@@ -80,6 +86,9 @@
                               styleClass="p-button-text p-button-icon p-button-rounded"></p-button>
                 </div>
             </div>
+        </div>
+        <div class="chat-input p10 flexed hcenter vcenter" *ngIf="currentChat?.closed">
+            <span class="caption-common-message flexed hcenter"><i class="mdi-history"></i><span>История сообщений</span></span>
         </div>
     </ng-template>
 </p-dialog>

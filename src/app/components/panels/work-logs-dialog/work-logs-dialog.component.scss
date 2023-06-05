@@ -1,0 +1,18 @@
+.work-log-element {
+  display: grid;
+  grid: repeat(3, min-content) 1fr / 1fr;
+  gap: .5rem;
+  padding: 1rem;
+
+  &:not(:last-child) {
+    border-bottom: 1px solid var(--bgc-100);
+  }
+}
+
+.report{
+  .report-text{
+    white-space: pre-line;
+    font-size: .9rem;
+    color: var(--tc-700);
+  }
+}

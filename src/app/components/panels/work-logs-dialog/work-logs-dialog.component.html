@@ -1,0 +1,78 @@
+<p-dialog [(visible)]="dialogVisible" [draggable]="false" [modal]="true" [resizable]="false" appendTo="body"
+          [breakpoints]="{'960px': '75vw', '640px': '100vw'}" [style]="{width:'50vw'}" header="Работы и отчеты по задаче">
+    <ng-template pTemplate="content">
+        <div class="flexed gap5 column list-view">
+            <div *ngFor="let workLog of workLogs; trackBy: trackByWorkLog" class="work-log-element">
+                <ng-container *ngTemplateOutlet="statusCaption; context: {$implicit: workLog.status}"></ng-container>
+                <span class="flexed gap10">
+                    <span>
+                        <span class="flexed gap3 hcenter caption-secondary"><i
+                                class="mdi-groups"></i><span>Назначены:</span></span>
+                        <app-avatar-list [employees]="workLog.employees"></app-avatar-list>
+                    </span>
+                    <span>
+                        <span class="flexed gap3 hcenter caption-secondary"><i
+                                class="mdi-groups"></i><span>Приняли:</span></span>
+                        <app-avatar-list [employees]="workLog.whoAccepted"></app-avatar-list>
+                    </span>
+                    <span>
+                        <span class="flexed gap3 hcenter caption-secondary"><i
+                                class="mdi-groups"></i><span>Завершили:</span></span>
+                        <app-avatar-list [employees]="workLog.whoClosed"></app-avatar-list>
+                    </span>
+                    <span>
+                        <span class="flexed gap3 hcenter caption-secondary"><i
+                                class="mdi-person"></i><span>Создал:</span></span>
+                        <app-employee-label [size]="2" [employee]="workLog.creator"></app-employee-label>
+                    </span>
+                </span>
+                <span class="flexed gap10 caption-main-small">
+                    <span class="flexed column">
+                        <span class="flexed gap3 hcenter caption-secondary"><i class="mdi-schedule_send"></i><span>Создан:</span></span>
+                        <span>{{workLog.created | date:'dd-MM-yyyy HH:mm'}}</span>
+                    </span>
+                    <span class="flexed column">
+                        <span class="flexed gap3 hcenter caption-secondary"><i
+                                class="mdi-cancel_schedule_send"></i><span>Закрыт:</span></span>
+                        <span>{{workLog.closed | date:'dd-MM-yyyy HH:mm'}}</span>
+                    </span>
+                    <span class="flexed column">
+                        <span class="flexed gap3 hcenter caption-secondary"><i class="mdi-timelapse"></i><span>Затрачено времени:</span></span>
+                        <span>{{workLog.leadTime| elapsedTime:"":"":true}}</span>
+                    </span>
+                </span>
+                <span class="flexed gap10">
+                    <p-button label="Чат" icon="mdi-history" styleClass="p-button-secondary p-button-outlined" (onClick)="chatService.open.emit(workLog.chat.chatId)"></p-button>
+                    <p-button label="Отчеты" icon="mdi-summarize" styleClass="p-button-secondary p-button-outlined"></p-button>
+                </span>
+                <span class="report" *ngIf="workLog.report">
+                    <span class="flexed gap3 hcenter caption-secondary"><i class="mdi-summarize"></i><span>Отчет</span></span>
+                    <span class="report-text">{{workLog.report}}</span>
+                </span>
+            </div>
+        </div>
+    </ng-template>
+</p-dialog>
+
+<ng-template #statusCaption let-status>
+    <ng-container [ngSwitch]="status">
+        <span class="caption-sub-header flexed hcenter gap3" [style]="{color: 'var(--warm-600)'}" *ngSwitchCase="'ACTIVE'">
+            <i class="mdi-engineering"></i>
+            <span>
+                В работе
+            </span>
+        </span>
+        <span class="caption-sub-header flexed hcenter gap3" [style]="{color: 'var(--green-400)'}" *ngSwitchCase="'CLOSE'">
+            <i class="mdi-verified"></i>
+            <span>
+                Закрыт
+            </span>
+        </span>
+        <span class="caption-sub-header flexed hcenter gap3" [style]="{color: 'var(--red-400)'}" *ngSwitchCase="'FORCE_CLOSE'">
+            <i class="mdi-close"></i>
+            <span>
+                Закрыт принудительно
+            </span>
+        </span>
+    </ng-container>
+</ng-template>

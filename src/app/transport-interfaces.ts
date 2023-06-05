@@ -428,6 +428,8 @@ export interface SuperMessage{
     includedMessages: number[];
     attachmentType?: ContentType;
     isMediaGroup: boolean;
+    parentChatId: number;
+    descriptionOfAttachment?: string;
 }
 
 export interface Chat{
@@ -439,6 +441,7 @@ export interface Chat{
     creator: Employee;
     members: Employee[];
     updated: string;
+    closed?: string;
     lastMessage: ChatMessage;
 }
 
@@ -455,6 +458,12 @@ export interface WorkReport{
 }
 
 export interface WorkLog{
+    status: "ACTIVE" | "CLOSE" | "FORCE_CLOSE";
+    whoAccepted: Employee[];
+    whoClosed: Employee[];
+    report: string;
+    leadTime: number;
+    forceClosedReason?: string;
     workLogId: number;
     chat: Chat;
     workReports: WorkReport[];

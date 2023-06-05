@@ -1,22 +1,58 @@
 <div class="flexed hcenter gap5 wrapper">
-    <app-avatar [name]="personality.me?.fullName" [src]="personality.me?.avatar" [size]="3"></app-avatar>
+    <app-avatar [name]="personality.me?.fullName" [size]="3" [src]="personality.me?.avatar"></app-avatar>
     <div class="flexed column account">
         <span class="account-name">{{personality.me?.fullName}}</span>
         <span class="account-position">{{personality.me?.position?.name}}</span>
     </div>
-    <p-button styleClass="p-button-text p-button-icon p-button-rounded" icon="mdi-more_vert" (onClick)="menu.toggle($event)"></p-button>
+    <p-button (onClick)="menu.toggle($event)" icon="mdi-more_vert"
+              styleClass="p-button-text p-button-icon p-button-rounded"></p-button>
     <ng-container *ngIf="notifyService.isHasUnread; then fullNoti else emptyNoti"></ng-container>
 </div>
+
+<p-dialog [(visible)]="avatarChangeDialogVisible" [draggable]="false" [modal]="true" [resizable]="false" appendTo="body"
+          header="Изменить аватар">
+    <div class="avatar-change-content">
+        <div class="flexed gap10 p5 hcenter vcenter">
+            <div class="preview-wrapper">
+                <div class="preview unselect" *ngIf="!croppedImage"><i class="mdi-image"></i></div>
+                <img class="preview" [src]="croppedImage" *ngIf="croppedImage" alt=""/>
+                <span>
+                    Предпросмотр
+                </span>
+            </div>
+            <div class="flexed column gap5">
+                <p-button label="Выбрать" (onClick)="selectFile(fileInput)" icon="mdi-image" [disabled]="avatarUpload" styleClass="p-button-text p-button-secondary"></p-button>
+                <p-button label="Сохранить" (onClick)="saveAvatar()" icon="mdi-upload" [loading]="avatarUpload" [disabled]="!croppedImage"></p-button>
+            </div>
+            <input #fileInput (change)="this.imageChangedEvent = $event" type="file" [style.display]="'none'" accept="image/jpeg, image/png, image/jpg, image/bmp"/>
+        </div>
+        <image-cropper
+                (cropperReady)="cropperReady()"
+                (imageCropped)="imageCropped($event)"
+                (imageLoaded)="imageLoaded($event)"
+                (loadImageFailed)="loadImageFailed()"
+                [aspectRatio]="1"
+                [cropperMinWidth]="64"
+                [cropperMinHeight]="64"
+                [imageChangedEvent]="imageChangedEvent"
+                [maintainAspectRatio]="true"
+                [style]="{maxWidth: '40vw', minWidth: '15rem', height: 'fit-content'}"
+                format="png"
+        ></image-cropper>
+    </div>
+</p-dialog>
 
 <p-menu #menu [model]="controls" [popup]="true"></p-menu>
 
 
 <ng-template #emptyNoti>
-    <p-button styleClass="p-button-text p-button-icon p-button-rounded" icon="mdi-notifications_none" (onClick)="notifyService.showSideBar()"></p-button>
+    <p-button (onClick)="notifyService.showSideBar()" icon="mdi-notifications_none"
+              styleClass="p-button-text p-button-icon p-button-rounded"></p-button>
 </ng-template>
 
 <ng-template #fullNoti>
-    <span pBadge severity="warning" [value]="notifyService.unreadCount.toString()">
-        <p-button styleClass="p-button-text p-button-icon p-button-rounded" icon="mdi-notifications_active" (onClick)="notifyService.showSideBar()"></p-button>
+    <span [value]="notifyService.unreadCount.toString()" pBadge severity="warning">
+        <p-button (onClick)="notifyService.showSideBar()" icon="mdi-notifications_active"
+                  styleClass="p-button-text p-button-icon p-button-rounded"></p-button>
     </span>
 </ng-template>

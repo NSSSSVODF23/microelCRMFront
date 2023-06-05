@@ -12,6 +12,8 @@ import {
     ContextMenuComponent
 } from "../../controls/context-menu/context-menu.component";
 import {debounceTime, tap} from "rxjs";
+import {MessageService} from "primeng/api";
+import {ChatService} from "../../../services/chat.service";
 
 const MESSAGE_LIMIT = 25;
 
@@ -50,6 +52,7 @@ export class ChatPanelComponent implements OnInit, OnDestroy, AfterViewInit {
     constructor(readonly personality: PersonalityService,
                 readonly api: ApiService,
                 readonly mediaViewer: MediaViewerService,
+                readonly chatService: ChatService,
                 readonly rt: RealTimeUpdateService) {
     }
 
@@ -99,6 +102,7 @@ export class ChatPanelComponent implements OnInit, OnDestroy, AfterViewInit {
         this.api.getChat(this.chatId).subscribe({
             next: chat => {
                 this.currentChat = chat;
+                this.chatService.currentOpenChat = chat.chatId;
             }
         })
         this.api.getCountOfUnreadMessages(this.chatId).subscribe(c => this.unreadCount = c);
@@ -218,6 +222,7 @@ export class ChatPanelComponent implements OnInit, OnDestroy, AfterViewInit {
         this.isBeginSending = false;
         this.isLoading = false;
         this.isEnd = false;
+        this.chatService.currentOpenChat = undefined;
         this.subscriptions.unsubscribeAll();
     }
 

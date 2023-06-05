@@ -2,6 +2,55 @@
 
 }
 
+.avatar-change-content {
+  display: grid;
+  grid: min-content 1fr/ 1fr;
+
+  .avatar-change-buttons {
+    display: grid;
+    gap: 1rem;
+
+    input {
+      display: none;
+    }
+  }
+}
+
+.preview-wrapper {
+  display: grid;
+  gap: .5rem;
+  background-color: var(--bgc-100);
+  border-radius: 1rem;
+  color: var(--tc-600);
+  justify-items: center;
+  padding: 1rem;
+  font-weight: bold;
+
+  .preview {
+    width: 6rem;
+    height: 6rem;
+    border-radius: 50%;
+    object-fit: cover;
+    object-position: center;
+
+    &.unselect {
+      background-color: var(--bgc-400);
+      border: 1px solid var(--bgc-500);
+      color: white;
+      font-size: 1.5rem;
+      position: relative;
+
+      i {
+        position: absolute;
+        transform-origin: center;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+      }
+    }
+  }
+}
+
 .account {
   &-name {
     color: var(--tc-700);

@@ -1,2 +1,18 @@
 <router-outlet></router-outlet>
 <p-toast></p-toast>
+<p-toast position="bottom-right" key="chatMessage">
+    <ng-template let-message pTemplate="message">
+        <div class="flexed column stretched gap5">
+            <div class="flexed hcenter">
+                <app-employee-label [employee]="message.data.author"></app-employee-label>
+            </div>
+            <div class="flexed column" [style]="{marginLeft: '2rem'}">
+                <span *ngIf="message.data.descriptionOfAttachment" class="caption-active">{{message.data.descriptionOfAttachment}}</span>
+                <span *ngIf="message.data.text">{{message.data.text}}</span>
+            </div>
+            <div class="flexed vend caption-tiny">
+                <span>{{message.data.sendAt | date: 'dd-MM-yyyy HH:mm'}}</span>
+            </div>
+        </div>
+    </ng-template>
+</p-toast>

@@ -1,7 +1,7 @@
-<ng-container *ngIf="!isLoading && item" [ngSwitch]="item?.modelWireframe?.listViewType??''">
+<ng-container *ngIf="!isLoading && item" [ngSwitch]="item.modelWireframe?.listViewType??''">
 
     <div (click)="onClick.emit(item)" *ngSwitchCase="'SIMPLE'"
-         [ngClass]="itemClass" [routerLink]="!viewExample && !customClickHandler ? ['/task',item?.taskId] : null"
+         [ngClass]="itemClass" [routerLink]="!viewExample && !customClickHandler ? ['/task',item.taskId] : null"
          class="task-item simple-layout">
         <ng-container *ngIf="!viewExample">
             <ng-container *ngTemplateOutlet="statusTags"></ng-container>
@@ -19,7 +19,7 @@
     </div>
 
     <div (click)="onClick.emit(item)" *ngSwitchCase="'COMPOSITE'"
-         [ngClass]="itemClass" [routerLink]="!viewExample && !customClickHandler ? ['/task',item?.taskId] : null"
+         [ngClass]="itemClass" [routerLink]="!viewExample && !customClickHandler ? ['/task',item.taskId] : null"
          class="task-item composite-layout">
         <ng-container *ngIf="!viewExample">
             <ng-container *ngTemplateOutlet="statusTags"></ng-container>
@@ -45,7 +45,7 @@
     </div>
 
     <div (click)="onClick.emit(item)" *ngSwitchCase="'DETAILED'"
-         [ngClass]="itemClass" [routerLink]="!viewExample && !customClickHandler ? ['/task',item?.taskId] : null"
+         [ngClass]="itemClass" [routerLink]="!viewExample && !customClickHandler ? ['/task',item.taskId] : null"
          class="task-item detailed-layout">
         <ng-container *ngIf="!viewExample">
             <ng-container *ngTemplateOutlet="statusTags"></ng-container>

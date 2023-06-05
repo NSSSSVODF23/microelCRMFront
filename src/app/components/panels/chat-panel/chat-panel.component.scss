@@ -11,6 +11,16 @@
   background-color: var(--bgc-001);
   border-top: 1px solid var(--bgc-200);
 
+  &.empty{
+    display: flex;
+    flex-direction: row;
+    gap: .5rem;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    width: 100%;
+  }
+
   &.unread {
     box-shadow: inset 0 0 2px var(--warm-500);
   }

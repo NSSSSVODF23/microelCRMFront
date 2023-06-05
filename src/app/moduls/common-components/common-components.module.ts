@@ -132,6 +132,7 @@ import {AnimateModule} from "primeng/animate";
 import {PositionInScrolledViewDirective} from "../../directives/position-in-scrolled-view.directive";
 import {ContextMenuComponent} from "../../components/controls/context-menu/context-menu.component";
 import {MyActiveChatsComponent} from "../../components/panels/my-active-chats/my-active-chats.component";
+import {WorkLogsDialogComponent} from "../../components/panels/work-logs-dialog/work-logs-dialog.component";
 
 
 @NgModule({
@@ -202,7 +203,8 @@ import {MyActiveChatsComponent} from "../../components/panels/my-active-chats/my
         AvatarListComponent,
         PositionInScrolledViewDirective,
         ContextMenuComponent,
-        MyActiveChatsComponent
+        MyActiveChatsComponent,
+        WorkLogsDialogComponent
     ],
     exports: [
         AccountPanelComponent,
@@ -271,7 +273,8 @@ import {MyActiveChatsComponent} from "../../components/panels/my-active-chats/my
         AvatarListComponent,
         PositionInScrolledViewDirective,
         ContextMenuComponent,
-        MyActiveChatsComponent
+        MyActiveChatsComponent,
+        WorkLogsDialogComponent
     ],
     imports: [
         CommonPipesModule,

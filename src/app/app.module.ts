@@ -12,6 +12,7 @@ import {HttpClientModule} from "@angular/common/http";
 import {FormsModule} from "@angular/forms";
 import {RouterModule, RouterOutlet} from "@angular/router";
 import {ToastModule} from "primeng/toast";
+import {CommonComponentsModule} from "./moduls/common-components/common-components.module";
 
 registerLocaleData(localeRu, 'ru');
 
@@ -28,6 +29,7 @@ registerLocaleData(localeRu, 'ru');
         FormsModule,
         HttpClientModule,
         ToastModule,
+        CommonComponentsModule,
 
     ],
     exports: [BrowserAnimationsModule, RouterOutlet, FormsModule, HttpClientModule],

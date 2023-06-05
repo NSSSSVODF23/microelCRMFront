@@ -85,6 +85,10 @@ export class ApiService {
         return this.sendGet<Task>(url);
     }
 
+    getWorkLogsByTaskId(taskId: number): Observable<WorkLog[]>{
+        return this.sendGet(`api/private/task/${taskId}/work-logs`);
+    }
+
     getRootTask(taskId: number): Observable<Task> {
         return this.sendGet<Task>('api/private/task/' + taskId + '/root');
     }
@@ -247,9 +251,8 @@ export class ApiService {
         return this.sendGet<Employee>("api/private/me");
     }
 
-    setAvatar(login?: string, avatar?: string): Observable<string> | undefined {
-        if (!login || !avatar) return;
-        return this.sendPost<string>("api/private/employee/" + login + "/avatar", {avatar})
+    setAvatar(avatar: string){
+        return this.sendPost<Employee>("api/private/employee/avatar", avatar)
     }
 
     getResponsible(): Observable<(Department | Employee)[]> {
@@ -288,12 +291,12 @@ export class ApiService {
         return this.sendGet<Employee[]>("api/private/employees/installers");
     }
 
-    assignInstallersToTask(taskId: number, targetInstallers: Employee[]) {
+    assignInstallersToTask(taskId: number, targetInstallers:{installers: Employee[], description: String}) {
         return this.sendPost("api/private/task/" + taskId + "/assign-installers", targetInstallers);
     }
 
-    forceCloseWorkLog(taskId: number) {
-        return this.sendPost("api/private/task/" + taskId + "/force-close-work-log", {});
+    forceCloseWorkLog(taskId: number, reasonOfClosing: string) {
+        return this.sendPost("api/private/task/" + taskId + "/force-close-work-log", reasonOfClosing);
     }
 
     changeTaskObservers(taskId: number, departmentObservers: number[], personalObservers: string[]) {

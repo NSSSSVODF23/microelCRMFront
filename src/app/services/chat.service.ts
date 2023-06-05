@@ -3,6 +3,7 @@ import {Chat} from "../transport-interfaces";
 import {ApiService} from "./api.service";
 import {RealTimeUpdateService} from "./real-time-update.service";
 import {PersonalityService} from "./personality.service";
+import {MessageService} from "primeng/api";
 
 @Injectable({
     providedIn: 'root'
@@ -12,8 +13,14 @@ export class ChatService {
     chats: Chat[] = [];
     unreadMessagesCount: { [chatId: number]: number } = {};
     open: EventEmitter<number> = new EventEmitter<number>();
+    currentOpenChat?: number;
 
-    constructor(private api: ApiService, private rt: RealTimeUpdateService, private personality: PersonalityService) {
+    private notificationAudios = {
+        loud: new Audio('/assets/audio/notify/loud-notify.mp3'),
+        quiet: new Audio('/assets/audio/notify/quiet-notify.mp3'),
+    };
+
+    constructor(private api: ApiService, private rt: RealTimeUpdateService, private personality: PersonalityService, private messageService: MessageService) {
         this.getChats();
         personality.onGettingUserData.subscribe(emp => {
             if (!emp.login) return;
@@ -22,6 +29,20 @@ export class ChatService {
         })
         this.rt.chatUpdated().subscribe(this.updateChat.bind(this));
         this.rt.chatClosed().subscribe(this.closeChat.bind(this));
+        this.rt.chatMessageCreated().subscribe(message=>{
+            if(message.parentChatId !== this.currentOpenChat){
+                if(this.notificationAudios.loud.paused) this.notificationAudios.loud.play().then();
+                this.messageService.add({
+                    key: 'chatMessage',
+                    severity: 'chatmsg',
+                    data: message,
+                    life: 30000,
+                });
+            }else {
+                if(this.notificationAudios.quiet.paused) this.notificationAudios.quiet.play().then();
+            }
+        })
+        this.open.subscribe(()=>this.messageService.clear("chatMessage"));
     }
 
     get isHasUnreadMessages(): boolean {

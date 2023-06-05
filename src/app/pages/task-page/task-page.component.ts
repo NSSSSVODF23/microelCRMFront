@@ -24,9 +24,12 @@ import {CustomValidators} from "../../custom-validators";
 import {map} from 'rxjs';
 import {CustomNavigationService} from "../../services/custom-navigation.service";
 import {QuillEditorComponent} from "ngx-quill";
-import {TaskSelectingDialogComponent} from "../../components/panels/task-linking-dialog/task-selecting-dialog.component";
+import {
+    TaskSelectingDialogComponent
+} from "../../components/panels/task-linking-dialog/task-selecting-dialog.component";
 import {ChatPanelComponent} from "../../components/panels/chat-panel/chat-panel.component";
 import {ChatService} from "../../services/chat.service";
+import {WorkLogsDialogComponent} from "../../components/panels/work-logs-dialog/work-logs-dialog.component";
 
 @Component({
     templateUrl: './task-page.component.html',
@@ -110,6 +113,11 @@ export class TaskPageComponent implements OnInit, OnDestroy {
     commentInputControl: FormControl = new FormControl("", [Validators.required]);
     @ViewChild('commentEditor') commentEditor?: QuillEditorComponent;
     @ViewChild('taskLinkingDialog') taskLinkingDialog?: TaskSelectingDialogComponent;
+    @ViewChild('workLogsDialogEl') workLogsDialogEl?: WorkLogsDialogComponent;
+    targetDescription: string = "";
+    forceCloseWorkLogDialogVisible: boolean = false;
+    forceCloseWorkLogReason: string = "";
+    isForceClosingWorkLog = false;
     // Объект подсчета кол-ва времени actualFrom задачи
     private actualFromDurationCounter = new DurationCounter();
     // Возвращает текущее время до actualFrom задачи
@@ -120,7 +128,6 @@ export class TaskPageComponent implements OnInit, OnDestroy {
     private actualToDurationCounter = new DurationCounter();
     // Возвращает текущее время до actualTo задачи
     actualToTime$ = this.actualToDurationCounter.observer.pipe(map(dur => dur.mode === 'after' ? '-' + dur.actualLabel : dur.actualLabel));
-    @ViewChild('activeChat') activeChat?: ChatPanelComponent;
 
     constructor(readonly api: ApiService,
                 readonly route: ActivatedRoute,
@@ -324,14 +331,23 @@ export class TaskPageComponent implements OnInit, OnDestroy {
 
     sendListAppointedInstallers() {
         this.appointmentRequested = true;
-        this.api.assignInstallersToTask(this._taskId, this.targetInstallers).subscribe(
+        this.api.assignInstallersToTask(this._taskId, {
+            installers: this.targetInstallers,
+            description: this.targetDescription
+        }).subscribe(
             {
                 next: () => {
+                    this.appointmentRequested = false;
                     this.showAppointInstallersMenu = false;
                 },
                 error: () => this.appointmentRequested = false
             }
         )
+    }
+
+    clearAppointInstallers() {
+        this.targetDescription = "";
+        this.targetInstallers = [];
     }
 
     resetListAppointedInstallers() {
@@ -340,13 +356,15 @@ export class TaskPageComponent implements OnInit, OnDestroy {
     }
 
     forceCloseWorkLog() {
-        this.confirmation.confirm({
-            header: 'Подтверждение',
-            message: 'Принудительно забрать задачу у монтажников?',
-            accept: () => {
-                this.api.forceCloseWorkLog(this._taskId).subscribe();
-            }
-        })
+        this.api.forceCloseWorkLog(this._taskId, this.forceCloseWorkLogReason)
+            .subscribe({
+                next: () => {
+                    this.forceCloseWorkLogDialogVisible = false;
+                    this.forceCloseWorkLogReason = "";
+                    this.isForceClosingWorkLog = false;
+                },
+                error: () => this.isForceClosingWorkLog = false
+            })
     }
 
     sendObservableList() {
@@ -662,6 +680,11 @@ export class TaskPageComponent implements OnInit, OnDestroy {
         })
     }
 
+    private openWorkLogsDialog() {
+        if (!this.workLogsDialogEl) return;
+        this.workLogsDialogEl.open(this._taskId);
+    };
+
     private taskManagementMenu() {
         return [
             {
@@ -806,7 +829,7 @@ export class TaskPageComponent implements OnInit, OnDestroy {
                     {
                         label: "Принудительно забрать",
                         icon: 'mdi-assignment_return',
-                        command: this.forceCloseWorkLog.bind(this),
+                        command: () => this.forceCloseWorkLogDialogVisible = true,
                         visible: this.isTaskProcessing()
                     },
                     {
@@ -816,6 +839,7 @@ export class TaskPageComponent implements OnInit, OnDestroy {
                     {
                         label: "Отчеты",
                         icon: 'mdi-history_edu',
+                        command: this.openWorkLogsDialog.bind(this)
                     }
                 ]
             },
@@ -828,7 +852,7 @@ export class TaskPageComponent implements OnInit, OnDestroy {
                 icon: 'mdi-forum',
                 label: "Активный чат",
                 visible: this.isTaskProcessing(),
-                command: () => this.api.getActiveTaskChat(this._taskId).subscribe(chat=>this.chatService.open.emit(chat.chatId))
+                command: () => this.api.getActiveTaskChat(this._taskId).subscribe(chat => this.chatService.open.emit(chat.chatId))
             }
         ];
     }
