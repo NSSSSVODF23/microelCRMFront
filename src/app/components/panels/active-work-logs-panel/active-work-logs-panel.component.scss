@@ -1,0 +1,19 @@
+.title{
+  padding-bottom: .3rem;
+  border-bottom: 1px solid var(--bgc-200);
+  //margin-bottom: .5rem;
+}
+.work-logs{
+}
+
+.work-log-item{
+  display: grid;
+  grid: min-content/ max-content max-content 1fr;
+  gap: .5rem;
+  padding: .5rem;
+  align-items: center;
+
+  &:not(:last-child){
+    border-bottom: 1px solid var(--bgc-200);
+  }
+}

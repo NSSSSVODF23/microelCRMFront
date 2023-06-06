@@ -1,0 +1,39 @@
+<span *ngIf="countOfActive" class="relative flexed">
+    <p-button (onClick)="overlayPanelEl.toggle($event)"
+              icon="mdi-engineering" styleClass="p-button-secondary p-button-icon p-button-rounded p-button-text"></p-button>
+    <p-badge [value]="countOfActive.toString()" class="ur-badge"></p-badge>
+</span>
+
+<p-overlayPanel #overlayPanelEl [baseZIndex]="2000" appendTo="body">
+    <ng-template pTemplate="content">
+        <div class="caption-header title">Активные журналы работ</div>
+        <div [style.max-height]="'30rem'" class="work-logs list-view">
+            <ng-container *ngFor="let workLog of workLogs; trackBy: trackByWorkLog">
+                <ng-container *ngTemplateOutlet="workLogItem; context: {$implicit: workLog}"></ng-container>
+            </ng-container>
+        </div>
+    </ng-template>
+</p-overlayPanel>
+
+<ng-template #workLogItem let-workLog>
+    <div class="work-log-item">
+        <p-button [label]="'Задача #'+workLog.task.taskId" (onClick)="overlayPanelEl.hide()" [routerLink]="['/task', workLog.task.taskId]"
+                  [style]="{whiteSpace: 'nowrap'}" styleClass="p-button-info p-button-text"></p-button>
+        <div [style]="{}" class="flexed column">
+            <span class="caption-tiny">Активные монтажники:</span>
+            <span *ngIf="workLog.whoActive.length===0" class="caption-secondary">-</span>
+            <app-avatar-list *ngIf="workLog.whoActive.length>0" [employees]="workLog.whoActive"
+                             [size]="1.7"></app-avatar-list>
+        </div>
+        <div>
+            <div class="flexed gap3 hcenter">
+                <span class="caption-tiny">Назначил:</span>
+                <app-employee-label [employee]="workLog.creator"></app-employee-label>
+            </div>
+            <div>
+                <span class="caption-tiny">Прошло:</span>
+                <app-time-elapsed [startTime]="workLog.created" class="caption-secondary"></app-time-elapsed>
+            </div>
+        </div>
+    </div>
+</ng-template>
