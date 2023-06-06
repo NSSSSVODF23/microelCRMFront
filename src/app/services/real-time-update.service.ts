@@ -162,6 +162,10 @@ export class RealTimeUpdateService {
         return this.watch<WorkLog>('worklog', 'update')
     }
 
+    workLogClosed() {
+        return this.watch<WorkLog>('worklog', 'close')
+    }
+
     workLogDeleted(workLogId?: number) {
         if(workLogId) return this.watch<WorkLog>('work-log', workLogId.toString(), 'delete')
         return this.watch<WorkLog>('worklog', 'delete')

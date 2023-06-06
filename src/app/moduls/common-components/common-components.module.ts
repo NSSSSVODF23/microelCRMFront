@@ -133,6 +133,10 @@ import {PositionInScrolledViewDirective} from "../../directives/position-in-scro
 import {ContextMenuComponent} from "../../components/controls/context-menu/context-menu.component";
 import {MyActiveChatsComponent} from "../../components/panels/my-active-chats/my-active-chats.component";
 import {WorkLogsDialogComponent} from "../../components/panels/work-logs-dialog/work-logs-dialog.component";
+import {
+    ActiveWorkLogsPanelComponent
+} from "../../components/panels/active-work-logs-panel/active-work-logs-panel.component";
+import {TimeElapsedComponent} from "../../components/controls/time-elapsed/time-elapsed.component";
 
 
 @NgModule({
@@ -204,7 +208,9 @@ import {WorkLogsDialogComponent} from "../../components/panels/work-logs-dialog/
         PositionInScrolledViewDirective,
         ContextMenuComponent,
         MyActiveChatsComponent,
-        WorkLogsDialogComponent
+        WorkLogsDialogComponent,
+        ActiveWorkLogsPanelComponent,
+        TimeElapsedComponent
     ],
     exports: [
         AccountPanelComponent,
@@ -274,7 +280,9 @@ import {WorkLogsDialogComponent} from "../../components/panels/work-logs-dialog/
         PositionInScrolledViewDirective,
         ContextMenuComponent,
         MyActiveChatsComponent,
-        WorkLogsDialogComponent
+        WorkLogsDialogComponent,
+        ActiveWorkLogsPanelComponent,
+        TimeElapsedComponent
     ],
     imports: [
         CommonPipesModule,

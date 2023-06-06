@@ -77,6 +77,17 @@
                         <app-employee-label [employee]="currentTask?.responsible"></app-employee-label>
                     </span>
                 </div>
+                <div *ngIf="activeWorkLog" class="dedicated-panel">
+                    <div class="title">
+                        <i class="mdi-groups"></i>
+                        <span class="caption">
+                            Назначены монтажники
+                        </span>
+                    </div>
+                    <div class="list">
+                        <app-employee-label [employee]="employee" *ngFor="let employee of activeWorkLog.employees"></app-employee-label>
+                    </div>
+                </div>
                 <div *ngIf="isTaskHasObservers()" class="dedicated-panel">
                     <div class="title">
                         <i class="mdi-groups"></i>
@@ -387,9 +398,9 @@
         <div class="flexed column gap10">
             <div class="input-label-wrapper">
                 <label>Причина принудительного закрытия</label>
-                <textarea [(ngModel)]="forceCloseWorkLogReason" [rows]="5" class="stretched" pInputTextarea></textarea>
+                <textarea [(ngModel)]="forceCloseWorkLogReason" [rows]="5" [autoResize]="true" class="stretched" pInputTextarea></textarea>
             </div>
-            <div class="flexed hcenter vend">
+            <div class="flexed hcenter vend gap10">
                 <p-button icon="mdi-close" styleClass="p-button-secondary p-button-text" (onClick)="forceCloseWorkLogDialogVisible = false; forceCloseWorkLogReason=''" [disabled]="isForceClosingWorkLog"
                           label="Отменить"></p-button>
                 <p-button icon="mdi-check" styleClass="p-button-danger" (onClick)="forceCloseWorkLog()" [disabled]="!forceCloseWorkLogReason"

@@ -11,7 +11,7 @@ import {
     Page,
     Task,
     TaskFieldsSnapshot,
-    TaskStatus
+    TaskStatus, WorkLog
 } from "../../transport-interfaces";
 import {FileInputComponent} from "../../components/controls/file-input/file-input.component";
 import {ConfirmationService, MenuItem, MessageService, TreeNode} from "primeng/api";
@@ -21,7 +21,7 @@ import {fade} from "../../animations";
 import {OverlayPanel} from "primeng/overlaypanel";
 import {FormControl, FormGroup, Validators} from "@angular/forms";
 import {CustomValidators} from "../../custom-validators";
-import {map} from 'rxjs';
+import {map, take} from 'rxjs';
 import {CustomNavigationService} from "../../services/custom-navigation.service";
 import {QuillEditorComponent} from "ngx-quill";
 import {
@@ -129,6 +129,8 @@ export class TaskPageComponent implements OnInit, OnDestroy {
     // Возвращает текущее время до actualTo задачи
     actualToTime$ = this.actualToDurationCounter.observer.pipe(map(dur => dur.mode === 'after' ? '-' + dur.actualLabel : dur.actualLabel));
 
+    activeWorkLog?: WorkLog;
+
     constructor(readonly api: ApiService,
                 readonly route: ActivatedRoute,
                 readonly chatService: ChatService,
@@ -148,6 +150,9 @@ export class TaskPageComponent implements OnInit, OnDestroy {
         this._taskId = value;
         this.api.getTask(this._taskId).subscribe(task => {
             this.currentTask = task;
+            this.api.getActiveWorkLogByTaskId(task.taskId).subscribe(workLog => {
+                this.activeWorkLog = workLog
+            })
             this.orderFields();
             this.stageMenuItems = this.getStageMenuItems();
             this.subscriptions.addSubscription('taskUpd', this.rt.taskUpdated(value).subscribe(update => {
@@ -209,10 +214,26 @@ export class TaskPageComponent implements OnInit, OnDestroy {
 
     ngOnInit(): void {
         this.route.params.subscribe(params => {
-            this.taskId = params['id']
+            this.taskId = parseInt(params['id']);
             this.api.getCountAllTaskAttachments(this._taskId).subscribe(count => this.countAllAttachments = count);
             this.updateObservableList();
         })
+        this.subscriptions.addSubscription("wlCrd", this.rt.workLogCreated().subscribe(this.workLogCreated.bind(this)));
+        this.subscriptions.addSubscription("wlCls", this.rt.workLogClosed().subscribe(this.workLogClosed.bind(this)));
+    }
+
+    private workLogCreated(workLog: WorkLog) {
+        console.log(workLog.task.taskId, this._taskId);
+        if(workLog.task.taskId === this._taskId) {
+            this.activeWorkLog = workLog;
+        }
+    }
+
+    private workLogClosed(workLog: WorkLog) {
+        console.log(workLog.task.taskId, this._taskId);
+        if(workLog.task.taskId === this._taskId) {
+            this.activeWorkLog = undefined;
+        }
     }
 
     updateObservableList() {
@@ -831,10 +852,6 @@ export class TaskPageComponent implements OnInit, OnDestroy {
                         icon: 'mdi-assignment_return',
                         command: () => this.forceCloseWorkLogDialogVisible = true,
                         visible: this.isTaskProcessing()
-                    },
-                    {
-                        label: "Чаты",
-                        icon: 'mdi-forum',
                     },
                     {
                         label: "Отчеты",

@@ -89,6 +89,14 @@ export class ApiService {
         return this.sendGet(`api/private/task/${taskId}/work-logs`);
     }
 
+    getActiveWorkLogs() {
+        return this.sendGet<WorkLog[]>('api/private/work-logs/active');
+    }
+
+    getCountOfActiveWorkLogs() {
+        return this.sendGet<number>('api/private/work-logs/active/count');
+    }
+
     getRootTask(taskId: number): Observable<Task> {
         return this.sendGet<Task>('api/private/task/' + taskId + '/root');
     }
@@ -404,6 +412,10 @@ export class ApiService {
         }
     }
 
+    getActiveWorkLogByTaskId(taskId: number) {
+        return this.sendGetSilent<WorkLog>("api/private/task/" + taskId + "/work-log/active");
+    }
+
     readAllNotifications() {
         return this.sendPatch<void>("api/private/notifications/read-all", {});
     }
@@ -509,12 +521,12 @@ export class ApiService {
     getAddressSuggestions(query: string) {
         return this.sendGet<Address[]>("api/private/suggestions/address", {query});
     }
-
     getCountOfUnreadMessages(chatId: number) {
         return this.sendGet<number>("api/private/chat/" + chatId + "/messages/unread-count");
     }
 
     // Результаты запросов на сервер кэшируются по таймауту, чтобы не было доп нагрузки на сервер
+
     private sendGet<T>(uri: string, query?: any) {
         // Генерируем хэш запроса на основе конечной точки и параметров запроса
         const requestHash = this.generateHash(uri, query);
@@ -538,7 +550,6 @@ export class ApiService {
         }
         return observable;
     }
-
     // Результаты запросов на сервер кэшируются по таймауту, чтобы не было доп нагрузки на сервер
 
     private sendGetSilent<T>(uri: string, query?: any) {
@@ -556,6 +567,8 @@ export class ApiService {
         }
         return observable;
     }
+
+
     private sendPost<T>(uri: string, body: any) {
         return this.client.post<T>(uri, body)
             .pipe(catchError(async (err, caught) => {
@@ -571,7 +584,6 @@ export class ApiService {
                 throw err;
             }));
     }
-
 
     private sendDelete(uri: string) {
         return this.client.delete(uri)

@@ -2,6 +2,7 @@
     <img [style.height]="'3rem'" src="assets/logo-dark.svg" alt="">
     <app-button *ngIf="!isTaskCreationPage" label="Создать задачу" icon="add_task" model="p-button-success" (onClick)="openCreateTaskPage()"></app-button>
     <div class="stretched"></div>
+    <app-active-work-logs-panel></app-active-work-logs-panel>
     <app-my-active-chats></app-my-active-chats>
     <app-account-panel></app-account-panel>
 </div>

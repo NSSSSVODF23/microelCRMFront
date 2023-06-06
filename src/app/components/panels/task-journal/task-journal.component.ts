@@ -171,6 +171,8 @@ export class TaskJournalComponent implements OnInit, OnDestroy {
                     return "swipe_up_alt";
                 case TaskEventType.EDIT_FIELDS:
                     return "edit";
+                case TaskEventType.REPORT_CREATED:
+                    return "history_edu";
                 default:
                     return "adjust";
             }
@@ -189,7 +191,7 @@ export class TaskJournalComponent implements OnInit, OnDestroy {
                 case TaskEventType.FORCE_CLOSE_WORK_LOG:
                     return "#e81a30";
                 case TaskEventType.CLOSE_WORK_LOG:
-                    return "#e81a30";
+                    return "#52ff89";
                 case TaskEventType.CHANGE_RESPONSIBILITY:
                     return "#ff9f3b";
                 case TaskEventType.LINKED_TO_PARENT_TASK:
@@ -222,6 +224,8 @@ export class TaskJournalComponent implements OnInit, OnDestroy {
                     return "#1a7ae8";
                 case TaskEventType.EDIT_FIELDS:
                     return "#61d78d";
+                case TaskEventType.REPORT_CREATED:
+                    return "#ff9f3b";
                 default:
                     return "#ff0000";
             }

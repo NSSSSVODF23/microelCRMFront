@@ -336,6 +336,7 @@ export enum TaskEventType {
     CLOSE_TASK = "CLOSE_TASK",
     REOPEN_TASK = "REOPEN_TASK",
     EDIT_FIELDS = "EDIT_FIELDS",
+    REPORT_CREATED = "REPORT_CREATED",
 }
 
 export interface TaskEvent {
@@ -461,6 +462,7 @@ export interface WorkLog{
     status: "ACTIVE" | "CLOSE" | "FORCE_CLOSE";
     whoAccepted: Employee[];
     whoClosed: Employee[];
+    whoActive: Employee[];
     report: string;
     leadTime: number;
     forceClosedReason?: string;

@@ -49,6 +49,8 @@ export class TaskEventTranslatePipe implements PipeTransform {
                 return "Задача вновь открыта";
             case TaskEventType.EDIT_FIELDS:
                 return "Информация в задаче отредактирована"
+            case TaskEventType.REPORT_CREATED:
+                return "Завершил работы по задаче: "
         }
     }
 

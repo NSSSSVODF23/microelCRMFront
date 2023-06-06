@@ -1,7 +1,19 @@
-<p-dialog [(visible)]="dialogVisible" [draggable]="false" [modal]="true" [resizable]="false" appendTo="body"
-          [breakpoints]="{'960px': '75vw', '640px': '100vw'}" [style]="{width:'50vw'}" header="Работы и отчеты по задаче">
+<p-dialog [(visible)]="dialogVisible" [breakpoints]="{'960px': '75vw', '640px': '100vw'}"
+          [contentStyle]="{display: 'grid'}" [draggable]="false" [modal]="true"
+          [resizable]="false"
+          [style]="{maxWidth:'50vw', width: 'fit-content', maxHeight: '60vh', minHeight: '10rem'}"
+          appendTo="body"
+          header="Работы и отчеты по задаче">
     <ng-template pTemplate="content">
-        <div class="flexed gap5 column list-view">
+        <div class="flexed column hcenter vcenter p10" *ngIf="!isLoading && !workLogs.length">
+            <span class="caption-common-message flexed hcenter gap2">
+                <i class="mdi-playlist_remove"></i>
+                <span>
+                    Нет журналов работ
+                </span>
+            </span>
+        </div>
+        <div class="flexed gap5 column list-view" *ngIf="!isLoading && workLogs.length">
             <div *ngFor="let workLog of workLogs; trackBy: trackByWorkLog" class="work-log-element">
                 <ng-container *ngTemplateOutlet="statusCaption; context: {$implicit: workLog.status}"></ng-container>
                 <span class="flexed gap10">
@@ -23,7 +35,7 @@
                     <span>
                         <span class="flexed gap3 hcenter caption-secondary"><i
                                 class="mdi-person"></i><span>Создал:</span></span>
-                        <app-employee-label [size]="2" [employee]="workLog.creator"></app-employee-label>
+                        <app-employee-label [employee]="workLog.creator" [size]="2"></app-employee-label>
                     </span>
                 </span>
                 <span class="flexed gap10 caption-main-small">
@@ -42,37 +54,83 @@
                     </span>
                 </span>
                 <span class="flexed gap10">
-                    <p-button label="Чат" icon="mdi-history" styleClass="p-button-secondary p-button-outlined" (onClick)="chatService.open.emit(workLog.chat.chatId)"></p-button>
-                    <p-button label="Отчеты" icon="mdi-summarize" styleClass="p-button-secondary p-button-outlined"></p-button>
+                    <p-button (onClick)="chatService.open.emit(workLog.chat.chatId)" icon="mdi-history" label="Чат"
+                              styleClass="p-button-secondary p-button-outlined"></p-button>
+                    <p-button icon="mdi-summarize" label="Отчеты"
+                              styleClass="p-button-secondary p-button-outlined"></p-button>
                 </span>
-                <span class="report" *ngIf="workLog.report">
+                <span *ngIf="workLog.report" class="report">
                     <span class="flexed gap3 hcenter caption-secondary"><i class="mdi-summarize"></i><span>Отчет</span></span>
                     <span class="report-text">{{workLog.report}}</span>
                 </span>
             </div>
         </div>
+        <ng-container *ngIf="isLoading">
+            <ng-container *ngTemplateOutlet="loadingPlaceholderEl"></ng-container>
+        </ng-container>
     </ng-template>
 </p-dialog>
 
 <ng-template #statusCaption let-status>
     <ng-container [ngSwitch]="status">
-        <span class="caption-sub-header flexed hcenter gap3" [style]="{color: 'var(--warm-600)'}" *ngSwitchCase="'ACTIVE'">
+        <span *ngSwitchCase="'ACTIVE'" [style]="{color: 'var(--warm-600)'}"
+              class="caption-sub-header flexed hcenter gap3">
             <i class="mdi-engineering"></i>
             <span>
                 В работе
             </span>
         </span>
-        <span class="caption-sub-header flexed hcenter gap3" [style]="{color: 'var(--green-400)'}" *ngSwitchCase="'CLOSE'">
+        <span *ngSwitchCase="'CLOSE'" [style]="{color: 'var(--green-400)'}"
+              class="caption-sub-header flexed hcenter gap3">
             <i class="mdi-verified"></i>
             <span>
                 Закрыт
             </span>
         </span>
-        <span class="caption-sub-header flexed hcenter gap3" [style]="{color: 'var(--red-400)'}" *ngSwitchCase="'FORCE_CLOSE'">
+        <span *ngSwitchCase="'FORCE_CLOSE'" [style]="{color: 'var(--red-400)'}"
+              class="caption-sub-header flexed hcenter gap3">
             <i class="mdi-close"></i>
             <span>
                 Закрыт принудительно
             </span>
         </span>
     </ng-container>
+</ng-template>
+
+<ng-template #loadingPlaceholderEl>
+    <div class="flexed gap5 column list-view">
+        <div *ngFor="let ph of loadingPlaceholders" class="work-log-element">
+            <p-skeleton height=".9rem" width="10rem"></p-skeleton>
+            <span class="flexed gap10">
+                    <span>
+                        <p-skeleton height="3.5rem" width="5rem"></p-skeleton>
+                    </span>
+                    <span>
+                        <p-skeleton height="3.5rem" width="5rem"></p-skeleton>
+                    </span>
+                    <span>
+                        <p-skeleton height="3.5rem" width="5rem"></p-skeleton>
+                    </span>
+                    <span>
+                        <p-skeleton height="3.5rem" width="5rem"></p-skeleton>
+                    </span>
+                </span>
+            <span class="flexed gap10 caption-main-small">
+                <span class="flexed column">
+                    <p-skeleton height="2rem" width="7rem"></p-skeleton>
+                </span>
+                <span class="flexed column">
+                    <p-skeleton height="2rem" width="7rem"></p-skeleton>
+                </span>
+                <span class="flexed column">
+                    <p-skeleton height="2rem" width="7rem"></p-skeleton>
+                </span>
+            </span>
+            <span class="flexed gap10">
+                <p-skeleton height="2.5rem" width="5rem"></p-skeleton>
+                <p-skeleton height="2.5rem" width="6rem"></p-skeleton>
+            </span>
+            <p-skeleton height="5rem" width="25rem"></p-skeleton>
+        </div>
+    </div>
 </ng-template>

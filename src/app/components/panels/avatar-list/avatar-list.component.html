@@ -1,4 +1,4 @@
-<div (mouseenter)="isListShow=true" (mouseleave)="isListShow=false" class="avatars">
+<div (mouseenter)="sliced.length>0 ? isListShow=true : isListShow=false" (mouseleave)="isListShow=false" class="avatars">
     <app-avatar *ngFor="let employee of sliced; let i = index; trackBy: trackByEmployee"
                 [deleted]="employee.deleted"
                 [name]="employee.fullName"

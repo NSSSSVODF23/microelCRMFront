@@ -15,6 +15,7 @@ export class WorkLogsDialogComponent implements OnInit, OnDestroy {
     workLogs: WorkLog[] = [];
     isLoading = false;
     subscriptions: SubscriptionsHolder = new SubscriptionsHolder();
+    loadingPlaceholders = Array(3).fill(null);
 
     constructor(readonly api: ApiService, readonly rt: RealTimeUpdateService, readonly chatService: ChatService) {
     }
