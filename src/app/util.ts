@@ -44,23 +44,23 @@ export class Utils {
         return false;
     }
 
-    static dateArrayToStringRange(dateArray?: Date[]): string {
-        if (!dateArray) return "{}";
+    static dateArrayToRange(dateArray?: (Date | undefined)[] | null) {
+        if (!dateArray) return null;
         const dateStrings = dateArray.map((date, index) => {
             if (!date) return undefined;
             if (index === 1) {
-                date.setHours(23,59,59,999);
-                return this.dateFormat(date);
+                date.setHours(23, 59, 59, 999);
+                return Utils.dateFormat(date);
             } else {
-                date.setHours(0,0,0,0);
-                return this.dateFormat(date);
+                date.setHours(0, 0, 0, 0);
+                return Utils.dateFormat(date);
             }
         });
         const rangeObject: DateRange = {
             start: dateStrings[0],
             end: dateStrings[1]
         };
-        return JSON.stringify(rangeObject);
+        return rangeObject;
     }
 
     static dateFormat(date: Date) {
@@ -179,6 +179,24 @@ export class Utils {
                 break;
         }
         return fieldItem;
+    }
+
+    static prepareForHttpRequest(obj: any) {
+        if (typeof obj === 'object') {
+            for (let key in obj) {
+                if (!Array.isArray(obj[key]) && typeof obj[key] !== 'string' && typeof obj[key] !== 'number' && typeof obj[key] !== 'boolean') {
+                    obj[key] = JSON.stringify(obj[key]);
+                }else if(Array.isArray(obj[key])){
+                    obj[key] = obj[key].map((item:any) => {
+                        if(typeof item === 'object'){
+                            return JSON.stringify(item);
+                        }
+                        return item;
+                    });
+                }
+            }
+        }
+        return obj;
     }
 }
 

@@ -271,7 +271,7 @@ export class WireframeConstructorPageComponent implements OnInit {
     }
 
     taskItemForView(): Task {
-        return {taskId: 0, modelWireframe: this.wireframe, listItemFields:[]};
+        return {taskId: 0, modelWireframe: this.wireframe, listItemFields:[], allEmployeesObservers:[]};
     }
 
     createStage() {

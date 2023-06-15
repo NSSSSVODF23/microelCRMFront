@@ -16,6 +16,7 @@ export class LoginPageComponent implements OnInit {
     });
     wrongCredentialsTimer: any;
     isWrongCredentials = false;
+    isLogining = false;
 
     constructor(readonly api: ApiService, readonly router: Router) {
     }
@@ -31,12 +32,15 @@ export class LoginPageComponent implements OnInit {
 
     signIn() {
         if (!this.loginForm.valid) return;
+        this.isLogining = true;
         this.api.signIn(this.loginForm.getRawValue()).subscribe({
             next: () => {
                 this.router.navigate(['/']).then();
+                this.isLogining = false;
             },
             error: (err) => {
                 this.setWrongCredentials();
+                this.isLogining = false;
             }
         });
     }

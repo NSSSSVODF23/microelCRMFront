@@ -9,7 +9,7 @@
   position: fixed;
   top: 100px;
   right: 1rem;
-  //z-index: 1010;
+  z-index: 1010;
   gap: 1rem;
   transition: all 0.5s ease-in-out;
 }
@@ -33,6 +33,6 @@
   color: var(--tc-500);
 
   &:hover {
-    color: var(--mc);
+    color: var(--mc-500);
   }
 }

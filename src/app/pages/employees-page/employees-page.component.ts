@@ -117,7 +117,7 @@ export class EmployeesPageComponent implements OnInit, OnDestroy {
             this.employees.push(value);
         }));
         this.subscriptions.addSubscription('empDel', this.rt.employeeDeleted().subscribe(value => {
-            const foundIndex = this.employees.findIndex(emp => emp.login === value);
+            const foundIndex = this.employees.findIndex(emp => emp.login === value.login);
             if (foundIndex >= 0) {
                 this.employees.splice(foundIndex, 1);
             }

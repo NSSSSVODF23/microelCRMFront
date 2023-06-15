@@ -16,3 +16,11 @@
   display: grid;
   grid: 1fr/max-content 1fr;
 }
+
+.stage-header{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex: 1;
+  background-color: white;
+}

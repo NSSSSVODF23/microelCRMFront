@@ -57,3 +57,25 @@
     }
   }
 }
+
+.tag-item{
+  display: flex;
+  align-items: center;
+  padding: .5rem;
+  gap: .5rem;
+
+  &:not(:last-child){
+    border-bottom: 1px solid var(--bgc-200);
+  }
+
+  .color{
+    width: 1rem;
+    height: 1rem;
+    border-radius: 999px;
+  }
+
+  .name{
+    font-size: 1rem;
+    color: var(--tc-700);
+  }
+}

@@ -47,7 +47,7 @@ export class TaskSelectingDialogComponent implements OnInit {
     })
     templates$ = this.api.getWireframesNames().pipe(tap((wireframes) => {
         this.mainFilterForm.patchValue({template: wireframes.map(w => w.wireframeId)})
-        this.api.getPageOfTasks(0, this.TASK_PAGE_SIZE, {exclusionIds: this.excludedTasks, onlyMy: this.onlyMy}, []).subscribe(this.loadHandler())
+        this.api.getPageOfTasks(0, {exclusionIds: this.excludedTasks, onlyMy: this.onlyMy}).subscribe(this.loadHandler())
     }));
     mainFilters = {} as any;
 
@@ -68,7 +68,7 @@ export class TaskSelectingDialogComponent implements OnInit {
                         switch (key) {
                             case 'dateOfCreation':
                                 return {
-                                    [key]: Utils.dateArrayToStringRange(value)
+                                    [key]: Utils.dateArrayToRange(value)
                                 }
                             case 'tags':
                                 return {
@@ -103,12 +103,12 @@ export class TaskSelectingDialogComponent implements OnInit {
 
     changePage(event: any) {
         this.loading = true;
-        this.api.getPageOfTasks(event.page, this.TASK_PAGE_SIZE, {...this.mainFilters, onlyMy: this.onlyMy}, []).subscribe(this.loadHandler())
+        this.api.getPageOfTasks(event.page, {...this.mainFilters, onlyMy: this.onlyMy}).subscribe(this.loadHandler())
     }
 
     applyFilter() {
         this.loading = true;
-        this.api.getPageOfTasks(0, this.TASK_PAGE_SIZE, {...this.mainFilters, onlyMy: this.onlyMy}, []).subscribe(this.loadHandler())
+        this.api.getPageOfTasks(0, {...this.mainFilters, onlyMy: this.onlyMy}).subscribe(this.loadHandler())
     }
 
     loadHandler() {

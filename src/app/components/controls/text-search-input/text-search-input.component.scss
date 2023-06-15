@@ -4,10 +4,10 @@
   align-items: center;
   padding: 0 1rem 0 1rem;
   border-radius: 999px;
-  border: 1px solid var(--bgc-400);
+  border: 1px solid var(--bgc-200);
   width: 100%;
   background-color: white;
-  transition: border-color .2s ease-out;
+  transition: border-color .1s ease-out;
 
   .search-input {
     border: 0;
@@ -17,16 +17,16 @@
     font-size: 1.2rem;
     min-width: 5rem;
     padding: .9rem .3rem;
-    color: var(--tc-700);
+    color: var(--tc-600);
   }
 }
 
 .search-wrapper:hover {
-  border-color: var(--tc-500);
+  border-color: var(--bgc-300);
 }
 
 .focused {
-  border-color: var(--mc) !important;
+  border-color: var(--mc-300) !important;
 }
 
 :host{

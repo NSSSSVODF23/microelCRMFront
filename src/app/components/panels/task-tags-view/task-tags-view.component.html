@@ -15,9 +15,9 @@
             chevron_left
         </span>
     </div>
-    <app-button (onClick)="openTagManagementDialog($event)" *ngIf="tags.length===0" [disabled]="disabled" icon="add"
+    <app-button (onClick)="openTagManagementDialog($event)" *ngIf="tags.length===0 && !readOnly" [disabled]="disabled" icon="add"
                 label="Добавить теги" model="p-button-text"></app-button>
-    <app-icon-button (onClick)="openTagManagementDialog($event)" *ngIf="tags.length > 0" [disabled]="disabled"
+    <app-icon-button (onClick)="openTagManagementDialog($event)" *ngIf="tags.length > 0 && !readOnly" [disabled]="disabled"
                      icon="edit" pTooltip="Редактировать теги"></app-icon-button>
 </div>
 

@@ -2,7 +2,7 @@
     <i [class]="(value?'mdi-domain active':'mdi-domain_disabled unactive')+' icon'"></i>
 <!--    <i class="pi pi-search"></i>-->
     <input #inputEl [disabled]="disabled" [ngClass]="{unconfirmed:!value, confirmed:value}" [placeholder]="placeholder" [spellcheck]="false" autocomplete="off" class="address-input"
-           pInputText type="text"/>
+           pInputText type="text" (blur)="onTouched(); onBlur.emit()"/>
 </span>
 <p-overlay #overlay [(visible)]="showSuggestions" [responsive]="{ breakpoint: '640px', contentStyleClass: 'h-20rem' }"
            appendTo="body"

@@ -1,0 +1,54 @@
+<div class="template-selector">
+    <div class="template-selector-title">
+        <i class="mdi-checklist"></i>
+        <span class="stretched">
+            Типы задач
+        </span>
+        <span class="select-all-button" pRipple *ngIf="selected.length !== templates.length" [ngClass]="{disabled}" (click)="selectAll()" pTooltip="Выбрать все">
+            <i class="mdi-select_all"></i>
+        </span>
+    </div>
+    <ng-container [ngSwitch]="status">
+        <ng-container *ngSwitchCase="'ready'">
+            <div (click)="uniselect(template.wireframeId)"
+                 *ngFor="let template of templates; trackBy: templateTrack"
+                 [ngClass]="{'selected': isSelect(template.wireframeId), 'un-target': isUntarget(template.wireframeId), disabled}"
+                 class="template-selector-item">
+                <i (click)="$event.stopPropagation(); toggle(template.wireframeId)"
+                   [ngClass]="{'mdi-radio_button_unchecked': !isSelect(template.wireframeId), 'mdi-check_circle_outline': isSelect(template.wireframeId), 'mdi-close': isSelect(template.wireframeId) && isUntarget(template.wireframeId)}"></i>
+                <span (mouseenter)="uniTargetMode=true; uniTargetId=template.wireframeId"
+                      (mouseleave)="uniTargetMode=false" class="flexed hcenter">
+                    <span class="one-line">
+                        {{template.name}}
+                    </span>
+                    <app-colored-tag *ngIf="getCount(template.wireframeId) > 0" [caption]="getCount(template.wireframeId).toString()" color="var(--mc-500)"></app-colored-tag>
+                </span>
+            </div>
+        </ng-container>
+        <ng-container *ngSwitchCase="'loading'">
+            <div class="template-selector-message">
+                <p-progressSpinner class="primary-spinner" strokeWidth="1"></p-progressSpinner>
+            </div>
+        </ng-container>
+        <ng-container *ngSwitchCase="'error'">
+            <div class="template-selector-message">
+                <div class="caption-common-error flexed hcenter gap3">
+                    <i class="mdi-warning"></i>
+                    <span>
+                        Ошибка загрузки
+                    </span>
+                </div>
+            </div>
+        </ng-container>
+        <ng-container *ngSwitchCase="'empty'">
+            <div class="template-selector-message">
+                <div class="caption-common-message flexed hcenter gap3">
+                    <i class="mdi-search_off"></i>
+                    <span>
+                        Шаблонов нет
+                    </span>
+                </div>
+            </div>
+        </ng-container>
+    </ng-container>
+</div>

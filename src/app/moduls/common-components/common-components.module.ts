@@ -68,7 +68,7 @@ import {TinyButtonComponent} from "../../components/controls/tiny-button/tiny-bu
 import {TaskLinkComponent} from "../../components/controls/task-link/task-link.component";
 import {TaskTagsViewComponent} from "../../components/panels/task-tags-view/task-tags-view.component";
 import {MultiSelectModule} from "primeng/multiselect";
-import {TaskTagItemComponent} from "../../components/controls/task-tag-item/task-tag-item.component";
+import {TaskTagListItemComponent} from "../../components/controls/task-tag-item/task-tag-list-item.component";
 import {ConfirmPopupModule} from "primeng/confirmpopup";
 import {ColorPickerModule} from "primeng/colorpicker";
 import {AutoFocusModule} from "primeng/autofocus";
@@ -137,6 +137,15 @@ import {
     ActiveWorkLogsPanelComponent
 } from "../../components/panels/active-work-logs-panel/active-work-logs-panel.component";
 import {TimeElapsedComponent} from "../../components/controls/time-elapsed/time-elapsed.component";
+import {
+    InputVariationSelectorComponent
+} from "../../components/controls/input-variation-selector/input-variation-selector.component";
+import {
+    TaskTemplateMultiSelectorComponent
+} from "../../components/panels/task-template-multi-selector/task-template-multi-selector.component";
+import {SelectButtonModule} from "primeng/selectbutton";
+import {EmployeeSelectorComponent} from "../../components/controls/employee-selector/employee-selector.component";
+import {DataRangeInputComponent} from "../../components/controls/data-range-input/data-range-input.component";
 
 
 @NgModule({
@@ -178,7 +187,7 @@ import {TimeElapsedComponent} from "../../components/controls/time-elapsed/time-
         TinyButtonComponent,
         TaskLinkComponent,
         TaskTagsViewComponent,
-        TaskTagItemComponent,
+        TaskTagListItemComponent,
         LazyEndlessPageListComponent,
         TaskTagFilterInputComponent,
         TaskStatusChooserComponent,
@@ -210,7 +219,11 @@ import {TimeElapsedComponent} from "../../components/controls/time-elapsed/time-
         MyActiveChatsComponent,
         WorkLogsDialogComponent,
         ActiveWorkLogsPanelComponent,
-        TimeElapsedComponent
+        TimeElapsedComponent,
+        InputVariationSelectorComponent,
+        TaskTemplateMultiSelectorComponent,
+        EmployeeSelectorComponent,
+        DataRangeInputComponent
     ],
     exports: [
         AccountPanelComponent,
@@ -250,7 +263,7 @@ import {TimeElapsedComponent} from "../../components/controls/time-elapsed/time-
         TinyButtonComponent,
         TaskLinkComponent,
         TaskTagsViewComponent,
-        TaskTagItemComponent,
+        TaskTagListItemComponent,
         LazyEndlessPageListComponent,
         TaskTagFilterInputComponent,
         TaskStatusChooserComponent,
@@ -282,7 +295,11 @@ import {TimeElapsedComponent} from "../../components/controls/time-elapsed/time-
         MyActiveChatsComponent,
         WorkLogsDialogComponent,
         ActiveWorkLogsPanelComponent,
-        TimeElapsedComponent
+        TimeElapsedComponent,
+        InputVariationSelectorComponent,
+        TaskTemplateMultiSelectorComponent,
+        EmployeeSelectorComponent,
+        DataRangeInputComponent
     ],
     imports: [
         CommonPipesModule,
@@ -325,6 +342,7 @@ import {TimeElapsedComponent} from "../../components/controls/time-elapsed/time-
         TextFieldModule,
         RippleModule,
         AnimateModule,
+        SelectButtonModule,
 
     ],
     providers: [

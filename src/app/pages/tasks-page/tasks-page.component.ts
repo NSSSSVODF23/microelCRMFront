@@ -1,8 +1,8 @@
 import {AfterViewInit, Component, OnInit, ViewChild} from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
-import {TaskSearchCacheService} from "../../services/task-search-cache.service";
+import {TasksPageCacheService} from "../../services/tasks-page-cache.service";
 import {ApiService} from "../../services/api.service";
-import {Task} from "../../transport-interfaces";
+import {Employee, Task} from "../../transport-interfaces";
 import {Paginator} from "primeng/paginator";
 
 
@@ -11,15 +11,19 @@ import {Paginator} from "primeng/paginator";
 })
 export class TasksPageComponent implements OnInit, AfterViewInit {
 
-    employees$ = this.api.getEmployeesOptionsList();
+    employees: Employee[] = [];
     @ViewChild('paginator') paginator!: Paginator;
     loadingItems = Array.from({length: 10}).fill(null);
+    filterDialogVisible = false;
 
-    constructor(readonly taskService: TaskSearchCacheService, readonly api: ApiService, readonly route: ActivatedRoute) {
+    constructor(readonly taskService: TasksPageCacheService, readonly api: ApiService, readonly route: ActivatedRoute) {
     }
 
     ngOnInit(): void {
         this.taskService.loadPage();
+        this.api.getEmployees().subscribe(employees => {
+            this.employees = employees;
+        })
     }
 
     ngAfterViewInit(): void {
@@ -46,5 +50,9 @@ export class TasksPageComponent implements OnInit, AfterViewInit {
             this.api.getFieldsTask(item.taskId).subscribe(fields => {
                 item.fields = fields;
             })
+    }
+
+    clearTemplateFilters() {
+        this.taskService.templateFilterForm.reset()
     }
 }

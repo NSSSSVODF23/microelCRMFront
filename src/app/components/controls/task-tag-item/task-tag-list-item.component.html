@@ -1,17 +1,15 @@
-<div  class="task-tags-list-item">
-    <span class="name" [style.background-color]="tag?.color">
-        {{tag?.name}}
+<div class="tag-item">
+    <div [style.background-color]="tag?.color" class="color"></div>
+    <span class="flexed column">
+        <span class="name">{{tag?.name}}</span>
+        <span class="flexed hcenter gap2">
+            <span class="caption-secondary">Создан:</span>
+            <span class="caption-tiny">{{tag?.created | date:'dd MMM yyyy HH:mm'}}</span>
+        </span>
     </span>
-    <span class="time" [style.background-color]="tag?.color">
-        {{tag?.created | date:'dd MMM yyyy HH:mm'}}
-    </span>
-    <span class="creator">
-        <app-employee-label [employee]="tag?.creator"></app-employee-label>
-    </span>
-    <div class="edit-menu">
-        <app-icon-button model="light" (onClick)="openEditTagDialog()" icon="edit"></app-icon-button>
-        <app-icon-button model="light" (onClick)="deleteTag($event)" icon="delete"></app-icon-button>
-    </div>
+    <div class="stretched"></div>
+    <p-button styleClass="p-button-text p-button-warning" label="Редактировать" (onClick)="openEditTagDialog()" icon="mdi-edit"></p-button>
+    <p-button styleClass="p-button-text p-button-danger" label="Удалить" (onClick)="deleteTag($event)" icon="mdi-delete"></p-button>
 </div>
 
 <p-confirmPopup [key]="(this.tag?.taskTagId ?? '').toString()"></p-confirmPopup>

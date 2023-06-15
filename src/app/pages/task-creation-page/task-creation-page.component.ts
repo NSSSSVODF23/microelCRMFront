@@ -104,7 +104,7 @@ export class TaskCreationPageComponent implements OnInit {
                  return  new FormGroup(
                     step.fields.reduce(
                         (prev, field) => {
-                            return {...prev, [field.id]: new FormControl(null, [CustomValidators.taskInput(field.type)])};
+                            return {...prev, [field.id]: new FormControl(null, [CustomValidators.taskInput(field.type, field.variation)])};
                         }, {}
                     )
                 )

@@ -22,6 +22,6 @@
         <div class="preview-loading-indicator flexed vcenter hcenter" *ngIf="!previewLoading">
             <app-circle-loading-indicator></app-circle-loading-indicator>
         </div>
-        <img [src]="'/api/private/attachment/'+attachment?.name" class="preview-image" (load)="previewLoading=true">
+        <img [src]="'/api/private/thumbnail/'+attachment?.name" class="preview-image" (load)="previewLoading=true">
     </div>
 </ng-template>

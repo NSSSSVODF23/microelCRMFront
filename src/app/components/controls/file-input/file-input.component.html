@@ -2,8 +2,7 @@
      [tooltipDisabled]="!hasFiles" class="button-wrapper" tooltipPosition="left">
     <p-button (onClick)="hasFiles ? menu.toggle($event) : openFileManager()"
               [disabled]="disabled || loading" [label]="label"
-              [styleClass]="style"
-              icon="mdi-attach_file"
+              [styleClass]="style" icon="mdi-attach_file"
     ></p-button>
     <p-badge *ngIf="hasFiles" [style]="{fontSize:'.65rem', minWidth:'1.2rem', height:'1.2rem'}" [value]="filesLoaded.toString()"
              class="ur-badge"></p-badge>

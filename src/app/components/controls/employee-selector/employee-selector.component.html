@@ -1,0 +1,9 @@
+<p-dropdown styleClass="full-width" [options]="employees" optionValue="login" [formControl]="control" (onBlur)="onTouched()" [showClear]="true"
+            appendTo="body" placeholder="Сотрудник">
+    <ng-template let-employee pTemplate="selectedItem">
+        <app-employee-label [size]="1.4" [employee]="employee"></app-employee-label>
+    </ng-template>
+    <ng-template let-employee pTemplate="item">
+        <app-employee-label [size]="1.4" [employee]="employee"></app-employee-label>
+    </ng-template>
+</p-dropdown>

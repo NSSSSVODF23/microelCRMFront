@@ -16,7 +16,7 @@ export class MainMenuPanelComponent implements OnInit {
     stagesLoaded = false;
 
     category: string = 'main';
-    incomingCount$ = this.api.getIncomingTasksCount().pipe(map(count => count.toString()));
+    incomingCount$ = this.api.getCountIncomingTasks().pipe(map(count => count.toString()));
 
     constructor(readonly api: ApiService, readonly route: ActivatedRoute) {
 

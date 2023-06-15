@@ -5,7 +5,8 @@ import {RealTimeUpdateService} from "../../services/real-time-update.service";
 import {Page, Task} from "../../transport-interfaces";
 import {FormControl, FormGroup} from "@angular/forms";
 import {Paginator} from "primeng/paginator";
-import {of, switchMap, tap} from "rxjs";
+import {filter, of, switchMap} from "rxjs";
+import {PersonalityService} from "../../services/personality.service";
 
 @Component({
     templateUrl: './incoming-tasks-page.component.html',
@@ -19,21 +20,11 @@ export class IncomingTasksPageComponent implements OnInit {
     filtersForm = new FormGroup({
         template: new FormControl([] as number[])
     })
-    loading = false;
-    loadingTasks = Array.from({length:10}).fill(null);
-    templates$ = this.api.getWireframesNames().pipe(tap(wireframes => {
-        const filters = Storage.load<any>("incomingFilters");
-        if (filters) {
-            this.filtersForm.patchValue(filters);
-        } else {
-            this.filtersForm.patchValue({template: wireframes.map(w => w.wireframeId)})
-        }
-        this.loadTasks(this.filtersForm.getRawValue());
-    }));
-    @ViewChild('paginator') paginator?: Paginator;
+    status: 'ready' | 'loading' | 'error' | 'empty' = 'loading';
     subscribes = new SubscriptionsHolder();
+    @ViewChild('paginator') paginator?: Paginator;
 
-    constructor(readonly api: ApiService, readonly rt: RealTimeUpdateService) {
+    constructor(readonly api: ApiService, readonly rt: RealTimeUpdateService, readonly personality: PersonalityService) {
     }
 
     _pageNum = 0;
@@ -51,15 +42,17 @@ export class IncomingTasksPageComponent implements OnInit {
     }
 
     ngOnInit(): void {
-        this.subscribes.addSubscription('tskCr', this.rt.taskCreated().subscribe(this.rtCreateTask.bind(this)));
+        this.personality.onGettingUserData.subscribe(me=>{
+            this.subscribes.addSubscription('tskCr', this.rt.incomingTaskCreated(me.login).subscribe(this.rtCreateTask.bind(this)));
+        })
         this.subscribes.addSubscription('tskUp', this.rt.taskUpdated().subscribe(this.rtUpdateTask.bind(this)));
-        this.pageNum = Storage.load<number>("incomingPageNum");
-        // const filters = Storage.load<any>("incomingFilters");
-        // if (filters) this.filtersForm.setValue(filters);
-        this.subscribes.addSubscription('cngFltr', this.filtersForm.valueChanges.subscribe(filters => {
+        this.subscribes.addSubscription('cngFltr', this.filtersForm.valueChanges.pipe(filter(filters => !!filters.template && filters.template.length > 0)).subscribe(filters => {
             this.toFirstPage();
             this.loadTasks(filters);
         }))
+        this.pageNum = Storage.load<number>("incomingPageNum");
+        const filters = Storage.load<any>("incomingFilters");
+        if (filters) this.filtersForm.setValue(filters);
     }
 
     toFirstPage() {
@@ -83,7 +76,7 @@ export class IncomingTasksPageComponent implements OnInit {
     }
 
     loadTasks(filters: any) {
-        this.loading = true;
+        this.status = 'loading';
         this.api.getIncomingTasks(this.pageNum, this.PAGE_SIZE, filters)
             .pipe(
                 switchMap(page => {
@@ -100,10 +93,14 @@ export class IncomingTasksPageComponent implements OnInit {
                     this.taskPage = page;
                     Storage.save("incomingPageNum", this.pageNum);
                     Storage.save("incomingFilters", filters);
-                    this.loading = false;
+                    if(this.taskPage.totalElements === 0) {
+                        this.status = 'empty';
+                    }else {
+                        this.status = 'ready';
+                    }
                 },
-                error: ()=>{
-                    this.loading = false;
+                error: () => {
+                    this.status = 'error';
                 }
             })
     }

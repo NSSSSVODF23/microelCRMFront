@@ -39,6 +39,11 @@ export class NotificationsService {
         [NotificationType.TASK_STAGE_CHANGED]: 'Стадия задачи изменена',
         [NotificationType.YOU_OBSERVER]: 'Вы наблюдатель',
         [NotificationType.YOU_RESPONSIBLE]: 'Вы ответственный',
+        [NotificationType.TASK_HAS_BECOME_ACTUAL]: 'Актуальная',
+        [NotificationType.TASK_EXPIRED]: 'Срок истек',
+        [NotificationType.WORKS_COMPLETED]: 'Работы завершены',
+        [NotificationType.REPORT_RECEIVED]: 'Отчет получен',
+        [NotificationType.MENTIONED_IN_TASK]: 'Вас упомянули',
     }
     icons: { [key: string]: string } = {
         [NotificationType.NEW_COMMENT]: 'mdi-add_comment',
@@ -51,6 +56,11 @@ export class NotificationsService {
         [NotificationType.TASK_STAGE_CHANGED]: 'mdi-next_week',
         [NotificationType.YOU_OBSERVER]: 'mdi-visibility',
         [NotificationType.YOU_RESPONSIBLE]: 'mdi-person',
+        [NotificationType.TASK_HAS_BECOME_ACTUAL]: 'mdi-event_available',
+        [NotificationType.TASK_EXPIRED]: 'mdi-event_busy',
+        [NotificationType.WORKS_COMPLETED]: 'mdi-fact_check',
+        [NotificationType.REPORT_RECEIVED]: 'mdi-edit_note',
+        [NotificationType.MENTIONED_IN_TASK]: 'mdi-campaign',
     }
 
     private notificationAudios: { [key: string]: HTMLAudioElement } = {

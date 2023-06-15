@@ -1,0 +1,11 @@
+<span class="caption-active flexed hstart input-field" *ngIf="variationList && variationList.length" (click)="overlayPanelEl.toggle($event)">
+    <span>{{currentName}}</span>
+    <i class="mdi-arrow_drop_down"></i>
+</span>
+<p-overlayPanel #overlayPanelEl styleClass="no-paddings">
+    <ng-template pTemplate="content">
+        <div pRipple class="list-item" *ngFor="let variation of variationList; trackBy: trackByVariation" (click)="onChange(variation.id); overlayPanelEl.hide()">
+            {{variation.name}}
+        </div>
+    </ng-template>
+</p-overlayPanel>

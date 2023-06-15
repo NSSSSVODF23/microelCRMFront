@@ -1,9 +1,11 @@
-<div #wrapperElem class="flexed column wrapper" >
-    <div #titleElem class="title flexed gap6 hcenter" (click)="toggle()" [routerLink]="link" routerLinkActive="active">
+<div #wrapperElem class="flexed column wrapper">
+    <div #titleElem (click)="toggle()" [routerLink]="link" class="title flexed gap6 hcenter" routerLinkActive="active">
         <span class="material-icons-round title-icon">{{icon}}</span> {{caption}}
         <div class="stretched"></div>
-        <app-colored-tag *ngIf="badge" [caption]="badge" color="#2563eb"></app-colored-tag>
-        <span *ngIf="hasChild()" class="material-icons-round title-expanded-icon" [ngClass]="{rotated:_isExtended}">expand_more</span>
+        <app-colored-tag *ngIf="badge" [caption]="badge" color="var(--mc-500)"></app-colored-tag>
+        <span *ngIf="hasChild()" [ngClass]="{rotated:_isExtended}" class="material-icons-round title-expanded-icon">expand_more</span>
     </div>
-    <app-sub-extended-menu-item *ngFor="let el of elements" [caption]="el.label" [isExtended]="el.extended" [link]="el.link" [children]="el.children" [nLevel]="el.nestingLevel"></app-sub-extended-menu-item>
+    <app-sub-extended-menu-item *ngFor="let el of elements" [caption]="el.label" [children]="el.children"
+                                [isExtended]="el.extended" [link]="el.link"
+                                [nLevel]="el.nestingLevel"></app-sub-extended-menu-item>
 </div>

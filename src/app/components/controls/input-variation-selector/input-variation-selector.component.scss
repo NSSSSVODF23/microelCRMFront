@@ -1,0 +1,24 @@
+.input-field{
+  cursor: pointer;
+  user-select: none;
+  transition: opacity .15s ease-in-out;
+
+  &:hover{
+    opacity: 0.8;
+  }
+}
+
+.list-item{
+  cursor: pointer;
+  user-select: none;
+  transition: all .15s ease-in-out;
+  color: var(--tc-600);
+  padding: .5rem .9rem;
+
+  &:hover{
+    background-color: var(--mc-100);
+    color: var(--mc-500);
+  }
+}
+
+

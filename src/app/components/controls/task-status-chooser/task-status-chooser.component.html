@@ -1,14 +1,15 @@
-<div class="flexed column gap2 indent1">
-    <span class="caption-main-small flexed gap5 hcenter">
-        <p-checkbox [(ngModel)]="statuses" (ngModelChange)="onChangeStatus()" name="taskStatus" value="ACTIVE"></p-checkbox>
-        Активная
-    </span>
-    <span class="caption-main-small flexed gap5 hcenter">
-        <p-checkbox [(ngModel)]="statuses" (ngModelChange)="onChangeStatus()" name="taskStatus" value="PROCESSING"></p-checkbox>
-        У монтажников
-    </span>
-    <span class="caption-main-small flexed gap5 hcenter">
-        <p-checkbox [(ngModel)]="statuses" (ngModelChange)="onChangeStatus()" name="taskStatus" value="CLOSE"></p-checkbox>
-        Закрытая
-    </span>
-</div>
+<!--<div class="flexed column gap2 indent1">-->
+<!--    <span class="caption-main-small flexed gap5 hcenter">-->
+<!--        <p-checkbox [(ngModel)]="statuses" (ngModelChange)="onChangeStatus()" name="taskStatus" value="ACTIVE"></p-checkbox>-->
+<!--        Активная-->
+<!--    </span>-->
+<!--    <span class="caption-main-small flexed gap5 hcenter">-->
+<!--        <p-checkbox [(ngModel)]="statuses" (ngModelChange)="onChangeStatus()" name="taskStatus" value="PROCESSING"></p-checkbox>-->
+<!--        У монтажников-->
+<!--    </span>-->
+<!--    <span class="caption-main-small flexed gap5 hcenter">-->
+<!--        <p-checkbox [(ngModel)]="statuses" (ngModelChange)="onChangeStatus()" name="taskStatus" value="CLOSE"></p-checkbox>-->
+<!--        Закрытая-->
+<!--    </span>-->
+<!--</div>-->
+<p-selectButton [options]="options" [formControl]="chooserControl" optionLabel="name" optionValue="value" [multiple]="true"></p-selectButton>

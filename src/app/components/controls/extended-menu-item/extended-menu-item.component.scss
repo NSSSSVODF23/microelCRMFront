@@ -10,11 +10,15 @@
   color: var(--tc-700);
   cursor: pointer;
   user-select: none;
+  transition: color 0.15s ease-out;
+
   &.active{
-    color: var(--mc);
+    color: var(--mc-500);
+    background-color: var(--mc-0);
+    cursor: default;
   }
-  &:hover {
-    background-color: var(--bgc-300);
+  &:not(.active):hover {
+    color: var(--mc-400);
   }
   &-icon {
     font-size: 1.5rem;

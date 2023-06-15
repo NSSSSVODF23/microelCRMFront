@@ -69,6 +69,7 @@ import {ParseTaskPageComponent} from "../../pages/parse-task-page/parse-task-pag
 import {VirtualScrollerModule} from "primeng/virtualscroller";
 import {ProgressBarModule} from "primeng/progressbar";
 import {ParseAddressPageComponent} from "../../pages/parse-address-page/parse-address-page.component";
+import {SelectButtonModule} from "primeng/selectbutton";
 
 
 @NgModule({
@@ -143,7 +144,8 @@ import {ParseAddressPageComponent} from "../../pages/parse-address-page/parse-ad
         VirtualScrollerModule,
         ProgressBarModule,
         KeyValuePipe,
-        SlicePipe
+        SlicePipe,
+        SelectButtonModule
     ],
     providers: [MessageService, {provide: LOCALE_ID, useValue: 'ru'}, ConfirmationService]
 })

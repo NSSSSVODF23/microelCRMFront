@@ -11,30 +11,30 @@ import {
     Page,
     Task,
     TaskFieldsSnapshot,
-    TaskStatus, WorkLog
+    TaskStatus,
+    WorkLog
 } from "../../transport-interfaces";
 import {FileInputComponent} from "../../components/controls/file-input/file-input.component";
 import {ConfirmationService, MenuItem, MessageService, TreeNode} from "primeng/api";
 import {RealTimeUpdateService} from "../../services/real-time-update.service";
 import {DurationCounter, FormToModelItemConverter, quillDefaultModules, SubscriptionsHolder, Utils} from "../../util";
-import {fade} from "../../animations";
+import {fade, fadeIn} from "../../animations";
 import {OverlayPanel} from "primeng/overlaypanel";
-import {FormControl, FormGroup, Validators} from "@angular/forms";
+import {FormControl, FormGroup} from "@angular/forms";
 import {CustomValidators} from "../../custom-validators";
-import {map, take} from 'rxjs';
+import {map} from 'rxjs';
 import {CustomNavigationService} from "../../services/custom-navigation.service";
 import {QuillEditorComponent} from "ngx-quill";
 import {
     TaskSelectingDialogComponent
 } from "../../components/panels/task-linking-dialog/task-selecting-dialog.component";
-import {ChatPanelComponent} from "../../components/panels/chat-panel/chat-panel.component";
 import {ChatService} from "../../services/chat.service";
 import {WorkLogsDialogComponent} from "../../components/panels/work-logs-dialog/work-logs-dialog.component";
 
 @Component({
     templateUrl: './task-page.component.html',
     styleUrls: ['./task-page.component.scss'],
-    animations: [fade]
+    animations: [fade, fadeIn]
 })
 export class TaskPageComponent implements OnInit, OnDestroy {
 
@@ -84,7 +84,7 @@ export class TaskPageComponent implements OnInit, OnDestroy {
     totalExistingTasksToLink = 0;
     loadingExistingTasksToLink = false;
     globalTaskSearchString = "";
-    taskCreationDateFilterForLinking = [];
+    taskCreationDateFilterForLinking: string[] = [];
     taskAuthorEmployeeFilter = "";
 
     showChangeResponsibleDialog = false;
@@ -110,7 +110,6 @@ export class TaskPageComponent implements OnInit, OnDestroy {
     indexEditSnapshot = 0;
     managementMenu: MenuItem[] = [];
     isShowSchedulingDialog = false;
-    commentInputControl: FormControl = new FormControl("", [Validators.required]);
     @ViewChild('commentEditor') commentEditor?: QuillEditorComponent;
     @ViewChild('taskLinkingDialog') taskLinkingDialog?: TaskSelectingDialogComponent;
     @ViewChild('workLogsDialogEl') workLogsDialogEl?: WorkLogsDialogComponent;
@@ -118,6 +117,14 @@ export class TaskPageComponent implements OnInit, OnDestroy {
     forceCloseWorkLogDialogVisible: boolean = false;
     forceCloseWorkLogReason: string = "";
     isForceClosingWorkLog = false;
+    activeWorkLog?: WorkLog;
+    commentInputForm = new FormGroup({
+        text: new FormControl<string>(''),
+        files: new FormControl<FileData[]>([]),
+    });
+    commentEditorMode: 'simple' | 'extended' = 'simple';
+    taskEventsVisible = true;
+    journalVisible: boolean = false;
     // Объект подсчета кол-ва времени actualFrom задачи
     private actualFromDurationCounter = new DurationCounter();
     // Возвращает текущее время до actualFrom задачи
@@ -128,8 +135,6 @@ export class TaskPageComponent implements OnInit, OnDestroy {
     private actualToDurationCounter = new DurationCounter();
     // Возвращает текущее время до actualTo задачи
     actualToTime$ = this.actualToDurationCounter.observer.pipe(map(dur => dur.mode === 'after' ? '-' + dur.actualLabel : dur.actualLabel));
-
-    activeWorkLog?: WorkLog;
 
     constructor(readonly api: ApiService,
                 readonly route: ActivatedRoute,
@@ -222,20 +227,6 @@ export class TaskPageComponent implements OnInit, OnDestroy {
         this.subscriptions.addSubscription("wlCls", this.rt.workLogClosed().subscribe(this.workLogClosed.bind(this)));
     }
 
-    private workLogCreated(workLog: WorkLog) {
-        console.log(workLog.task.taskId, this._taskId);
-        if(workLog.task.taskId === this._taskId) {
-            this.activeWorkLog = workLog;
-        }
-    }
-
-    private workLogClosed(workLog: WorkLog) {
-        console.log(workLog.task.taskId, this._taskId);
-        if(workLog.task.taskId === this._taskId) {
-            this.activeWorkLog = undefined;
-        }
-    }
-
     updateObservableList() {
         this.api.getDepartments().subscribe(departments => {
             this.departmentList = departments
@@ -256,29 +247,30 @@ export class TaskPageComponent implements OnInit, OnDestroy {
     }
 
     sendComment() {
-        if (!this.commentInputControl.valid && !(this.attachedFiles && this.attachedFiles.length)) return;
-        this.commentSending = true;
+        const commentValue = this.commentInputForm.getRawValue();
+        if (commentValue.text?.trim().length === 0
+            && commentValue.files?.length === 0) return;
+        this.commentInputForm.disable({emitEvent: false});
 
         if (this.editComment) {
-            this.editComment.message = this.commentInputControl.value
+            if (commentValue.text === null || commentValue.text.trim().length === 0 || commentValue.text === this.editComment.message) return;
+            this.editComment.message = commentValue.text;
             this.api.updateComment(this.editComment).subscribe({
                 complete: () => {
-                    this.commentSending = false;
-                    this.commentInputControl.reset();
-                    this.filesInput.clear();
+                    this.commentInputForm.enable({emitEvent: false});
+                    this.commentInputForm.reset({text: '', files: []});
                     this.editComment = undefined;
-                }, error: () => this.commentSending = false
+                }, error: () => this.commentInputForm.enable({emitEvent: false})
             });
             return;
         }
 
-        this.api.createComment(this.commentInputControl.value, this._taskId, this.attachedFiles, this.replyComment).subscribe({
+        this.api.createComment(commentValue.text, this._taskId, commentValue.files, this.replyComment?.commentId).subscribe({
             complete: () => {
-                this.commentSending = false;
-                this.commentInputControl.reset();
-                this.filesInput.clear();
+                this.commentInputForm.enable({emitEvent: false});
+                this.commentInputForm.reset({text: '', files: []});
                 this.replyComment = undefined;
-            }, error: () => this.commentSending = false
+            }, error: () => this.commentInputForm.enable({emitEvent: false})
         });
     }
 
@@ -335,7 +327,7 @@ export class TaskPageComponent implements OnInit, OnDestroy {
     }
 
     editCommentChanged(event: Comment) {
-        this.commentInputControl.setValue(event.message);
+        this.commentInputForm.patchValue({text: event.message})
     }
 
     ngOnDestroy(): void {
@@ -437,8 +429,13 @@ export class TaskPageComponent implements OnInit, OnDestroy {
         const excludeIds = [this._taskId, ...this.currentTask?.children?.map(c => c.taskId) ?? []];
         if (this.currentTask?.parent) excludeIds.push(this.currentTask.parent);
 
-        this.api.getPageTasksByStatus(event.page, 50, [TaskStatus.ACTIVE, TaskStatus.PROCESSING, TaskStatus.CLOSE],
-            this.globalTaskSearchString, this.taskAuthorEmployeeFilter, this.taskCreationDateFilterForLinking, [], excludeIds).subscribe({
+        this.api.getPageOfTasks(event.page, {
+            status: [TaskStatus.ACTIVE, TaskStatus.PROCESSING, TaskStatus.CLOSE],
+            searchPhrase: this.globalTaskSearchString,
+            author: this.taskAuthorEmployeeFilter,
+            dateOfCreation: this.taskCreationDateFilterForLinking,
+            exclusionIds: excludeIds
+        }).subscribe({
                 next: page => {
                     this.applyPageOfTasks(page)
                     this.loadingExistingTasksToLink = false;
@@ -699,6 +696,29 @@ export class TaskPageComponent implements OnInit, OnDestroy {
             error: () => {
             }
         })
+    }
+
+    // Отчищает набранный текст комментария от html тегов
+    clearCommentText() {
+        let text = this.commentInputForm.value.text;
+        if (text) {
+            text = text.replace(/<\/?[^>]+(>|$)/g, "");
+        }
+        this.commentInputForm.patchValue({text})
+    }
+
+    private workLogCreated(workLog: WorkLog) {
+        console.log(workLog.task.taskId, this._taskId);
+        if (workLog.task.taskId === this._taskId) {
+            this.activeWorkLog = workLog;
+        }
+    }
+
+    private workLogClosed(workLog: WorkLog) {
+        console.log(workLog.task.taskId, this._taskId);
+        if (workLog.task.taskId === this._taskId) {
+            this.activeWorkLog = undefined;
+        }
     }
 
     private openWorkLogsDialog() {

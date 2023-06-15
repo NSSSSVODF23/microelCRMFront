@@ -5,7 +5,7 @@
   padding: .3rem;
   transition: background-color .2s ease-in;
   cursor: pointer;
-  color: var(--mc);
+  color: var(--mc-500);
   font-weight: bold;
   border-radius: .3rem;
 
@@ -20,7 +20,7 @@
   }
 
   &.primary{
-    color: var(--mc);
+    color: var(--mc-500);
     &:hover:not(.disabled){
       background-color: var(--mc-100);
     }

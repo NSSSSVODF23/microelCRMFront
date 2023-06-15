@@ -1,37 +1,39 @@
-<div appExtendPageHeight class="flexed">
+<div appExtendPageHeight class="flexed vcenter">
+    <div class="responsive-wrapper flexed gap10">
     <app-main-menu-panel></app-main-menu-panel>
-    <div class="flexed gap10 stretched" [style.padding]="'1rem 2rem 0 2rem'">
-        <ng-container *ngTemplateOutlet="taskList"></ng-container>
-        <ng-container *ngTemplateOutlet="filters"></ng-container>
+        <div class="flexed gap10 stretched">
+            <ng-container *ngTemplateOutlet="taskList"></ng-container>
+            <ng-container [formGroup]="filtersForm">
+                <app-task-template-multi-selector formControlName="template"></app-task-template-multi-selector>
+            </ng-container>
+<!--            <ng-container *ngTemplateOutlet="filters"></ng-container>-->
+        </div>
     </div>
 </div>
 
 <ng-template #taskList>
-    <div class="flexed column stretched" *ngIf="taskPage?.totalElements && !loading">
-        <app-task-list-element [item]="item" *ngFor="let item of tasks; let i = index; trackBy: taskTrack" [fullDate]="true"></app-task-list-element>
-        <div [style]="{flex:'1', minHeight: '2rem'}"></div>
-        <div class="sticky bottom0">
-            <p-paginator #paginator (onPageChange)="changePage($event)" [alwaysShow]="false"
-                         [rows]="PAGE_SIZE" [showCurrentPageReport]="true"
-                         [totalRecords]="taskPage?.totalElements ?? 0"
-                         currentPageReportTemplate="Показано с {first} по {last} из {totalRecords} задач"
-                         styleClass="back-blured"></p-paginator>
+    <ng-container [ngSwitch]="status">
+        <div class="flexed column stretched gap10" *ngSwitchCase="'ready'">
+            <app-task-list-element [item]="item" *ngFor="let item of tasks; let i = index; trackBy: taskTrack" [fullDate]="true"></app-task-list-element>
+            <div [style]="{flex:'1', minHeight: '2rem'}"></div>
+            <div class="sticky bottom0">
+                <p-paginator #paginator (onPageChange)="changePage($event)" [alwaysShow]="false"
+                             [rows]="PAGE_SIZE" [showCurrentPageReport]="true"
+                             [totalRecords]="taskPage?.totalElements ?? 0"
+                             currentPageReportTemplate="Показано с {first} по {last} из {totalRecords} задач"
+                             styleClass="back-blured"></p-paginator>
+            </div>
         </div>
-    </div>
-    <div class="flexed column stretched" *ngIf="loading">
-        <app-task-list-element [isLoading]="true" *ngFor="let task of loadingTasks"></app-task-list-element>
-    </div>
-    <div class="flexed column stretched hcenter vcenter" *ngIf="!loading && !taskPage?.totalElements">
-        <span class="caption-header">Входящих задач нет</span>
-    </div>
-</ng-template>
-
-<ng-template #filters>
-    <div [formGroup]="filtersForm" class="filter-panel" appExtendPageHeight [limited]="true">
-        <span class="caption-header">Тип задачи</span>
-        <p-listbox [checkbox]="true" [filter]="true"
-                   [listStyle]="{'max-height':'20vh'}" [multiple]="true"
-                   [options]="(templates$ | async) ?? []" class="indent1" filterBy="name"
-                   formControlName="template" optionLabel="name" optionValue="wireframeId"></p-listbox>
-    </div>
+        <div class="flexed column stretched hcenter vcenter" *ngSwitchCase="'loading'">
+            <p-progressSpinner class="primary-spinner" strokeWidth="1"></p-progressSpinner>
+        </div>
+        <div class="flexed column stretched hcenter vcenter" *ngSwitchCase="'empty'">
+            <span class="caption-common-message flexed hcenter">
+                <i class="mdi-search_off"></i>
+                <span>
+                    Входящих задач нет
+                </span>
+            </span>
+        </div>
+    </ng-container>
 </ng-template>

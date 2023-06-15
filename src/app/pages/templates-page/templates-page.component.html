@@ -1,7 +1,9 @@
-<div appExtendPageHeight class="flexed">
-    <app-main-menu-panel></app-main-menu-panel>
-    <div class="flexed column stretched gap10" [style.padding-top]="'1rem'">
-        <ng-container *ngTemplateOutlet="tabview"></ng-container>
+<div appExtendPageHeight class="flexed vcenter">
+    <div class="responsive-wrapper flexed gap10">
+        <app-main-menu-panel></app-main-menu-panel>
+        <div class="flexed column stretched gap10 panel overflow" [style.margin-bottom]="'1rem'">
+            <ng-container *ngTemplateOutlet="tabview"></ng-container>
+        </div>
     </div>
 </div>
 
@@ -17,7 +19,7 @@
         </p-tabPanel>
         <p-tabPanel header="Теги" leftIcon="mdi-local_offer">
             <div class="task-tags-list">
-                <app-task-tag-item *ngFor="let tag of availableTags" [tag]="tag"></app-task-tag-item>
+                <app-task-tag-list-item *ngFor="let tag of availableTags" [tag]="tag"></app-task-tag-list-item>
                 <div class="append-tag-button" (click)="openCreateTagDialog()"><i class="mdi-add"></i> Создать</div>
             </div>
         </p-tabPanel>

@@ -1,16 +1,15 @@
 import {Injectable} from '@angular/core';
-import {FieldItem, FilterModelItem, ModelItem, Page, Task, TaskStatus, Wireframe} from "../transport-interfaces";
+import {FieldItem, LoadingState, Page, Task, Wireframe} from "../transport-interfaces";
 import {ApiService} from "./api.service";
-import {SubscriptionsHolder, Utils} from "../util";
 import {RealTimeUpdateService} from "./real-time-update.service";
-import {distinctUntilChanged, filter, map, Observer, of, switchMap} from "rxjs";
+import {debounceTime, distinctUntilChanged, filter, map, Observer, switchMap} from "rxjs";
 import {FormControl, FormGroup} from "@angular/forms";
 
 
 @Injectable({
     providedIn: 'root'
 })
-export class TaskSearchCacheService {
+export class TasksPageCacheService {
 
     // Текущая страница
     pageNumber: number = 0;
@@ -28,10 +27,9 @@ export class TaskSearchCacheService {
 
     // Форма поиска по основным параметрам задач
     filterForm: FormGroup = new FormGroup({
+        status: new FormControl(['ACTIVE', 'PROCESSING']),
         template: new FormControl([]),
-        status: new FormControl(['ACTIVE', 'CLOSE', 'PROCESSING']),
-        author: new FormControl(null),
-        dateOfCreation: new FormControl(null),
+        searchPhrase: new FormControl(null),
         tags: new FormControl([]),
     })
 
@@ -39,13 +37,16 @@ export class TaskSearchCacheService {
     isPageChanging = false;
 
     // Форма поиска по полям из шаблона задачи, устанавливается из компонента страницы
-    templateFilterForm: FormGroup = new FormGroup<any>({});
+    templateFilterForm: FormGroup = new FormGroup<any>({
+        author: new FormControl(null),
+        dateOfCreation: new FormControl(null),
+    });
     // Массив доступных фильтров полученный из шаблона
     templateFilterFields: FieldItem[] = [];
     // Строка для контекстного поиска
     contextSearchString = '';
     // Состояние загрузки задач
-    taskItemsLoading: boolean = true;
+    loadingState: LoadingState = LoadingState.LOADING;
     // Массив идентификаторов исключенных из поиска
     exclusionIds: number[] = [];
 
@@ -62,40 +63,31 @@ export class TaskSearchCacheService {
 
         // Загрузка полей для фильтрации задач, если выделен 1 шаблон
         this.filterForm.valueChanges.pipe(
+            filter(value => value.template.length === 1),
             distinctUntilChanged(
-                (prev,curr)=>
-                    prev.template.length === curr.template.length
+                (prev, curr) =>
+                    curr.template[0] === prev.template[0]
             ),
-            switchMap(values=> {
-                if(values.template.length === 1)
-                    return this.api.getWireframe(values.template[0]);
-                else
-                    return of(null);
-            }),
-            map(wireframe =>{
-                if(!wireframe) return [];
-                return  wireframe.steps.reduce<FieldItem[]>((prev, step)=>[...prev, ...step.fields],[])
+            switchMap(values => this.api.getWireframe(values.template[0])),
+            map(wireframe => {
+                if (!wireframe) return [];
+                return wireframe.steps.reduce<FieldItem[]>((prev, step) => [...prev, ...step.fields], [])
             })
-        ).subscribe(fieldItems=> {
-                this.templateFilterForm = new FormGroup(fieldItems.reduce((prev, fieldItem) => {
+        ).subscribe(fieldItems => {
+            this.templateFilterForm = new FormGroup({
+                author: this.templateFilterForm.controls['author'],
+                dateOfCreation: this.templateFilterForm.controls['dateOfCreation'],
+                ...fieldItems.reduce((prev, fieldItem) => {
                     return {...prev, [fieldItem.id]: new FormControl(null)};
-                }, {}));
-                this.templateFilterFields = fieldItems;
+                }, {})
+            });
+            this.templateFilterFields = fieldItems;
         });
 
-        this.templateFilterForm.valueChanges.subscribe(value => console.log(`Update filter form ${JSON.stringify(value)}`))
-    }
-
-    get templateFiltersForRequest() {
-        const formValues = this.templateFilterForm.getRawValue();
-        return JSON.stringify(this.templateFilterFields.filter(f => formValues[f.id]).map<FilterModelItem>(field => {
-            const value = formValues[field.id];
-            return {
-                id: field.id,
-                wireframeFieldType: field.type,
-                value
-            }
-        }));
+        this.filterForm.valueChanges.pipe(
+            debounceTime(500),
+            distinctUntilChanged(),
+        ).subscribe(this.filtersApply.bind(this))
     }
 
     // Ссылка на абстрактную функцию установки текущей страницы в Paginator
@@ -127,18 +119,6 @@ export class TaskSearchCacheService {
     // Если это первая загрузка, то загружает первую страницу, если нет загружает последнюю открытую страницу
     loadPage() {
         this.loadPageOfTasks(this.pageNumber);
-    }
-
-    // Конвертирует значения кэша в формат для отправки в сервер
-    private convertCacheToRequest(values: any) {
-        const request: any = {};
-        if (this.contextSearchString) request.globalContext = this.contextSearchString;
-        if (values.status && values.status.length > 0) request.status = values.status;
-        if (values.template && values.template.length > 0) request.template = values.template;
-        if (values.author) request.author = values.author;
-        if (values.dateOfCreation) request.dateOfCreation = Utils.dateArrayToStringRange(values.dateOfCreation);
-        if (values.tags && values.tags.length > 0) request.tags = values.tags.map((tag: any) => tag.taskTagId);
-        return request;
     }
 
     // Добавление задачи в реальном времени
@@ -187,13 +167,29 @@ export class TaskSearchCacheService {
         if (page === 0) this.changePage(0);
 
         // Устанавливаем статус загрузки задач
-        this.taskItemsLoading = true;
+        this.loadingState = LoadingState.LOADING;
+
+
+        const formValues = this.templateFilterForm.getRawValue();
+        const templateFilter = JSON.stringify(this.templateFilterFields.filter(f => formValues[f.id]).map(field => {
+            const value = formValues[field.id];
+            return {
+                id: field.id,
+                wireframeFieldType: field.type,
+                value
+            }
+        }));
+
 
         // Запрашиваем данные по задачам из базы данных
-        this.api.getPageOfTasks(page, this.TASK_PAGE_SIZE,
-            this.convertCacheToRequest(this.filterForm.getRawValue()),
-            this.templateFiltersForRequest
-        ).subscribe(this.observerHandlers());
+        this.api.getPageOfTasks(page, {
+            ...this.filterForm.getRawValue(),
+            author: this.templateFilterForm.value['author'],
+            dateOfCreation: this.templateFilterForm.value['dateOfCreation'],
+            templateFilter
+        }).subscribe(this.observerHandlers());
+        this.filterForm.disable({emitEvent: false});
+        this.templateFilterForm.disable({emitEvent: false});
     }
 
     // Возвращает объект с обработчиками загрузки очередной страницы задач
@@ -201,11 +197,18 @@ export class TaskSearchCacheService {
         return {
             next: (value) => {
                 this.totalTaskItems = value.totalElements;
+                if (this.totalTaskItems === 0) this.loadingState = LoadingState.EMPTY;
+                else this.loadingState = LoadingState.READY;
                 this.taskItems = value.content;
                 this.changePage(this.pageNumber);
+                this.filterForm.enable({emitEvent: false});
+                this.templateFilterForm.enable({emitEvent: false});
             },
-            error: () => this.taskItemsLoading = false,
-            complete: () => this.taskItemsLoading = false
+            error: () => {
+                this.loadingState = LoadingState.ERROR;
+                this.filterForm.enable({emitEvent: false});
+                this.templateFilterForm.enable({emitEvent: false});
+            }
         }
     }
 }

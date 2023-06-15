@@ -21,7 +21,7 @@ import {
     Position, SuperMessage,
     Task, TaskCreationBody,
     TaskEvent,
-    TaskFieldsSnapshot,
+    TaskFieldsSnapshot, TaskFiltrationConditions,
     TaskTag,
     TokenChain,
     Wireframe,
@@ -105,32 +105,32 @@ export class ApiService {
         return this.sendGet<ModelItem[]>(`api/private/task/${taskId}/fields`)
     }
 
-    getPageOfTasks(page: number, limit: number, mainFilter: any, templateFilter: any): Observable<Page<Task>> {
-        return this.sendGet<Page<Task>>('api/private/tasks', {page, limit, ...mainFilter, templateFilter});
+    getPageOfTasks(page: number, filter: TaskFiltrationConditions): Observable<Page<Task>> {
+        return this.sendGet<Page<Task>>(`api/private/tasks/${page}`, Utils.prepareForHttpRequest(filter));
     }
 
-    getPageTasksByStatus(page: number, limit: number, status: string[], commonFilteringString?: string, taskCreator?: string, taskCreationDate?: Date[], filterTags?: TaskTag[], exclusionIds?: number[]): Observable<Page<Task>> {
-        const query: any = {page, limit, status}
-        if (commonFilteringString) query.commonFilteringString = commonFilteringString;
-        if (taskCreator) query.taskCreator = taskCreator;
-        if (taskCreationDate) query.taskCreationDate = Utils.dateArrayToStringRange(taskCreationDate);
-        if (filterTags) query.filterTags = filterTags.map(t => t.taskTagId);
-        if (exclusionIds) query.exclusionIds = exclusionIds;
-        return this.sendGet<Page<Task>>('api/private/tasks', query);
-    }
+    // getPageTasksByStatus(page: number, limit: number, status: string[], commonFilteringString?: string, taskCreator?: string, taskCreationDate?: Date[], filterTags?: TaskTag[], exclusionIds?: number[]): Observable<Page<Task>> {
+    //     const query: any = {page, limit, status}
+    //     if (commonFilteringString) query.commonFilteringString = commonFilteringString;
+    //     if (taskCreator) query.taskCreator = taskCreator;
+    //     if (taskCreationDate) query.taskCreationDate = Utils.dateArrayToStringRange(taskCreationDate);
+    //     if (filterTags) query.filterTags = filterTags.map(t => t.taskTagId);
+    //     if (exclusionIds) query.exclusionIds = exclusionIds;
+    //     return this.sendGet<Page<Task>>('api/private/tasks', query);
+    // }
 
-    getPageTasksByStatusAndTemplate(page: number, limit: number, status: string[], template: number, filters?: { [filterId: string]: FilterModelItem }, filterTags?: TaskTag[], exclusionIds?: number[]) {
-        const query: any = {page, limit, status, template}
-        if (filters) {
-            let filterModelItems = Object.values(filters);
-            if (filterModelItems.length > 0 && filterModelItems.some(f => f.value)) {
-                query.filters = JSON.stringify(Object.values(filters))
-            }
-        }
-        if (filterTags) query.filterTags = filterTags.map(t => t.taskTagId);
-        if (exclusionIds) query.exclusionIds = exclusionIds;
-        return this.sendGet<Page<Task>>('api/private/tasks', query);
-    }
+    // getPageTasksByStatusAndTemplate(page: number, limit: number, status: string[], template: number, filters?: { [filterId: string]: FilterModelItem }, filterTags?: TaskTag[], exclusionIds?: number[]) {
+    //     const query: any = {page, limit, status, template}
+    //     if (filters) {
+    //         let filterModelItems = Object.values(filters);
+    //         if (filterModelItems.length > 0 && filterModelItems.some(f => f.value)) {
+    //             query.filters = JSON.stringify(Object.values(filters))
+    //         }
+    //     }
+    //     if (filterTags) query.filterTags = filterTags.map(t => t.taskTagId);
+    //     if (exclusionIds) query.exclusionIds = exclusionIds;
+    //     return this.sendGet<Page<Task>>('api/private/tasks', query);
+    // }
 
     getStreets(cityId: number): Observable<any> {
         return this.sendGet('api/private/streets/' + cityId);
@@ -140,11 +140,11 @@ export class ApiService {
         return this.sendGet('api/private/cities');
     }
 
-    createComment(text: string, taskId: number, files: FileData[], replyComment?: Comment): Observable<Comment> {
+    createComment(text: string|null, taskId: number, files: FileData[]|null, replyComment?: number): Observable<Comment> {
         return this.sendPost<Comment>("api/private/comment", {
             taskId,
-            text,
-            files,
+            text: text ? text : '',
+            files: files ? files : [],
             replyComment
         })
     }
@@ -468,8 +468,16 @@ export class ApiService {
         });
     }
 
-    getIncomingTasksCount() {
+    getCountIncomingTasks() {
         return this.sendGet<number>("api/private/tasks/incoming/count", {});
+    }
+
+    getCountIncomingTasksByWireframeId(wireframeId: number) {
+        return this.sendGet<number>("api/private/tasks/incoming/wireframe/" + wireframeId + "/count", {});
+    }
+
+    getCountAllTasksByWireframeId(wireframeId: number) {
+        return this.sendGet<number>("api/private/tasks/wireframe/" + wireframeId + "/count", {});
     }
 
     getScheduledTask(start: string, end: string) {

@@ -37,35 +37,32 @@
 }
 
 .task-tags-list{
-  display: flex;
-  flex-wrap: wrap;
-  align-content: flex-start;
-  gap: .5rem;
-  padding: .5rem;
+  display: grid;
+  grid: auto-flow / 1fr;
+  //flex-wrap: wrap;
+  //align-content: flex-start;
+  //gap: .5rem;
+  //padding: .5rem;
   overflow-y: auto;
   //height: 40vh;
 }
 
 .append-tag-button{
   background-color: white;
-  color: var(--mc);
+  color: var(--tc-500);
   font-size: 1rem;
   font-weight: bold;
-  padding: .5rem 1rem;
-  border-radius: 999px;
+  padding: 1rem;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0px 0px 0.7px rgba(0, 0, 0, 0.01),
-  0px 0.3px 2.8px rgba(0, 0, 0, 0.036),
-  0px 4px 10px rgba(0, 0, 0, 0.15);
   cursor: pointer;
   user-select: none;
-  transition: all .2s ease-out;
+  transition: all .1s ease-out;
 
   &:hover{
-    background-color: var(--mc);
-    color: white;
+    background-color: var(--mc-100);
+    color: var(--mc-400);
   }
 }
 
@@ -83,6 +80,6 @@
   transition: all .2s ease-out;
   &:hover{
     background-color: var(--mc-100);
-    color: var(--mc);
+    color: var(--mc-500);
   }
 }

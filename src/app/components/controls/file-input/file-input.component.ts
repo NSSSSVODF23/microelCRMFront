@@ -1,15 +1,23 @@
-import {Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild} from '@angular/core';
+import {Component, ElementRef, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild} from '@angular/core';
 import {MenuItem, MessageService} from "primeng/api";
 import {FileData} from "../../../transport-interfaces";
+import {ControlValueAccessor, NG_VALUE_ACCESSOR} from "@angular/forms";
 
 const FILE_SIZE_LIMIT = 1048576 * 20;
 
 @Component({
     selector: 'app-file-input',
     templateUrl: './file-input.component.html',
-    styleUrls: ['./file-input.component.scss']
+    styleUrls: ['./file-input.component.scss'],
+    providers: [
+        {
+            provide: NG_VALUE_ACCESSOR,
+            useExisting: FileInputComponent,
+            multi: true
+        }
+    ]
 })
-export class FileInputComponent implements OnInit {
+export class FileInputComponent implements OnInit, OnDestroy, ControlValueAccessor {
 
     @ViewChild("fileManager") fileManager!: ElementRef<HTMLInputElement>;
     @Input() files: FileData[] = [];
@@ -64,6 +72,7 @@ export class FileInputComponent implements OnInit {
         this.filesLoaded = 0;
         this.files = [];
         this.filesChange.emit([]);
+        this.onChange([]);
         this.fileManager.nativeElement.value = '';
     }
 
@@ -102,6 +111,7 @@ export class FileInputComponent implements OnInit {
                     this.lastFileName = file.name;
                     this.filesLoaded = this.files.length;
                     this.filesChange.emit(this.files);
+                    this.onChange(this.files);
                     if (this.filesLoaded === this.filesCatching) this.loading = false;
                 }
             };
@@ -112,5 +122,32 @@ export class FileInputComponent implements OnInit {
             };
             reader.readAsArrayBuffer(file);
         }
+    }
+
+    onChange = (files: FileData[]) => {
+    }
+
+    onTouched = () => {
+    }
+
+    ngOnDestroy(): void {
+
+    }
+
+    registerOnChange(fn: any): void {
+        this.onChange = fn;
+    }
+
+    registerOnTouched(fn: any): void {
+        this.onTouched = fn;
+    }
+
+    setDisabledState(isDisabled: boolean): void {
+        this.disabled = isDisabled;
+    }
+
+    writeValue(obj: any): void {
+        this.files = obj;
+        this.filesChange.emit(this.files);
     }
 }

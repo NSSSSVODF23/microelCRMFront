@@ -1,4 +1,4 @@
-<div [limited]="true" appExtendPageHeight class="flexed">
+<div [limited]="true" appExtendPageHeight class="flexed gap10" [style.padding-left]="'1rem'">
     <app-main-menu-panel></app-main-menu-panel>
     <div class="flexed column gap5 overflow">
         <div class="caption-header p10 flexed hcenter gap5">
@@ -12,7 +12,7 @@
                 <app-button @fade label="Переместить" icon="swap_horiz" model="p-button-outlined p-button-help" (onClick)="taskMovePanel.toggle($event)" [disabled]="!wireframe?.stages || wireframe?.stages?.length === 0"></app-button>
             </ng-container>
         </div>
-        <div class="stages-wrapper">
+        <div class="stages-wrapper" appDragScrolling>
             <app-list-panel (onScrollDown)="stageScrollDown('null-pointer')"
                             *ngIf="tasksCount['null-pointer']>0"
                             [headerTemplate]="header" [itemTemplate]="taskElem"

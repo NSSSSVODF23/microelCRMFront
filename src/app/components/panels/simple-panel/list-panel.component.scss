@@ -5,14 +5,15 @@
   border: 1px solid var(--bgc-300);
   min-height: 100px;
   height: max-content;
-  min-width: 100px;
+  min-width: 15rem;
+  max-width: 30rem;
   overflow: hidden;
 
   &>.header{
     display: flex;
     align-items: baseline;
     padding: .9rem 1.1rem;
-    background-color: var(--bgc-100);
+    background-color: white;
     color: var(--tc-700);
     font-size: 1.1rem;
     font-weight: bold;

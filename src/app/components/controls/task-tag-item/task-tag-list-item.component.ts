@@ -5,11 +5,11 @@ import {ConfirmationService} from "primeng/api";
 import {ApiService} from "../../../services/api.service";
 
 @Component({
-    selector: 'app-task-tag-item',
-    templateUrl: './task-tag-item.component.html',
-    styleUrls: ['./task-tag-item.component.scss']
+    selector: 'app-task-tag-list-item',
+    templateUrl: './task-tag-list-item.component.html',
+    styleUrls: ['./task-tag-list-item.component.scss']
 })
-export class TaskTagItemComponent implements OnInit {
+export class TaskTagListItemComponent implements OnInit {
     @Input() tag?: TaskTag;
     showEditTagDialog = false;
     tagNameToEdit: string = '';

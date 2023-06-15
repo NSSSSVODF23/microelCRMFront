@@ -60,7 +60,7 @@
         }
 
         .message-text {
-          color: var(--mc);
+          color: var(--mc-500);
 
           .message-footer {
             color: var(--mc-300);
@@ -407,15 +407,6 @@
     0px 0px 2.7px rgba(255, 150, 31, 0.042),
     0px 0px 5px rgba(255, 150, 31, 0.05),
     0px 0px 12px rgba(255, 150, 31, 0.07);
-  }
-
-  textarea {
-    padding: 1.4rem;
-    flex: 1;
-    resize: none;
-    border: none;
-    outline: none;
-    background-color: transparent;
   }
 
   .button-block {

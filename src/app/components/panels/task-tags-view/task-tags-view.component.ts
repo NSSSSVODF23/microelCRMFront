@@ -16,6 +16,7 @@ export class TaskTagsViewComponent implements OnInit {
         this.tags = task.tags ?? [];
     }
     @Input() disabled: boolean = false;
+    @Input() readOnly: boolean = false;
     tags: TaskTag[] = [];
     editValueTags: TaskTag[] = []
     availableTags: TaskTag[] = []

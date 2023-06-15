@@ -75,7 +75,7 @@
                 </div>
             </div>
             <div class="input-wrapper">
-                <textarea #messageInput (keydown)="messageInputKeyDown($event)" [(ngModel)]="sendingText"
+                <textarea #messageInput class="borderless-text-field" (keydown)="messageInputKeyDown($event)" [(ngModel)]="sendingText"
                           [disabled]="isBeginSending" appTextareaAutoresize placeholder="Сообщение"></textarea>
                 <div class="button-block">
                     <app-emoji-panel (onChoosing)="insertEmoji($event)"></app-emoji-panel>

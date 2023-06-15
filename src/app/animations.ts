@@ -54,6 +54,14 @@ export const fade = trigger("fade", [
     ])
 ])
 
+export const fadeIn = trigger("fadeIn", [
+    transition(':enter', [
+        style({opacity: 0}),  // initial
+        animate('0.2s',
+            style({opacity: 1}))  // final
+    ]),
+])
+
 export const fadeAlt = trigger("fadeAlt", [
     state('fade', style({opacity: 0})),
     state('unfade', style({opacity: .2})),

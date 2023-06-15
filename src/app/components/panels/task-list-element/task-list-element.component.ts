@@ -1,14 +1,15 @@
-import {Component, EventEmitter, Input, OnInit, Output, ViewChild} from '@angular/core';
-import {FieldItem, Task, TaskStatus} from "../../../transport-interfaces";
-import {TaskSearchCacheService} from "../../../services/task-search-cache.service";
+import {Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges, ViewChild} from '@angular/core';
+import {FieldItem, ModelItem, Task, TaskStatus, WorkLog} from "../../../transport-interfaces";
+import {TasksPageCacheService} from "../../../services/tasks-page-cache.service";
 import {OverlayPanel} from "primeng/overlaypanel";
+import {ApiService} from "../../../services/api.service";
 
 @Component({
     selector: 'app-task-list-element',
     templateUrl: './task-list-element.component.html',
     styleUrls: ['./task-list-element.component.scss']
 })
-export class TaskListElementComponent implements OnInit {
+export class TaskListElementComponent implements OnInit, OnChanges {
 
     @Input() item?: Task;
     @Input() viewExample: boolean = false;
@@ -26,18 +27,42 @@ export class TaskListElementComponent implements OnInit {
     itemClass: any = {};
     showTags = false;
     @Input() isLoading = false;
-    get isMoreTwoTags(){
-        if(!this.item?.tags) return false;
-        return this.item.tags.length > 2;
+
+    actualWorkLog?: WorkLog;
+
+    constructor(readonly taskService: TasksPageCacheService, readonly api: ApiService) {
+    }
+
+    get statusColor() {
+        return {
+            'active': this.item?.taskStatus === TaskStatus.ACTIVE,
+            'processing': this.item?.taskStatus === TaskStatus.PROCESSING,
+            'close': this.item?.taskStatus === TaskStatus.CLOSE
+        }
     };
 
-    get remainingNumberOfTags(){
-        if(!this.item?.tags) return 0;
-        return this.item.tags.length - 2;
+    get isMoreTwoTags() {
+        if (!this.item?.tags) return false;
+        return this.item.tags.length > 4;
+    };
+
+    get remainingNumberOfTags() {
+        if (!this.item?.tags) return 0;
+        return this.item.tags.length - 4;
     }
 
-    constructor(readonly taskService: TaskSearchCacheService) {
+    get bodyClass() {
+        return {
+            'simple': this.item?.modelWireframe?.listViewType === 'SIMPLE',
+            'composite': this.item?.modelWireframe?.listViewType === 'COMPOSITE',
+            'detailed': this.item?.modelWireframe?.listViewType === 'DETAILED'
+        }
     }
+
+    trackByField(index: number, field: ModelItem) {
+        if(!field) return "";
+        return field.id + field.name + field.textRepresentation;
+    };
 
     ngOnInit(): void {
         if (this.item?.taskStatus) {
@@ -47,7 +72,22 @@ export class TaskListElementComponent implements OnInit {
                 close: this.item.taskStatus === TaskStatus.CLOSE
             }
         }
-        this.itemClass = {'view-example':this.viewExample, 'hovered':this.isHover, 'selected':this.check, ...this.statusClass}
+        this.updateActualWorkLog();
+        this.itemClass = {
+            'view-example': this.viewExample,
+            'hovered': this.isHover,
+            'selected': this.check, ...this.statusClass
+        }
+    }
+
+    private updateActualWorkLog(){
+        if(this.item?.taskStatus === TaskStatus.PROCESSING){
+            this.api.getActiveWorkLogByTaskId(this.item.taskId).subscribe({
+                next: (workLog: WorkLog) => {
+                    this.actualWorkLog = workLog;
+                }
+            })
+        }
     }
 
     tagsPreviewShow(event: MouseEvent) {
@@ -60,10 +100,17 @@ export class TaskListElementComponent implements OnInit {
         })
     }
 
-    getFieldValue(index: number){
-        if(!this.item || this.item.listItemFields[index] === undefined || this.item.listItemFields[index] === null){
+    getFieldValue(index: number) {
+        if (!this.item || this.item.listItemFields[index] === undefined || this.item.listItemFields[index] === null) {
             return ""
         }
         return this.item.listItemFields[index].textRepresentation;
+    }
+
+    ngOnChanges(changes: SimpleChanges): void {
+        const {item} = changes;
+        if (item && item.currentValue) {
+            this.updateActualWorkLog();
+        }
     }
 }

@@ -6,7 +6,7 @@
   position: fixed;
   font-size: 1.2rem;
   font-weight: 400;
-  color: var(--mc);
+  color: var(--mc-500);
   gap: .7rem;
   overflow: hidden;
   z-index: 1;
@@ -18,7 +18,7 @@
   .wait-indicator {
     width: 30%;
     height: 1px;
-    background-color: var(--mc);
+    background-color: var(--mc-500);
     animation: loading-animation 1s infinite ease-in-out;
     align-self: flex-start;
     position: relative;

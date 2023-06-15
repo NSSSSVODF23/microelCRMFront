@@ -11,7 +11,7 @@
   }
 
   &.primary {
-    color: var(--mc);
+    color: var(--mc-500);
 
     &:hover {
       color: #2542a4;
@@ -96,7 +96,7 @@
     animation: spin 1s linear infinite;
 
     &.primary {
-      border-top-color: var(--mc);
+      border-top-color: var(--mc-500);
     }
 
     &.success {

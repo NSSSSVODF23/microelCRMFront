@@ -29,7 +29,7 @@ export class AvatarComponent implements OnInit, OnChanges {
             width: this.size + 'rem',
             height: this.size + 'rem',
             fontSize: this.size + 'rem',
-            background: this.isLoad ? 'transparent' : this.colorize()
+            background: this.isLoad ? 'transparent' : this.deleted ? 'var(--bgc-500)' : this.colorize()
         }
     }
 
@@ -76,6 +76,7 @@ export class AvatarComponent implements OnInit, OnChanges {
     }
 
     ngOnChanges(changes: SimpleChanges): void {
+        this.isLoad = false;
         // setTimeout(() => {
         //     if(!this.wrapperEl || !this.captionEl) return;
         //     // Получаем наибольшее значение высоты или ширины элемента captionEl

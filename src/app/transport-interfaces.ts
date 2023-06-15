@@ -1,3 +1,5 @@
+import {Subscription} from "rxjs";
+
 export enum WireframeFieldType {
     BOOLEAN = "BOOLEAN",
     SMALL_TEXT = "SMALL_TEXT",
@@ -46,6 +48,7 @@ export interface FieldItem {
     id: string;
     name: string;
     type: WireframeFieldType;
+    variation?: string;
     listViewIndex?: number;
     orderPosition?: number;
 }
@@ -55,7 +58,7 @@ export enum WireframeType {
 }
 
 export interface Employee {
-    login?: string;
+    login: string;
     department?: Department;
     position?: Position;
     avatar?: string;
@@ -130,6 +133,7 @@ export interface ItemsGroup {
 }
 
 export interface Task {
+    allEmployeesObservers: Employee[];
     taskId: number;
     created?: string;
     updated?: string;
@@ -155,6 +159,21 @@ export interface Task {
     children?: Task[];
     // Список полей для отображения в элементе списка
     listItemFields: ModelItem[];
+}
+
+/**
+ * Интерфейс для передачи данных о фильтрации задач на сервер
+ */
+export interface TaskFiltrationConditions {
+    status?: TaskStatus[];
+    template?: number[];
+    templateFilter?: string;
+    searchPhrase?: string;
+    author?: string;
+    dateOfCreation?: string[];
+    exclusionIds?: number[];
+    tags?: number[];
+    onlyMy?: boolean;
 }
 
 /**
@@ -287,13 +306,15 @@ export interface Page<T> {
 export interface Comment {
     commentId: number;
     message: string;
-    created?: string;
-    creator?: Employee;
+    created: string;
+    creator: Employee;
     attachments?: Attachment[];
     replyComment?: Comment;
     edited?: boolean;
     deleted?: boolean;
-    parent?: Task;
+    parent: Task;
+    // Отчищенное от форматирования сообщение
+    simpleText: string;
 }
 
 export interface Attachment {
@@ -405,7 +426,7 @@ export interface LongPollEvent<T> {
     created: string;
 }
 
-export interface ChatMessage{
+export interface ChatMessage {
     chatMessageId: number;
     text: string;
     attachment?: Attachment;
@@ -416,7 +437,7 @@ export interface ChatMessage{
     author: Employee;
 }
 
-export interface SuperMessage{
+export interface SuperMessage {
     superMessageId: number;
     text: string;
     attachments: Attachment[];
@@ -433,7 +454,7 @@ export interface SuperMessage{
     descriptionOfAttachment?: string;
 }
 
-export interface Chat{
+export interface Chat {
     chatId: number;
     title?: string;
     messages: ChatMessage[];
@@ -446,19 +467,19 @@ export interface Chat{
     lastMessage: ChatMessage;
 }
 
-export interface ChatUnreadCounter{
+export interface ChatUnreadCounter {
     chatId: number;
     count: number;
 }
 
-export interface WorkReport{
+export interface WorkReport {
     workReportId: number;
     description: string;
     author: Employee;
     created: string;
 }
 
-export interface WorkLog{
+export interface WorkLog {
     status: "ACTIVE" | "CLOSE" | "FORCE_CLOSE";
     whoAccepted: Employee[];
     whoClosed: Employee[];
@@ -488,6 +509,11 @@ export enum NotificationType {
     YOU_RESPONSIBLE = "YOU_RESPONSIBLE",
     YOU_OBSERVER = "YOU_OBSERVER",
     NEW_COMMENT = "NEW_COMMENT",
+    TASK_HAS_BECOME_ACTUAL = "TASK_HAS_BECOME_ACTUAL",
+    TASK_EXPIRED = "TASK_EXPIRED",
+    WORKS_COMPLETED = "WORKS_COMPLETED",
+    REPORT_RECEIVED = "REPORT_RECEIVED",
+    MENTIONED_IN_TASK = "MENTIONED_IN_TASK",
 }
 
 export interface INotification {
@@ -509,4 +535,21 @@ export enum EmployeeStatus {
     ONLINE = "ONLINE",
     AWAY = "AWAY",
     OFFLINE = "OFFLINE"
+}
+
+export enum LoadingState {
+    READY = "READY",
+    LOADING = "LOADING",
+    ERROR = "ERROR",
+    EMPTY = "EMPTY"
+}
+
+export class CacheUnit<T> {
+    page!: Page<T>;
+    state: LoadingState = LoadingState.LOADING;
+    createSubscription!: Subscription;
+    updateSubscription!: Subscription;
+    deleteSubscription!: Subscription;
+    pageNumber!: number;
+    filters: any;
 }

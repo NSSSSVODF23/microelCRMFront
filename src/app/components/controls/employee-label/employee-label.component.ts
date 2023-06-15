@@ -1,4 +1,4 @@
-import {Component, Input, OnDestroy, OnInit, ViewChild} from '@angular/core';
+import {Component, Input, OnChanges, OnDestroy, OnInit, SimpleChanges, ViewChild} from '@angular/core';
 import {Employee, EmployeeStatus} from "../../../transport-interfaces";
 import {ApiService} from "../../../services/api.service";
 import {OverlayPanel} from "primeng/overlaypanel";
@@ -11,47 +11,22 @@ import {ElapsedTimePipe} from "../../../pipes/elapsed-time.pipe";
     templateUrl: './employee-label.component.html',
     styleUrls: ['./employee-label.component.scss']
 })
-export class EmployeeLabelComponent implements OnInit, OnDestroy {
+export class EmployeeLabelComponent implements OnInit, OnChanges, OnDestroy {
     @Input() size = 1.7;
     @Input() inline = false;
     @Input() showStatus = false;
+    @Input() employee?: Employee | string;
+    loadStatus: 'ready' | 'loading' | 'empty' | 'error' = 'loading';
     @ViewChild('preview') preview?: OverlayPanel;
-    failed = false;
     sub?: Subscription;
+    _employee?: Employee;
 
     constructor(readonly api: ApiService, readonly rt: RealTimeUpdateService) {
     }
 
-    _employee?: Employee = {} as Employee;
-
-    get employee(): Employee | undefined {
-        return this._employee;
-    }
-
-    @Input() set employee(employee: Employee | undefined) {
-        if (this.showStatus && employee?.login && employee.login !== this._employee?.login) {
-            if (this.sub) this.sub.unsubscribe();
-            this.sub = this.rt.employeeUpdated(employee.login)
-            .subscribe(employee => {
-                this._employee = employee
-            });
-        }
-        this._employee = employee;
-    }
-
-    _employeeId?: string;
-
-    @Input() set employeeId(id: string) {
-        this._employeeId = id;
-        this.api.getEmployee(id, true).subscribe({
-            next: employee => this.employee = employee,
-            error: () => this.failed = true
-        });
-    }
-
     get statusStyle(): any {
         const style = {} as any;
-        switch (this.employee?.status) {
+        switch (this._employee?.status) {
             case EmployeeStatus.ONLINE:
                 style.color = '#36ff3b';
                 break;
@@ -68,13 +43,13 @@ export class EmployeeLabelComponent implements OnInit, OnDestroy {
     };
 
     get status(): string {
-        switch (this.employee?.status) {
+        switch (this._employee?.status) {
             case EmployeeStatus.ONLINE:
                 return 'В сети';
             case EmployeeStatus.AWAY:
                 return 'Отошел';
             case EmployeeStatus.OFFLINE:
-                return new ElapsedTimePipe().transform(this.employee?.lastSeen,'Был(а) в сети ', ' назад');
+                return new ElapsedTimePipe().transform(this._employee?.lastSeen, 'Был(а) в сети ', ' назад');
             default:
                 return '';
         }
@@ -82,13 +57,13 @@ export class EmployeeLabelComponent implements OnInit, OnDestroy {
 
     static createElement(employeeId: string, inline: boolean): HTMLElement {
         const element = document.createElement('employee-label-element') as any;
-        element.employeeId = employeeId;
+        element.employee = employeeId;
         element.inline = inline;
         return element;
     }
 
     ngOnInit(): void {
-
+        this.loadingEmployee();
     }
 
     ngOnDestroy(): void {
@@ -103,5 +78,41 @@ export class EmployeeLabelComponent implements OnInit, OnDestroy {
         setTimeout(() => {
             if (this.preview) this.preview.hide()
         })
+    }
+
+    ngOnChanges(changes: SimpleChanges): void {
+        const employeeChange = changes['employee'];
+        if (employeeChange && employeeChange.currentValue) {
+            this.loadingEmployee();
+        }
+    }
+
+    private loadingEmployee() {
+        if (this.employee) {
+            if (typeof this.employee === 'string') {
+                this.api.getEmployee(this.employee, true).subscribe({
+                    next: (employee) => {
+                        this._employee = employee;
+                        this.sub = this.rt.employeeUpdated(this._employee.login)
+                            .subscribe(employee => {
+                                this._employee = employee
+                            });
+                        this.loadStatus = 'ready';
+                    },
+                    error: () => {
+                        this.loadStatus = 'error';
+                    }
+                })
+            } else {
+                this._employee = this.employee;
+                this.loadStatus = 'ready';
+                this.sub = this.rt.employeeUpdated(this._employee.login)
+                    .subscribe(employee => {
+                        this._employee = employee
+                    });
+            }
+        } else {
+            this.loadStatus = 'empty';
+        }
     }
 }

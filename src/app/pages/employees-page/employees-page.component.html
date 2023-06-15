@@ -1,43 +1,43 @@
-<div appExtendPageHeight class="flexed">
-    <app-main-menu-panel></app-main-menu-panel>
-
-    <div class="flexed column stretched">
-        <div class="flexed gap5 p10 vcenter hcenter">
-            <app-text-search-input (onClear)="findGlobal()" (onSearch)="findGlobal()"
-                                   [(value)]="globalSearchValue"></app-text-search-input>
-            <span class="caption-sub-header flexed column hcenter">
-                <p-inputSwitch (onChange)="findGlobal()" [(ngModel)]="showDeleted" [falseValue]="false"
-                               [ngStyle]="{lineHeight:'0'}"
-                               [trueValue]="true"></p-inputSwitch>
-                Показывать удаленные?
-            </span>
-            <span>
-                <app-button (onClick)="openEmployeeCreator()" icon="person_add" label="Создать"
-                            model="p-button-text p-button-success"></app-button>
-            </span>
-        </div>
-        <div class="employee-list">
-            <div *ngFor="let employee of employees" class="employee-list-item">
-                <app-avatar [deleted]="employee.deleted ?? false" [size]="2.5" [name]="employee.fullName" [src]="employee.avatar"></app-avatar>
-                <div class="flexed column">
-                    <span class="caption-main">{{employee.fullName}}</span>
-                    <div class="flexed gap5 hcenter">
-                        <span appColorize>
-                            {{employee.department?.name}}
-                        </span>
-                        <span appColorize>
-                            {{employee.position?.name}}
-                        </span>
+<div appExtendPageHeight class="flexed vcenter">
+    <div class="responsive-wrapper flexed gap10">
+        <app-main-menu-panel></app-main-menu-panel>
+        <div class="flexed column stretched">
+            <div class="flexed gap5 p10 vcenter hcenter">
+                <app-text-search-input (onClear)="findGlobal()" (onSearch)="findGlobal()"
+                                       [(value)]="globalSearchValue"></app-text-search-input>
+                <span class="caption-sub-header flexed column hcenter">
+                    <p-inputSwitch (onChange)="findGlobal()" [(ngModel)]="showDeleted" [falseValue]="false"
+                                   [ngStyle]="{lineHeight:'0'}"
+                                   [trueValue]="true"></p-inputSwitch>
+                    Показывать удаленные?
+                </span>
+                <span>
+                    <app-button (onClick)="openEmployeeCreator()" icon="person_add" label="Создать"
+                                model="p-button-text p-button-success"></app-button>
+                </span>
+            </div>
+            <div class="employee-list">
+                <div *ngFor="let employee of employees" class="employee-list-item">
+                    <app-avatar [deleted]="employee.deleted ?? false" [size]="2.5" [name]="employee.fullName" [src]="employee.avatar"></app-avatar>
+                    <div class="flexed column">
+                        <span class="caption-main">{{employee.fullName}}</span>
+                        <div class="flexed gap5 hcenter">
+                            <span appColorize>
+                                {{employee.department?.name}}
+                            </span>
+                            <span appColorize>
+                                {{employee.position?.name}}
+                            </span>
+                        </div>
                     </div>
+                    <div class="stretched"></div>
+                    <app-icon-button icon="edit" model="secondary" [disabled]="employee.deleted ?? false" (onClick)="openEmployeeEditor(employee.login)"></app-icon-button>
+                    <app-icon-button icon="delete" model="danger" [disabled]="employee.deleted ?? false" (onClick)="employeeDeleteConfirm(employee)"
+                                     [loading]="employee.login ? isBeginDeleteEmployee[employee.login] : false"></app-icon-button>
                 </div>
-                <div class="stretched"></div>
-                <app-icon-button icon="edit" model="secondary" [disabled]="employee.deleted ?? false" (onClick)="openEmployeeEditor(employee.login)"></app-icon-button>
-                <app-icon-button icon="delete" model="danger" [disabled]="employee.deleted ?? false" (onClick)="employeeDeleteConfirm(employee)"
-                                 [loading]="employee.login ? isBeginDeleteEmployee[employee.login] : false"></app-icon-button>
             </div>
         </div>
-    </div>
-    <p-tabView class="department-menu">
+        <p-tabView class="department-menu">
         <p-tabPanel>
             <ng-template pTemplate="header">
                 <div class="flexed gap3 hcenter">
@@ -119,6 +119,7 @@
             </div>
         </p-tabPanel>
     </p-tabView>
+    </div>
 </div>
 
 <p-dialog [(visible)]="showCreateDepartmentDialog" [modal]="true" [resizable]="false" header="Создание отдела">

@@ -5,7 +5,7 @@ import {
     Chat, ChatUnreadCounter,
     Comment,
     Department,
-    Employee,
+    Employee, INotification,
     Position,
     SuperMessage,
     Task,
@@ -108,12 +108,16 @@ export class RealTimeUpdateService {
         return this.watch<Task>('task', 'create')
     }
 
+    incomingTaskCreated(login: string) {
+        return this.watchUnicast<Task>(login, 'task', 'create')
+    }
+
     notificationCreated(login: string) {
-        return this.watchUnicast<any>(login, 'notification', 'create')
+        return this.watchUnicast<INotification>(login, 'notification', 'create')
     }
 
     notificationUpdated(login: string) {
-        return this.watchUnicast<any>(login, 'notification', 'update')
+        return this.watchUnicast<INotification>(login, 'notification', 'update')
     }
 
     chatMessageCreated(chatId?: number) {

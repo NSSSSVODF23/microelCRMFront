@@ -1,7 +1,9 @@
-<div appExtendPageHeight class="flexed">
-    <app-main-menu-panel></app-main-menu-panel>
-    <div [style.padding]="'2rem'" class="flexed gap10 stretched">
-        <ng-container *ngTemplateOutlet="calendar"></ng-container>
+<div appExtendPageHeight class="flexed vcenter">
+    <div class="responsive-wrapper flexed gap10">
+        <app-main-menu-panel></app-main-menu-panel>
+        <div class="flexed gap10 stretched">
+            <ng-container *ngTemplateOutlet="calendar"></ng-container>
+        </div>
     </div>
 </div>
 

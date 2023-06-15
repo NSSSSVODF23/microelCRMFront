@@ -98,8 +98,9 @@
 
 
 <ng-template #editedLabel>
-    <label>
+    <label class="flexed hcenter gap5">
         <app-editing-caption (captionChange)="setName($event)" [caption]="field?.name"></app-editing-caption>
+        <app-input-variation-selector [variationList]="currentVariationsList" [(value)]="currentVariation"></app-input-variation-selector>
     </label>
 </ng-template>
 

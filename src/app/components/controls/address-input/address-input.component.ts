@@ -1,4 +1,4 @@
-import {AfterViewInit, Component, ElementRef, OnDestroy, OnInit, ViewChild} from '@angular/core';
+import {AfterViewInit, Component, ElementRef, EventEmitter, OnDestroy, OnInit, Output, ViewChild} from '@angular/core';
 import {ControlValueAccessor, NG_VALUE_ACCESSOR} from "@angular/forms";
 import {SubscriptionsHolder} from "../../../util";
 import {debounceTime, distinctUntilChanged, fromEvent, map, of, switchMap, tap} from "rxjs";
@@ -22,6 +22,7 @@ export class AddressInputComponent implements OnInit, ControlValueAccessor, Afte
     @ViewChild('inputEl') inputEl?: ElementRef<HTMLInputElement>;
     @ViewChild('overlay') overlay?: Overlay;
     @ViewChild('list') list?: ElementRef<HTMLDivElement>;
+    @Output() onBlur = new EventEmitter<void>();
     value?: Address | null = null;
     subscriptions: SubscriptionsHolder = new SubscriptionsHolder();
     suggestions: Address[] = [];

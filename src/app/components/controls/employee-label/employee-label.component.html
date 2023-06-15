@@ -1,47 +1,57 @@
-<span *ngIf="!inline" class="flexed gap2 hcenter">
-    <ng-container *ngIf="employee && employee.login; then info"></ng-container>
-    <ng-container *ngIf="!(employee && employee.login) && !failed; then loading"></ng-container>
-    <ng-container *ngIf="failed">#{{_employeeId}}</ng-container>
+<span *ngIf="!inline" class="flexed gap4 hcenter">
+    <ng-container [ngSwitch]="loadStatus">
+        <ng-container *ngSwitchCase="'ready'">
+            <app-avatar *ngIf="showStatus" [deleted]="_employee?.deleted" [name]="_employee?.fullName ?? ''" [shape]="'circle'" [size]="size"
+                        [src]="_employee?.avatar" [status]="_employee?.status"></app-avatar>
+            <app-avatar *ngIf="!showStatus" [deleted]="_employee?.deleted" [name]="_employee?.fullName ?? ''" [shape]="'circle'" [size]="size"
+                        [src]="_employee?.avatar"></app-avatar>
+            <span class="caption-main-small one-line">
+                {{_employee?.fullName}}
+            </span>
+        </ng-container>
+        <ng-container *ngSwitchCase="'loading'">
+            <p-skeleton [shape]="'circle'" [size]="size+'rem'"></p-skeleton>
+            <p-skeleton height=".8rem" width="8rem"></p-skeleton>
+        </ng-container>
+        <ng-container *ngSwitchCase="'error'">
+            <span class="">Пользователь не найден</span>
+        </ng-container>
+        <ng-container *ngSwitchCase="'empty'">
+        </ng-container>
+    </ng-container>
 </span>
 
 <ng-container *ngIf="inline">
-    <span *ngIf="employee && employee.login" class="like-link" (mouseenter)="showPreview($event)" (mouseleave)="hidePreview()">{{employee.fullName}}</span>
-    <span *ngIf="failed">
-        {{_employeeId}}
-    </span>
-    <p-skeleton *ngIf="!(employee && employee.login) && !failed" [style.display]="'inline-block'" height=".9rem" width="5rem"></p-skeleton>
+    <ng-container [ngSwitch]="loadStatus">
+        <ng-container *ngSwitchCase="'ready'">
+            <span class="like-link" (mouseenter)="showPreview($event)" (mouseleave)="hidePreview()">{{_employee?.fullName}}</span>
+        </ng-container>
+        <ng-container *ngSwitchCase="'loading'">
+            <p-skeleton [style.display]="'inline-block'" height=".8rem" width="5rem"></p-skeleton>
+        </ng-container>
+        <ng-container *ngSwitchCase="'error'">
+            <span class="">Пользователь не найден</span>
+        </ng-container>
+        <ng-container *ngSwitchCase="'empty'">
+        </ng-container>
+    </ng-container>
 </ng-container>
-
-<ng-template #loading>
-    <p-skeleton [shape]="'circle'" size="1.7rem"></p-skeleton>
-    <p-skeleton height=".8rem" width="8rem"></p-skeleton>
-</ng-template>
-
-<ng-template #info>
-    <app-avatar *ngIf="showStatus" [deleted]="employee?.deleted" [name]="employee?.fullName ?? ''" [shape]="'circle'" [size]="size"
-                [src]="employee?.avatar" [status]="employee?.status"></app-avatar>
-    <app-avatar *ngIf="!showStatus" [deleted]="employee?.deleted" [name]="employee?.fullName ?? ''" [shape]="'circle'" [size]="size"
-                [src]="employee?.avatar"></app-avatar>
-    <span class="caption-main-small one-line">
-        {{employee?.fullName}}
-    </span>
-</ng-template>
 
 <!--Панель для предварительного просмотра карточки сотрудника в inline режиме-->
 <p-overlayPanel #preview appendTo="body" showTransitionOptions="0ms" hideTransitionOptions="0ms">
     <ng-template pTemplate="content">
         <div class="employee-preview">
-            <app-avatar class="avatar" [size]="6" shape="square" [deleted]="employee?.deleted"
-                        [src]="employee?.avatar" [name]="employee?.fullName ?? ''" [status]="employee?.status"></app-avatar>
+            <app-avatar class="avatar" [size]="6" shape="square" [deleted]="_employee?.deleted"
+                        [src]="_employee?.avatar" [name]="_employee?.fullName ?? ''" [status]="_employee?.status"></app-avatar>
             <div class="name caption-header">
-                {{employee?.fullName}}
+                {{_employee?.fullName}}
             </div>
             <div class="status">
                 <span *ngIf="status" class="caption-secondary" [style]="statusStyle">{{status}}</span>
-                <span class="caption-main-small" *ngIf="employee?.deleted">(удален)</span>
+                <span class="caption-main-small" *ngIf="_employee?.deleted">(удален)</span>
             </div>
-            <div class="department caption-sub-header">{{employee?.department?.name}}</div>
-            <div class="position caption-sub-header">{{employee?.position?.name}}</div>
+            <div class="department caption-sub-header">{{_employee?.department?.name}}</div>
+            <div class="position caption-sub-header">{{_employee?.position?.name}}</div>
         </div>
     </ng-template>
 </p-overlayPanel>

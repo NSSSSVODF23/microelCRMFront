@@ -3,7 +3,7 @@
     display: inline-flex;
     font-size: .8rem;
     font-weight: 600;
-    color: var(--mc);
+    color: var(--mc-500);
     line-height: normal;
     padding: .3rem .5rem;
     border-radius: .3rem;
@@ -15,7 +15,7 @@
 
     span {
         font-size: .75rem;
-        color: var(--mc);
+        color: var(--mc-500);
     }
 
     &:hover {

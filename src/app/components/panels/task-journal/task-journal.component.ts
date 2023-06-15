@@ -25,11 +25,15 @@ export class TaskJournalComponent implements OnInit, OnDestroy {
     @Input() editComment?: Comment;
     @Output() editCommentChange: EventEmitter<Comment> = new EventEmitter();
 
+    @Output() onFirstLoad: EventEmitter<boolean> = new EventEmitter();
+
     entries: (Comment | TaskEvent)[] = [];
     skeletons: any[] = Array.from({length: 10})
     totalEntries = 0;
     loading = false;
     firstLoad = true;
+
+    @Input() showEvents = true;
 
     counters = []
 
@@ -38,6 +42,15 @@ export class TaskJournalComponent implements OnInit, OnDestroy {
     }
 
     _taskId: number = -1;
+    trackByEntry(index: number, entry: Comment | TaskEvent) {
+        if("commentId" in entry) {
+            return entry.commentId + entry.message + entry.edited;
+        }else if("taskEventId" in entry) {
+            return entry.taskEventId;
+        }else{
+            return null;
+        }
+    };
 
     @Input() set taskId(value: number) {
         this._taskId = value;
@@ -111,6 +124,7 @@ export class TaskJournalComponent implements OnInit, OnDestroy {
                 this.entries = page.content;
                 this.loading = false;
                 this.firstLoad = false
+                this.onFirstLoad.emit(this.totalEntries > 0);
             })
         else
             this.loading = false;
