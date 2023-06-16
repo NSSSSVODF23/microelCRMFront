@@ -79,7 +79,7 @@
   --br-900: 100%;
 }
 
-html, body {
+html:not(.whited), body:not(.whited) {
   padding: 0 !important;
   margin: 0 !important;
   background-color: var(--bgc-100) !important;
@@ -132,7 +132,6 @@ html, body {
 
 .back-blured {
   background-color: rgba(255, 255, 255, 0.8) !important;
-  box-shadow: var(--shadow-0);
   backdrop-filter: blur(8px);
 }
 
@@ -510,7 +509,7 @@ html, body {
       font-size: .85rem;
 
       &.selected {
-        background-color: var(--mc-100);
+        background-color: var(--mc-0);
         color: var(--mc-500);
       }
     }
@@ -535,6 +534,10 @@ html, body {
   flex-grow: 1;
   flex-basis: fit-content;
   flex-shrink: 1;
+}
+
+.self-center{
+  align-self: center;
 }
 
 .p-input-icon-left > i, .p-input-icon-right > i {

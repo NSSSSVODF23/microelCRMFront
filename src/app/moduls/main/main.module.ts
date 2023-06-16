@@ -70,6 +70,7 @@ import {VirtualScrollerModule} from "primeng/virtualscroller";
 import {ProgressBarModule} from "primeng/progressbar";
 import {ParseAddressPageComponent} from "../../pages/parse-address-page/parse-address-page.component";
 import {SelectButtonModule} from "primeng/selectbutton";
+import {AutoFocusModule} from "primeng/autofocus";
 
 
 @NgModule({
@@ -145,7 +146,8 @@ import {SelectButtonModule} from "primeng/selectbutton";
         ProgressBarModule,
         KeyValuePipe,
         SlicePipe,
-        SelectButtonModule
+        SelectButtonModule,
+        AutoFocusModule
     ],
     providers: [MessageService, {provide: LOCALE_ID, useValue: 'ru'}, ConfirmationService]
 })

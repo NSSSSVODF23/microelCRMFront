@@ -362,7 +362,7 @@
     <div [style]="{overflow:'auto',minHeight:'100%'}" appDragScrolling>
         <p-organizationChart [value]="taskChain">
             <ng-template let-node pTemplate="task">
-                <app-task-list-element [fullDate]="true" [item]="node.data"
+                <app-task-list-element [item]="node.data"
                                        [style]="{maxWidth:'45rem',minWidth:'35rem'}"></app-task-list-element>
             </ng-template>
         </p-organizationChart>

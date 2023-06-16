@@ -12,7 +12,7 @@
 <!--Панель для предварительного просмотра связанной задачи-->
 <p-overlayPanel #previewConnectedTask appendTo="body" showTransitionOptions="0ms" hideTransitionOptions="0ms">
     <ng-template pTemplate="content">
-        <app-task-list-element [isHover]="false" *ngIf="task?.taskId" [item]="task" [fullDate]="true"
+        <app-task-list-element [isHover]="false" *ngIf="task?.taskId" [item]="task" [inlined]="true"
                                [style]="{width:'40vw',minWidth:'min-content'}"></app-task-list-element>
     </ng-template>
 </p-overlayPanel>

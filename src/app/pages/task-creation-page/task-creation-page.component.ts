@@ -40,6 +40,7 @@ export class TaskCreationPageComponent implements OnInit {
     taskCreationForm: FormArray<FormGroup> = new FormArray([] as FormGroup[]);
 
     constructor(readonly api: ApiService, readonly route: ActivatedRoute, readonly personality: PersonalityService, readonly toast: MessageService) {
+        document.body.classList.add("whited");
     }
 
     // Выбранный шаблон для создания задачи

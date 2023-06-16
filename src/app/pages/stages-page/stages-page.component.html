@@ -28,7 +28,7 @@
                     </div>
                 </ng-template>
                 <ng-template #taskElem let-item>
-                    <app-task-list-element [(check)]="checkedTasks" [item]="item"></app-task-list-element>
+                    <app-task-list-element [(check)]="checkedTasks" [item]="item" [inlined]="true"></app-task-list-element>
                 </ng-template>
             </app-list-panel>
             <app-list-panel (onScrollDown)="stageScrollDown(stage.stageId)" *ngFor="let stage of wireframe?.stages"
@@ -45,7 +45,7 @@
                     </div>
                 </ng-template>
                 <ng-template #taskElem let-item>
-                    <app-task-list-element [(check)]="checkedTasks" [item]="item"></app-task-list-element>
+                    <app-task-list-element [(check)]="checkedTasks" [item]="item" [inlined]="true"></app-task-list-element>
                 </ng-template>
             </app-list-panel>
         </div>

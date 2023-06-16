@@ -2,7 +2,7 @@ import {AfterViewInit, Component, OnInit, ViewChild} from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
 import {TasksPageCacheService} from "../../services/tasks-page-cache.service";
 import {ApiService} from "../../services/api.service";
-import {Employee, Task} from "../../transport-interfaces";
+import {Employee, FieldItem, Task} from "../../transport-interfaces";
 import {Paginator} from "primeng/paginator";
 
 
@@ -18,6 +18,14 @@ export class TasksPageComponent implements OnInit, AfterViewInit {
 
     constructor(readonly taskService: TasksPageCacheService, readonly api: ApiService, readonly route: ActivatedRoute) {
     }
+
+    trackByField(index: number, field: FieldItem) {
+        return field.id + field.variation;
+    };
+
+    trackByTask(index: number, task: Task) {
+        return task.taskId + (task.updated ?? '');
+    };
 
     ngOnInit(): void {
         this.taskService.loadPage();

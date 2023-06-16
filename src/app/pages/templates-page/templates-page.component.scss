@@ -61,8 +61,8 @@
   transition: all .1s ease-out;
 
   &:hover{
-    background-color: var(--mc-100);
-    color: var(--mc-400);
+    background-color: var(--mc-0);
+    color: var(--mc-500);
   }
 }
 
@@ -79,7 +79,7 @@
   user-select: none;
   transition: all .2s ease-out;
   &:hover{
-    background-color: var(--mc-100);
+    background-color: var(--mc-0);
     color: var(--mc-500);
   }
 }

@@ -146,6 +146,10 @@ import {
 import {SelectButtonModule} from "primeng/selectbutton";
 import {EmployeeSelectorComponent} from "../../components/controls/employee-selector/employee-selector.component";
 import {DataRangeInputComponent} from "../../components/controls/data-range-input/data-range-input.component";
+import {
+    ObserverSelectorInputComponent
+} from "../../components/controls/observer-selector-input/observer-selector-input.component";
+import {AutoCompleteModule} from "primeng/autocomplete";
 
 
 @NgModule({
@@ -223,7 +227,8 @@ import {DataRangeInputComponent} from "../../components/controls/data-range-inpu
         InputVariationSelectorComponent,
         TaskTemplateMultiSelectorComponent,
         EmployeeSelectorComponent,
-        DataRangeInputComponent
+        DataRangeInputComponent,
+        ObserverSelectorInputComponent
     ],
     exports: [
         AccountPanelComponent,
@@ -299,7 +304,8 @@ import {DataRangeInputComponent} from "../../components/controls/data-range-inpu
         InputVariationSelectorComponent,
         TaskTemplateMultiSelectorComponent,
         EmployeeSelectorComponent,
-        DataRangeInputComponent
+        DataRangeInputComponent,
+        ObserverSelectorInputComponent
     ],
     imports: [
         CommonPipesModule,
@@ -343,6 +349,7 @@ import {DataRangeInputComponent} from "../../components/controls/data-range-inpu
         RippleModule,
         AnimateModule,
         SelectButtonModule,
+        AutoCompleteModule,
 
     ],
     providers: [

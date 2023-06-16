@@ -5,6 +5,7 @@ import {ConfirmationService} from 'primeng/api';
 import {Department, Employee, Position} from "../../transport-interfaces";
 import {SubscriptionsHolder} from "../../util";
 import {RealTimeUpdateService} from "../../services/real-time-update.service";
+import {debounceTime, distinctUntilChanged, tap} from "rxjs";
 
 class AccessFlag {
     static readonly NONE = 0;
@@ -50,8 +51,6 @@ export class EmployeesPageComponent implements OnInit, OnDestroy {
     employees: Employee[] = [];
     departments: Department[] = [];
     positions: Position[] = [];
-    globalSearchValue: string = '';
-    showDeleted: boolean = false;
     showCreateDepartmentDialog = false;
     showEditDepartmentDialog = false;
     isBeginCreatingDepartment = false;
@@ -75,6 +74,12 @@ export class EmployeesPageComponent implements OnInit, OnDestroy {
     isBeginDeletePosition: { [id: number]: boolean } = {};
     showCreateEmployeeDialog = false;
     showEditEmployeeDialog = false;
+
+    employeeFiltrationForm = new FormGroup({
+        query: new FormControl(''),
+        showDeleted: new FormControl(false)
+    })
+
     employeeForm: FormGroup = new FormGroup({
         lastName: new FormControl(''),
         firstName: new FormControl('', Validators.required),
@@ -152,10 +157,21 @@ export class EmployeesPageComponent implements OnInit, OnDestroy {
                 this.positions.splice(foundIndex, 1);
             }
         }));
-    }
-
-    findGlobal() {
-        setTimeout(() => this.api.getEmployees(this.globalSearchValue, this.showDeleted).subscribe(value => this.employees = value));
+        this.subscriptions.addSubscription('empSearch', this.employeeFiltrationForm.valueChanges
+            .pipe(
+                debounceTime(1000),
+                distinctUntilChanged(),
+            )
+            .subscribe(value => {
+                this.employeeFiltrationForm.disable({ emitEvent: false });
+                this.api.getEmployees(value.query ?? undefined, value.showDeleted ?? undefined).subscribe({
+                    next: value => {
+                        this.employees = value;
+                        this.employeeFiltrationForm.enable({emitEvent: false});
+                    },
+                    error: ()=> this.employeeFiltrationForm.enable({ emitEvent: false })
+                });
+            }))
     }
 
     departmentCreate() {

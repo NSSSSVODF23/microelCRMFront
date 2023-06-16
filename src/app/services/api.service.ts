@@ -7,7 +7,7 @@ import {
     Chat,
     ChatMessage,
     City,
-    Comment,
+    Comment, DefaultObservers,
     Department,
     Employee,
     EmployeeStatus,
@@ -138,6 +138,14 @@ export class ApiService {
 
     getCities(): Observable<City[]> {
         return this.sendGet('api/private/cities');
+    }
+
+    getAvailableObservers(): Observable<DefaultObservers[]> {
+        return this.sendGet('api/private/available-observers');
+    }
+
+    getAvailableObserversSuggestions(query: string): Observable<DefaultObservers[]> {
+        return this.sendGet(`api/private/available-observers/${query}`);
     }
 
     createComment(text: string|null, taskId: number, files: FileData[]|null, replyComment?: number): Observable<Comment> {

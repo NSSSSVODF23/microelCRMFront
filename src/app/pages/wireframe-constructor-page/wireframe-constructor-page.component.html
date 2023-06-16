@@ -1,15 +1,19 @@
-<div [ngSwitch]="constructStage" appExtendPageHeight class="flexed hcenter column gap20 p20 bg-white">
+<div [ngSwitch]="constructStage" appExtendPageHeight class="flexed hcenter column gap15" [style.padding-bottom]="'2rem'">
     <ng-container *ngSwitchCase="'FIELDS'">
-        <div class="flexed column gap10">
-            <div class="gap15 flexed hend">
+        <div class="flexed column gap10 panel p10">
+            <div class="flexed gap5">
+                <p-button label="Выйти" icon="mdi-close" (onClick)="nav.backOrDefault(['/'])" styleClass="p-button-secondary p-button-text"></p-button>
+                <p-button label="Далее: Настройка стадий задачи" icon="mdi-navigate_next" (onClick)="changeStagesSettingsStep()" [disabled]="!wireframe.name"></p-button>
+            </div>
+            <div class="gap10 flexed hend">
                 <div class="input-label-wrapper">
                     <label>Название шаблона задачи</label>
                     <input [(ngModel)]="wireframe.name" [disabled]="editingId!==undefined" pInputText>
                 </div>
-                <app-button (onClick)="createStep()" icon="post_add" label="Добавить этап"
-                            model="p-button-success"></app-button>
-                <app-button (onClick)="changeStagesSettingsStep()" [disabled]="!wireframe.name" icon="navigate_next"
-                            label="Далее: Настройка стадий задачи"></app-button>
+            </div>
+            <div class="input-label-wrapper">
+                <label>Ответственные по умолчанию</label>
+                <app-observer-selector-input [(ngModel)]="wireframe.defaultObservers"></app-observer-selector-input>
             </div>
             <div class="flexed">
                 <div class="input-label-wrapper stretched">
@@ -17,13 +21,11 @@
                     <textarea [(ngModel)]="wireframe.description" [autoResize]="true" pInputTextarea></textarea>
                 </div>
             </div>
-            <div class="input-label-wrapper">
-                <label>Ответственные по умолчанию</label>
-                <p-multiSelect [(ngModel)]="wireframe.defaultObservers"
-                               [options]="(responsible$|async)??[]"></p-multiSelect>
-            </div>
+
+            <p-button label="Добавить этап" icon="mdi-add" (onClick)="createStep()" styleClass="p-button-success" class="self-center"></p-button>
             <p-steps [activeIndex]="activeStepIndex" [model]="stepsArray" [readonly]="false"
                      class="stretched"></p-steps>
+
         </div>
         <div class="flexed hcenter column stretched">
             <div class="step-construct-view panel">
@@ -36,7 +38,7 @@
                             class="step-construct-view-header-caption">
                     </app-editing-caption>
                 </div>
-                <div class="flexed column p10 gap10">
+                <div class="flexed column p20 gap5">
                     <div *ngFor="let field of this.wireframe.steps[activeStepIndex].fields" class="flexed gap5 hcenter">
                         <app-task-template-input [field]="field" [isExample]="true"
                                                              class="stretched"></app-task-template-input>
@@ -52,7 +54,7 @@
     </ng-container>
     <ng-container *ngSwitchCase="'STAGES'">
         <div class="flexed column gap10">
-            <div class="gap15 flexed hend">
+            <div class="gap15 flexed hend panel p10">
                 <app-button (onClick)="this.constructStage = 'FIELDS'" [disabled]="!wireframe.name"
                             icon="arrow_back_ios" label="Назад"
                             model="p-button-secondary p-button-text"></app-button>
@@ -83,7 +85,7 @@
         </div>
     </ng-container>
     <ng-container *ngSwitchCase="'VIEW'">
-        <div class="flexed column gap20">
+        <div class="flexed column gap20 panel p10">
             <div class="gap15 flexed hend vend">
                 <app-button (onClick)="this.constructStage = 'STAGES'" [disabled]="!wireframe.name"
                             icon="arrow_back_ios" label="Назад"
@@ -94,7 +96,7 @@
                 <app-button (onClick)="updateWireframe()" *ngIf="editingId!==undefined" icon="edit"
                             label="Редактировать шаблон задачи"></app-button>
             </div>
-            <div class="gap5 flexed column">
+            <div class="gap5 flexed column p10">
                 <span class="header400">
                     Элемент списка
                 </span>
@@ -110,7 +112,7 @@
                                            [wireframeFieldsList]="wireframeFieldsList"></app-task-list-element>
                 </div>
             </div>
-            <div class="gap5 flexed column">
+            <div class="gap5 flexed column p10">
                 <span class="header400">
                     Порядок полей
                 </span>

@@ -1,5 +1,5 @@
 import {Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges, ViewChild} from '@angular/core';
-import {FieldItem, ModelItem, Task, TaskStatus, WorkLog} from "../../../transport-interfaces";
+import {FieldItem, ModelItem, Task, TaskStatus, TaskTag, WorkLog} from "../../../transport-interfaces";
 import {TasksPageCacheService} from "../../../services/tasks-page-cache.service";
 import {OverlayPanel} from "primeng/overlaypanel";
 import {ApiService} from "../../../services/api.service";
@@ -12,25 +12,43 @@ import {ApiService} from "../../../services/api.service";
 export class TaskListElementComponent implements OnInit, OnChanges {
 
     @Input() item?: Task;
+
     @Input() viewExample: boolean = false;
     @Input() wireframeFieldsList: FieldItem[] = [];
+
     @Input() check?: number[];
     @Output() checkChange: EventEmitter<number[]> = new EventEmitter();
     @Input() checkGroup: string = 'task';
+
     @Output() selectFieldToView: EventEmitter<{ id: string, index: number }> = new EventEmitter();
+
     @Input() isHover = true;
-    @Input() fullDate = false;
+    @Input() inlined = false;
+
     @Output() onClick: EventEmitter<Task> = new EventEmitter();
     @Input() customClickHandler = false;
+
     @ViewChild('tagsPreview') tagsPreview?: OverlayPanel;
+
     statusClass: any = {};
     itemClass: any = {};
-    showTags = false;
-    @Input() isLoading = false;
 
     actualWorkLog?: WorkLog;
 
     constructor(readonly taskService: TasksPageCacheService, readonly api: ApiService) {
+    }
+
+    get fieldCountArray() {
+        switch (this.item?.modelWireframe?.listViewType) {
+            case 'SIMPLE':
+                return [1];
+            case 'COMPOSITE':
+                return [1, 2];
+            case 'DETAILED':
+                return [1, 2, 3];
+            default:
+                return [];
+        }
     }
 
     get statusColor() {
@@ -59,8 +77,16 @@ export class TaskListElementComponent implements OnInit, OnChanges {
         }
     }
 
+    trackByIndex(index: number, item: any) {
+        return index;
+    };
+
+    trackByTag(index: number, tag: TaskTag) {
+        return tag.taskTagId + tag.name + tag.color;
+    };
+
     trackByField(index: number, field: ModelItem) {
-        if(!field) return "";
+        if (!field) return "";
         return field.id + field.name + field.textRepresentation;
     };
 
@@ -77,16 +103,6 @@ export class TaskListElementComponent implements OnInit, OnChanges {
             'view-example': this.viewExample,
             'hovered': this.isHover,
             'selected': this.check, ...this.statusClass
-        }
-    }
-
-    private updateActualWorkLog(){
-        if(this.item?.taskStatus === TaskStatus.PROCESSING){
-            this.api.getActiveWorkLogByTaskId(this.item.taskId).subscribe({
-                next: (workLog: WorkLog) => {
-                    this.actualWorkLog = workLog;
-                }
-            })
         }
     }
 
@@ -111,6 +127,16 @@ export class TaskListElementComponent implements OnInit, OnChanges {
         const {item} = changes;
         if (item && item.currentValue) {
             this.updateActualWorkLog();
+        }
+    }
+
+    private updateActualWorkLog() {
+        if (this.item?.taskStatus === TaskStatus.PROCESSING) {
+            this.api.getActiveWorkLogByTaskId(this.item.taskId).subscribe({
+                next: (workLog: WorkLog) => {
+                    this.actualWorkLog = workLog;
+                }
+            })
         }
     }
 }

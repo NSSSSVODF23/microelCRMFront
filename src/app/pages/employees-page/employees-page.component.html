@@ -1,124 +1,133 @@
 <div appExtendPageHeight class="flexed vcenter">
-    <div class="responsive-wrapper flexed gap10">
+    <div class="responsive-wrapper flexed gap10" [style.padding-bottom]="'2rem'">
         <app-main-menu-panel></app-main-menu-panel>
-        <div class="flexed column stretched">
-            <div class="flexed gap5 p10 vcenter hcenter">
-                <app-text-search-input (onClear)="findGlobal()" (onSearch)="findGlobal()"
-                                       [(value)]="globalSearchValue"></app-text-search-input>
-                <span class="caption-sub-header flexed column hcenter">
-                    <p-inputSwitch (onChange)="findGlobal()" [(ngModel)]="showDeleted" [falseValue]="false"
-                                   [ngStyle]="{lineHeight:'0'}"
-                                   [trueValue]="true"></p-inputSwitch>
-                    Показывать удаленные?
-                </span>
-                <span>
-                    <app-button (onClick)="openEmployeeCreator()" icon="person_add" label="Создать"
-                                model="p-button-text p-button-success"></app-button>
-                </span>
-            </div>
-            <div class="employee-list">
-                <div *ngFor="let employee of employees" class="employee-list-item">
-                    <app-avatar [deleted]="employee.deleted ?? false" [size]="2.5" [name]="employee.fullName" [src]="employee.avatar"></app-avatar>
-                    <div class="flexed column">
-                        <span class="caption-main">{{employee.fullName}}</span>
-                        <div class="flexed gap5 hcenter">
+
+        <p-tabView class="stretched panel overflow">
+            <p-tabPanel>
+                <ng-template pTemplate="header">
+                    <div class="flexed gap3 hcenter">
+                        <i class="mdi-person"></i>
+                        <span>
+                            Сотрудники
+                        </span>
+                    </div>
+                </ng-template>
+                <div class="flexed column">
+                    <div class="flexed gap10 vcenter hcenter" [formGroup]="employeeFiltrationForm">
+                        <span class="p-input-icon-left">
+                            <i class="mdi-search"></i>
+                            <input formControlName="query" pInputText type="text" placeholder="Поиск...">
+                        </span>
+                        <span class="caption-sub-header flexed column hcenter">
+                            <p-inputSwitch [falseValue]="false"
+                                           [ngStyle]="{lineHeight:'0'}" formControlName="showDeleted"
+                                           [trueValue]="true"></p-inputSwitch>
+                            Показывать удаленные?
+                        </span>
+                        <span>
+                            <app-button (onClick)="openEmployeeCreator()" icon="person_add" label="Создать"
+                                        model="p-button-text p-button-success"></app-button>
+                        </span>
+                    </div>
+                    <div class="employee-list">
+                        <div *ngFor="let employee of employees" class="employee-list-item">
+                            <app-avatar [deleted]="employee.deleted ?? false" [size]="2.5" [name]="employee.fullName" [src]="employee.avatar"></app-avatar>
+                            <div class="flexed column">
+                                <span class="caption-main">{{employee.fullName}}</span>
+                                <div class="flexed gap5 hcenter">
                             <span appColorize>
                                 {{employee.department?.name}}
                             </span>
-                            <span appColorize>
+                                    <span appColorize>
                                 {{employee.position?.name}}
                             </span>
+                                </div>
+                            </div>
+                            <div class="stretched"></div>
+                            <app-icon-button icon="edit" model="secondary" [disabled]="employee.deleted ?? false" (onClick)="openEmployeeEditor(employee.login)"></app-icon-button>
+                            <app-icon-button icon="delete" model="danger" [disabled]="employee.deleted ?? false" (onClick)="employeeDeleteConfirm(employee)"
+                                             [loading]="employee.login ? isBeginDeleteEmployee[employee.login] : false"></app-icon-button>
                         </div>
                     </div>
-                    <div class="stretched"></div>
-                    <app-icon-button icon="edit" model="secondary" [disabled]="employee.deleted ?? false" (onClick)="openEmployeeEditor(employee.login)"></app-icon-button>
-                    <app-icon-button icon="delete" model="danger" [disabled]="employee.deleted ?? false" (onClick)="employeeDeleteConfirm(employee)"
-                                     [loading]="employee.login ? isBeginDeleteEmployee[employee.login] : false"></app-icon-button>
                 </div>
-            </div>
-        </div>
-        <p-tabView class="department-menu">
-        <p-tabPanel>
-            <ng-template pTemplate="header">
-                <div class="flexed gap3 hcenter">
-                    <span [style.width]="'1.8rem'" class="material-icons-round">
-                        groups
-                    </span>
-                    <span>
-                        Отделы
-                    </span>
+            </p-tabPanel>
+            <p-tabPanel>
+                <ng-template pTemplate="header">
+                    <div class="flexed gap3 hcenter">
+                        <i class="mdi-groups"></i>
+                        <span>
+                            Отделы
+                        </span>
+                    </div>
+                </ng-template>
+                <div class="flexed column gap10">
+                    <div>
+                        <app-button (onClick)="openDepartmentCreator()" icon="add" label="Создать"
+                                    model="p-button-success"></app-button>
+                    </div>
+                    <div class="list-view">
+                        <div *ngFor="let department of departments" class="list-view-item bordered">
+                            <div class="flexed column gap5">
+                                    <span appColorize class="caption-sub-header">
+                                        {{department.name}}
+                                    </span>
+                                <div *ngIf="department.description" [style]="{maxWidth:'20rem',marginLeft:'.5rem'}"
+                                     class="caption-main-small">
+                                    {{department.description}}
+                                </div>
+                            </div>
+                            <div class="stretched"></div>
+                            <app-icon-button
+                                    (onClick)="openDepartmentEditor(department.name??'', department.description??'', department.departmentId)"
+                                    [size]="1.4" icon="edit"
+                                    model="secondary"></app-icon-button>
+                            <app-icon-button (onClick)="departmentDeleteConfirm(department)"
+                                             [loading]="department.departmentId ? isBeginDeleteDepartment[department.departmentId] : false"
+                                             [size]="1.4"
+                                             icon="delete"
+                                             model="danger"></app-icon-button>
+                        </div>
+                    </div>
                 </div>
-            </ng-template>
-            <div class="flexed column gap10">
-                <div>
-                    <app-button (onClick)="openDepartmentCreator()" icon="group_add" label="Создать"
+            </p-tabPanel>
+            <p-tabPanel>
+                <ng-template pTemplate="header">
+                    <div class="flexed gap3 hcenter">
+                        <i class="mdi-badge"></i>
+                        <span>
+                            Должности
+                        </span>
+                    </div>
+                </ng-template>
+                <div class="flexed gap10 column">
+                    <app-button (onClick)="openPositionCreator()" icon="add" label="Создать"
                                 model="p-button-success"></app-button>
-                </div>
-                <div class="list-view">
-                    <div *ngFor="let department of departments" class="list-view-item bordered">
-                        <div class="flexed column gap5">
-                                <span appColorize class="caption-sub-header">
-                                    {{department.name}}
-                                </span>
-                            <div *ngIf="department.description" [style]="{maxWidth:'20rem',marginLeft:'.5rem'}"
-                                 class="caption-main-small">
-                                {{department.description}}
+                    <div class="list-view">
+                        <div *ngFor="let position of positions" class="list-view-item bordered">
+                            <div class="flexed column gap5">
+                                    <span appColorize class="caption-sub-header">
+                                        {{position?.name}}
+                                    </span>
+                                <div *ngIf="position.description" [style]="{maxWidth:'20rem',marginLeft:'.5rem'}"
+                                     class="caption-main-small">
+                                    {{position.description}}
+                                </div>
                             </div>
+                            <div class="stretched"></div>
+                            <app-icon-button
+                                    (onClick)="openPositionEditor(position.name??'', position.description??'', position.access??0, position.positionId)"
+                                    [size]="1.4" icon="edit"
+                                    model="secondary"></app-icon-button>
+                            <app-icon-button (onClick)="positionDeleteConfirm(position)"
+                                             [loading]="position.positionId ? isBeginDeletePosition[position.positionId] : false"
+                                             [size]="1.4"
+                                             icon="delete"
+                                             model="danger"></app-icon-button>
                         </div>
-                        <div class="stretched"></div>
-                        <app-icon-button
-                                (onClick)="openDepartmentEditor(department.name??'', department.description??'', department.departmentId)"
-                                [size]="1.4" icon="edit"
-                                model="secondary"></app-icon-button>
-                        <app-icon-button (onClick)="departmentDeleteConfirm(department)"
-                                         [loading]="department.departmentId ? isBeginDeleteDepartment[department.departmentId] : false"
-                                         [size]="1.4"
-                                         icon="delete"
-                                         model="danger"></app-icon-button>
                     </div>
                 </div>
-            </div>
-        </p-tabPanel>
-        <p-tabPanel>
-            <ng-template pTemplate="header">
-                <div [style]="{height:'1.8rem'}" class="flexed gap3 hcenter">
-                    <span [style]="{width:'1.5rem', fontSize:'1.5rem'}" class="material-icons-round">
-                        badge
-                    </span>
-                    <span>
-                        Должности
-                    </span>
-                </div>
-            </ng-template>
-            <div class="flexed gap10 column">
-                <app-button (onClick)="openPositionCreator()" icon="add" label="Создать"
-                            model="p-button-success"></app-button>
-                <div class="list-view">
-                    <div *ngFor="let position of positions" class="list-view-item bordered">
-                        <div class="flexed column gap5">
-                                <span appColorize class="caption-sub-header">
-                                    {{position?.name}}
-                                </span>
-                            <div *ngIf="position.description" [style]="{maxWidth:'20rem',marginLeft:'.5rem'}"
-                                 class="caption-main-small">
-                                {{position.description}}
-                            </div>
-                        </div>
-                        <div class="stretched"></div>
-                        <app-icon-button
-                                (onClick)="openPositionEditor(position.name??'', position.description??'', position.access??0, position.positionId)"
-                                [size]="1.4" icon="edit"
-                                model="secondary"></app-icon-button>
-                        <app-icon-button (onClick)="positionDeleteConfirm(position)"
-                                         [loading]="position.positionId ? isBeginDeletePosition[position.positionId] : false"
-                                         [size]="1.4"
-                                         icon="delete"
-                                         model="danger"></app-icon-button>
-                    </div>
-                </div>
-            </div>
-        </p-tabPanel>
-    </p-tabView>
+            </p-tabPanel>
+        </p-tabView>
     </div>
 </div>
 
@@ -152,8 +161,7 @@
                 <textarea [autoResize]="true" [cols]="50" [rows]="5" formControlName="description"
                           pInputTextarea></textarea>
             </span>
-            <app-button (onClick)="departmentEdit()" [disabled]="!departmentForm.valid" icon="save" label="Сохранить"
-                        model="p-button-help"></app-button>
+            <app-button (onClick)="departmentEdit()" [disabled]="!departmentForm.valid" icon="save" label="Сохранить"></app-button>
         </form>
     </ng-template>
 </p-dialog>
@@ -201,7 +209,7 @@
                 </div>
             </p-panel>
             <app-button (onClick)="positionEdit()" [disabled]="!positionForm.valid" icon="save" label="Сохранить"
-                        model="p-button-help"></app-button>
+                        ></app-button>
         </form>
     </ng-template>
 </p-dialog>

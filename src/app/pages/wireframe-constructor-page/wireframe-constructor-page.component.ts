@@ -60,24 +60,6 @@ export class WireframeConstructorPageComponent implements OnInit {
     }, {label: "Подробный", value: "DETAILED"},];
     // stages = [{label: "Начальный", stageId: v4(), orderIndex: 0}]
 
-    responsible$ = this.api.getResponsible().pipe(map(resp => {
-        return resp.map((item: any) => {
-            if (item.login) {
-                return {
-                    label: item.login,
-                    value: {targetId: item.login.toString(), targetType: DefaultObserverTargetType.EMPLOYEE}
-                }
-            } else if (item.departmentId) {
-                return {
-                    label: item.name,
-                    value: {targetId: item.departmentId.toString(), targetType: DefaultObserverTargetType.DEPARTMENT}
-                }
-            } else {
-                return {}
-            }
-        })
-    }));
-
     constructor(readonly api: ApiService, readonly route: ActivatedRoute, readonly nav: CustomNavigationService) {
     }
 

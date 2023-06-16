@@ -25,7 +25,7 @@
 
                 <ng-container *ngSwitchCase="'READY'">
                     <div class="flexed gap10 column">
-                        <app-task-list-element *ngFor="let item of taskService.taskItems"
+                        <app-task-list-element *ngFor="let item of taskService.taskItems; trackBy: trackByTask"
                                                [item]="item"></app-task-list-element>
                     </div>
                 </ng-container>
@@ -48,7 +48,7 @@
                              [rows]="taskService.TASK_PAGE_SIZE" [showCurrentPageReport]="true"
                              [totalRecords]="taskService.totalTaskItems"
                              currentPageReportTemplate="Показано с {first} по {last} из {totalRecords} задач"
-                             styleClass="back-blured"></p-paginator>
+                             styleClass="panel"></p-paginator>
             </div>
         </div>
 
@@ -74,7 +74,7 @@
                         <app-data-range-input formControlName="dateOfCreation"></app-data-range-input>
                     </span>
                 <ng-container *ngIf="taskService.templateFilterFields.length > 0">
-                    <app-task-template-filter-input *ngFor="let field of taskService.templateFilterFields"
+                    <app-task-template-filter-input *ngFor="let field of taskService.templateFilterFields; trackBy: trackByField"
                                                     [field]="field"
                                                     [formControlName]="field.id">
                     </app-task-template-filter-input>

@@ -21,6 +21,7 @@ export class TaskTemplateMultiSelectorComponent implements OnInit, ControlValueA
     templates: Wireframe[] = [];
     selected: number[] = [];
     @Input() countersType: "incoming" | "all" | "none" = "incoming";
+    @Input() inline = false;
     counters: { id: number, num: number }[] = [];
     status: "loading" | "ready" | "error" | "empty" = "loading";
     uniTargetMode = false;
@@ -79,6 +80,7 @@ export class TaskTemplateMultiSelectorComponent implements OnInit, ControlValueA
                 } else {
                     if (this.selected.length === 0) {
                         this.selected = [this.templates[0].wireframeId];
+                        this.onChange(this.selected);
                     }
                     this.counters = [];
                     if (this.countersType !== "none")

@@ -14,14 +14,14 @@
 <ng-template #taskList>
     <ng-container [ngSwitch]="status">
         <div class="flexed column stretched gap10" *ngSwitchCase="'ready'">
-            <app-task-list-element [item]="item" *ngFor="let item of tasks; let i = index; trackBy: taskTrack" [fullDate]="true"></app-task-list-element>
+            <app-task-list-element [item]="item" *ngFor="let item of tasks; let i = index; trackBy: taskTrack"></app-task-list-element>
             <div [style]="{flex:'1', minHeight: '2rem'}"></div>
             <div class="sticky bottom0">
                 <p-paginator #paginator (onPageChange)="changePage($event)" [alwaysShow]="false"
                              [rows]="PAGE_SIZE" [showCurrentPageReport]="true"
                              [totalRecords]="taskPage?.totalElements ?? 0"
                              currentPageReportTemplate="Показано с {first} по {last} из {totalRecords} задач"
-                             styleClass="back-blured"></p-paginator>
+                             styleClass="panel"></p-paginator>
             </div>
         </div>
         <div class="flexed column stretched hcenter vcenter" *ngSwitchCase="'loading'">

@@ -123,8 +123,8 @@ export class TaskJournalComponent implements OnInit, OnDestroy {
                 this.totalEntries = page.totalElements;
                 this.entries = page.content;
                 this.loading = false;
-                this.firstLoad = false
-                this.onFirstLoad.emit(this.totalEntries > 0);
+                this.firstLoad = false;
+                this.onFirstLoad.emit(this.totalEntries > 0 || page.content.length > 0);
             })
         else
             this.loading = false;

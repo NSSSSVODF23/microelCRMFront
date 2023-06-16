@@ -1,0 +1,5 @@
+<p-autoComplete [formControl]="control" [showClear]="true" [showEmptyMessage]="true"
+                [suggestions]="suggestions" emptyMessage="Наблюдатели не найдены"
+                field="name" [forceSelection]="true" placeholder="Наблюдатели" (onBlur)="onTouched()"
+                (completeMethod)="search($event)" appendTo="body" [completeOnFocus]="true"
+                [multiple]="true"></p-autoComplete>

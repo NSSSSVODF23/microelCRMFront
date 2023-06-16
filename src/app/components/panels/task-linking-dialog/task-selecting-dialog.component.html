@@ -2,7 +2,32 @@
           [draggable]="false" [modal]="true" [resizable]="false" [contentStyle]="dialogContentStyle"
           [style]="{width: '80vw'}" (onHide)="closeHandler()" [header]="header">
     <ng-template pTemplate="content">
-        <ng-container *ngIf="linkingMode === 'single'; then parentTaskList else childTaskList"></ng-container>
+        <ng-container [ngSwitch]="loadingState">
+            <ng-container *ngSwitchCase="'LOADING'">
+                <div class="list flexed hcenter vcenter">
+                    <p-progressSpinner class="primary-spinner" strokeWidth="1"></p-progressSpinner>
+                </div>
+            </ng-container>
+            <ng-container *ngSwitchCase="'ERROR'">
+                <div class="list flexed hcenter vcenter flexed hcenter gap3">
+                    <div class="caption-common-error">
+                        <i class="mdi-error"></i>
+                        <span>Ошибка загрузки</span>
+                    </div>
+                </div>
+            </ng-container>
+            <ng-container *ngSwitchCase="'READY'">
+                <ng-container *ngIf="linkingMode === 'single'; then parentTaskList else childTaskList"></ng-container>
+            </ng-container>
+            <ng-container *ngSwitchCase="'EMPTY'">
+                <div class="list flexed hcenter vcenter">
+                    <div class="caption-common-message flexed hcenter gap3">
+                        <i class="mdi-search_off"></i>
+                        <span>Не найдено задач</span>
+                    </div>
+                </div>
+            </ng-container>
+        </ng-container>
         <ng-container *ngTemplateOutlet="filter"></ng-container>
         <ng-container *ngTemplateOutlet="paginator"></ng-container>
         <p-button *ngIf="linkingMode==='multiply'" styleClass="p-button-success" class="float-button"
@@ -17,7 +42,7 @@
 <ng-template #parentTaskList>
     <div class="list">
         <app-task-list-element (onClick)="this.selectParent(task.taskId)" [item]="task" *ngFor="let task of pageOfTasks?.content"
-                               [customClickHandler]="true" [fullDate]="true"></app-task-list-element>
+                               [customClickHandler]="true" [inlined]="true"></app-task-list-element>
     </div>
 </ng-template>
 
@@ -25,51 +50,29 @@
 <ng-template #childTaskList>
     <div class="list">
         <app-task-list-element [(check)]="selectedChildTask" checkGroup="childTasks" [item]="task" *ngFor="let task of pageOfTasks?.content"
-                               [customClickHandler]="true" [fullDate]="true"></app-task-list-element>
+                               [customClickHandler]="true" [inlined]="true" [isHover]="false"></app-task-list-element>
     </div>
 </ng-template>
 
 <!--Фильтрация задач-->
 <ng-template #filter>
     <div class="filters" [formGroup]="mainFilterForm">
-        <div class="flexed column gap5">
-            <span class="caption-header">Тип задачи</span>
-            <p-listbox [checkbox]="true" [filter]="true"
-                       [listStyle]="{'max-height':'20vh'}" [multiple]="true"
-                       [options]="(templates$ | async)??[]" class="indent1" filterBy="name"
-                       formControlName="template" optionLabel="name" optionValue="wireframeId"></p-listbox>
-        </div>
-        <div class="flexed column gap5" *ngIf="!onlyMy">
-            <span class="caption-header">Статус задачи</span>
-            <app-task-status-chooser formControlName="status"></app-task-status-chooser>
-        </div>
-        <input pInputText formControlName="globalContext" placeholder="Общий поиск"/>
-        <p-dropdown [options]="(employees$ | async)??[]" [showClear]="true"
-                    appendTo="body" formControlName="author" placeholder="Автор задачи"
-                    styleClass="full-width" optionValue="login">
-            <ng-template let-item pTemplate="item">
-                <app-employee-label [employee]="item"></app-employee-label>
-            </ng-template>
-            <ng-template let-item pTemplate="selectedItem">
-                <app-employee-label [employee]="item"></app-employee-label>
-            </ng-template>
-        </p-dropdown>
-        <p-calendar [readonlyInput]="true" [showClear]="true" [selectOtherMonths]="true" appendTo="body"
-                    formControlName="dateOfCreation" placeholder="Дата создания" selectionMode="range"
-                    styleClass="full-width"></p-calendar>
+        <app-task-template-multi-selector [inline]="true" formControlName="template"></app-task-template-multi-selector>
+        <app-task-status-chooser formControlName="status" *ngIf="!onlyMy"></app-task-status-chooser>
+        <input pInputText formControlName="searchPhrase" placeholder="Общий поиск"/>
+        <app-employee-selector formControlName="author"></app-employee-selector>
+        <app-data-range-input formControlName="dateOfCreation"></app-data-range-input>
         <app-task-tag-filter-input class="full-width" formControlName="tags"></app-task-tag-filter-input>
-        <p-button label="Применить" icon="mdi-filter_alt" (onClick)="applyFilter()" *ngIf="mainFilterChanged"
-                  [disabled]="!mainFilterForm.valid" [loading]="loading"></p-button>
     </div>
 </ng-template>
 
 <!--Выбор страницы с задачами-->
 <ng-template #paginator>
     <p-paginator (onPageChange)="changePage($event)" [alwaysShow]="true"
-                 [rows]="TASK_PAGE_SIZE" [showCurrentPageReport]="true"
+                 [rows]="25" [showCurrentPageReport]="true"
                  [totalRecords]="pageOfTasks?.totalElements ?? 0"
                  currentPageReportTemplate="Показано с {first} по {last} из {totalRecords} задач"
-                 styleClass="back-blured" class="paginator"></p-paginator>
+                  class="paginator"></p-paginator>
 </ng-template>
 
 

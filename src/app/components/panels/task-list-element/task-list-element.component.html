@@ -1,4 +1,4 @@
-<div (click)="onClick.emit(item)" [ngClass]="{processing: item?.taskStatus === 'PROCESSING'}" [routerLink]="!viewExample && !customClickHandler ? ['/task', item?.taskId] : null"
+<div (click)="onClick.emit(item)" [ngClass]="{processing: item?.taskStatus === 'PROCESSING', inlined, hovered: isHover}" [routerLink]="!viewExample && !customClickHandler ? ['/task', item?.taskId] : null"
      class="task-item">
     <div class="task-item-header">
         <p-checkbox (click)="$event.stopPropagation()" (ngModelChange)="checkChange.emit($event)" [(ngModel)]="check"
@@ -41,8 +41,19 @@
         <app-avatar-list *ngIf="item?.taskStatus === 'PROCESSING' && actualWorkLog?.employees" [employees]="actualWorkLog?.employees ?? []"
                          [size]="1.7"></app-avatar-list>
     </div>
-    <div [ngClass]="bodyClass" class="task-item-body">
-        <span *ngFor="let field of item?.listItemFields; trackBy: trackByField">{{field?.textRepresentation}}</span>
+    <div [ngClass]="this.item?.modelWireframe?.listViewType" class="task-item-body">
+        <ng-container *ngIf="!viewExample">
+            <ng-container *ngFor="let field of item?.listItemFields; let i = index; trackBy: trackByField">
+                <span *ngIf="i<fieldCountArray.length">{{field?.textRepresentation}}</span>
+            </ng-container>
+        </ng-container>
+        <ng-container *ngIf="viewExample">
+            <ng-container *ngFor="let field of fieldCountArray; trackBy: trackByIndex">
+                <app-select-field-to-view-button (selectView)="selectFieldToView.emit($event)"
+                                                 [fields]="wireframeFieldsList"
+                                                 [index]="field"></app-select-field-to-view-button>
+            </ng-container>
+        </ng-container>
     </div>
     <div *ngIf="item?.lastComment" class="task-item-last-comment">
         <span class="autor">
@@ -60,115 +71,11 @@
     </div>
 </div>
 
-<!--<ng-container *ngIf="!isLoading && item" [ngSwitch]="item.modelWireframe?.listViewType??''">-->
-
-<!--    <div (click)="onClick.emit(item)" *ngSwitchCase="'SIMPLE'"-->
-<!--         [ngClass]="itemClass" [routerLink]="!viewExample && !customClickHandler ? ['/task',item.taskId] : null"-->
-<!--         class="task-item simple-layout">-->
-<!--        <ng-container *ngIf="!viewExample">-->
-<!--            <ng-container *ngTemplateOutlet="statusTags"></ng-container>-->
-<!--            <ng-container *ngTemplateOutlet="checkbox"></ng-container>-->
-<!--        </ng-container>-->
-<!--        <span class="main-caption" *ngIf="!viewExample">-->
-<!--            {{getFieldValue(0)}}-->
-<!--        </span>-->
-<!--        <app-select-field-to-view-button (selectView)="selectFieldToView.emit($event)"-->
-<!--                                         *ngIf="viewExample"-->
-<!--                                         [fields]="wireframeFieldsList"-->
-<!--                                         [index]="1"-->
-<!--                                         class="main-caption"></app-select-field-to-view-button>-->
-<!--        <ng-component *ngTemplateOutlet="metaInfo"></ng-component>-->
-<!--    </div>-->
-
-<!--    <div (click)="onClick.emit(item)" *ngSwitchCase="'COMPOSITE'"-->
-<!--         [ngClass]="itemClass" [routerLink]="!viewExample && !customClickHandler ? ['/task',item.taskId] : null"-->
-<!--         class="task-item composite-layout">-->
-<!--        <ng-container *ngIf="!viewExample">-->
-<!--            <ng-container *ngTemplateOutlet="statusTags"></ng-container>-->
-<!--            <ng-container *ngTemplateOutlet="checkbox"></ng-container>-->
-<!--        </ng-container>-->
-<!--        <span class="main-caption" *ngIf="!viewExample">-->
-<!--            {{getFieldValue(0)}}-->
-<!--        </span>-->
-<!--        <app-select-field-to-view-button (selectView)="selectFieldToView.emit($event)"-->
-<!--                                         *ngIf="viewExample"-->
-<!--                                         [fields]="wireframeFieldsList"-->
-<!--                                         [index]="1"-->
-<!--                                         class="main-caption"></app-select-field-to-view-button>-->
-<!--        <span class="additional-caption" *ngIf="!viewExample">-->
-<!--            {{getFieldValue(1)}}-->
-<!--        </span>-->
-<!--        <app-select-field-to-view-button (selectView)="selectFieldToView.emit($event)"-->
-<!--                                         *ngIf="viewExample"-->
-<!--                                         [fields]="wireframeFieldsList"-->
-<!--                                         [index]="2"-->
-<!--                                         class="additional-caption"></app-select-field-to-view-button>-->
-<!--        <ng-component *ngTemplateOutlet="metaInfo"></ng-component>-->
-<!--    </div>-->
-
-<!--    <div (click)="onClick.emit(item)" *ngSwitchCase="'DETAILED'"-->
-<!--         [ngClass]="itemClass" [routerLink]="!viewExample && !customClickHandler ? ['/task',item.taskId] : null"-->
-<!--         class="task-item detailed-layout">-->
-<!--        <ng-container *ngIf="!viewExample">-->
-<!--            <ng-container *ngTemplateOutlet="statusTags"></ng-container>-->
-<!--            <ng-container *ngTemplateOutlet="checkbox"></ng-container>-->
-<!--        </ng-container>-->
-<!--        <span class="main-caption" *ngIf="!viewExample">-->
-<!--            {{getFieldValue(0)}}-->
-<!--        </span>-->
-<!--        <app-select-field-to-view-button (selectView)="selectFieldToView.emit($event)"-->
-<!--                                         *ngIf="viewExample"-->
-<!--                                         [fields]="wireframeFieldsList"-->
-<!--                                         [index]="1"-->
-<!--                                         class="main-caption"></app-select-field-to-view-button>-->
-<!--        <span class="splitter">-</span>-->
-<!--        <span class="second-caption" *ngIf="!viewExample">-->
-<!--            {{getFieldValue(1)}}-->
-<!--        </span>-->
-<!--        <app-select-field-to-view-button (selectView)="selectFieldToView.emit($event)"-->
-<!--                                         *ngIf="viewExample"-->
-<!--                                         [fields]="wireframeFieldsList"-->
-<!--                                         [index]="2"-->
-<!--                                         class="second-caption"></app-select-field-to-view-button>-->
-<!--        <span class="additional-caption" *ngIf="!viewExample">-->
-<!--            {{getFieldValue(2)}}-->
-<!--        </span>-->
-<!--        <app-select-field-to-view-button (selectView)="selectFieldToView.emit($event)"-->
-<!--                                         *ngIf="viewExample"-->
-<!--                                         [fields]="wireframeFieldsList"-->
-<!--                                         [index]="3"-->
-<!--                                         class="additional-caption"></app-select-field-to-view-button>-->
-<!--        <ng-component *ngTemplateOutlet="metaInfo"></ng-component>-->
-<!--    </div>-->
-
-<!--</ng-container>-->
-
-<!--<ng-container *ngIf="isLoading">-->
-<!--    <div class="task-item detailed-layout">-->
-<!--        <p-skeleton class="main-caption" width="5rem" height=".9rem"></p-skeleton>-->
-<!--        <span class="splitter">-</span>-->
-<!--        <p-skeleton class="second-caption" width="25%" height=".9rem"></p-skeleton>-->
-<!--        <div class="additional-caption" [style]="{display:'flex', flexDirection:'column', gap:'.3rem'}">-->
-<!--            <p-skeleton width="70%" height=".8rem"></p-skeleton>-->
-<!--            <p-skeleton width="56%" height=".8rem"></p-skeleton>-->
-<!--            <p-skeleton width="44%" height=".8rem"></p-skeleton>-->
-<!--        </div>-->
-<!--        <p-skeleton class="meta-info" width="5rem" height="2rem"></p-skeleton>-->
-<!--    </div>-->
-<!--</ng-container>-->
-
-<!--Элемент чекбокс для выбора задачи-->
-<ng-template #checkbox>
-    <div (click)="$event.stopPropagation()" *ngIf="check" class="checkbox-wrapper">
-        <p-checkbox (ngModelChange)="checkChange.emit($event)" [(ngModel)]="check" [name]="checkGroup"
-                    [value]="item?.taskId"></p-checkbox>
-    </div>
-</ng-template>
 
 <!--Дополнительная информация о статусе и тегах задачи-->
 <ng-template #statusTags>
     <div class="tags-view">
-        <div *ngFor="let tag of item?.tags|slice:0:4" [style.background-color]="tag.color"
+        <div *ngFor="let tag of item?.tags|slice:0:4; trackBy: trackByTag" [style.background-color]="tag.color"
              class="tags-view-item small">{{tag.name}}</div>
         <div (mouseenter)="tagsPreviewShow($event)" (mouseleave)="tagsPreviewHide()" *ngIf="isMoreTwoTags"
              class="tags-view-item small">{{remainingNumberOfTags}}+
@@ -176,20 +83,10 @@
     </div>
 </ng-template>
 
-<!--Информация о времени создания и авторе задачи-->
-<ng-template #metaInfo>
-    <div class="meta-info flexed stretched column hend spbtw p5">
-        <div class="flexed gap5 hcenter">
-            <app-employee-label *ngIf="!viewExample" [employee]="item?.creator" [size]="1.8"></app-employee-label>
-            <app-employee-label *ngIf="viewExample" [employee]="{login:'Сотрудник'}" [size]="1.8"></app-employee-label>
-        </div>
-        <span class="caption-secondary one-line">{{item?.created | date:fullDate ? "dd MMM yyyy HH:mm" : "HH:mm"}}</span>
-    </div>
-</ng-template>
 
 <p-overlayPanel #tagsPreview [appendTo]="'body'" hideTransitionOptions="0ms" showTransitionOptions="0ms">
     <div class="tags-view wrap max">
-        <div *ngFor="let tag of item?.tags|slice:2" [style.background-color]="tag.color"
+        <div *ngFor="let tag of item?.tags|slice:2; trackBy: trackByTag" [style.background-color]="tag.color"
              class="tags-view-item">{{tag.name}}</div>
     </div>
 </p-overlayPanel>

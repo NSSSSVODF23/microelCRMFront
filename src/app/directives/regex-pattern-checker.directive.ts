@@ -11,6 +11,7 @@ export class RegexPatternCheckerDirective {
 
   @HostListener('keydown', ['$event'])
   letterChange(event: any) {
+    if(event.ctrlKey) return;
     if(!this.patternRx) return;
     const regex = new RegExp(this.patternRx);
     const specialKeys = ["Enter", "Space", "Tab", "Backspace"]

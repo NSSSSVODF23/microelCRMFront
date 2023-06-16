@@ -22,14 +22,14 @@
   &.primary{
     color: var(--mc-500);
     &:hover:not(.disabled){
-      background-color: var(--mc-100);
+      background-color: var(--mc-0);
     }
   }
 
   &.secondary{
     color: var(--text-color-secondary);
     &:hover:not(.disabled){
-      background-color: var(--mc-100);
+      background-color: var(--mc-0);
     }
   }
 
@@ -62,7 +62,7 @@
   }
 
   &:hover:not(.disabled) {
-    background-color: var(--mc-100);
+    background-color: var(--mc-0);
   }
 
   &-icon {

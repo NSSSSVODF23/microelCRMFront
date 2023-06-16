@@ -93,6 +93,7 @@ export enum DefaultObserverTargetType {
 
 export interface DefaultObservers {
     targetId: string;
+    targetName: string;
     targetType: DefaultObserverTargetType;
 }
 
@@ -165,15 +166,15 @@ export interface Task {
  * Интерфейс для передачи данных о фильтрации задач на сервер
  */
 export interface TaskFiltrationConditions {
-    status?: TaskStatus[];
-    template?: number[];
-    templateFilter?: string;
-    searchPhrase?: string;
-    author?: string;
-    dateOfCreation?: string[];
-    exclusionIds?: number[];
-    tags?: number[];
-    onlyMy?: boolean;
+    status?: TaskStatus[] | null;
+    template?: number[] | null;
+    templateFilter?: string | null;
+    searchPhrase?: string | null;
+    author?: string | null;
+    dateOfCreation?: string[] | null;
+    exclusionIds?: number[] | null;
+    tags?: number[] | null;
+    onlyMy?: boolean | null;
 }
 
 /**

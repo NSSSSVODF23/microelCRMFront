@@ -7,24 +7,35 @@
 .task-item {
   display: grid;
   grid: auto-flow / 1fr;
-  background-color: white;
-  //box-shadow: var(--shadow-0);
   padding: 1rem;
-  border: 1px solid var(--bgc-300);
-  border-radius: var(--br-200);
   gap: .5rem;
   transition: box-shadow .1s ease-in-out;
   cursor: pointer;
+  background-color: white;
+  outline-offset: -1px;
 
-  &.checking{
+  &:not(.inlined) {
+    border: 1px solid var(--bgc-300);
+    border-radius: var(--br-200);
+  }
+
+  &.inlined:not(:last-child) {
+    border-bottom: 1px solid var(--bgc-300);
+  }
+
+  &.checking {
     grid: auto-flow / min-content 1fr;
   }
 
-  &:hover {
+  &.hovered:not(.inlined):hover {
     box-shadow: 0 0 .3rem var(--mc-200);
   }
 
-  &.processing{
+  &.hovered.inlined:hover {
+    outline: 1px solid var(--mc-200);
+  }
+
+  &.processing {
     border: 1px solid var(--warm-500);
   }
 
@@ -36,19 +47,19 @@
     padding: .5rem;
     border-bottom: 1px solid var(--bgc-200);
 
-    .status-caption{
+    .status-caption {
       font-size: .9rem;
       font-weight: 600;
 
-      &.active{
+      &.active {
         color: var(--mc-500);
       }
 
-      &.processing{
+      &.processing {
         color: var(--warm-700);
       }
 
-      &.close{
+      &.close {
         color: var(--tc-400);
       }
     }
@@ -61,14 +72,15 @@
     color: var(--tc-700);
     margin: 0 1rem;
 
-    &.simple {
+    &.SIMPLE {
       display: flex;
     }
 
-    &.composite {
+    &.COMPOSITE {
       display: grid;
       grid: repeat(2, min-content)/ 1fr;
-      & > span:last-child {
+
+      & > span {
         display: -webkit-box;
         overflow: hidden;
         -webkit-box-orient: vertical;
@@ -76,9 +88,16 @@
       }
     }
 
-    &.detailed {
+    &.DETAILED {
       display: grid;
-      grid: repeat(2, min-content)/ max-content 1fr;
+      grid: repeat(2, min-content)/ fit-content(50%) 1fr;
+
+      & > span:not(:last-child) {
+        display: -webkit-box;
+        overflow: hidden;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 2;
+      }
 
       & > span:last-child {
         display: -webkit-box;
@@ -90,7 +109,7 @@
     }
   }
 
-  &-last-comment{
+  &-last-comment {
     display: flex;
     align-items: flex-start;
     padding: .4rem .8rem;
@@ -103,12 +122,12 @@
     border-radius: .8rem;
     background-color: var(--bgc-200);
 
-    &>.autor{
+    & > .autor {
       color: var(--tc-500);
       white-space: nowrap;
     }
 
-    &>.comment{
+    & > .comment {
       display: -webkit-box;
       overflow: hidden;
       -webkit-box-orient: vertical;
@@ -116,7 +135,7 @@
     }
   }
 
-  &-footer{
+  &-footer {
     display: flex;
     align-items: center;
     justify-content: flex-end;

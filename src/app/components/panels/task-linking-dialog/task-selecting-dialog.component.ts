@@ -1,11 +1,10 @@
-import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
-import {Page, Task, TaskTag} from "../../../transport-interfaces";
+import {Component, EventEmitter, Input, OnDestroy, OnInit, Output} from '@angular/core';
+import {LoadingState, Page, Task, TaskStatus, TaskTag} from "../../../transport-interfaces";
 import {ApiService} from "../../../services/api.service";
-import {map, tap} from "rxjs";
-import {FormControl, FormGroup, Validators} from "@angular/forms";
+import {debounceTime, distinctUntilChanged, map, tap} from "rxjs";
+import {FormControl, FormGroup} from "@angular/forms";
 import {CustomValidators} from "../../../custom-validators";
-import {require} from "ace-builds";
-import {Utils} from "../../../util";
+import {SubscriptionsHolder, Utils} from "../../../util";
 import {ConfirmationService} from "primeng/api";
 
 @Component({
@@ -13,7 +12,7 @@ import {ConfirmationService} from "primeng/api";
     templateUrl: './task-selecting-dialog.component.html',
     styleUrls: ['./task-selecting-dialog.component.scss']
 })
-export class TaskSelectingDialogComponent implements OnInit {
+export class TaskSelectingDialogComponent implements OnInit, OnDestroy {
 
     @Input() excludedTasks: number[] = [];
     @Input() header: string = "";
@@ -25,11 +24,9 @@ export class TaskSelectingDialogComponent implements OnInit {
     selectedChildTask: number[] = [];
     pageOfTasks?: Page<Task>;
     currentPage = 0;
-    TASK_PAGE_SIZE = 25;
-    loading = true;
+    loadingState: LoadingState = LoadingState.LOADING;
     linkingInProgress = false;
     lastAppliedMainFilter = {};
-    employees$ = this.api.getEmployees(undefined, true, false);
     dialogContentStyle = {
         padding: '0 1rem 0 1rem',
         display: 'grid',
@@ -38,88 +35,62 @@ export class TaskSelectingDialogComponent implements OnInit {
         columnGap: '1rem',
     }
     mainFilterForm = new FormGroup({
-        globalContext: new FormControl(""),
-        template: new FormControl([] as number[], [CustomValidators.notEmpty]),
-        status: new FormControl(['ACTIVE', 'PROCESSING', 'CLOSE'], [CustomValidators.notEmpty]),
-        author: new FormControl(""),
-        dateOfCreation: new FormControl([]),
-        tags: new FormControl([] as number[]),
+        searchPhrase: new FormControl<string|null>(null),
+        template: new FormControl<number[]|null>([], [CustomValidators.notEmpty]),
+        status: new FormControl<TaskStatus[]>([TaskStatus.ACTIVE, TaskStatus.PROCESSING, TaskStatus.CLOSE], [CustomValidators.notEmpty]),
+        author: new FormControl<string|null>(null),
+        dateOfCreation: new FormControl<string[]|null>(null),
+        tags: new FormControl<number[]>([]),
     })
-    templates$ = this.api.getWireframesNames().pipe(tap((wireframes) => {
-        this.mainFilterForm.patchValue({template: wireframes.map(w => w.wireframeId)})
-        this.api.getPageOfTasks(0, {exclusionIds: this.excludedTasks, onlyMy: this.onlyMy}).subscribe(this.loadHandler())
-    }));
-    mainFilters = {} as any;
+    subscriptions = new SubscriptionsHolder();
 
 
     constructor(readonly api: ApiService, readonly confirm: ConfirmationService) {
     }
 
-    get mainFilterChanged() {
-        return JSON.stringify(this.lastAppliedMainFilter) !== JSON.stringify(this.mainFilters);
+    ngOnInit(): void {
+        const filters$ = this.mainFilterForm.valueChanges.pipe(
+            debounceTime(1000),
+            distinctUntilChanged(),
+        );
+
+        this.subscriptions.addSubscription("filter", filters$.subscribe(filters => {
+            this.loadingState = LoadingState.LOADING;
+            this.mainFilterForm.disable({emitEvent: false});
+            this.api.getPageOfTasks(0, {...filters, exclusionIds: this.excludedTasks, onlyMy: this.onlyMy}).subscribe(this.loadHandler())
+        }));
     }
 
-    ngOnInit(): void {
-        this.mainFilterForm.valueChanges.pipe(
-            map((values) => {
-                return Object.entries(values)
-                    .filter(([key, value]) => !CustomValidators.isValueEmpty(value))
-                    .map(([key, value]: any) => {
-                        switch (key) {
-                            case 'dateOfCreation':
-                                return {
-                                    [key]: Utils.dateArrayToRange(value)
-                                }
-                            case 'tags':
-                                return {
-                                    [key]: value.map((tag: TaskTag) => tag.taskTagId)
-                                }
-                            default:
-                                return {
-                                    [key]: value
-                                }
-                        }
-                    }).reduce((acc, curr) => ({...acc, ...curr}), {})
-            })
-        ).subscribe(filters => {
-            this.mainFilters = filters
-            this.mainFilters.exclusionIds = this.excludedTasks;
-        });
+    ngOnDestroy(): void {
+        this.subscriptions.unsubscribeAll();
     }
 
     open(mode: 'single' | 'multiply') {
         this.isShow = true;
         this.linkingMode = mode;
-        this.loading = true;
-    }
-
-    onParentTaskLink() {
-
-    }
-
-    onChildTaskLink() {
 
     }
 
     changePage(event: any) {
-        this.loading = true;
-        this.api.getPageOfTasks(event.page, {...this.mainFilters, onlyMy: this.onlyMy}).subscribe(this.loadHandler())
-    }
-
-    applyFilter() {
-        this.loading = true;
-        this.api.getPageOfTasks(0, {...this.mainFilters, onlyMy: this.onlyMy}).subscribe(this.loadHandler())
+        this.loadingState = LoadingState.LOADING;
+        this.mainFilterForm.disable({emitEvent: false});
+        this.api.getPageOfTasks(event.page, {...this.mainFilterForm.getRawValue(), exclusionIds: this.excludedTasks, onlyMy: this.onlyMy}).subscribe(this.loadHandler())
     }
 
     loadHandler() {
         return {
             next: (page: Page<Task>) => {
                 this.pageOfTasks = page;
-                this.loading = false;
-                this.lastAppliedMainFilter = this.mainFilters;
+                if(page.totalElements>0){
+                    this.loadingState = LoadingState.READY;
+                }else{
+                    this.loadingState = LoadingState.EMPTY;
+                }
+                this.mainFilterForm.enable({emitEvent: false});
             },
             error: () => {
-                this.loading = false;
+                this.loadingState = LoadingState.ERROR;
+                this.mainFilterForm.enable({emitEvent: false});
             }
         }
     }
@@ -141,11 +112,11 @@ export class TaskSelectingDialogComponent implements OnInit {
     closeHandler() {
         this.mainFilterForm.setValue({
             template: [],
-            status: ['ACTIVE', 'PROCESSING', 'CLOSE'],
+            status: [TaskStatus.ACTIVE, TaskStatus.PROCESSING, TaskStatus.CLOSE],
             dateOfCreation: [],
             tags: [],
             author: "",
-            globalContext: ""
+            searchPhrase: ""
         })
         this.pageOfTasks = undefined;
     }
