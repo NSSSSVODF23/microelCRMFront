@@ -5,7 +5,7 @@ import {ConfirmationService} from 'primeng/api';
 import {Department, Employee, Position} from "../../transport-interfaces";
 import {SubscriptionsHolder} from "../../util";
 import {RealTimeUpdateService} from "../../services/real-time-update.service";
-import {debounceTime, distinctUntilChanged, tap} from "rxjs";
+import {debounceTime, distinctUntilChanged} from "rxjs";
 
 class AccessFlag {
     static readonly NONE = 0;
@@ -104,6 +104,19 @@ export class EmployeesPageComponent implements OnInit, OnDestroy {
     constructor(readonly api: ApiService, readonly confirm: ConfirmationService, readonly rt: RealTimeUpdateService) {
     }
 
+    trackByEmployee(index: number, employee: Employee) {
+        return employee.login + employee.fullName + JSON.stringify(employee.position)
+            + JSON.stringify(employee.department) + employee.deleted + employee.avatar + employee.deleted;
+    };
+
+    trackByPosition(index: number, position: Position) {
+        return position.positionId + position.name + position.description + position.deleted;
+    };
+
+    trackByDepartment(index: number, department: Department) {
+        return department.departmentId + department.name + department.description + department.deleted;
+    };
+
     ngOnDestroy(): void {
         this.subscriptions.unsubscribeAll();
     }
@@ -128,31 +141,37 @@ export class EmployeesPageComponent implements OnInit, OnDestroy {
             }
         }));
         this.subscriptions.addSubscription('depUpd', this.rt.departmentUpdated().subscribe(value => {
-            const foundIndex = this.departments.findIndex(emp => emp.departmentId === value.departmentId);
+            const foundIndex = this.departments.findIndex(dep => dep.departmentId === value.departmentId);
             if (foundIndex >= 0) {
-                this.employees[foundIndex].department = value;
+                this.departments[foundIndex] = value;
             }
+            this.employees.filter(emp => emp.department?.departmentId === value.departmentId).forEach(emp => {
+                emp.department = value
+            })
         }));
         this.subscriptions.addSubscription('depCr', this.rt.departmentCreated().subscribe(value => {
             this.departments.push(value);
         }));
         this.subscriptions.addSubscription('depDel', this.rt.departmentDeleted().subscribe(value => {
-            const foundIndex = this.departments.findIndex(emp => emp.departmentId === value);
+            const foundIndex = this.departments.findIndex(dep => dep.departmentId === value.departmentId);
             if (foundIndex >= 0) {
                 this.departments.splice(foundIndex, 1);
             }
         }));
         this.subscriptions.addSubscription('posUpd', this.rt.positionUpdated().subscribe(value => {
-            const foundIndex = this.positions.findIndex(emp => emp.positionId === value.positionId);
+            const foundIndex = this.positions.findIndex(pos => pos.positionId === value.positionId);
             if (foundIndex >= 0) {
                 this.positions[foundIndex] = value;
             }
+            this.employees.filter(emp => emp.position?.positionId === value.positionId).forEach(emp => {
+                emp.position = value
+            })
         }));
         this.subscriptions.addSubscription('posCr', this.rt.positionCreated().subscribe(value => {
             this.positions.push(value);
         }));
         this.subscriptions.addSubscription('posDel', this.rt.positionDeleted().subscribe(value => {
-            const foundIndex = this.positions.findIndex(emp => emp.positionId === value);
+            const foundIndex = this.positions.findIndex(pos => pos.positionId === value.positionId);
             if (foundIndex >= 0) {
                 this.positions.splice(foundIndex, 1);
             }
@@ -163,13 +182,13 @@ export class EmployeesPageComponent implements OnInit, OnDestroy {
                 distinctUntilChanged(),
             )
             .subscribe(value => {
-                this.employeeFiltrationForm.disable({ emitEvent: false });
+                this.employeeFiltrationForm.disable({emitEvent: false});
                 this.api.getEmployees(value.query ?? undefined, value.showDeleted ?? undefined).subscribe({
                     next: value => {
                         this.employees = value;
                         this.employeeFiltrationForm.enable({emitEvent: false});
                     },
-                    error: ()=> this.employeeFiltrationForm.enable({ emitEvent: false })
+                    error: () => this.employeeFiltrationForm.enable({emitEvent: false})
                 });
             }))
     }
@@ -216,11 +235,11 @@ export class EmployeesPageComponent implements OnInit, OnDestroy {
         this.isBeginEditingDepartment = true;
         this.api.editDepartment(this.departmentForm.getRawValue(), id).subscribe({
             complete: () => {
-                this.isBeginCreatingDepartment = false;
-                this.showCreateDepartmentDialog = false;
+                this.isBeginEditingDepartment = false;
+                this.showEditDepartmentDialog = false;
             },
             error: () => {
-                this.isBeginCreatingDepartment = false;
+                this.isBeginEditingDepartment = false;
             }
         })
     }
@@ -273,11 +292,11 @@ export class EmployeesPageComponent implements OnInit, OnDestroy {
         if (Array.isArray(rawValue['access'])) rawValue['access'] = rawValue['access'].reduce((p: number, c: number) => p + c, 0)
         this.api.editPosition(rawValue, rawValue['id']).subscribe({
             complete: () => {
-                this.isBeginCreatingPosition = false;
+                this.isBeginEditingPosition = false;
                 this.showEditPositionDialog = false;
             },
             error: () => {
-                this.isBeginCreatingPosition = false;
+                this.isBeginEditingPosition = false;
             }
         })
     }

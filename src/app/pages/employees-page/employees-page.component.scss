@@ -12,8 +12,8 @@
     align-items: center;
     transition: background-color .2s ease-out;
 
-    &:hover{
-      background-color: var(--bgc-100);
+    &:not(:last-child){
+      border-bottom: 1px solid var(--bgc-100);
     }
   }
 }

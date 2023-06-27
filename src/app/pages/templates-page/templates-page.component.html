@@ -30,12 +30,12 @@
     <div [queryParams]="{editingId:item.wireframeId}"
          [routerLink]="['constructor']" class="template-item flexed">
         <div class="template-item-main-info flexed column gap2 stretched">
-                <span class="template-item-main-info-name">
-                    {{item.name}}
-                </span>
+            <span class="template-item-main-info-name">
+                {{item.name}}
+            </span>
             <span class="template-item-main-info-description">
-                    {{item.description}}
-                </span>
+                {{item.description}}
+            </span>
         </div>
         <div class="template-item-created-date" *ngIf="item.wireframeId">
             {{item.created | date:"dd-MM-yy HH:mm"}}

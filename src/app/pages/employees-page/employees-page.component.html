@@ -1,5 +1,5 @@
 <div appExtendPageHeight class="flexed vcenter">
-    <div class="responsive-wrapper flexed gap10" [style.padding-bottom]="'2rem'">
+    <div [style.padding-bottom]="'2rem'" class="responsive-wrapper flexed gap10">
         <app-main-menu-panel></app-main-menu-panel>
 
         <p-tabView class="stretched panel overflow">
@@ -13,15 +13,15 @@
                     </div>
                 </ng-template>
                 <div class="flexed column">
-                    <div class="flexed gap10 vcenter hcenter" [formGroup]="employeeFiltrationForm">
+                    <div [formGroup]="employeeFiltrationForm" class="flexed gap10 vcenter hcenter">
                         <span class="p-input-icon-left">
                             <i class="mdi-search"></i>
-                            <input formControlName="query" pInputText type="text" placeholder="Поиск...">
+                            <input formControlName="query" pInputText placeholder="Поиск..." type="text">
                         </span>
                         <span class="caption-sub-header flexed column hcenter">
                             <p-inputSwitch [falseValue]="false"
-                                           [ngStyle]="{lineHeight:'0'}" formControlName="showDeleted"
-                                           [trueValue]="true"></p-inputSwitch>
+                                           [ngStyle]="{lineHeight:'0'}" [trueValue]="true"
+                                           formControlName="showDeleted"></p-inputSwitch>
                             Показывать удаленные?
                         </span>
                         <span>
@@ -30,8 +30,9 @@
                         </span>
                     </div>
                     <div class="employee-list">
-                        <div *ngFor="let employee of employees" class="employee-list-item">
-                            <app-avatar [deleted]="employee.deleted ?? false" [size]="2.5" [name]="employee.fullName" [src]="employee.avatar"></app-avatar>
+                        <div *ngFor="let employee of employees; trackBy: trackByEmployee" class="employee-list-item">
+                            <app-avatar [deleted]="employee.deleted ?? false" [name]="employee.fullName" [size]="2.5"
+                                        [src]="employee.avatar"></app-avatar>
                             <div class="flexed column">
                                 <span class="caption-main">{{employee.fullName}}</span>
                                 <div class="flexed gap5 hcenter">
@@ -44,9 +45,13 @@
                                 </div>
                             </div>
                             <div class="stretched"></div>
-                            <app-icon-button icon="edit" model="secondary" [disabled]="employee.deleted ?? false" (onClick)="openEmployeeEditor(employee.login)"></app-icon-button>
-                            <app-icon-button icon="delete" model="danger" [disabled]="employee.deleted ?? false" (onClick)="employeeDeleteConfirm(employee)"
-                                             [loading]="employee.login ? isBeginDeleteEmployee[employee.login] : false"></app-icon-button>
+                            <p-button icon="mdi-edit" styleClass="p-button-text p-button-warning"
+                                      label="Редактировать"
+                                      (onClick)="openEmployeeEditor(employee.login)" [disabled]="employee.deleted ?? false"></p-button>
+                            <p-button icon="mdi-delete" styleClass="p-button-text p-button-danger"
+                                      (onClick)="employeeDeleteConfirm(employee)" [disabled]="employee.deleted ?? false"
+                                      label="Удалить"
+                                        [loading]="employee.login ? isBeginDeleteEmployee[employee.login] : false"></p-button>
                         </div>
                     </div>
                 </div>
@@ -66,7 +71,7 @@
                                     model="p-button-success"></app-button>
                     </div>
                     <div class="list-view">
-                        <div *ngFor="let department of departments" class="list-view-item bordered">
+                        <div *ngFor="let department of departments; trackBy: trackByDepartment" class="list-view-item bordered">
                             <div class="flexed column gap5">
                                     <span appColorize class="caption-sub-header">
                                         {{department.name}}
@@ -77,15 +82,14 @@
                                 </div>
                             </div>
                             <div class="stretched"></div>
-                            <app-icon-button
-                                    (onClick)="openDepartmentEditor(department.name??'', department.description??'', department.departmentId)"
-                                    [size]="1.4" icon="edit"
-                                    model="secondary"></app-icon-button>
-                            <app-icon-button (onClick)="departmentDeleteConfirm(department)"
-                                             [loading]="department.departmentId ? isBeginDeleteDepartment[department.departmentId] : false"
-                                             [size]="1.4"
-                                             icon="delete"
-                                             model="danger"></app-icon-button>
+                            <p-button icon="mdi-edit" styleClass="p-button-text p-button-warning"
+                                      label="Редактировать"
+                                      (onClick)="openDepartmentEditor(department.name??'', department.description??'', department.departmentId)"
+                                      [disabled]="department.deleted ?? false"></p-button>
+                            <p-button icon="mdi-delete" styleClass="p-button-text p-button-danger"
+                                      (onClick)="departmentDeleteConfirm(department)"
+                                      [loading]="department.departmentId ? isBeginDeleteDepartment[department.departmentId] : false"
+                                      label="Удалить"></p-button>
                         </div>
                     </div>
                 </div>
@@ -103,7 +107,7 @@
                     <app-button (onClick)="openPositionCreator()" icon="add" label="Создать"
                                 model="p-button-success"></app-button>
                     <div class="list-view">
-                        <div *ngFor="let position of positions" class="list-view-item bordered">
+                        <div *ngFor="let position of positions; trackBy: trackByPosition" class="list-view-item bordered">
                             <div class="flexed column gap5">
                                     <span appColorize class="caption-sub-header">
                                         {{position?.name}}
@@ -114,15 +118,14 @@
                                 </div>
                             </div>
                             <div class="stretched"></div>
-                            <app-icon-button
-                                    (onClick)="openPositionEditor(position.name??'', position.description??'', position.access??0, position.positionId)"
-                                    [size]="1.4" icon="edit"
-                                    model="secondary"></app-icon-button>
-                            <app-icon-button (onClick)="positionDeleteConfirm(position)"
-                                             [loading]="position.positionId ? isBeginDeletePosition[position.positionId] : false"
-                                             [size]="1.4"
-                                             icon="delete"
-                                             model="danger"></app-icon-button>
+                            <p-button icon="mdi-edit" styleClass="p-button-text p-button-warning"
+                                      label="Редактировать"
+                                      (onClick)="openPositionEditor(position.name??'', position.description??'', position.access??0, position.positionId)"
+                                      [disabled]="position.deleted ?? false"></p-button>
+                            <p-button icon="mdi-delete" styleClass="p-button-text p-button-danger"
+                                      (onClick)="positionDeleteConfirm(position)"
+                                      [loading]="position.positionId ? isBeginDeletePosition[position.positionId] : false"
+                                      label="Удалить"></p-button>
                         </div>
                     </div>
                 </div>
@@ -144,7 +147,7 @@
                           pInputTextarea></textarea>
             </span>
             <app-button (onClick)="departmentCreate()" [disabled]="!departmentForm.valid" icon="add"
-                        label="Создать"></app-button>
+                        [loading]="isBeginCreatingDepartment" label="Создать"></app-button>
         </form>
     </ng-template>
 </p-dialog>
@@ -161,7 +164,8 @@
                 <textarea [autoResize]="true" [cols]="50" [rows]="5" formControlName="description"
                           pInputTextarea></textarea>
             </span>
-            <app-button (onClick)="departmentEdit()" [disabled]="!departmentForm.valid" icon="save" label="Сохранить"></app-button>
+            <app-button (onClick)="departmentEdit()" [disabled]="!departmentForm.valid" icon="save"
+                        [loading]="isBeginEditingDepartment" label="Сохранить"></app-button>
         </form>
     </ng-template>
 </p-dialog>
@@ -185,7 +189,7 @@
                 </div>
             </p-panel>
             <app-button (onClick)="positionCreate()" [disabled]="!positionForm.valid" icon="add"
-                        label="Создать"></app-button>
+                        [loading]="isBeginCreatingPosition" label="Создать"></app-button>
         </form>
     </ng-template>
 </p-dialog>
@@ -208,8 +212,8 @@
                                 formControlName="access" name="access"></p-checkbox>
                 </div>
             </p-panel>
-            <app-button (onClick)="positionEdit()" [disabled]="!positionForm.valid" icon="save" label="Сохранить"
-                        ></app-button>
+            <app-button (onClick)="positionEdit()" [disabled]="!positionForm.valid" icon="save"
+                        [loading]="isBeginEditingPosition" label="Сохранить"></app-button>
         </form>
     </ng-template>
 </p-dialog>
@@ -297,7 +301,8 @@
             <p-panel header="Параметры доступа">
                 <div class="flexed gap10 column">
                     <div class="flexed gap10 hcenter">
-                        <p-toggleButton (onChange)="checkAllAccess($event)" [disabled]="!isAccessOverride" offLabel="Выделить всё"
+                        <p-toggleButton (onChange)="checkAllAccess($event)" [disabled]="!isAccessOverride"
+                                        offLabel="Выделить всё"
                                         onLabel="Снять выделение"></p-toggleButton>
                         <p-toggleButton (ngModelChange)="accessOverrideChange($event)" [(ngModel)]="isAccessOverride"
                                         [ngModelOptions]="{standalone:true}" offLabel="Переопределить"
@@ -404,7 +409,8 @@
             <p-panel header="Параметры доступа">
                 <div class="flexed gap10 column">
                     <div class="flexed gap10 hcenter">
-                        <p-toggleButton (onChange)="checkAllAccess($event)" [disabled]="!isAccessOverride" offLabel="Выделить всё"
+                        <p-toggleButton (onChange)="checkAllAccess($event)" [disabled]="!isAccessOverride"
+                                        offLabel="Выделить всё"
                                         onLabel="Снять выделение"></p-toggleButton>
                         <p-toggleButton (ngModelChange)="accessOverrideChange($event)" [(ngModel)]="isAccessOverride"
                                         [ngModelOptions]="{standalone:true}" offLabel="Переопределить"

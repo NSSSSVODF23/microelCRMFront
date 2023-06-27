@@ -80,10 +80,10 @@ export interface Employee {
 }
 
 export interface Department {
-    departmentId?: number;
-    name?: string;
+    departmentId: number;
+    name: string;
     description?: string;
-    created?: string;
+    created: string;
     deleted?: boolean;
 }
 
@@ -98,10 +98,10 @@ export interface DefaultObservers {
 }
 
 export interface Position {
-    positionId?: number;
-    name?: string;
+    positionId: number;
+    name: string;
     description?: string;
-    created?: string;
+    created: string;
     access?: number;
     deleted?: boolean;
 }
