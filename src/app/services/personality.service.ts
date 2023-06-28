@@ -68,12 +68,14 @@ export class PersonalityService {
 
         // Проверяем истекает ли срок действия токена, если да обновляем его
         setInterval(() => {
-            if(!this.api.loggedIn) return;
             const now = new Date().getTime();
             const rawToken = localStorage.getItem('token');
             if (!rawToken) return;
             const token = jwtDecode(rawToken) as Token;
-            if ((token.exp * 1000) - now < 30000) this.api.authCheckout().subscribe();
+            if ((token.exp * 1000) - now < 30000) {
+                this.api.authCheckout().subscribe();
+                console.log("Проверка токена")
+            }
         }, 10000)
     }
 }

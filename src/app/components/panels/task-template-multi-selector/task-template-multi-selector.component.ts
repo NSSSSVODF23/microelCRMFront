@@ -19,6 +19,7 @@ import {from, map, mergeMap} from "rxjs";
 export class TaskTemplateMultiSelectorComponent implements OnInit, ControlValueAccessor {
 
     templates: Wireframe[] = [];
+    deletedTemplates: Wireframe[] = [];
     selected: number[] = [];
     @Input() countersType: "incoming" | "all" | "none" = "incoming";
     @Input() inline = false;
@@ -27,6 +28,7 @@ export class TaskTemplateMultiSelectorComponent implements OnInit, ControlValueA
     uniTargetMode = false;
     uniTargetId = 0;
     disabled = false;
+    closed = true;
 
     constructor(readonly api: ApiService) {
     }
@@ -72,9 +74,10 @@ export class TaskTemplateMultiSelectorComponent implements OnInit, ControlValueA
 
     ngOnInit(): void {
         this.status = "loading";
-        this.api.getWireframes().subscribe({
+        this.api.getWireframes(true).subscribe({
             next: wireframes => {
-                this.templates = wireframes;
+                this.templates = wireframes.filter(w => !w.deleted);
+                this.deletedTemplates = wireframes.filter(w => w.deleted);
                 if (this.templates.length === 0) {
                     this.status = "empty";
                 } else {
@@ -134,5 +137,9 @@ export class TaskTemplateMultiSelectorComponent implements OnInit, ControlValueA
     selectAll() {
         this.selected = this.templates.map(i => i.wireframeId);
         this.onChange(this.selected);
+    }
+
+    toggleExpand() {
+        this.closed = !this.closed;
     }
 }

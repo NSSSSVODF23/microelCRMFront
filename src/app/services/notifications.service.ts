@@ -33,7 +33,7 @@ export class NotificationsService {
         [NotificationType.TASK_CREATED]: 'Новая задача',
         [NotificationType.TASK_EDITED]: 'Изменены детали задачи',
         [NotificationType.TASK_DELETED]: 'Задача удалена',
-        [NotificationType.TASK_CLOSED]: 'Задача завершена',
+        [NotificationType.TASK_CLOSED]: 'Задача закрыта',
         [NotificationType.TASK_REOPENED]: 'Задача возобновлена',
         [NotificationType.TASK_PROCESSED]: 'Задача назначена',
         [NotificationType.TASK_STAGE_CHANGED]: 'Стадия задачи изменена',

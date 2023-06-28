@@ -6,13 +6,7 @@
   padding: .8rem .8rem 1.1rem 1.1rem;
   font-size: 1.2rem;
   color: var(--tc-700);
-  cursor: pointer;
   transition: background-color .2s ease-out;
-
-  &:hover{
-    background-color: var(--bgc-100);
-    color: var(--tc-700);
-  }
 
   &-main-info{
     &-description{

@@ -1,15 +1,22 @@
 <div class="tag-item">
     <div [style.background-color]="tag?.color" class="color"></div>
     <span class="flexed column">
-        <span class="name">{{tag?.name}}</span>
+        <span class="name flexed hcenter gap3" [style.opacity]="tag?.deleted ? 0.5 : 1">
+            <i class="mdi-not_interested" *ngIf="tag?.deleted"></i>
+            <span>
+                {{tag?.name}}
+            </span>
+        </span>
         <span class="flexed hcenter gap2">
             <span class="caption-secondary">Создан:</span>
             <span class="caption-tiny">{{tag?.created | date:'dd MMM yyyy HH:mm'}}</span>
         </span>
     </span>
     <div class="stretched"></div>
-    <p-button styleClass="p-button-text p-button-warning" label="Редактировать" (onClick)="openEditTagDialog()" icon="mdi-edit"></p-button>
-    <p-button styleClass="p-button-text p-button-danger" label="Удалить" (onClick)="deleteTag($event)" icon="mdi-delete"></p-button>
+    <p-button styleClass="p-button-text p-button-warning" label="Редактировать" (onClick)="openEditTagDialog()"
+              [disabled]="tag?.deleted ?? false" icon="mdi-edit"></p-button>
+    <p-button styleClass="p-button-text p-button-danger" label="Удалить" (onClick)="deleteTag($event)"
+              [disabled]="tag?.deleted ?? false" icon="mdi-delete"></p-button>
 </div>
 
 <p-confirmPopup [key]="(this.tag?.taskTagId ?? '').toString()"></p-confirmPopup>

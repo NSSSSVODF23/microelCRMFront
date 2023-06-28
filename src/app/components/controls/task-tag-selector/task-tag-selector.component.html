@@ -1,0 +1,25 @@
+<div class="p-component p-inputtext wrapper" [ngClass]="{disabled: control.disabled}" *ngIf="!focused && !(control.value?.length === 0 && control.disabled)" (click)="focusing()">
+    <span class="placeholder-text" *ngIf="control.value?.length === 0">Выбрать теги...</span>
+    <span class="tags-view-item" *ngFor="let value of control.value|slice:0:2; trackBy: trackByTaskTag" [style.background-color]="value.color">{{value.name}}</span>
+    <span class="tags-view-item" *ngIf="control.value && control.value.length>2" (mouseenter)="extraPreviewVisible = true" (mouseleave)="extraPreviewVisible = false">
+        +{{control.value.length-2}}
+    </span>
+    <p-overlay contentStyleClass="overlay flexed wrapped p10 gap5" [(visible)]="extraPreviewVisible" showTransitionOptions="0ms" hideTransitionOptions="0ms" appendTo="body">
+        <span class="tags-view-item" *ngFor="let value of control.value|slice:2; trackBy: trackByTaskTag" [style.background-color]="value.color">{{value.name}}</span>
+    </p-overlay>
+</div>
+<div class="p-inputgroup" *ngIf="focused">
+    <p-autoComplete #inputEl [formControl]="control" [suggestions]="suggestions" styleClass="task-tag-selector w-full"
+                    (completeMethod)="search($event)" [multiple]="true" appendTo="body" [completeOnFocus]="true">
+        <ng-template let-value pTemplate="selectedItem">
+            <span class="tags-view-item" [style.background-color]="value.color">{{value.name}}</span>
+        </ng-template>
+        <ng-template let-value pTemplate="item">
+            <div [style.color]="value.color">
+                {{value.name}}
+            </div>
+        </ng-template>
+    </p-autoComplete>
+    <button pButton icon="mdi-save" (click)="accept()"></button>
+</div>
+

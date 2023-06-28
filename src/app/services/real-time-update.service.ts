@@ -10,7 +10,7 @@ import {
     SuperMessage,
     Task,
     TaskEvent,
-    TaskTag, WorkLog
+    TaskTag, Wireframe, WorkLog
 } from "../transport-interfaces";
 import {cyrb53} from "../util";
 import {OldTracker, SimpleMessage} from "../parsing-interfaces";
@@ -173,6 +173,20 @@ export class RealTimeUpdateService {
     workLogDeleted(workLogId?: number) {
         if(workLogId) return this.watch<WorkLog>('work-log', workLogId.toString(), 'delete')
         return this.watch<WorkLog>('worklog', 'delete')
+    }
+
+    wireframeCreated() {
+        return this.watch<Wireframe>('wireframe', 'create');
+    }
+
+    wireframeUpdated(wireframeId?: number) {
+        if(wireframeId) return this.watch<Wireframe>('wireframe', wireframeId.toString(), 'update')
+        return this.watch<Wireframe>('wireframe', 'update');
+    }
+
+    wireframeDeleted(wireframeId?: number) {
+        if(wireframeId) return this.watch<Wireframe>('wireframe', wireframeId.toString(), 'delete')
+        return this.watch<Wireframe>('wireframe', 'delete');
     }
 
     private watchUnicast<T>(...path: string[]): Observable<T> {

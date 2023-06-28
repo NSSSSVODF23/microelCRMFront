@@ -12,6 +12,7 @@ import {
     Task,
     TaskFieldsSnapshot,
     TaskStatus,
+    TaskTag,
     WorkLog
 } from "../../transport-interfaces";
 import {FileInputComponent} from "../../components/controls/file-input/file-input.component";
@@ -22,7 +23,7 @@ import {fade, fadeIn} from "../../animations";
 import {OverlayPanel} from "primeng/overlaypanel";
 import {FormControl, FormGroup} from "@angular/forms";
 import {CustomValidators} from "../../custom-validators";
-import {map} from 'rxjs';
+import {distinctUntilChanged, map} from 'rxjs';
 import {CustomNavigationService} from "../../services/custom-navigation.service";
 import {QuillEditorComponent} from "ngx-quill";
 import {
@@ -125,6 +126,7 @@ export class TaskPageComponent implements OnInit, OnDestroy {
     commentEditorMode: 'simple' | 'extended' = 'simple';
     taskEventsVisible = true;
     journalVisible: boolean = false;
+    installedTags = new FormControl<TaskTag[]>([]);
     // Объект подсчета кол-ва времени actualFrom задачи
     private actualFromDurationCounter = new DurationCounter();
     // Возвращает текущее время до actualFrom задачи
@@ -155,6 +157,17 @@ export class TaskPageComponent implements OnInit, OnDestroy {
         this._taskId = value;
         this.api.getTask(this._taskId).subscribe(task => {
             this.currentTask = task;
+            this.installedTags.setValue(task.tags ?? [], {emitEvent: false});
+            if(this.isTaskClose()){
+                this.installedTags.disable({emitEvent: false});
+            }else{
+                this.installedTags.enable({emitEvent: false});
+            }
+            this.subscriptions.addSubscription('edTaskTg', this.installedTags.valueChanges
+                .subscribe(value => {
+                    if (!value) return;
+                    this.api.setTaskTags(task.taskId, value).subscribe();
+                }))
             this.api.getActiveWorkLogByTaskId(task.taskId).subscribe(workLog => {
                 this.activeWorkLog = workLog
             })
@@ -162,6 +175,12 @@ export class TaskPageComponent implements OnInit, OnDestroy {
             this.stageMenuItems = this.getStageMenuItems();
             this.subscriptions.addSubscription('taskUpd', this.rt.taskUpdated(value).subscribe(update => {
                 this.currentTask = update;
+                this.installedTags.setValue(update.tags ?? [], {emitEvent: false});
+                if(this.isTaskClose()){
+                    this.installedTags.disable({emitEvent: false});
+                }else{
+                    this.installedTags.enable({emitEvent: false});
+                }
                 this.stageMenuItems = this.getStageMenuItems();
                 this.orderFields();
                 this.managementMenu = this.taskManagementMenu();
@@ -821,18 +840,36 @@ export class TaskPageComponent implements OnInit, OnDestroy {
                         ]
                     },
                     {
-                        label: "Время",
+                        label: "Время выполнения",
                         icon: 'mdi-schedule',
                         items: [
                             {
-                                label: "Запланировать",
+                                label: "Начало",
                                 icon: 'mdi-pending_actions',
-                                command: () => this.openChangeDateDialog("from")
+                                items: [
+                                    {
+                                        label: "Назначить",
+                                        command: () => this.openChangeDateDialog("from")
+                                    },
+                                    {
+                                        label: "Удалить",
+                                        command: () => this.confirmUnbindDate("from")
+                                    }
+                                ]
                             },
                             {
-                                label: "Установить срок",
+                                label: "Конец",
                                 icon: 'mdi-today',
-                                command: () => this.openChangeDateDialog("to")
+                                items: [
+                                    {
+                                        label: "Назначить",
+                                        command: () => this.openChangeDateDialog("to")
+                                    },
+                                    {
+                                        label: "Удалить",
+                                        command: () => this.confirmUnbindDate("to")
+                                    }
+                                ]
                             }
                         ],
                         disabled: this.isTaskClose()
@@ -920,5 +957,13 @@ export class TaskPageComponent implements OnInit, OnDestroy {
                 children: this.recursivelyCreatingChainOfTasks(childTask)
             }
         }) ?? []
+    }
+
+    private confirmUnbindDate(state: "from"|"to") {
+        if(state === "from") {
+            this.confirmation.confirm({header: "Подтверждение", message: "Вы уверены, что хотите удалить запланированную дату?", accept: () => this.api.clearActualFromDate(this.taskId).subscribe()});
+        } else {
+            this.confirmation.confirm({header: "Подтверждение", message: "Вы уверены, что хотите удалить срок выполнения?", accept: () => this.api.clearActualToDate(this.taskId).subscribe()});
+        }
     }
 }

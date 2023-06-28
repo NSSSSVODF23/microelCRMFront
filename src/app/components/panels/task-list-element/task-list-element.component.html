@@ -75,7 +75,7 @@
 <!--Дополнительная информация о статусе и тегах задачи-->
 <ng-template #statusTags>
     <div class="tags-view">
-        <div *ngFor="let tag of item?.tags|slice:0:4; trackBy: trackByTag" [style.background-color]="tag.color"
+        <div *ngFor="let tag of item?.tags|slice:0:2; trackBy: trackByTag" [style.background-color]="tag.color"
              class="tags-view-item small">{{tag.name}}</div>
         <div (mouseenter)="tagsPreviewShow($event)" (mouseleave)="tagsPreviewHide()" *ngIf="isMoreTwoTags"
              class="tags-view-item small">{{remainingNumberOfTags}}+

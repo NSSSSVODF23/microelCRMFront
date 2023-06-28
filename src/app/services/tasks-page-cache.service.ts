@@ -2,7 +2,7 @@ import {Injectable} from '@angular/core';
 import {FieldItem, LoadingState, Page, Task, Wireframe} from "../transport-interfaces";
 import {ApiService} from "./api.service";
 import {RealTimeUpdateService} from "./real-time-update.service";
-import {debounceTime, distinctUntilChanged, filter, map, Observer, switchMap} from "rxjs";
+import {debounceTime, distinctUntilChanged, filter, iif, map, Observer, switchMap} from "rxjs";
 import {FormControl, FormGroup} from "@angular/forms";
 
 
@@ -21,9 +21,6 @@ export class TasksPageCacheService {
     taskItems: Task[] = [];
     // Общее количество задач в базе данных
     totalTaskItems: number = 0;
-
-    // Массив существующих шаблонов задач
-    templatesOptions: Wireframe[] = [];
 
     // Форма поиска по основным параметрам задач
     filterForm: FormGroup = new FormGroup({
@@ -55,33 +52,29 @@ export class TasksPageCacheService {
         this.rt.taskUpdated().subscribe(this.updateTask.bind(this))
         this.rt.taskDeleted().subscribe(this.deleteTask.bind(this))
 
-
-        this.api.getWireframesNames().subscribe(templates => {
-            this.templatesOptions = templates;
-            this.filterForm.patchValue({template: templates.map(v => v.wireframeId)});
-        });
-
         // Загрузка полей для фильтрации задач, если выделен 1 шаблон
-        this.filterForm.valueChanges.pipe(
-            filter(value => value.template.length === 1),
-            distinctUntilChanged(
-                (prev, curr) =>
-                    curr.template[0] === prev.template[0]
-            ),
-            switchMap(values => this.api.getWireframe(values.template[0])),
-            map(wireframe => {
-                if (!wireframe) return [];
-                return wireframe.steps.reduce<FieldItem[]>((prev, step) => [...prev, ...step.fields], [])
-            })
-        ).subscribe(fieldItems => {
-            this.templateFilterForm = new FormGroup({
-                author: this.templateFilterForm.controls['author'],
-                dateOfCreation: this.templateFilterForm.controls['dateOfCreation'],
-                ...fieldItems.reduce((prev, fieldItem) => {
-                    return {...prev, [fieldItem.id]: new FormControl(null)};
-                }, {})
-            });
-            this.templateFilterFields = fieldItems;
+        this.filterForm.controls['template'].valueChanges.subscribe((selectedTemp:number[]) => {
+            console.log(selectedTemp.length)
+            if(selectedTemp.length === 1){
+                this.api.getWireframe(selectedTemp[0]).subscribe(wireframe => {
+                    const fieldItems = wireframe.allFields ?? [];
+
+                    this.templateFilterForm = new FormGroup({
+                        author: this.templateFilterForm.controls['author'],
+                        dateOfCreation: this.templateFilterForm.controls['dateOfCreation'],
+                        ...fieldItems.reduce((prev, fieldItem) => {
+                            return {...prev, [fieldItem.id]: new FormControl(null)};
+                        }, {})
+                    });
+                    this.templateFilterFields = fieldItems;
+                })
+            }else{
+                this.templateFilterForm = new FormGroup({
+                    author: this.templateFilterForm.controls['author'],
+                    dateOfCreation: this.templateFilterForm.controls['dateOfCreation'],
+                })
+                this.templateFilterFields = [];
+            }
         });
 
         this.filterForm.valueChanges.pipe(

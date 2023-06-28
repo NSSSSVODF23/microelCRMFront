@@ -61,12 +61,12 @@ export class TaskListElementComponent implements OnInit, OnChanges {
 
     get isMoreTwoTags() {
         if (!this.item?.tags) return false;
-        return this.item.tags.length > 4;
+        return this.item.tags.length > 2;
     };
 
     get remainingNumberOfTags() {
         if (!this.item?.tags) return 0;
-        return this.item.tags.length - 4;
+        return this.item.tags.length - 2;
     }
 
     get bodyClass() {

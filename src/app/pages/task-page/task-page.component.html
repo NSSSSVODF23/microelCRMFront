@@ -32,8 +32,7 @@
         </p-menubar>
         <div class="flexed gap5 column">
             <div class="flexed hcenter gap20 indent2">
-                <app-task-tags-view *ngIf="currentTask" [disabled]="isTaskClose()"
-                                    [task]="currentTask"></app-task-tags-view>
+                <app-task-tag-selector [formControl]="installedTags"></app-task-tag-selector>
             </div>
             <div class="flexed gap10 spbtw p20">
                 <div class="flexed gap7 column ">
@@ -159,7 +158,7 @@
                           class="indent2"></app-task-journal>
     </div>
 </div>
-<div [formGroup]="commentInputForm" class="sticky bottom1 flexed vcenter column gap10">
+<div [formGroup]="commentInputForm" *ngIf="!isTaskClose()" class="sticky bottom1 flexed vcenter column gap10">
     <div *ngIf="replyComment" [style.padding]="'1rem 1.5rem'"
          class="flexed hcenter gap15 panel responsive-wrapper caption-active">
         <i class="mdi-reply"></i>
@@ -222,42 +221,6 @@
         </ng-container>
     </ng-container>
 </div>
-<!--<div *ngIf="!isTaskClose()" class="full-width flexed vcenter p10 sticky bottom0" >-->
-<!--    <div class="responsive-wrapper comment-input-wrapper">-->
-<!--        <div class="flexed column">-->
-<!--            <div class="edit-reply-preview">-->
-<!--                <div *ngIf="replyComment" class="reply-comment-preview">-->
-<!--                    <span class="material-icons-round preview-icon">reply</span>-->
-<!--                    <span class="whose-comment">{{replyComment.creator?.fullName}}</span>-->
-<!--                    <quill-view-html [content]="replyComment.message" class="comment-text"></quill-view-html>-->
-<!--                    <app-icon-button (onClick)="replyComment=undefined" class="cancel-button" icon="close"-->
-<!--                                     model="secondary"></app-icon-button>-->
-<!--                </div>-->
-<!--                <div *ngIf="editComment" class="reply-comment-preview">-->
-<!--                    <span class="material-icons-round preview-icon">edit</span>-->
-<!--                    <quill-view-html [content]="editComment.message" class="comment-text"></quill-view-html>-->
-<!--                    <app-icon-button (onClick)="editComment=undefined; commentInputControl.reset()"-->
-<!--                                     class="cancel-button" icon="close" model="secondary"></app-icon-button>-->
-<!--                </div>-->
-<!--            </div>-->
-<!--            <quill-editor #commentEditor (keydown)="sendCommentByEnter($event)"-->
-<!--                          (onContentChanged)="empInsertPanel.setQuillEvent($event)"-->
-<!--                          [formControl]="commentInputControl"-->
-<!--                          [modules]="quillModules"-->
-<!--                          [styles]="{maxHeight:'30vh', minHeight:'10rem', overflow:'auto'}" class="input"-->
-<!--                          placeholder="Комментарий..."></quill-editor>-->
-<!--        </div>-->
-<!--        <div class="flexed hcenter gap10 vend">-->
-<!--            <app-file-input #filesInput [(files)]="attachedFiles" [disabled]="commentSending"-->
-<!--                            class="attach-button"></app-file-input>-->
-<!--            <p-button (onClick)="sendComment()"-->
-<!--                      [disabled]="!commentInputControl.valid && attachedFiles.length === 0"-->
-<!--                      [loading]="commentSending" class="send-button" icon="mdi-send" iconPos="right"-->
-<!--                      label="Отправить"></p-button>-->
-<!--        </div>-->
-<!--    </div>-->
-<!--</div>-->
-
 
 <app-attachments-history-dialog [(show)]="showFilesHistory" [taskId]="taskId"></app-attachments-history-dialog>
 

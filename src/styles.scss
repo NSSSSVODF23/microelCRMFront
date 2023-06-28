@@ -86,7 +86,7 @@ html:not(.whited), body:not(.whited) {
   font-size: 13px !important;
   font-family: var(--font-family) !important;
   color: var(--tc-900) !important;
-  line-height: normal !important;
+  //line-height: 1 !important;
   //overflow-x: hidden;
 }
 
@@ -94,6 +94,22 @@ html:not(.whited), body:not(.whited) {
   display: flex;
   justify-content: center;
   width: 100%;
+}
+
+.p-button{
+  &>.p-button-label{
+    transform: translateY(3%);
+  }
+  &>.p-button-icon{
+    line-height: 0 !important;
+    font-size: 1.3em;
+    &.p-button-icon-left{
+      margin-right: 0.2rem;
+    }
+    &.p-button-icon-right{
+      margin-left: 0.2rem;
+    }
+  }
 }
 
 .p-button.b-stretched {
@@ -150,7 +166,7 @@ html:not(.whited), body:not(.whited) {
 }
 
 * {
-  line-height: normal !important;
+  line-height: 1 !important;
 }
 
 .like-link {
@@ -488,6 +504,7 @@ html:not(.whited), body:not(.whited) {
   0px 0px 14px rgba(0, 0, 0, 0.07);
   border-radius: .5rem;
   overflow: hidden;
+  transform: translateY(.3rem);
 
   &-list {
 
@@ -882,7 +899,7 @@ markdown > p:last-child {
 * {
   scrollbar-width: thin;
   scrollbar-color: #7c7c7c #ffffff;
-  //line-height: normal !important;
+  line-height: normal !important;
 }
 
 *::-webkit-scrollbar {
@@ -1103,4 +1120,16 @@ markdown > p:last-child {
   border: none;
   outline: none;
   background-color: transparent;
+}
+
+.p-autocomplete.task-tag-selector>.p-autocomplete-multiple-container {
+    &>.p-autocomplete-token{
+      background-color: transparent;
+      border: none;
+      padding: .375rem 0;
+      margin-right: .3rem;
+      &>.p-autocomplete-token-icon{
+        margin-left: .2rem;
+      }
+    }
 }

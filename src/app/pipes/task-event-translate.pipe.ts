@@ -38,11 +38,11 @@ export class TaskEventTranslatePipe implements PipeTransform {
             case TaskEventType.CHANGE_ACTUAL_FROM:
                 return "Задача запланирована: ";
             case TaskEventType.CHANGE_ACTUAL_TO:
-                return "Установлен срок исполнения: ";
+                return "Установлен срок выполнения: ";
             case TaskEventType.CLEAR_ACTUAL_FROM_TASK:
-                return "Удалена запланированная дата начала задачи";
+                return "Удалена запланированная дата";
             case TaskEventType.CLEAR_ACTUAL_TO_TASK:
-                return "Удалена дата истечения актуальности задачи";
+                return "Удален срок выполнения";
             case TaskEventType.CLOSE_TASK:
                 return "Задача закрыта";
             case TaskEventType.REOPEN_TASK:

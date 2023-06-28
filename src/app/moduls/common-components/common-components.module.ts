@@ -150,6 +150,7 @@ import {
     ObserverSelectorInputComponent
 } from "../../components/controls/observer-selector-input/observer-selector-input.component";
 import {AutoCompleteModule} from "primeng/autocomplete";
+import {TaskTagSelectorComponent} from "../../components/controls/task-tag-selector/task-tag-selector.component";
 
 
 @NgModule({
@@ -228,7 +229,8 @@ import {AutoCompleteModule} from "primeng/autocomplete";
         TaskTemplateMultiSelectorComponent,
         EmployeeSelectorComponent,
         DataRangeInputComponent,
-        ObserverSelectorInputComponent
+        ObserverSelectorInputComponent,
+        TaskTagSelectorComponent
     ],
     exports: [
         AccountPanelComponent,
@@ -305,7 +307,8 @@ import {AutoCompleteModule} from "primeng/autocomplete";
         TaskTemplateMultiSelectorComponent,
         EmployeeSelectorComponent,
         DataRangeInputComponent,
-        ObserverSelectorInputComponent
+        ObserverSelectorInputComponent,
+        TaskTagSelectorComponent
     ],
     imports: [
         CommonPipesModule,

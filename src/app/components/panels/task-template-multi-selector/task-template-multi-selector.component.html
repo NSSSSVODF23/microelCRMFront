@@ -4,26 +4,15 @@
         <span class="stretched">
             Типы задач
         </span>
-        <span class="select-all-button" pRipple *ngIf="selected.length !== templates.length" [ngClass]="{disabled}" (click)="selectAll()" pTooltip="Выбрать все">
+        <span class="select-all-button" pRipple *ngIf="selected.length < templates.length" [ngClass]="{disabled}" (click)="selectAll()" pTooltip="Выбрать все">
             <i class="mdi-select_all"></i>
         </span>
     </div>
     <ng-container [ngSwitch]="status">
         <ng-container *ngSwitchCase="'ready'">
-            <div (click)="uniselect(template.wireframeId)"
-                 *ngFor="let template of templates; trackBy: templateTrack"
-                 [ngClass]="{'selected': isSelect(template.wireframeId), 'un-target': isUntarget(template.wireframeId), disabled}"
-                 class="template-selector-item">
-                <i (click)="$event.stopPropagation(); toggle(template.wireframeId)"
-                   [ngClass]="{'mdi-radio_button_unchecked': !isSelect(template.wireframeId), 'mdi-check_circle_outline': isSelect(template.wireframeId), 'mdi-close': isSelect(template.wireframeId) && isUntarget(template.wireframeId)}"></i>
-                <span (mouseenter)="uniTargetMode=true; uniTargetId=template.wireframeId"
-                      (mouseleave)="uniTargetMode=false" class="flexed hcenter">
-                    <span class="one-line">
-                        {{template.name}}
-                    </span>
-                    <app-colored-tag *ngIf="getCount(template.wireframeId) > 0" [caption]="getCount(template.wireframeId).toString()" color="var(--mc-500)"></app-colored-tag>
-                </span>
-            </div>
+            <ng-container *ngFor="let template of templates; trackBy: templateTrack">
+                <ng-container *ngTemplateOutlet="templateItem; context:{$implicit:template}"></ng-container>
+            </ng-container>
         </ng-container>
         <ng-container *ngSwitchCase="'loading'">
             <div class="template-selector-message">
@@ -51,4 +40,33 @@
             </div>
         </ng-container>
     </ng-container>
+    <div class="flexed column" *ngIf="deletedTemplates.length">
+        <div class="expand-button" [ngClass]="{closed}" (click)="toggleExpand()">
+            <span class="stretched">
+                Не активные
+            </span>
+            <i class="mdi-expand_more"></i>
+        </div>
+        <div #expandListEl class="expand-list" [style.height]="closed ? '0px' : expandListEl.scrollHeight+'px'">
+            <ng-container *ngFor="let template of deletedTemplates; trackBy: templateTrack">
+                <ng-container *ngTemplateOutlet="templateItem; context:{$implicit:template}"></ng-container>
+            </ng-container>
+        </div>
+    </div>
 </div>
+
+<ng-template #templateItem let-template>
+    <div (click)="uniselect(template.wireframeId)"
+         [ngClass]="{'selected': isSelect(template.wireframeId), 'un-target': isUntarget(template.wireframeId), disabled}"
+         class="template-selector-item">
+        <i (click)="$event.stopPropagation(); toggle(template.wireframeId)"
+           [ngClass]="{'mdi-radio_button_unchecked': !isSelect(template.wireframeId), 'mdi-check_circle_outline': isSelect(template.wireframeId), 'mdi-close': isSelect(template.wireframeId) && isUntarget(template.wireframeId)}"></i>
+        <span (mouseenter)="uniTargetMode=true; uniTargetId=template.wireframeId"
+              (mouseleave)="uniTargetMode=false" class="flexed hcenter">
+                    <span class="one-line">
+                        {{template.name}}
+                    </span>
+                    <app-colored-tag *ngIf="getCount(template.wireframeId) > 0" [caption]="getCount(template.wireframeId).toString()" color="var(--mc-500)"></app-colored-tag>
+                </span>
+    </div>
+</ng-template>

@@ -52,8 +52,11 @@ export class ApiService {
         return this.sendGet<FieldItem[]>('api/private/wireframe/' + id + '/fields');
     }
 
-    getWireframes(): Observable<Wireframe[]> {
-        return this.sendGet('api/private/wireframes');
+    getWireframes(includingRemoved?: boolean): Observable<Wireframe[]> {
+        if(includingRemoved === undefined || includingRemoved === null){
+            return this.sendGet('api/private/wireframes');
+        }
+        return this.sendGet('api/private/wireframes', {includingRemoved});
     }
 
     getWireframesNames(): Observable<Wireframe[]> {
@@ -338,6 +341,10 @@ export class ApiService {
         const query: any = {};
         if (includingRemote !== undefined) query.includingRemote = includingRemote;
         return this.sendGet<TaskTag[]>("api/private/task-tags", query);
+    }
+
+    getTaskTagsBySearch(query: string) {
+        return this.sendGet<TaskTag[]>(`api/private/task-tags/${query}`);
     }
 
     createTaskTag(taskTag: TaskTag) {

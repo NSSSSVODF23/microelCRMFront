@@ -1,9 +1,10 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
 import {ApiService} from "../../services/api.service";
-import {TaskTag, Wireframe} from "../../transport-interfaces";
+import {LoadingState, TaskTag, Wireframe} from "../../transport-interfaces";
 import {RealTimeUpdateService} from "../../services/real-time-update.service";
 import {SubscriptionsHolder} from "../../util";
 import {ConfirmationService} from "primeng/api";
+import {FormControl} from "@angular/forms";
 
 @Component({
     templateUrl: './templates-page.component.html',
@@ -17,18 +18,54 @@ export class TemplatesPageComponent implements OnInit, OnDestroy {
     tagColorToCreate: string = '';
     isTagCreating = false;
     subscription: SubscriptionsHolder = new SubscriptionsHolder();
+    deletedTemplatesSwitcher = new FormControl(false);
+    deletedTagsSwitcher = new FormControl(false);
+
+    templateLoadingState: LoadingState = LoadingState.LOADING;
+    tagLoadingState: LoadingState = LoadingState.LOADING;
+    templateLoadingHandler = {
+        next: (response: Wireframe[]) => {
+            this.templateLoadingState = response.length > 0 ? LoadingState.READY : LoadingState.EMPTY;
+            this.templateItems = response
+        },
+        error: () => {
+            this.templateLoadingState = LoadingState.ERROR
+        }
+    }
+    tagLoadingHandler = {
+        next: (response: TaskTag[]) => {
+            this.tagLoadingState = response.length > 0 ? LoadingState.READY : LoadingState.EMPTY;
+            this.availableTags = response
+        },
+        error: () => {
+            this.tagLoadingState = LoadingState.ERROR
+        }
+    }
 
     constructor(readonly api: ApiService, readonly rt: RealTimeUpdateService, readonly confirmation: ConfirmationService) {
     }
 
     ngOnInit(): void {
-        this.api.getWireframes().subscribe((response: any) => this.templateItems = response);
-        this.api.getTaskTags().subscribe((response) => {
-            this.availableTags = response;
-            this.subscription.addSubscription('crTag', this.rt.taskTagCreated().subscribe(this.tagCreated.bind(this)));
-            this.subscription.addSubscription('updTag', this.rt.taskTagUpdated().subscribe(this.tagUpdated.bind(this)));
-            this.subscription.addSubscription('delTag', this.rt.taskTagDeleted().subscribe(this.tagDeleted.bind(this)));
-        });
+
+        this.subscription.addSubscription('crTag', this.rt.taskTagCreated().subscribe(this.tagCreated.bind(this)));
+        this.subscription.addSubscription('updTag', this.rt.taskTagUpdated().subscribe(this.tagUpdated.bind(this)));
+        this.subscription.addSubscription('delTag', this.rt.taskTagDeleted().subscribe(this.tagDeleted.bind(this)));
+
+        this.subscription.addSubscription("crTemp", this.rt.wireframeCreated().subscribe(this.templateCreated.bind(this)));
+        this.subscription.addSubscription("updTemp", this.rt.wireframeUpdated().subscribe(this.templateUpdated.bind(this)));
+        this.subscription.addSubscription("delTemp", this.rt.wireframeDeleted().subscribe(this.templateDeleted.bind(this)));
+
+        this.api.getWireframes(false).subscribe(this.templateLoadingHandler);
+        this.subscription.addSubscription('swDelTemp', this.deletedTemplatesSwitcher.valueChanges.subscribe(value => {
+            this.templateLoadingState = LoadingState.LOADING;
+            this.api.getWireframes(value ?? false).subscribe(this.templateLoadingHandler);
+        }));
+
+        this.api.getTaskTags().subscribe(this.tagLoadingHandler);
+        this.subscription.addSubscription('swDelTag', this.deletedTagsSwitcher.valueChanges.subscribe(value => {
+            this.tagLoadingState = LoadingState.LOADING;
+            this.api.getTaskTags(value??false).subscribe(this.tagLoadingHandler);
+        }));
     }
 
     ngOnDestroy(): void {
@@ -48,7 +85,35 @@ export class TemplatesPageComponent implements OnInit, OnDestroy {
 
     tagDeleted(tag: TaskTag) {
         const index = this.availableTags.findIndex(item => item.taskTagId === tag.taskTagId);
-        if (index >= 0) this.availableTags.splice(index, 1);
+        if (index >= 0) {
+            if(tag.deleted && this.deletedTagsSwitcher.value) {
+                this.availableTags[index].deleted = true;
+                return;
+            }
+            this.availableTags.splice(index, 1)
+        }
+    }
+
+    templateCreated(wireframe: Wireframe) {
+        if (!this.templateItems.some(item => item.wireframeId === wireframe.wireframeId)) {
+            this.templateItems.unshift(wireframe);
+        }
+    }
+
+    templateUpdated(wireframe: Wireframe) {
+        const index = this.templateItems.findIndex(item => item.wireframeId === wireframe.wireframeId);
+        if (index >= 0) this.templateItems[index] = wireframe;
+    }
+
+    templateDeleted(wireframe: Wireframe) {
+        const index = this.templateItems.findIndex(item => item.wireframeId === wireframe.wireframeId);
+        if (index >= 0) {
+            if(wireframe.deleted && this.deletedTemplatesSwitcher.value) {
+                this.templateItems[index].deleted = true;
+                return;
+            }
+            this.templateItems.splice(index, 1);
+        }
     }
 
     createTag() {
@@ -84,6 +149,14 @@ export class TemplatesPageComponent implements OnInit, OnDestroy {
             message: "Удалить шаблон?",
             accept: () => this.api.deleteWireframe(wireframeId).subscribe()
         })
+    }
+
+    trackByTemplate(index: number, item: Wireframe) {
+        return item.wireframeId + item.name + item.description;
+    };
+
+    trackByTag(index: number, item: TaskTag) {
+        return item.taskTagId + item.name + item.color;
     }
 
     // Private methods to convert hsl color value to hex color value

@@ -10,37 +10,89 @@
 <ng-template #tabview>
     <p-tabView>
         <p-tabPanel header="Шаблоны" leftIcon="mdi-list_alt">
-            <ng-container *ngFor="let item of templateItems">
-                <ng-container *ngTemplateOutlet="templateItem; context:{$implicit:item}"></ng-container>
-            </ng-container>
-            <div [routerLink]="['constructor']" class="template-create-button">
-                <i class="mdi-add"></i> Создать
+            <div class="flexed gap10" [style.padding-bottom]="'1rem'">
+                <p-button [routerLink]="['constructor']" styleClass="p-button-outlined p-button-success" icon="mdi-add" label="Создать"></p-button>
+                <p-toggleButton onLabel="Скрыть удаленные" offLabel="Показать удаленные" [formControl]="deletedTemplatesSwitcher"></p-toggleButton>
             </div>
+            <ng-container [ngSwitch]="templateLoadingState">
+                <ng-container *ngSwitchCase="'LOADING'">
+                    <div class="flexed hcenter vcenter p20">
+                        <p-progressSpinner class="primary-spinner" strokeWidth="1"></p-progressSpinner>
+                    </div>
+                </ng-container>
+                <ng-container *ngSwitchCase="'READY'">
+                    <ng-container *ngFor="let item of templateItems; trackBy: trackByTemplate">
+                        <ng-container *ngTemplateOutlet="templateItem; context:{$implicit:item}"></ng-container>
+                    </ng-container>
+                </ng-container>
+                <ng-container *ngSwitchCase="'ERROR'">
+                    <div class="flexed hcenter vcenter p20 caption-common-error">
+                        <i class="mdi-alert"></i>
+                        <span>Ошибка загрузки шаблонов</span>
+                    </div>
+                </ng-container>
+                <ng-container *ngSwitchCase="'EMPTY'">
+                    <div class="flexed hcenter vcenter p20 caption-common-message">
+                        <i class="mdi-alert"></i>
+                        <span>Нет шаблонов</span>
+                    </div>
+                </ng-container>
+            </ng-container>
+
         </p-tabPanel>
         <p-tabPanel header="Теги" leftIcon="mdi-local_offer">
-            <div class="task-tags-list">
-                <app-task-tag-list-item *ngFor="let tag of availableTags" [tag]="tag"></app-task-tag-list-item>
-                <div class="append-tag-button" (click)="openCreateTagDialog()"><i class="mdi-add"></i> Создать</div>
+            <div class="flexed gap10" [style.padding-bottom]="'1rem'">
+                <p-button (click)="openCreateTagDialog()" styleClass="p-button-outlined p-button-success" icon="mdi-add" label="Создать"></p-button>
+                <p-toggleButton onLabel="Скрыть удаленные" offLabel="Показать удаленные" [formControl]="deletedTagsSwitcher"></p-toggleButton>
             </div>
+            <ng-container [ngSwitch]="tagLoadingState">
+                <ng-container *ngSwitchCase="'LOADING'">
+                    <div class="flexed hcenter vcenter p20">
+                        <p-progressSpinner class="primary-spinner" strokeWidth="1"></p-progressSpinner>
+                    </div>
+                </ng-container>
+                <ng-container *ngSwitchCase="'READY'">
+                    <app-task-tag-list-item *ngFor="let tag of availableTags; trackBy: trackByTag" [tag]="tag"></app-task-tag-list-item>
+                </ng-container>
+                <ng-container *ngSwitchCase="'ERROR'">
+                    <div class="flexed hcenter vcenter p20 caption-common-error">
+                        <i class="mdi-alert"></i>
+                        <span>Ошибка загрузки тегов</span>
+                    </div>
+                </ng-container>
+                <ng-container *ngSwitchCase="'EMPTY'">
+                    <div class="flexed hcenter vcenter p20 caption-common-message">
+                        <i class="mdi-alert"></i>
+                        <span>Нет тегов</span>
+                    </div>
+                </ng-container>
+            </ng-container>
         </p-tabPanel>
     </p-tabView>
 </ng-template>
 
 <ng-template #templateItem let-item>
-    <div [queryParams]="{editingId:item.wireframeId}"
-         [routerLink]="['constructor']" class="template-item flexed">
-        <div class="template-item-main-info flexed column gap2 stretched">
-            <span class="template-item-main-info-name">
-                {{item.name}}
+    <div class="template-item flexed hcenter gap5">
+        <div class="flexed column gap5 stretched">
+            <span class="flexed hcenter caption-main stretched hcenter gap3" [style.opacity]="item.deleted ? 0.5 : 1">
+                <i class="mdi-not_interested" *ngIf="item.deleted"></i>
+                <span>
+                    {{item.name}}
+                </span>
+                <span class="caption-tiny indent1">
+                    Создана: {{item.created|date:"dd MMMM yyyy HH:mm"}}
+                </span>
             </span>
-            <span class="template-item-main-info-description">
+            <span *ngIf="item.description" class="caption-secondary">
                 {{item.description}}
             </span>
         </div>
-        <div class="template-item-created-date" *ngIf="item.wireframeId">
-            {{item.created | date:"dd-MM-yy HH:mm"}}
-            <p-button (onClick)="confirmDeleteWireframe($event, item.wireframeId)" styleClass="p-button-danger p-button-text" icon="mdi-delete" label="Удалить"></p-button>
-        </div>
+        <p-button label="Редактировать" [routerLink]="['constructor']" [disabled]="item.deleted" icon="mdi-edit"
+                  [queryParams]="{editingId:item.wireframeId}" styleClass="p-button-warning p-button-text">
+        </p-button>
+        <p-button (onClick)="confirmDeleteWireframe($event, item.wireframeId)"
+                  styleClass="p-button-danger p-button-text" icon="mdi-delete" label="Удалить"
+                  [disabled]="item.deleted"></p-button>
     </div>
 </ng-template>
 

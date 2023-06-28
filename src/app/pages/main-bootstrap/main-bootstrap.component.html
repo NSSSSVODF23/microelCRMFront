@@ -1,6 +1,6 @@
 <div class="top-panel">
     <div class="responsive-wrapper top-panel-content">
-        <img [style.height]="'3rem'" src="assets/logo-dark.svg" alt="">
+        <img [style.height]="'3rem'" src="assets/logo-dark.svg" alt="" class="cursor-pointer" [routerLink]="['/']">
         <app-button *ngIf="!isTaskCreationPage" label="Создать задачу" icon="add_task" model="p-button-success" (onClick)="openCreateTaskPage()"></app-button>
         <div class="stretched"></div>
         <app-active-work-logs-panel></app-active-work-logs-panel>
