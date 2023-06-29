@@ -24,7 +24,7 @@ import {
     NgStyle,
     NgSwitch,
     NgSwitchCase,
-    NgTemplateOutlet, SlicePipe
+    NgTemplateOutlet, SlicePipe, TitleCasePipe
 } from "@angular/common";
 import {TabViewModule} from "primeng/tabview";
 import {DialogModule} from "primeng/dialog";
@@ -147,7 +147,8 @@ import {AutoFocusModule} from "primeng/autofocus";
         KeyValuePipe,
         SlicePipe,
         SelectButtonModule,
-        AutoFocusModule
+        AutoFocusModule,
+        TitleCasePipe
     ],
     providers: [MessageService, {provide: LOCALE_ID, useValue: 'ru'}, ConfirmationService]
 })

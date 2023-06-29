@@ -36,7 +36,7 @@
   }
 
   &.processing {
-    border: 1px solid var(--warm-500);
+    border: 1px solid var(--warm-400);
   }
 
   &-header {
@@ -52,11 +52,11 @@
       font-weight: 600;
 
       &.active {
-        color: var(--mc-500);
+        color: var(--mc-400);
       }
 
       &.processing {
-        color: var(--warm-700);
+        color: var(--warm-400);
       }
 
       &.close {

@@ -481,4 +481,10 @@ export class Storage {
         if (item === null) return null;
         return JSON.parse(item) as T;
     }
+
+    static loadOrDefault<T>(key: string, defaultValue: T): T {
+        const item = localStorage.getItem(key);
+        if (item === null) return defaultValue;
+        return JSON.parse(item) as T;
+    }
 }

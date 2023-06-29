@@ -81,6 +81,6 @@
         <div class="stretched"></div>
         <app-button (onClick)="downloadLink.click()" icon="download" label="Скачать"
                     model="p-button-success"></app-button>
-        <a #downloadLink [download]="media?.name" [style.display]="'none'" href="/api/private/attachment/"></a>
+        <a #downloadLink [download]="media?.name" [style.display]="'none'" [href]="'/api/private/attachment/'+media?.name"></a>
     </div>
 </ng-template>

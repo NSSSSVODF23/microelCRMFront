@@ -1,9 +1,10 @@
 import {Injectable} from '@angular/core';
-import {FieldItem, LoadingState, Page, Task, Wireframe} from "../transport-interfaces";
+import {FieldItem, LoadingState, Page, Task} from "../transport-interfaces";
 import {ApiService} from "./api.service";
 import {RealTimeUpdateService} from "./real-time-update.service";
-import {debounceTime, distinctUntilChanged, filter, iif, map, Observer, switchMap} from "rxjs";
+import {debounceTime, distinctUntilChanged, Observer} from "rxjs";
 import {FormControl, FormGroup} from "@angular/forms";
+import {Storage} from "../util";
 
 
 @Injectable({
@@ -25,7 +26,7 @@ export class TasksPageCacheService {
     // Форма поиска по основным параметрам задач
     filterForm: FormGroup = new FormGroup({
         status: new FormControl(['ACTIVE', 'PROCESSING']),
-        template: new FormControl([]),
+        template: new FormControl(Storage.loadOrDefault('listPageTempFilter', [])),
         searchPhrase: new FormControl(null),
         tags: new FormControl([]),
     })
@@ -34,12 +35,9 @@ export class TasksPageCacheService {
     isPageChanging = false;
 
     // Форма поиска по полям из шаблона задачи, устанавливается из компонента страницы
-    templateFilterForm: FormGroup = new FormGroup<any>({
-        author: new FormControl(null),
-        dateOfCreation: new FormControl(null),
-    });
+    templateFilterForm: FormGroup = new FormGroup<any>(this.templateFilterFormInit);
     // Массив доступных фильтров полученный из шаблона
-    templateFilterFields: FieldItem[] = [];
+    templateFilterFields: FieldItem[] = Storage.loadOrDefault('templateFilterFields', []);
     // Строка для контекстного поиска
     contextSearchString = '';
     // Состояние загрузки задач
@@ -53,27 +51,32 @@ export class TasksPageCacheService {
         this.rt.taskDeleted().subscribe(this.deleteTask.bind(this))
 
         // Загрузка полей для фильтрации задач, если выделен 1 шаблон
-        this.filterForm.controls['template'].valueChanges.subscribe((selectedTemp:number[]) => {
-            console.log(selectedTemp.length)
-            if(selectedTemp.length === 1){
+        this.filterForm.controls['template'].valueChanges.subscribe((selectedTemp: number[]) => {
+            Storage.save('listPageTempFilter', selectedTemp);
+            if (selectedTemp.length === 1) {
                 this.api.getWireframe(selectedTemp[0]).subscribe(wireframe => {
                     const fieldItems = wireframe.allFields ?? [];
-
-                    this.templateFilterForm = new FormGroup({
+                    const controls = {
                         author: this.templateFilterForm.controls['author'],
                         dateOfCreation: this.templateFilterForm.controls['dateOfCreation'],
                         ...fieldItems.reduce((prev, fieldItem) => {
                             return {...prev, [fieldItem.id]: new FormControl(null)};
                         }, {})
-                    });
+                    };
+                    this.templateFilterForm = new FormGroup(controls);
                     this.templateFilterFields = fieldItems;
+                    Storage.save('templateFilterFormControls', ['author', 'dateOfCreation', ...fieldItems.map(fieldItem => fieldItem.id)]);
+                    Storage.save('templateFilterFields', this.templateFilterFields);
                 })
-            }else{
-                this.templateFilterForm = new FormGroup({
+            } else {
+                const controls = {
                     author: this.templateFilterForm.controls['author'],
                     dateOfCreation: this.templateFilterForm.controls['dateOfCreation'],
-                })
+                }
+                this.templateFilterForm = new FormGroup(controls);
                 this.templateFilterFields = [];
+                Storage.save('templateFilterFormControls', ['author', 'dateOfCreation']);
+                Storage.save('templateFilterFields', this.templateFilterFields);
             }
         });
 
@@ -81,6 +84,13 @@ export class TasksPageCacheService {
             debounceTime(500),
             distinctUntilChanged(),
         ).subscribe(this.filtersApply.bind(this))
+    }
+
+    get templateFilterFormInit() {
+        return Storage.loadOrDefault('templateFilterFormControls', ['author', 'dateOfCreation']).reduce((prev, curr) => {
+            prev[curr] = new FormControl(null);
+            return prev
+        }, {} as any);
     }
 
     // Ссылка на абстрактную функцию установки текущей страницы в Paginator

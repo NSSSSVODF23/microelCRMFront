@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, OnDestroy, OnInit, Output} from '@angular/core';
+import {Component, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, SimpleChanges} from '@angular/core';
 import {ApiService} from "../../../services/api.service";
 import {Attachment, Comment, Employee, TaskEvent, TaskEventType} from "../../../transport-interfaces";
 import {PersonalityService} from "../../../services/personality.service";
@@ -15,7 +15,7 @@ import {fade} from "../../../animations";
         fade
     ]
 })
-export class TaskJournalComponent implements OnInit, OnDestroy {
+export class TaskJournalComponent implements OnInit, OnDestroy{
 
     rtSubscriptions: SubscriptionsHolder = new SubscriptionsHolder();
 
@@ -28,6 +28,12 @@ export class TaskJournalComponent implements OnInit, OnDestroy {
     @Output() onFirstLoad: EventEmitter<boolean> = new EventEmitter();
 
     entries: (Comment | TaskEvent)[] = [];
+    get displayedEntries(): (Comment | TaskEvent)[]{
+        if(this.showEvents) {
+            return this.entries;
+        }
+        return this.entries.filter(entry => "commentId" in entry);
+    };
     skeletons: any[] = Array.from({length: 10})
     totalEntries = 0;
     loading = false;
@@ -74,6 +80,7 @@ export class TaskJournalComponent implements OnInit, OnDestroy {
         )) {
             this.entries.unshift(comment);
             this.totalEntries++;
+            this.onFirstLoad.emit(true);
         }
     }
 
@@ -99,6 +106,7 @@ export class TaskJournalComponent implements OnInit, OnDestroy {
             "taskEventId" in entry ? entry.taskEventId === event.taskEventId : false
         )) {
             this.entries.unshift(event);
+            this.onFirstLoad.emit(true);
         }
     }
 

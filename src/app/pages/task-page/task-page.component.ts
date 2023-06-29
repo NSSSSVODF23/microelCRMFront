@@ -40,7 +40,8 @@ import {WorkLogsDialogComponent} from "../../components/panels/work-logs-dialog/
 export class TaskPageComponent implements OnInit, OnDestroy {
 
     currentTask?: Task;
-    // commentInputValue: string = "";
+    isLoading = true;
+
     commentSending = false;
 
     quillModules = quillDefaultModules;
@@ -157,6 +158,7 @@ export class TaskPageComponent implements OnInit, OnDestroy {
         this._taskId = value;
         this.api.getTask(this._taskId).subscribe(task => {
             this.currentTask = task;
+            this.isLoading = false;
             this.installedTags.setValue(task.tags ?? [], {emitEvent: false});
             if(this.isTaskClose()){
                 this.installedTags.disable({emitEvent: false});

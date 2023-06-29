@@ -1,6 +1,6 @@
 :root {
   --bgc-000: #FFFFFF;
-  --bgc-001: #fafafc;
+  --bgc-001: #fdfdff;
   --bgc-100: #F6F8FA;
   --bgc-200: #edf1f6;
   --bgc-300: #dfe5ec;
@@ -30,15 +30,15 @@
   --mc-800: #0E61B3;
   --mc-900: #0C559E;
 
-  --warm-100: #ffede8;
-  --warm-200: #f6ded7;
-  --warm-300: #efc7ba;
-  --warm-400: #f6b9a8;
-  --warm-500: #f8ae9a;
-  --warm-600: #f88d6f;
-  --warm-700: #f88160;
-  --warm-800: #f66b45;
-  --warm-900: #fc5928;
+  --warm-100: #FFECDE;
+  --warm-200: #FFC499;
+  --warm-300: #FFA15E;
+  --warm-400: #FF842B;
+  --warm-500: #FF6B00;
+  --warm-600: #D45900;
+  --warm-700: #B04A00;
+  --warm-800: #923D00;
+  --warm-900: #793300;
 
   --danger-100: #fef2f2;
   --danger-200: #fcd9d9;
@@ -82,10 +82,10 @@
 html:not(.whited), body:not(.whited) {
   padding: 0 !important;
   margin: 0 !important;
-  background-color: var(--bgc-100) !important;
+  background-color: var(--bgc-001) !important;
   font-size: 13px !important;
   font-family: var(--font-family) !important;
-  color: var(--tc-900) !important;
+  color: var(--tc-700) !important;
   //line-height: 1 !important;
   //overflow-x: hidden;
 }
@@ -96,17 +96,20 @@ html:not(.whited), body:not(.whited) {
   width: 100%;
 }
 
-.p-button{
-  &>.p-button-label{
+.p-button {
+  & > .p-button-label {
     transform: translateY(3%);
   }
-  &>.p-button-icon{
+
+  & > .p-button-icon {
     line-height: 0 !important;
     font-size: 1.3em;
-    &.p-button-icon-left{
+
+    &.p-button-icon-left {
       margin-right: 0.2rem;
     }
-    &.p-button-icon-right{
+
+    &.p-button-icon-right {
       margin-left: 0.2rem;
     }
   }
@@ -167,6 +170,13 @@ html:not(.whited), body:not(.whited) {
 
 * {
   line-height: 1 !important;
+}
+
+.center-of-page{
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
 }
 
 .like-link {
@@ -289,86 +299,91 @@ html:not(.whited), body:not(.whited) {
     justify-content: stretch;
   }
 
-  &.gap {
-    &20 {
-      gap: 2rem;
-    }
+}
 
-    &19 {
-      gap: 1.9rem;
-    }
+.grided {
+  display: grid;
+}
 
-    &18 {
-      gap: 1.8rem;
-    }
+.gap {
+  &20 {
+    gap: 2rem;
+  }
 
-    &17 {
-      gap: 1.7rem;
-    }
+  &19 {
+    gap: 1.9rem;
+  }
 
-    &16 {
-      gap: 1.6rem;
-    }
+  &18 {
+    gap: 1.8rem;
+  }
 
-    &15 {
-      gap: 1.5rem;
-    }
+  &17 {
+    gap: 1.7rem;
+  }
 
-    &14 {
-      gap: 1.4rem;
-    }
+  &16 {
+    gap: 1.6rem;
+  }
 
-    &13 {
-      gap: 1.3rem;
-    }
+  &15 {
+    gap: 1.5rem;
+  }
 
-    &12 {
-      gap: 1.2rem;
-    }
+  &14 {
+    gap: 1.4rem;
+  }
 
-    &11 {
-      gap: 1.1rem;
-    }
+  &13 {
+    gap: 1.3rem;
+  }
 
-    &10 {
-      gap: 1rem;
-    }
+  &12 {
+    gap: 1.2rem;
+  }
 
-    &9 {
-      gap: .9rem;
-    }
+  &11 {
+    gap: 1.1rem;
+  }
 
-    &8 {
-      gap: .8rem;
-    }
+  &10 {
+    gap: 1rem;
+  }
 
-    &7 {
-      gap: .7rem;
-    }
+  &9 {
+    gap: .9rem;
+  }
 
-    &6 {
-      gap: .6rem;
-    }
+  &8 {
+    gap: .8rem;
+  }
 
-    &5 {
-      gap: .5rem;
-    }
+  &7 {
+    gap: .7rem;
+  }
 
-    &4 {
-      gap: .4rem;
-    }
+  &6 {
+    gap: .6rem;
+  }
 
-    &3 {
-      gap: .3rem;
-    }
+  &5 {
+    gap: .5rem;
+  }
 
-    &2 {
-      gap: .2rem;
-    }
+  &4 {
+    gap: .4rem;
+  }
 
-    &1 {
-      gap: .1rem;
-    }
+  &3 {
+    gap: .3rem;
+  }
+
+  &2 {
+    gap: .2rem;
+  }
+
+  &1 {
+    gap: .1rem;
   }
 }
 
@@ -553,7 +568,7 @@ html:not(.whited), body:not(.whited) {
   flex-shrink: 1;
 }
 
-.self-center{
+.self-center {
   align-self: center;
 }
 
@@ -1122,14 +1137,87 @@ markdown > p:last-child {
   background-color: transparent;
 }
 
-.p-autocomplete.task-tag-selector>.p-autocomplete-multiple-container {
-    &>.p-autocomplete-token{
-      background-color: transparent;
-      border: none;
-      padding: .375rem 0;
-      margin-right: .3rem;
-      &>.p-autocomplete-token-icon{
-        margin-left: .2rem;
-      }
+.p-autocomplete.task-tag-selector > .p-autocomplete-multiple-container {
+  & > .p-autocomplete-token {
+    background-color: transparent;
+    border: none;
+    padding: .375rem 0;
+    margin-right: .3rem;
+
+    & > .p-autocomplete-token-icon {
+      margin-left: .2rem;
     }
+  }
+}
+
+.w {
+  &-max {
+    width: max-content;
+  }
+
+  &-min {
+    width: min-content;
+  }
+
+  &-full {
+    width: 100%;
+  }
+
+  &-fit {
+    width: fit-content;
+  }
+
+  &.max {
+    &-fit {
+      width: fit-content;
+    }
+
+    &-min {
+      width: min-content;
+    }
+
+    &-full {
+      width: 100%;
+    }
+
+    &-max {
+      width: max-content;
+    }
+  }
+}
+
+.h {
+  &-max {
+    height: max-content;
+  }
+
+  &-min {
+    height: min-content;
+  }
+
+  &-full {
+    height: 100%;
+  }
+
+  &-fit {
+    height: fit-content;
+  }
+
+  &.max {
+    &-fit {
+      height: fit-content;
+    }
+
+    &-min {
+      height: min-content;
+    }
+
+    &-full {
+      height: 100%;
+    }
+
+    &-max {
+      height: max-content;
+    }
+  }
 }

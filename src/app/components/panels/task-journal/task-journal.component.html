@@ -1,58 +1,60 @@
 <section (load)="loadComments()" [(loading)]="loading" appLazyPageLoader class="journal">
 
-    <div *ngFor="let entry of entries; trackBy: trackByEntry" @fade [ngClass]="{event:!isComment(entry), reply:isHasReply(entry)}"
-         class="journal-item">
-        <ng-container *ngIf="(!isComment(entry) && showEvents) || isComment(entry)">
-            <ng-container *ngTemplateOutlet="eventIcon; context:{$implicit:entry}"></ng-container>
-            <div class="vertical-line"></div>
-            <div class="employee-avatar-wrapper">
-                <app-avatar [src]="entry.creator?.avatar" [name]="entry.creator?.fullName" [size]="2.8"></app-avatar>
-            </div>
-            <ng-container *ngTemplateOutlet="eventHeader; context:{$implicit:entry,reply:false}"></ng-container>
-            <div [ngClass]="{event:!isComment(entry), reply:isHasReply(entry)}" class="journal-event-body">
-                <quill-view-html *ngIf="isComment(entry)" [content]="entry.message" appTextRevival></quill-view-html>
-                <div *ngIf="!isComment(entry)" class="flexed gap5 hcenter">
-                    <span>{{entry | taskEventTranslate}}</span>
-                    <span *ngIf="entry.message" appTextRevival>{{entry.message}}</span>
-                </div>
-                <div *ngIf="hasAttachments(entry)" class="attachments-list">
-                    <app-attachment-link *ngFor="let attachment of getAttachments(entry); trackBy: trackByAttachment"
-                                         [attachment]="attachment"></app-attachment-link>
-                    <app-expanding-panel *ngIf="getAttachmentsCount(entry) > 3"
-                                         [buttonCaption]="'Показать '+(getAttachmentsCount(entry)-3)+'+'">
-                    <app-attachment-link
-                            *ngFor="let attachment of getAttachments(entry,false); trackBy: trackByAttachment"
-                            [attachment]="attachment"></app-attachment-link>
-                    </app-expanding-panel>
-                </div>
-            </div>
-            <div *ngIf="isHasReply(entry)" class="reply-comment">
-                <div class="reply-marker"></div>
+    <ng-container *ngFor="let entry of displayedEntries; let i = index; trackBy: trackByEntry">
+        <div  *ngIf="(!isComment(entry) && showEvents) || isComment(entry)" @fade [ngClass]="{event:!isComment(entry), reply:isHasReply(entry)}"
+             class="journal-item">
+            <ng-container>
+                <ng-container *ngTemplateOutlet="eventIcon; context:{$implicit:entry}"></ng-container>
+                <div class="vertical-line" *ngIf="i<displayedEntries.length-1"></div>
                 <div class="employee-avatar-wrapper">
-                    <app-avatar [name]="getReplyComment(entry)?.creator?.fullName" [src]="getReplyComment(entry)?.creator?.avatar" [size]="2.8"></app-avatar>
+                    <app-avatar [src]="entry.creator?.avatar" [name]="entry.creator?.fullName" [size]="2.8"></app-avatar>
                 </div>
-                <ng-container
-                        *ngTemplateOutlet="eventHeader; context:{$implicit:getReplyComment(entry),reply:true}"></ng-container>
-                <div class="journal-event-body">
-                    <markdown [data]="getReplyComment(entry)?.message"></markdown>
-
-                    <div *ngIf="hasAttachments(getReplyComment(entry))" class="attachments-list">
+                <ng-container *ngTemplateOutlet="eventHeader; context:{$implicit:entry,reply:false}"></ng-container>
+                <div [ngClass]="{event:!isComment(entry), reply:isHasReply(entry)}" class="journal-event-body">
+                    <quill-view-html *ngIf="isComment(entry)" [content]="entry.message" appTextRevival></quill-view-html>
+                    <div *ngIf="!isComment(entry)" class="flexed gap5 hcenter">
+                        <span>{{entry | taskEventTranslate}}</span>
+                        <span *ngIf="entry.message" appTextRevival>{{entry.message}}</span>
+                    </div>
+                    <div *ngIf="hasAttachments(entry)" class="attachments-list">
+                        <app-attachment-link *ngFor="let attachment of getAttachments(entry); trackBy: trackByAttachment"
+                                             [attachment]="attachment"></app-attachment-link>
+                        <app-expanding-panel *ngIf="getAttachmentsCount(entry) > 3"
+                                             [buttonCaption]="'Показать '+(getAttachmentsCount(entry)-3)+'+'">
                         <app-attachment-link
-                                *ngFor="let attachment of getAttachments(getReplyComment(entry)); trackBy: trackByAttachment"
+                                *ngFor="let attachment of getAttachments(entry,false); trackBy: trackByAttachment"
                                 [attachment]="attachment"></app-attachment-link>
-                        <app-expanding-panel
-                                *ngIf="getAttachmentsCount(getReplyComment(entry)) > 3"
-                                [buttonCaption]="'Показать '+(getAttachmentsCount(getReplyComment(entry))-3)+'+'">
-                            <app-attachment-link
-                                    *ngFor="let attachment of getAttachments(getReplyComment(entry),false); trackBy: trackByAttachment"
-                                    [attachment]="attachment"></app-attachment-link>
                         </app-expanding-panel>
                     </div>
                 </div>
-            </div>
-            <div *ngIf="!isComment(entry)" class="event-footer"></div>
-        </ng-container>
-    </div>
+                <div *ngIf="isHasReply(entry)" class="reply-comment">
+                    <div class="reply-marker"></div>
+                    <div class="employee-avatar-wrapper">
+                        <app-avatar [name]="getReplyComment(entry)?.creator?.fullName" [src]="getReplyComment(entry)?.creator?.avatar" [size]="2.8"></app-avatar>
+                    </div>
+                    <ng-container
+                            *ngTemplateOutlet="eventHeader; context:{$implicit:getReplyComment(entry),reply:true}"></ng-container>
+                    <div class="journal-event-body">
+                        <markdown [data]="getReplyComment(entry)?.message"></markdown>
+
+                        <div *ngIf="hasAttachments(getReplyComment(entry))" class="attachments-list">
+                            <app-attachment-link
+                                    *ngFor="let attachment of getAttachments(getReplyComment(entry)); trackBy: trackByAttachment"
+                                    [attachment]="attachment"></app-attachment-link>
+                            <app-expanding-panel
+                                    *ngIf="getAttachmentsCount(getReplyComment(entry)) > 3"
+                                    [buttonCaption]="'Показать '+(getAttachmentsCount(getReplyComment(entry))-3)+'+'">
+                                <app-attachment-link
+                                        *ngFor="let attachment of getAttachments(getReplyComment(entry),false); trackBy: trackByAttachment"
+                                        [attachment]="attachment"></app-attachment-link>
+                            </app-expanding-panel>
+                        </div>
+                    </div>
+                </div>
+                <div *ngIf="!isComment(entry)" class="event-footer"></div>
+            </ng-container>
+        </div>
+    </ng-container>
 
     <ng-container *ngIf="loading">
         <div *ngFor="let s of skeletons" class="journal-item skeleton">
