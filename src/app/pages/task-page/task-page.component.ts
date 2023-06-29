@@ -7,6 +7,7 @@ import {
     Employee,
     FieldItem,
     FileData,
+    LoadingState,
     ModelItem,
     Page,
     Task,
@@ -23,7 +24,7 @@ import {fade, fadeIn} from "../../animations";
 import {OverlayPanel} from "primeng/overlaypanel";
 import {FormControl, FormGroup} from "@angular/forms";
 import {CustomValidators} from "../../custom-validators";
-import {distinctUntilChanged, map} from 'rxjs';
+import {map} from 'rxjs';
 import {CustomNavigationService} from "../../services/custom-navigation.service";
 import {QuillEditorComponent} from "ngx-quill";
 import {
@@ -40,7 +41,7 @@ import {WorkLogsDialogComponent} from "../../components/panels/work-logs-dialog/
 export class TaskPageComponent implements OnInit, OnDestroy {
 
     currentTask?: Task;
-    isLoading = true;
+    loadingState: LoadingState = LoadingState.LOADING;
 
     commentSending = false;
 
@@ -156,40 +157,49 @@ export class TaskPageComponent implements OnInit, OnDestroy {
 
     set taskId(value: number) {
         this._taskId = value;
-        this.api.getTask(this._taskId).subscribe(task => {
-            this.currentTask = task;
-            this.isLoading = false;
-            this.installedTags.setValue(task.tags ?? [], {emitEvent: false});
-            if(this.isTaskClose()){
-                this.installedTags.disable({emitEvent: false});
-            }else{
-                this.installedTags.enable({emitEvent: false});
-            }
-            this.subscriptions.addSubscription('edTaskTg', this.installedTags.valueChanges
-                .subscribe(value => {
-                    if (!value) return;
-                    this.api.setTaskTags(task.taskId, value).subscribe();
-                }))
-            this.api.getActiveWorkLogByTaskId(task.taskId).subscribe(workLog => {
-                this.activeWorkLog = workLog
-            })
-            this.orderFields();
-            this.stageMenuItems = this.getStageMenuItems();
-            this.subscriptions.addSubscription('taskUpd', this.rt.taskUpdated(value).subscribe(update => {
-                this.currentTask = update;
-                this.installedTags.setValue(update.tags ?? [], {emitEvent: false});
-                if(this.isTaskClose()){
+        this.api.getTask(this._taskId).subscribe({
+            next: task => {
+                this.currentTask = task;
+                if (task.deleted) {
+                    this.loadingState = LoadingState.ERROR;
+                } else {
+                    this.loadingState = LoadingState.READY;
+                }
+                this.installedTags.setValue(task.tags ?? [], {emitEvent: false});
+                if (this.isTaskClose()) {
                     this.installedTags.disable({emitEvent: false});
-                }else{
+                } else {
                     this.installedTags.enable({emitEvent: false});
                 }
-                this.stageMenuItems = this.getStageMenuItems();
+                this.subscriptions.addSubscription('edTaskTg', this.installedTags.valueChanges
+                    .subscribe(value => {
+                        if (!value) return;
+                        this.api.setTaskTags(task.taskId, value).subscribe();
+                    }))
+                this.api.getActiveWorkLogByTaskId(task.taskId).subscribe(workLog => {
+                    this.activeWorkLog = workLog
+                })
                 this.orderFields();
+                this.stageMenuItems = this.getStageMenuItems();
+                this.subscriptions.addSubscription('taskUpd', this.rt.taskUpdated(value).subscribe(update => {
+                    this.currentTask = update;
+                    this.installedTags.setValue(update.tags ?? [], {emitEvent: false});
+                    if (this.isTaskClose()) {
+                        this.installedTags.disable({emitEvent: false});
+                    } else {
+                        this.installedTags.enable({emitEvent: false});
+                    }
+                    this.stageMenuItems = this.getStageMenuItems();
+                    this.orderFields();
+                    this.managementMenu = this.taskManagementMenu();
+                    this.updateTaskActualTimers();
+                }));
                 this.managementMenu = this.taskManagementMenu();
                 this.updateTaskActualTimers();
-            }));
-            this.managementMenu = this.taskManagementMenu();
-            this.updateTaskActualTimers();
+            },
+            error: () => {
+                this.loadingState = LoadingState.ERROR;
+            }
         });
     }
 

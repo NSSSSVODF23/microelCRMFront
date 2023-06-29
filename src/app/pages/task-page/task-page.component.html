@@ -1,18 +1,20 @@
 <div appExtendPageHeight class="flexed column hcenter gap20">
-    <p-progressSpinner strokeWidth="1" class="primary-spinner center-of-page" *ngIf="isLoading"></p-progressSpinner>
-    <ng-container *ngIf="!isLoading">
-        <ng-container *ngIf="currentTask?.deleted">
+    <ng-container [ngSwitch]="loadingState">
+        <ng-container *ngSwitchCase="'LOADING'">
+            <p-progressSpinner strokeWidth="1" class="primary-spinner center-of-page"></p-progressSpinner>
+        </ng-container>
+        <ng-container *ngSwitchCase="'ERROR'">
             <div class="panel flexed column hcenter vcenter gap15 p20 caption-common-error responsive-wrapper">
                 <div class="flexed column hcenter">
                     <span class="mds-error"></span>
                     <span>
-                        Задачи #{{currentTask?.taskId}} не существует
+                        Задачи #{{taskId}} не существует
                     </span>
                 </div>
                 <p-button label="Перейти назад" icon="mdi-chevron_left" (onClick)="customNav.backOrDefault(['/tasks','list'])" styleClass="p-button-outlined"></p-button>
             </div>
         </ng-container>
-        <ng-container *ngIf="!currentTask?.deleted">
+        <ng-container *ngSwitchCase="'READY'">
             <div class="responsive-wrapper stretched flexed gap10 column">
                 <p-menubar [model]="managementMenu" [style]="{border: 'none'}" styleClass="panel">
                     <ng-template pTemplate="start">
