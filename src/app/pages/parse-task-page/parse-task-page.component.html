@@ -21,7 +21,7 @@
         </p-virtualScroller>
         <div class="flexed gap10">
             <div class="stretched flexed column gap3 vcenter">
-                <span class="caption-active" *ngIf="parserState?.remainingTime">
+                <span class="caption size-small wt-bold f-color-primary" *ngIf="parserState?.remainingTime">
                     {{parserState?.elapsedTime | elapsedTime:'Прошло ':'':true}}
                     / {{parserState?.averageTimePerTask | elapsedTime:'На задачу ':'':true}}
                     / {{parserState?.remainingTime | elapsedTime:'Осталось ':'':true}}
@@ -35,28 +35,28 @@
         </div>
         <div class="flexed gap10">
             <div class="flexed column gap5" *ngIf="streetToCorrect[0]" [style.width]="'max-content'">
-                <div class="flexed hcenter vcenter caption-header">{{streetToCorrect[0]}}</div>
-                <div class="flexed hcenter vcenter caption-active">{{streetToCorrect[1]?.streetRaw}} {{streetToCorrect[1]?.houseRaw}} {{streetToCorrect[1]?.apartRaw}}</div>
+                <div class="flexed hcenter vcenter caption size-big">{{streetToCorrect[0]}}</div>
+                <div class="flexed hcenter vcenter caption size-small wt-bold f-color-primary">{{streetToCorrect[1]?.streetRaw}} {{streetToCorrect[1]?.houseRaw}} {{streetToCorrect[1]?.apartRaw}}</div>
                 <app-address-input [ngModel]="streetToCorrect[1]?.address" (ngModelChange)="currentCorrectingStreetAddress=$event"></app-address-input>
                 <p-button label="Откорректировать" (onClick)="correctStreet(streetToCorrect)"></p-button>
             </div>
             <div class="flexed column gap5" *ngIf="houseToCorrect[0]" [style.width]="'max-content'">
-                <div class="flexed hcenter vcenter caption-header">{{houseToCorrect[0]}}</div>
-                <div class="flexed hcenter vcenter caption-active">{{houseToCorrect[1]?.streetRaw}} {{houseToCorrect[1]?.houseRaw}} {{houseToCorrect[1]?.apartRaw}}</div>
+                <div class="flexed hcenter vcenter caption size-big">{{houseToCorrect[0]}}</div>
+                <div class="flexed hcenter vcenter caption size-small wt-bold f-color-primary">{{houseToCorrect[1]?.streetRaw}} {{houseToCorrect[1]?.houseRaw}} {{houseToCorrect[1]?.apartRaw}}</div>
                 <app-address-input [ngModel]="houseToCorrect[1]?.address" (ngModelChange)="currentCorrectingHouseAddress=$event"></app-address-input>
                 <p-button label="Откорректировать" (onClick)="correctHouse(houseToCorrect)"></p-button>
             </div>
             <div class="flexed column gap5" *ngIf="apartmentToCorrect[0]" [style.width]="'max-content'">
-                <div class="flexed hcenter vcenter caption-header">{{apartmentToCorrect[0]}}</div>
-                <div class="flexed hcenter vcenter caption-active">{{apartmentToCorrect[1]?.streetRaw}} {{apartmentToCorrect[1]?.houseRaw}} {{apartmentToCorrect[1]?.apartRaw}}</div>
+                <div class="flexed hcenter vcenter caption size-big">{{apartmentToCorrect[0]}}</div>
+                <div class="flexed hcenter vcenter caption size-small wt-bold f-color-primary">{{apartmentToCorrect[1]?.streetRaw}} {{apartmentToCorrect[1]?.houseRaw}} {{apartmentToCorrect[1]?.apartRaw}}</div>
                 <app-address-input [ngModel]="apartmentToCorrect[1]?.address" (ngModelChange)="currentCorrectingApartAddress=$event"></app-address-input>
                 <p-button label="Откорректировать" (onClick)="correctApart(apartmentToCorrect)"></p-button>
             </div>
         </div>
 <!--        <div class="flexed gap10 v-scroll column" [style.height]="'40rem'">-->
 <!--            <div class="flexed gap2 column" *ngFor="let entry of addressCorrectingPool | keyvalue">-->
-<!--                <span class="caption-main">{{entry.key}}</span>-->
-<!--                <span class="caption-main-small">{{entry.value | json}}</span>-->
+<!--                <span class="caption">{{entry.key}}</span>-->
+<!--                <span class="caption size-small">{{entry.value | json}}</span>-->
 <!--            </div>-->
 <!--        </div>-->
     </div>

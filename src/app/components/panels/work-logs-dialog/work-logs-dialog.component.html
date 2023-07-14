@@ -6,7 +6,7 @@
           header="Работы и отчеты по задаче">
     <ng-template pTemplate="content">
         <div class="flexed column hcenter vcenter p10" *ngIf="!isLoading && !workLogs.length">
-            <span class="caption-common-message flexed hcenter gap2">
+            <span class="caption size-big wt-bold f-color-500 flexed hcenter gap2">
                 <i class="mdi-playlist_remove"></i>
                 <span>
                     Нет журналов работ
@@ -18,38 +18,38 @@
                 <ng-container *ngTemplateOutlet="statusCaption; context: {$implicit: workLog.status}"></ng-container>
                 <span class="flexed gap10">
                     <span>
-                        <span class="flexed gap3 hcenter caption-secondary"><i
+                        <span class="flexed gap3 hcenter caption size-small wt-bold f-color-500"><i
                                 class="mdi-groups"></i><span>Назначены:</span></span>
                         <app-avatar-list [employees]="workLog.employees"></app-avatar-list>
                     </span>
                     <span>
-                        <span class="flexed gap3 hcenter caption-secondary"><i
+                        <span class="flexed gap3 hcenter caption size-small wt-bold f-color-500"><i
                                 class="mdi-groups"></i><span>Приняли:</span></span>
                         <app-avatar-list [employees]="workLog.whoAccepted"></app-avatar-list>
                     </span>
                     <span>
-                        <span class="flexed gap3 hcenter caption-secondary"><i
+                        <span class="flexed gap3 hcenter caption size-small wt-bold f-color-500"><i
                                 class="mdi-groups"></i><span>Завершили:</span></span>
                         <app-avatar-list [employees]="workLog.whoClosed"></app-avatar-list>
                     </span>
                     <span>
-                        <span class="flexed gap3 hcenter caption-secondary"><i
+                        <span class="flexed gap3 hcenter caption size-small wt-bold f-color-500"><i
                                 class="mdi-person"></i><span>Создал:</span></span>
                         <app-employee-label [employee]="workLog.creator" [size]="2"></app-employee-label>
                     </span>
                 </span>
-                <span class="flexed gap10 caption-main-small">
+                <span class="flexed gap10 caption size-small">
                     <span class="flexed column">
-                        <span class="flexed gap3 hcenter caption-secondary"><i class="mdi-schedule_send"></i><span>Создан:</span></span>
+                        <span class="flexed gap3 hcenter caption size-small wt-bold f-color-500"><i class="mdi-schedule_send"></i><span>Создан:</span></span>
                         <span>{{workLog.created | date:'dd-MM-yyyy HH:mm'}}</span>
                     </span>
                     <span class="flexed column">
-                        <span class="flexed gap3 hcenter caption-secondary"><i
+                        <span class="flexed gap3 hcenter caption size-small wt-bold f-color-500"><i
                                 class="mdi-cancel_schedule_send"></i><span>Закрыт:</span></span>
                         <span>{{workLog.closed | date:'dd-MM-yyyy HH:mm'}}</span>
                     </span>
                     <span class="flexed column">
-                        <span class="flexed gap3 hcenter caption-secondary"><i class="mdi-timelapse"></i><span>Затрачено времени:</span></span>
+                        <span class="flexed gap3 hcenter caption size-small wt-bold f-color-500"><i class="mdi-timelapse"></i><span>Затрачено времени:</span></span>
                         <span>{{workLog.leadTime| elapsedTime:"":"":true}}</span>
                     </span>
                 </span>
@@ -60,7 +60,7 @@
                               styleClass="p-button-secondary p-button-outlined"></p-button>
                 </span>
                 <span *ngIf="workLog.report" class="report">
-                    <span class="flexed gap3 hcenter caption-secondary"><i class="mdi-summarize"></i><span>Отчет</span></span>
+                    <span class="flexed gap3 hcenter caption size-small wt-bold f-color-500"><i class="mdi-summarize"></i><span>Отчет</span></span>
                     <span class="report-text">{{workLog.report}}</span>
                 </span>
             </div>
@@ -74,21 +74,21 @@
 <ng-template #statusCaption let-status>
     <ng-container [ngSwitch]="status">
         <span *ngSwitchCase="'ACTIVE'" [style]="{color: 'var(--warm-600)'}"
-              class="caption-sub-header flexed hcenter gap3">
+              class="caption size-small f-color-500 flexed hcenter gap3">
             <i class="mdi-engineering"></i>
             <span>
                 В работе
             </span>
         </span>
         <span *ngSwitchCase="'CLOSE'" [style]="{color: 'var(--green-400)'}"
-              class="caption-sub-header flexed hcenter gap3">
+              class="caption size-small f-color-500 flexed hcenter gap3">
             <i class="mdi-verified"></i>
             <span>
                 Закрыт
             </span>
         </span>
         <span *ngSwitchCase="'FORCE_CLOSE'" [style]="{color: 'var(--red-400)'}"
-              class="caption-sub-header flexed hcenter gap3">
+              class="caption size-small f-color-500 flexed hcenter gap3">
             <i class="mdi-close"></i>
             <span>
                 Закрыт принудительно
@@ -115,7 +115,7 @@
                         <p-skeleton height="3.5rem" width="5rem"></p-skeleton>
                     </span>
                 </span>
-            <span class="flexed gap10 caption-main-small">
+            <span class="flexed gap10 caption size-small">
                 <span class="flexed column">
                     <p-skeleton height="2rem" width="7rem"></p-skeleton>
                 </span>

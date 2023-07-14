@@ -1,0 +1,106 @@
+<div appExtendPageHeight class="flexed vcenter">
+    <div class="responsive-wrapper flexed gap10">
+        <app-main-menu-panel></app-main-menu-panel>
+        <div [style.grid]="'min-content 1fr/1fr'" class="grided gap10 stretched">
+            <div [formGroup]="filterForm" class="flexed gap10 panel p10 vcenter">
+                <span class="p-inputgroup">
+                    <span class="p-inputgroup-addon"><i class="mdi-search"></i></span>
+                    <input formControlName="nameQuery" pInputText placeholder="Наименование..." type="text">
+                </span>
+                <p-toggleButton formControlName="includeDeleted" offIcon="mdi-visibility" offLabel="Удаленные"
+                                onIcon="mdi-visibility_off" onLabel="Удаленные"></p-toggleButton>
+                <p-button (onClick)="openCreationDialog()" icon="mdi-add" label="Создать"
+                          styleClass="p-button-success"></p-button>
+            </div>
+            <div [ngSwitch]="loadingState" [style]="{grid:'1fr min-content/1fr', marginBottom:'1rem'}"
+                 class="grided panel p10">
+                <ng-container *ngSwitchCase="'READY'">
+                    <div class="flexed column">
+                        <div *ngFor="let paidAction of paidActionsPage?.content; trackBy: trackByPaidAction"
+                             class="flexed p10 gap10 h-fit split-line">
+                            <div class="flexed column stretched">
+                                <span class="caption size-big flexed hcenter gap3">
+                                    <span>
+                                        {{paidAction.name}}
+                                    </span>
+                                    <span *ngIf="paidAction.deleted" class="caption size-small f-color-500">
+                                        (удален)
+                                    </span>
+                                </span>
+                                <span *ngIf="paidAction.description" class="caption size-small">
+                                    {{paidAction.description}}
+                                </span>
+                                <span *ngIf="!paidAction.description" class="caption size-small f-color-500">
+                                    Без описания
+                                </span>
+                            </div>
+                            <div *ngIf="!paidAction.deleted" class="flexed column gap5">
+                                <p-button (onClick)="openCreationDialog(paidAction)" icon="mdi-edit"
+                                          styleClass="p-button-warning p-button-icon p-button-outlined"></p-button>
+                                <p-button (onClick)="deletePaidAction(paidAction.paidActionId)" icon="mdi-delete"
+                                          styleClass="p-button-danger p-button-icon p-button-outlined"></p-button>
+                            </div>
+                            <div class="flexed column gap5 vend hstart">
+                                <span class="caption">
+                                    {{paidAction.cost | currency:'RUB'}}/{{paidAction.unit | unitName}}
+                                </span>
+                                <app-employee-label [employee]="paidAction.creator"></app-employee-label>
+                                <div class="stretched"></div>
+                                <span class="caption size-tiny wt-bold f-color-500">
+                                    {{paidAction.created | date: "dd MMMM yyyy HH:mm"}}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </ng-container>
+                <ng-container *ngSwitchCase="'LOADING'">
+                    <div class="grided vcenter hcenter">
+                        <p-progressSpinner class="primary-spinner" strokeWidth="1"></p-progressSpinner>
+                    </div>
+                </ng-container>
+                <ng-container *ngSwitchCase="'ERROR'">
+                    <div class="caption size-big wt-bold f-color-danger grided vcenter hcenter">
+                        <span class="mds-error"></span>
+                        <span>Ошибка загрузки</span>
+                    </div>
+                </ng-container>
+                <ng-container *ngSwitchCase="'EMPTY'">
+                    <div class="caption size-big wt-bold f-color-500 grided vcenter hcenter">
+                        <span class="mds-search_off"></span>
+                        <span>Платных действий не найденно</span>
+                    </div>
+                </ng-container>
+                <p-paginator (onPageChange)="changePage($event.page)" [first]="25*(page-1)"
+                             [rows]="25"
+                             [totalRecords]="paidActionsPage?.totalElements ?? 0"></p-paginator>
+            </div>
+        </div>
+    </div>
+</div>
+
+<p-dialog [(visible)]="createDialogVisible" [draggable]="false" [header]="createDialogHeader" [modal]="true"
+          [resizable]="false" appendTo="body">
+    <ng-template pTemplate="content">
+        <div [formGroup]="createForm" [style.margin-top]="'.2rem'" class="grided gap10">
+            <input [style.max-width]="'15rem'" formControlName="name" pInputText placeholder="Наименование..."
+                   type="text">
+            <textarea [autoResize]="true" [cols]="50" [rows]="5" formControlName="description"
+                      pInputTextarea placeholder="Описание..."></textarea>
+            <p-inputNumber [maxFractionDigits]="1" currency="RUB" formControlName="cost" locale="ru-RU" mode="currency"
+                           placeholder="Сумма..."></p-inputNumber>
+            <p-dropdown [options]="typeOptions" appendTo="body" formControlName="unit" placeholder="Тип"></p-dropdown>
+            <div [ngSwitch]="createDialogMode" class="flexed hcenter">
+                <span *ngIf="withoutNDFL>0 && createForm.value.unit" class="caption size-big f-color-500">
+                    Без НДФЛ: {{withoutNDFL | currency:'RUB'}}/{{createForm.value.unit|unitName}}
+                </span>
+                <div class="stretched"></div>
+                <p-button (onClick)="createPaidAction()" *ngSwitchCase="'create'" [loading]="beginCreate"
+                          [style.place-self]="'flex-end'"
+                          icon="mdi-add" label="Создать" styleClass="p-button-success"></p-button>
+                <p-button (onClick)="editPaidAction()" *ngSwitchCase="'edit'" [loading]="beginCreate"
+                          [style.place-self]="'flex-end'" icon="mdi-pencil" label="Изменить"
+                          styleClass="p-button-success"></p-button>
+            </div>
+        </div>
+    </ng-template>
+</p-dialog>

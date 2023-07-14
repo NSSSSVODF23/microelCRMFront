@@ -6,7 +6,6 @@
             <ng-container [formGroup]="filtersForm">
                 <app-task-template-multi-selector formControlName="template"></app-task-template-multi-selector>
             </ng-container>
-<!--            <ng-container *ngTemplateOutlet="filters"></ng-container>-->
         </div>
     </div>
 </div>
@@ -24,12 +23,12 @@
                              styleClass="panel"></p-paginator>
             </div>
         </div>
-        <div class="flexed column stretched hcenter vcenter" *ngSwitchCase="'loading'">
+        <div class="flexed column stretched hcenter vcenter self-center" *ngSwitchCase="'loading'">
             <p-progressSpinner class="primary-spinner" strokeWidth="1"></p-progressSpinner>
         </div>
-        <div class="flexed column stretched hcenter vcenter" *ngSwitchCase="'empty'">
-            <span class="caption-common-message flexed hcenter">
-                <i class="mdi-search_off"></i>
+        <div class="flexed column stretched hcenter vcenter self-center" *ngSwitchCase="'empty'">
+            <span class="caption size-big wt-bold f-color-500 flexed column hcenter vcenter">
+                <span class="mds-inbox"></span>
                 <span>
                     Входящих задач нет
                 </span>

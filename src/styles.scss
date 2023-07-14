@@ -9,15 +9,15 @@
   --bgc-600: #646E78;
   --bgc-900: #3B4C5B;
 
-  --tc-100: #FFFFFF;
-  --tc-200: #e4e9ee;
-  --tc-300: #c3ccd7;
-  --tc-400: #aebac7;
-  --tc-500: #9EABB9;
-  --tc-600: #7a848f;
-  --tc-700: #535664;
-  --tc-800: #41444f;
-  --tc-900: #262933;
+  --tc-100: #EDEFF1;
+  --tc-200: #CCD3D7;
+  --tc-300: #AFBBC0;
+  --tc-400: #96A6AC;
+  --tc-500: #80939B;
+  --tc-600: #6B8088;
+  --tc-700: #5C6E75;
+  --tc-800: #4F5F65;
+  --tc-900: #445257;
 
   --mc-0: #F4F9FE;
   --mc-100: #C3DFFA;
@@ -172,11 +172,20 @@ html:not(.whited), body:not(.whited) {
   line-height: 1 !important;
 }
 
-.center-of-page{
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
+.center-of {
+  &-page {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+
+  &-content {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
 }
 
 .like-link {
@@ -255,47 +264,47 @@ html:not(.whited), body:not(.whited) {
     }
   }
 
-  &.bline {
+  &:not(.column).bline {
     align-items: baseline;
   }
 
-  &.hcenter {
+  &:not(.column).hcenter {
     align-items: center;
   }
 
-  &.vcenter {
+  &:not(.column).vcenter {
     justify-content: center;
   }
 
-  &.hend {
+  &:not(.column).hend {
     align-items: flex-end;
   }
 
-  &.vend {
+  &:not(.column).vend {
     justify-content: flex-end;
   }
 
-  &.hstart {
+  &:not(.column).hstart {
     align-items: flex-start;
   }
 
-  &.vstart {
+  &:not(.column).vstart {
     justify-content: flex-start;
   }
 
-  &.speven {
+  &:not(.column).speven {
     justify-content: space-evenly;
   }
 
-  &.spbtw {
+  &:not(.column).spbtw {
     justify-content: space-between;
   }
 
-  &.sparnd {
+  &:not(.column).sparnd {
     justify-content: space-around;
   }
 
-  &.hstretched {
+  &:not(.column).hstretched {
     justify-content: stretch;
   }
 
@@ -303,6 +312,14 @@ html:not(.whited), body:not(.whited) {
 
 .grided {
   display: grid;
+
+  &.vcenter {
+    justify-items: center;
+  }
+
+  &.hcenter {
+    align-content: center;
+  }
 }
 
 .gap {
@@ -474,6 +491,88 @@ html:not(.whited), body:not(.whited) {
 
   &30 {
     padding: 3rem;
+  }
+}
+
+.p-sides {
+  &-1 {
+    padding: 0 .1rem;
+  }
+
+  &-2 {
+    padding: 0 .2rem;
+  }
+
+  &-3 {
+    padding: 0 .3rem;
+  }
+
+  &-4 {
+    padding: 0 .4rem;
+  }
+
+  &-5 {
+    padding: 0 .5rem;
+  }
+
+  &-6 {
+    padding: 0 .6rem;
+  }
+
+  &-7 {
+    padding: 0 .7rem;
+  }
+
+  &-8 {
+    padding: 0 .8rem;
+  }
+
+  &-9 {
+    padding: 0 .9rem;
+  }
+
+  &-10 {
+    padding: 0 1rem;
+  }
+
+  &-11 {
+    padding: 0 1.1rem;
+  }
+
+  &-12 {
+    padding: 0 1.2rem;
+  }
+
+  &-13 {
+    padding: 0 1.3rem;
+  }
+
+  &-14 {
+    padding: 0 1.4rem;
+  }
+
+  &-15 {
+    padding: 0 1.5rem;
+  }
+
+  &-16 {
+    padding: 0 1.6rem;
+  }
+
+  &-17 {
+    padding: 0 1.7rem;
+  }
+
+  &-18 {
+    padding: 0 1.8rem;
+  }
+
+  &-19 {
+    padding: 0 1.9rem;
+  }
+
+  &-20 {
+    padding: 0 2rem;
   }
 }
 
@@ -671,78 +770,124 @@ fieldset.node {
 }
 
 .caption {
-  &-common-message {
-    font-size: 1.1rem;
-    font-weight: bold;
-    color: var(--tc-500);
-    line-height: normal;
+  font-size: 1rem;
+  font-weight: 400;
+  color: var(--tc-700);
+  line-height: normal;
+
+  &.size {
+    &-tiny {
+      font-size: .7rem;
+    }
+
+    &-small {
+      font-size: .85rem;
+    }
+
+    &-big {
+      font-size: 1.15rem;
+    }
+
+    &-huge {
+      font-size: 1.4rem;
+    }
   }
 
-  &-common-error {
-    font-size: 1.1rem;
-    font-weight: bold;
-    color: var(--danger-600);
-    line-height: normal;
+  &.f-color {
+    &-100 {
+      color: var(--tc-100);
+    }
+
+    &-200 {
+      color: var(--tc-200);
+    }
+
+    &-300 {
+      color: var(--tc-300);
+    }
+
+    &-400 {
+      color: var(--tc-400);
+    }
+
+    &-500 {
+      color: var(--tc-500);
+    }
+
+    &-600 {
+      color: var(--tc-600);
+    }
+
+    &-700 {
+      color: var(--tc-700);
+    }
+
+    &-800 {
+      color: var(--tc-800);
+    }
+
+    &-900 {
+      color: var(--tc-900);
+    }
+
+    &-danger {
+      color: var(--danger-600);
+    }
+
+    &-warning {
+      color: var(--warm-400);
+    }
+
+    &-success{
+      color: var(--green-400);
+    }
+
+    &-primary {
+      color: var(--mc-400);
+    }
   }
 
-  &-header {
-    font-size: 1.1rem;
-    font-weight: 400;
-    color: var(--tc-700);
-    line-height: normal;
+  &.wt {
+    &-tiny {
+      font-weight: 200;
+    }
+
+    &-bold {
+      font-weight: 600;
+    }
+
+    &-black {
+      font-weight: 800;
+    }
   }
 
-  &-sub-header {
-    font-size: .9rem;
-    font-weight: 500;
-    color: var(--tc-500);
-    line-height: normal;
-  }
-
-  &-main {
-    font-size: 1rem;
-    font-weight: 400;
-    color: var(--tc-700);
-    line-height: normal;
-  }
-
-  &-inline-param {
-    font-size: 0.8rem;
-    font-weight: 400;
-    color: var(--tc-700);
-    line-height: normal;
+  &.f-inline {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
   }
 
-  &-main-small {
-    font-size: .9rem;
-    font-weight: 400;
-    color: var(--tc-700);
-    line-height: normal;
+  &.with-icon {
+    display: flex;
+    align-items: center;
+    gap: .25em;
   }
 
-  &-secondary {
-    font-size: .85rem;
-    font-weight: 500;
-    color: var(--tc-500);
-    line-height: normal;
+  &.prewrap{
+    white-space: pre-line;
   }
+}
 
-  &-active {
-    font-size: .9rem;
-    font-weight: bold;
-    color: var(--mc-500);
-    line-height: normal;
-  }
+.not-selectable{
+  user-select: none;
+}
 
-  &-tiny {
-    font-size: .7rem;
-    font-weight: bold;
-    color: var(--tc-500);
-    line-height: normal;
-  }
+.drop-zone{
+  outline: 2px solid var(--mc-400);
+}
+
+.p-tabview.tab-content-unpadding > .p-tabview-panels{
+  padding: 0;
 }
 
 .min {
@@ -1048,7 +1193,7 @@ markdown > p:last-child {
 }
 
 .p-ripple.primary .p-ink {
-  background: var(--mc-200)
+  background: var(--mc-100)
 }
 
 .overlay-wrapper {
@@ -1220,4 +1365,34 @@ markdown > p:last-child {
       height: max-content;
     }
   }
+}
+
+.split-line:not(:last-child) {
+  border-bottom: 1px solid var(--bgc-200);
+}
+
+.terminator {
+  border-bottom: 1px solid var(--bgc-300);
+  height: 0;
+}
+
+.p-breadcrumb {
+  .p-menuitem-link {
+    display: flex;
+  }
+}
+
+.p-component-overlay {
+  background-color: rgba(0, 0, 0, 0.03) !important;
+}
+
+.work-tree {
+  border: none !important;
+  border-right: 1px solid var(--bgc-200) !important;
+  border-radius: 0 !important;
+  height: 100%;
+}
+
+.p-inputgroup-addon > i{
+  font-size: 1.35rem !important;
 }

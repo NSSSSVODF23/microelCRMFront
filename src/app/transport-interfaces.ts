@@ -1,4 +1,5 @@
 import {Subscription} from "rxjs";
+import {TreeNode, TreeNodeDragEvent} from "primeng/api";
 
 export enum WireframeFieldType {
     BOOLEAN = "BOOLEAN",
@@ -497,6 +498,8 @@ export interface WorkLog {
     employees: Employee[];
     task: Task;
     creator: Employee;
+    calculated: boolean;
+    targetDescription?: string;
 }
 
 export enum NotificationType {
@@ -543,6 +546,192 @@ export enum LoadingState {
     LOADING = "LOADING",
     ERROR = "ERROR",
     EMPTY = "EMPTY"
+}
+
+export interface PaidAction{
+    paidActionId: number;
+    identifier: string;
+    name: string;
+    description?: string;
+    created: string;
+    creator: Employee;
+    edited: boolean;
+    deleted: boolean;
+    unit: PaidActionUnit;
+    cost: number;
+}
+
+export enum PaidActionUnit {
+    AMOUNT = "AMOUNT",
+    METRES = "METRES",
+    KILOGRAMS = "KILOGRAMS"
+}
+
+export interface PaidActionForm {
+    name: string;
+    description?: string;
+    unit: PaidActionUnit;
+    cost: number;
+}
+
+export interface PaidActionFilter {
+    nameQuery?: string;
+    includeDeleted?: boolean;
+}
+
+export interface PaidWorkGroup{
+    paidWorkGroupId: number;
+    name: string;
+    description?: string;
+    isRoot: boolean;
+    childrenGroups: PaidWorkGroup[];
+}
+
+export interface PaidWorkGroupForm {
+    name: string;
+    description?: string;
+    parentGroupId?: number;
+}
+
+export interface PaidWork{
+    paidWorkId: number;
+    name: string;
+    description?: string;
+    position: number;
+    actions: PaidActionTemplate[];
+    path: number[];
+}
+
+export interface PaidWorkForm {
+    name: string;
+    description?: string;
+}
+
+export interface TreeNodeMoveEvent {
+    sourcePath: number[];
+    targetPath: number[];
+    object: TreeNodeDto;
+}
+
+export interface TreeNodeUpdateEvent{
+    path: number[];
+    object: TreeNodeDto;
+}
+
+export class TreeDragDropEvent {
+    source: TreeNodeDto;
+    target: TreeNodeDto | null = null;
+    index: number | null = null;
+
+    constructor(event: any) {
+        const dragNode = event.dragNode;
+        const dropNode = event.dropNode;
+        this.index = event.index;
+        this.source = new TreeNodeDto(dragNode);
+        if(dropNode.children && dropNode.children.includes(dragNode)){
+            this.target = new TreeNodeDto(dropNode);
+        }else{
+            this.target = dropNode.parent ? new TreeNodeDto(dropNode.parent) : null;
+        }
+    }
+}
+
+export class TreeNodeDto{
+    key!: string;
+    label!: string;
+    icon!: string;
+    // data!: any;
+    type!: string;
+    // children!: TreeNodeDto[]
+
+    constructor(node: any) {
+        this.key = node.key;
+        this.label = node.label;
+        this.icon = node.icon;
+        // this.data = node.data;
+        this.type = node.type;
+        // this.children = node.children;
+    }
+}
+
+export interface PaidActionTemplate{
+    paidActionTemplateId: number;
+    action: PaidAction;
+    count: number;
+}
+
+export interface PaidActionTemplateForm{
+    actionId: number;
+    count: number;
+}
+
+export interface TreeElementPosition{
+    id: number;
+    type: string;
+    position: number;
+    path?: number[];
+}
+
+export interface WorkActionItemForm{
+    workName: string;
+    workId: number;
+    actionName: string;
+    count: number;
+    unit: PaidActionUnit;
+    price: number;
+    cost: number;
+    actionId: number;
+}
+
+export interface WorkCalculationForm{
+    workLogId: number;
+    employeeRatio: {[login: string]: {ratio: number, sum:number}};
+    actions: WorkActionItemForm[];
+}
+
+export interface FactorAction{
+    name: string;
+    factor: number;
+    actionUuids: string[];
+}
+
+export interface ActionTaken {
+    actionTakenId: number;
+    workName: string;
+    paidAction: PaidAction;
+    count: number;
+    uuid: string;
+}
+
+export  interface WorkCalculation{
+    workCalculationId: number;
+    workLog: WorkLog;
+    actions: ActionTaken[];
+    employee: Employee;
+    ratio: number;
+    factorsActions: FactorAction[];
+    created: string;
+    creator: Employee;
+    empty: boolean;
+    emptyDescription: string;
+}
+
+export interface WorkingDay{
+    workingDayId: number;
+    date: string;
+    employee: Employee;
+    calculations: WorkCalculation[]
+}
+
+export interface SalaryPoint {
+    date: string;
+    value: number;
+}
+
+export interface SalaryRow{
+    employee: Employee;
+    salaryPoints: SalaryPoint[]
+    sum: number;
 }
 
 export class CacheUnit<T> {

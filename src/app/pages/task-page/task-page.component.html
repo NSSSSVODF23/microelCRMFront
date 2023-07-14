@@ -1,10 +1,10 @@
-<div appExtendPageHeight class="flexed column hcenter gap20">
+<div appExtendPageHeight class="flexed column vcenter gap20">
     <ng-container [ngSwitch]="loadingState">
         <ng-container *ngSwitchCase="'LOADING'">
             <p-progressSpinner strokeWidth="1" class="primary-spinner center-of-page"></p-progressSpinner>
         </ng-container>
         <ng-container *ngSwitchCase="'ERROR'">
-            <div class="panel flexed column hcenter vcenter gap15 p20 caption-common-error responsive-wrapper">
+            <div class="panel flexed column hcenter vcenter gap15 p20 caption size-big wt-bold f-color-danger responsive-wrapper">
                 <div class="flexed column hcenter">
                     <span class="mds-error"></span>
                     <span>
@@ -24,7 +24,7 @@
                                       tooltipPosition="bottom"></p-button>
                             <div class="flexed column ">
                                 <span class="header400">{{currentTask?.modelWireframe?.name ?? ''}}</span>
-                                <div class="flexed bline gap5 caption-sub-header">
+                                <div class="flexed bline gap5 caption size-small f-color-500">
                                     <span>Стадия:</span>
                                     <app-tiny-button (onClick)="stageMenu.toggle($event)"
                                                      [disabled]="!currentTask?.currentStage"
@@ -53,8 +53,8 @@
                             <app-task-tag-selector [formControl]="installedTags"></app-task-tag-selector>
                         </div>
                         <div *ngFor="let field of currentTask?.fields ?? []" class="flexed gap1 column">
-                            <div class="caption-secondary">{{field.name}}</div>
-                            <div class="caption-main">
+                            <div class="caption size-small wt-bold f-color-500">{{field.name}}</div>
+                            <div class="caption">
                                 {{field.textRepresentation}}
                             </div>
                         </div>
@@ -137,7 +137,7 @@
                             </div>
                             <div class="list">
                                 <div *ngIf="isTaskHasParent()" class="flexed hcenter gap3">
-                                    <span class="caption-sub-header">Родительская:</span>
+                                    <span class="caption size-small f-color-500">Родительская:</span>
                                     <app-task-link [taskId]="currentTask?.parent ?? 0"></app-task-link>
                                     <app-tiny-button (onClick)="unlinkParentTask()"
                                                      *ngIf="!!currentTask?.parent"
@@ -146,7 +146,7 @@
                                                      pTooltip="Отсоединить задачу"
                                                      tooltipPosition="bottom"></app-tiny-button>
                                 </div>
-                                <div *ngIf="isTaskHasChilds()" class="flexed gap5 caption-sub-header">
+                                <div *ngIf="isTaskHasChilds()" class="flexed gap5 caption size-small f-color-500">
                                     <span>Дочерние:</span>
                                     <div class="flexed column gap3">
                                     <span *ngFor="let taskCld of currentTask?.children" class="flexed gap3 hcenter">
@@ -176,11 +176,11 @@
             </div>
             <div [formGroup]="commentInputForm" *ngIf="!isTaskClose()" class="sticky bottom1 flexed vcenter column gap10">
                 <div *ngIf="replyComment" [style.padding]="'1rem 1.5rem'"
-                     class="flexed hcenter gap15 panel responsive-wrapper caption-active">
+                     class="flexed hcenter gap15 panel responsive-wrapper caption size-small wt-bold f-color-primary">
                     <i class="mdi-reply"></i>
                     <div class="flexed column">
                         <app-employee-label [employee]="replyComment.creator" [size]="2"></app-employee-label>
-                        <div class="caption-main indent2">
+                        <div class="caption indent2">
                             {{replyComment.simpleText}}
                         </div>
                     </div>
@@ -190,11 +190,11 @@
                               icon="mdi-cancel" styleClass="p-button-icon p-button-text"></p-button>
                 </div>
                 <div *ngIf="editComment" [style.padding]="'1rem 1.5rem'"
-                     class="flexed hcenter gap15 panel responsive-wrapper caption-active">
+                     class="flexed hcenter gap15 panel responsive-wrapper caption size-small wt-bold f-color-primary">
                     <i class="mdi-edit"></i>
                     <div class="flexed column gap3">
                         <span>Редактирование</span>
-                        <div class="caption-main">
+                        <div class="caption">
                             {{editComment.simpleText}}
                         </div>
                     </div>
@@ -203,13 +203,13 @@
                     <p-button (onClick)="editComment = undefined; commentInputForm.reset({text: '', files: []})" [disabled]="commentInputForm.disabled" icon="mdi-cancel"
                               styleClass="p-button-icon p-button-text"></p-button>
                 </div>
-                <ng-container [ngSwitch]="commentEditorMode">
+                <ng-container [ngSwitch]="commentEditorMode" *ngIf="!isTaskClose()">
                     <ng-container *ngSwitchCase="'simple'">
                         <div @fadeIn [style.padding]="'.5rem 1rem'" class="flexed hcenter gap5 panel responsive-wrapper">
                             <p-button [disabled]="commentInputForm.disabled" icon="mdi-text_fields"
                                       pTooltip="Расширенный редактор" (onClick)="commentEditorMode = 'extended'"
                                       styleClass="p-button-icon p-button-text"></p-button>
-                            <textarea (keydown)="sendCommentByEnter($event)" appTextareaAutoresize class="borderless-text-field stretched"
+                            <textarea (keydown)="sendCommentByEnter($event)" [disabled]="isTaskClose()" appTextareaAutoresize class="borderless-text-field stretched"
                                       formControlName="text" placeholder="Новый комментарий..."></textarea>
                             <app-file-input *ngIf="!editComment" [short]="true" formControlName="files"></app-file-input>
                             <p-button (onClick)="sendComment()" [disabled]="commentInputForm.disabled"
@@ -229,7 +229,7 @@
                         </span>
                             <quill-editor #commentEditor (keydown)="sendCommentByEnter($event)"
                                           (onContentChanged)="empInsertPanel.setQuillEvent($event)"
-                                          [modules]="quillModules"
+                                          [modules]="quillModules" [disabled]="isTaskClose()"
                                           [styles]="{maxHeight:'30vh', minHeight:'10rem', overflow:'auto'}"
                                           class="input" formControlName="text"
                                           placeholder="Новый комментарий..."></quill-editor>
@@ -260,7 +260,7 @@
             </ng-template>
         </p-pickList>
         <div [style]="{minHeight: '8rem'}" class="flexed column">
-            <div class="caption-sub-header">Текущая цель (необязательно)</div>
+            <div class="caption size-small f-color-500">Текущая цель (необязательно)</div>
             <textarea [(ngModel)]="targetDescription" [autoResize]="true" [rows]="3" class="stretched"
                       pInputTextarea></textarea>
         </div>
@@ -285,7 +285,7 @@
                 <div *ngFor="let dep of departmentList" class="list-view-item bordered flexed hcenter gap10">
                     <p-checkbox [(ngModel)]="selectedDepartmentObservers" [value]="dep.departmentId"
                                 name="dep"></p-checkbox>
-                    <span appColorize class="caption-main">{{dep.name}}</span>
+                    <span appColorize class="caption">{{dep.name}}</span>
                 </div>
             </div>
         </p-tabPanel>
@@ -318,10 +318,10 @@
                  class="list-view-item hovered bordered flexed hcenter gap10">
                 <app-avatar [name]="emp.fullName" [size]="2.3" [src]="emp.avatar"></app-avatar>
                 <div class="flexed column">
-                    <span class="caption-main">{{emp.fullName}}</span>
-                    <span class="caption-secondary">{{emp.department?.name}}</span>
+                    <span class="caption">{{emp.fullName}}</span>
+                    <span class="caption size-small wt-bold f-color-500">{{emp.department?.name}}</span>
                 </div>
-                <span *ngIf="selectedEmployeeAsResponsible?.login === emp.login" class="caption-active">(Выбран)</span>
+                <span *ngIf="selectedEmployeeAsResponsible?.login === emp.login" class="caption size-small wt-bold f-color-primary">(Выбран)</span>
             </div>
         </div>
         <div class="flexed vend hcenter gap10">
@@ -380,7 +380,7 @@
             <div *ngIf="editTaskSnapshots?.length" class="flexed column hcenter vcenter gap5">
                 <span class="flexed hcenter gap3">
                     Время:
-                    <span class="caption-main-small">
+                    <span class="caption size-small">
                         {{editTaskSnapshots[indexEditSnapshot].whenEdited | date: 'dd MMMM yyyy HH:mm'}}
                     </span>
                 </span>
@@ -389,7 +389,7 @@
                     <app-employee-label
                             [employee]="editTaskSnapshots[indexEditSnapshot].whoEdited"></app-employee-label>
                 </span>
-                <span class="caption-main-small">
+                <span class="caption size-small">
                     Снимок {{indexEditSnapshot + 1}} из {{editTaskSnapshots.length}}
                 </span>
             </div>
@@ -421,7 +421,7 @@
             <tbody>
             <tr *ngFor="let fieldPair of snapshotFieldPairs(editTaskSnapshots[indexEditSnapshot]); trackBy: trackSnapshotPair">
                 <td>
-                        <span class="caption-header one-line">
+                        <span class="caption size-big one-line">
                             {{fieldPair.before.name}}
                         </span>
                 </td>
@@ -430,7 +430,7 @@
                 </td>
                 <td>
                         <span *ngIf="!areFieldsEqual(fieldPair.before,fieldPair.after)"
-                              class="material-icons-round caption-active">keyboard_double_arrow_right</span>
+                              class="material-icons-round caption size-small wt-bold f-color-primary">keyboard_double_arrow_right</span>
                 </td>
                 <td>
                     {{fieldPair.after.textRepresentation}}
@@ -492,7 +492,7 @@
 
 <ng-template #actualFromLabel>
     <div [pTooltip]="(currentTask?.actualFrom | date:'dd MMMM yyyy HH:mm')??''"
-         [style.color]="'#f7ce2a'" class="flexed gap3 caption-main hcenter p10" tooltipPosition="bottom">
+         [style.color]="'#f7ce2a'" class="flexed gap3 caption hcenter p10" tooltipPosition="bottom">
         <i class="mdi-today parent-inherit"></i>
         <span>
             Запланирована через
@@ -505,7 +505,7 @@
 
 <ng-template #actualToLabel>
     <div [pTooltip]="(currentTask?.actualTo | date:'dd MMMM yyyy HH:mm')??''"
-         [style.color]="'#ff512a'" class="flexed gap3 caption-main hcenter p10" tooltipPosition="bottom">
+         [style.color]="'#ff512a'" class="flexed gap3 caption hcenter p10" tooltipPosition="bottom">
         <i class="mdi-today parent-inherit"></i>
         <span>
             Срок выполнения

@@ -1,7 +1,7 @@
 <div appExtendPageHeight class="flexed gap10 column" [style.padding]="'0 2rem 2rem 2rem'">
     <ng-container *ngIf="isTemplateSelected; then selectedTemplatePanel else unselectedTemplatePanel"></ng-container>
     <div *ngIf="isTemplateSelected" @flow class="stage-view">
-        <div class="caption-main">Этап {{this.currentStep + 1}}
+        <div class="caption">Этап {{this.currentStep + 1}}
             : {{this.selectedTemplate ? this.selectedTemplate.steps[currentStep].name : ""}}</div>
         <div [@swipeChild]="currentStepFields.length" [formGroup]="currentStepForm" class="flexed column p10 gap10">
             <app-task-template-input *ngFor="let field of currentStepFields" [formControlName]="field.id" [field]="field"

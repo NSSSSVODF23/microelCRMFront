@@ -5,7 +5,7 @@
           position="bottom-right">
     <ng-template pTemplate="header">
         <div class="flexed hcenter gap5">
-            <span class="caption-sub-header flexed hcenter gap3"><i class="mdi-chat"></i> {{currentChat?.title}}</span>
+            <span class="caption size-small f-color-500 flexed hcenter gap3"><i class="mdi-chat"></i> {{currentChat?.title}}</span>
             <app-avatar-list [employees]="currentChat?.members ?? []"></app-avatar-list>
         </div>
     </ng-template>
@@ -45,7 +45,7 @@
                 <i class="mdi-arrow_downward"></i>
             </div>
         </div>
-        <div *ngIf="!isLoading && messages.length===0" class="chat-view empty caption-common-message">
+        <div *ngIf="!isLoading && messages.length===0" class="chat-view empty caption size-big wt-bold f-color-500">
             <i class="mdi-chat"></i>
             <span>
                 Чат пуст
@@ -53,7 +53,7 @@
         </div>
         <div [ngClass]="{unread: unreadCount>0}" *ngIf="!currentChat?.closed" class="chat-input">
             <div *ngIf="editMessage" class="preview-message-wrapper">
-                <div class="flexed hcenter gap2 caption-secondary">
+                <div class="flexed hcenter gap2 caption size-small wt-bold f-color-500">
                     <i class="mdi-edit"></i> <span>Редактирование</span>
                 </div>
                 <div class="flexed hcenter gap5">
@@ -64,7 +64,7 @@
                 </div>
             </div>
             <div *ngIf="replyMessage" class="preview-message-wrapper">
-                <div class="flexed hcenter gap2 caption-secondary">
+                <div class="flexed hcenter gap2 caption size-small wt-bold f-color-500">
                     <i class="mdi-reply"></i> <span>Ответ</span>
                 </div>
                 <div class="flexed hcenter gap5">
@@ -88,7 +88,7 @@
             </div>
         </div>
         <div class="chat-input p10 flexed hcenter vcenter" *ngIf="currentChat?.closed">
-            <span class="caption-common-message flexed hcenter"><i class="mdi-history"></i><span>История сообщений</span></span>
+            <span class="caption size-big wt-bold f-color-500 flexed hcenter"><i class="mdi-history"></i><span>История сообщений</span></span>
         </div>
     </ng-template>
 </p-dialog>

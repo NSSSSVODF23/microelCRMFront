@@ -1,0 +1,268 @@
+<div appExtendPageHeight class="flexed vcenter">
+    <div class="responsive-wrapper flexed gap10" [style]="{marginBottom: '1rem'}">
+        <app-main-menu-panel></app-main-menu-panel>
+        <div class="flexed column gap10 stretched panel p10">
+            <p-breadcrumb [home]="breadcrumbHome" [model]="breadcrumb"></p-breadcrumb>
+            <div class="flexed gap10 stretched">
+                <p-tree (onNodeContextMenuSelect)="changeContextMenuItems()" (onNodeDrop)="nodeDrop($event)"
+                        (onNodeExpand)="loadOfGroup($event)" (onNodeSelect)="selectNode($event)"
+                        (onNodeUnselect)="changeBreadcrumbs()" styleClass="work-tree"
+                        [(selection)]="selectedNodeInTree" [contextMenu]="treeContextMenu"
+                        [draggableNodes]="true" [droppableNodes]="true" [lazy]="true" [loading]="loadingTreeState === 'LOADING'"
+                        [style]="{padding:'0'}" [value]="treeMenuItems" draggableScope="self" droppableScope="self"
+                        selectionMode="single">
+                    <ng-template pTemplate="header">
+                        <div [style]="{padding:'0 0 0 1rem'}" class="flexed hcenter gap10">
+                            <span class="caption size-big f-inline">Список работ</span>
+                            <div class="stretched"></div>
+                            <p-button (onClick)="rootTreeMenu.toggle($event)" icon="mdi-more_vert"
+                                      styleClass="p-button-secondary p-button-text p-button-icon"></p-button>
+                        </div>
+                    </ng-template>
+                    <ng-template pTemplate="empty">
+                        <div class="flexed column group hcenter vcenter caption size-big wt-bold f-color-500 p10">
+                            <span class="mds-receipt_long"></span>
+                            <span>
+                                Нет элементов
+                            </span>
+                        </div>
+                    </ng-template>
+                </p-tree>
+                <ng-container [ngSwitch]="loadingTreeState">
+                    <ng-container *ngSwitchCase="'LOADING'">
+                        <ng-container *ngTemplateOutlet="loadingRef"></ng-container>
+                    </ng-container>
+                    <ng-container *ngSwitchCase="'ERROR'">
+                    </ng-container>
+                    <ng-container *ngSwitchCase="'READY'">
+                        <ng-container *ngIf="selectedNodeInTree" [ngSwitch]="selectedNodeInTree?.type">
+                            <div *ngSwitchCase="'group'" class="flexed column gap10 stretched">
+                                <ng-container *ngTemplateOutlet="nodeTitleRef; context: {$implicit: selectedNodeInTree}"></ng-container>
+                                <div class="flexed wrapped gap10 stretched" [style]="{alignContent: 'flex-start'}" @flowInChild>
+                                    <ng-container *ngTemplateOutlet="backButtonRef"></ng-container>
+                                    <ng-container *ngFor="let node of selectedNodeInTree?.children; trackBy: trackByNode">
+                                        <ng-container *ngTemplateOutlet="nodeRef; context: {$implicit: node}"></ng-container>
+                                    </ng-container>
+                                    <ng-container *ngTemplateOutlet="createButtonRef"></ng-container>
+                                </div>
+                                <div class="group-description" *ngIf="selectedNodeInTree?.data.description">
+                                    <span class="caption size-small f-inline">
+                                        Описание:
+                                    </span>
+                                    <span class="caption">
+                                        {{selectedNodeInTree?.data.description}}
+                                    </span>
+                                </div>
+                            </div>
+                            <div *ngSwitchCase="'work'" class="flexed column stretched">
+                                <ng-container *ngTemplateOutlet="nodeTitleRef; context: {$implicit: selectedNodeInTree}"></ng-container>
+                                <ng-container [ngSwitch]="workLoadingState">
+                                    <ng-container *ngSwitchCase="'LOADING'">
+                                        <ng-container *ngTemplateOutlet="loadingRef"></ng-container>
+                                    </ng-container>
+                                    <ng-container *ngSwitchCase="'ERROR'">
+                                        <ng-container *ngTemplateOutlet="errorRef"></ng-container>
+                                    </ng-container>
+                                    <ng-container *ngSwitchCase="'READY'">
+                                        <div class="flexed column gap10 p10">
+                                            <div class="flexed column" *ngIf="currentWork?.description">
+                                                <span class="caption wt-bold size-big f-color-500">Описание</span>
+                                                <span class="caption indent1">{{currentWork?.description}}</span>
+                                            </div>
+                                            <div class="flexed column">
+                                                <span class="caption wt-bold size-big f-color-500">
+                                                    Действия
+                                                </span>
+                                                <div class="flexed column">
+                                                    <ng-container *ngFor="let action of currentWork?.actions; trackBy: trackByAction">
+                                                        <ng-container *ngTemplateOutlet="workEntryRef; context: {$implicit: action}"></ng-container>
+                                                    </ng-container>
+                                                </div>
+                                                <div class="terminator"></div>
+                                                <div class="flexed gap5 vend hcenter caption wt-tiny f-color-primary size-big p10">
+                                                    <span>Всего</span>
+                                                    <span>{{currentWorkActionsSum}} руб</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </ng-container>
+                                </ng-container>
+                            </div>
+                        </ng-container>
+                        <ng-container *ngIf="!selectedNodeInTree">
+                            <div class="flexed column gap10">
+                                <div class="flexed wrapped gap10" @flowInChild [style]="{alignContent: 'flex-start'}">
+                                    <ng-container *ngFor="let node of treeMenuItems; trackBy: trackByNode">
+                                        <ng-container *ngTemplateOutlet="nodeRef; context: {$implicit: node}"></ng-container>
+                                    </ng-container>
+                                    <ng-container *ngTemplateOutlet="createButtonRef"></ng-container>
+                                </div>
+                            </div>
+                        </ng-container>
+                    </ng-container>
+                    <ng-container *ngSwitchCase="'EMPTY'">
+                        <div class="flexed column gap10 relative stretched">
+                            <ng-container *ngTemplateOutlet="nodeTitleRef; context: {$implicit: selectedNodeInTree}"></ng-container>
+                            <div class="flexed wrapped gap10">
+                                <ng-container *ngTemplateOutlet="backButtonRef"></ng-container>
+                                <ng-container *ngTemplateOutlet="createButtonRef"></ng-container>
+                                <div class="center-of-content flexed column vcenter caption size-big wt-bold f-color-500">
+                                    <span class="mds-receipt_long"></span>
+                                    <span>Нет элементов</span>
+                                </div>
+                            </div>
+                        </div>
+                    </ng-container>
+                </ng-container>
+            </div>
+        </div>
+    </div>
+</div>
+
+<p-contextMenu #treeContextMenu [model]="treeContextMenuItems" appendTo="body"></p-contextMenu>
+<p-menu #rootTreeMenu [model]="rootContextMenuItems" [popup]="true"></p-menu>
+<p-menu #inViewContextMenu [model]="inViewContextMenuItems" [popup]="true"></p-menu>
+
+<p-dialog [(visible)]="createGroupDialogVisible"
+          [header]="createGroupDialogMode==='create'? 'Создание группы': 'Изменение группы'" [resizable]="false"
+          appendTo="body">
+    <ng-template pTemplate="content">
+        <div [formGroup]="createGroupForm" class="flexed column gap10 p1">
+            <input [style]="{maxWidth:'15rem'}" formControlName="name" pInputText placeholder="Название группы...">
+            <textarea [autoResize]="true" cols="50" formControlName="description" pInputTextarea
+                      placeholder="Описание группы..." rows="5"></textarea>
+            <ng-container [ngSwitch]="createGroupDialogMode">
+                <p-button (onClick)="createGroup()" *ngSwitchCase="'create'" [style.place-self]="'flex-end'"
+                          icon="mdi-plus" label="Создать"></p-button>
+                <p-button (onClick)="updateGroup()" *ngSwitchCase="'edit'" [style.place-self]="'flex-end'"
+                          icon="mdi-edit" label="Изменить"></p-button>
+            </ng-container>
+        </div>
+    </ng-template>
+</p-dialog>
+
+<p-dialog [(visible)]="createWorkDialogVisible"
+          [autoZIndex]="false" [baseZIndex]="999"
+          [header]="createWorkDialogMode==='create'? 'Создание работы': 'Изменение работы'" [resizable]="false">
+    <ng-template pTemplate="content">
+        <div [formGroup]="createWorkForm" class="flexed column gap10 p1">
+            <input [style]="{maxWidth:'15rem'}" formControlName="name" pInputText placeholder="Название работы...">
+            <textarea [autoResize]="true" cols="70" formControlName="description" pInputTextarea
+                      placeholder="Описание работы..." rows="5"></textarea>
+            <p-pickList (onMoveToSource)="unselectPaidAction($event)" (onMoveToTarget)="selectPaidAction($event)" [dragdrop]="true"
+                        [showSourceControls]="false" [showTargetControls]="false"
+                        [source]="availablePaidActions"
+                        [target]="selectedPaidActions" sourceHeader="Доступные действия" targetHeader="Выбранные действия">
+                <ng-template let-item pTemplate="item">
+                    <div class="flexed gap5">
+                        <div class="flexed column gap5 stretched">
+                            <span class="caption size-big w-max">
+                                {{item.name}}
+                            </span>
+                            <span class="caption size-small f-color-500">
+                                {{item.cost}} руб./{{item.unit | unitName}}
+                            </span>
+                        </div>
+                        <div *ngIf="item.mode === 'select'" class="w-min" [formGroup]="item.control">
+                            <p-inputNumber formControlName="count" [size]="4" [min]="0.01" [minFractionDigits]="0" [maxFractionDigits]="2"
+                                           [max]="99999" [allowEmpty]="false"></p-inputNumber>
+                        </div>
+                    </div>
+                </ng-template>
+            </p-pickList>
+            <ng-container [ngSwitch]="createWorkDialogMode">
+                <p-button (onClick)="createWork()" *ngSwitchCase="'create'" [style.place-self]="'flex-end'"
+                          icon="mdi-plus" label="Создать"></p-button>
+                <p-button (onClick)="updateWork()" *ngSwitchCase="'edit'" [style.place-self]="'flex-end'"
+                          icon="mdi-edit" label="Изменить"></p-button>
+            </ng-container>
+        </div>
+    </ng-template>
+</p-dialog>
+
+<ng-template #workEntryRef let-workTemp>
+    <div class="flexed gap5 hcenter p10 split-line">
+        <div class="flexed column">
+            <span class="caption size-big f-color-600">
+                {{workTemp.action.name}}
+            </span>
+            <span class="caption with-icon size-small f-color-500 wt-black">
+                <span class="mdi-payments"></span>
+                <span>
+                    {{workTemp.action.cost}} руб/{{workTemp.action.unit | unitName}}
+                </span>
+            </span>
+        </div>
+        <div class="stretched"></div>
+        <span class="caption size-big wt-tiny">
+            Кол-во:
+            {{workTemp.count}}
+            {{workTemp.action.unit | unitName}}
+        </span>
+        <span class="caption size-big f-color-primary wt-tiny">
+            Стоймость:
+            {{workTemp.action.cost * workTemp.count}} руб
+        </span>
+    </div>
+</ng-template>
+
+<ng-template #nodeTitleRef let-node>
+    <ng-container [ngSwitch]="node.type">
+        <ng-container *ngSwitchCase="'group'">
+            <div class="caption size-huge f-color-500 wt-bold f-inline">
+                <span>
+                    {{node.data.name}}
+                </span>
+            </div>
+        </ng-container>
+        <ng-container *ngSwitchCase="'work'">
+            <div class="flexed hcenter gap5 p3 caption size-huge f-color-500 wt-bold f-inline ">
+                <p-button styleClass="p-button-text p-button-secondary p-button-icon" icon="mdi-arrow_back" (onClick)="back()"></p-button>
+                <span>
+                    {{node.data.name}}
+                </span>
+                <div class="stretched"></div>
+                <p-button styleClass="p-button-text p-button-warning" label="Редактировать" icon="mdi-edit" (onClick)="editingWorkId = node.data.id; openEditWorkDialog()"></p-button>
+            </div>
+        </ng-container>
+    </ng-container>
+
+</ng-template>
+
+<ng-template #loadingRef>
+    <div class="relative stretched">
+        <p-progressSpinner class="primary-spinner center-of-content"></p-progressSpinner>
+    </div>
+</ng-template>
+
+<ng-template #errorRef>
+    <div class="relative stretched">
+        <div class="flexed hcenter column caption size-big wt-bold f-color-danger center-of-content">
+            <span class="mds-error"></span>
+            <span>
+                Ошибка загрузки
+            </span>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #backButtonRef>
+    <div class="group-list-el primary" (click)="back()" pRipple>
+        <span class="mds-arrow_top_left"></span>
+        <span class="name">Назад</span>
+    </div>
+</ng-template>
+
+<ng-template #createButtonRef>
+    <div class="group-list-el primary" (click)="inViewContextMenu.toggle($event)" pRipple>
+        <span class="mds-add"></span>
+        <span class="name">Создать</span>
+    </div>
+</ng-template>
+
+<ng-template #nodeRef let-node>
+    <div class="group-list-el primary" (click)="selectGroupInView(node)" pRipple>
+        <span [class]="node.type === 'group' ? 'mds-folder' : 'mds-construction'"></span>
+        <span class="name" appTicker>{{node.data.name}}</span>
+    </div>
+</ng-template>

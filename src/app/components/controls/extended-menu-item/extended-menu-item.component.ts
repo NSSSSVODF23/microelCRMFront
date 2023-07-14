@@ -35,11 +35,11 @@ export class ExtendedMenuItemComponent implements OnInit, AfterViewInit {
     }
 
     ngOnInit(): void {
-        // this.route.url.pipe(map(url => url.map(u => u.path))).subscribe(path => {
+        // this.route.url.pipe(map(url => url.map(u => u.breadcrumb))).subscribe(breadcrumb => {
         //     console.log(this.caption)
         //     setTimeout(() => {
         //         this.elements.forEach(elm => {
-        //             if (elm.link[1].replace(/\W/g, '') === path[1].replace(/\W/g, '')) {
+        //             if (elm.link[1].replace(/\W/g, '') === breadcrumb[1].replace(/\W/g, '')) {
         //                 this.isExtended = true;
         //             }
         //             this.extending();

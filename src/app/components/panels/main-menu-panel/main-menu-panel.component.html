@@ -6,6 +6,9 @@
         <ng-container *ngSwitchCase="'tasks'">
             <ng-container *ngTemplateOutlet="tasks"></ng-container>
         </ng-container>
+        <ng-container *ngSwitchCase="'salary'">
+            <ng-container *ngTemplateOutlet="salary"></ng-container>
+        </ng-container>
         <ng-container *ngSwitchDefault>
             <ng-container *ngTemplateOutlet="main"></ng-container>
         </ng-container>
@@ -19,6 +22,7 @@
     <app-extended-menu-item caption="Коммутаторы" icon="dns"></app-extended-menu-item>
     <app-extended-menu-item caption="Склад" icon="warehouse"></app-extended-menu-item>
     <app-extended-menu-item [link]="['/employees']" caption="Сотрудники" icon="account_circle"></app-extended-menu-item>
+    <app-extended-menu-item [link]="['/salary','table']" caption="Зарплата" icon="currency_ruble"></app-extended-menu-item>
 </ng-template>
 
 <ng-template #tasks>
@@ -30,6 +34,14 @@
     <app-extended-menu-item [elements]="stagesMenuItems" [isExtended]="stageMenuExtended" caption="Доска"
                             icon="checklist"></app-extended-menu-item>
     <app-extended-menu-item [link]="['/tasks','templates']" caption="Теги/Шаблоны" icon="ballot"></app-extended-menu-item>
+</ng-template>
+
+<ng-template #salary>
+    <ng-container *ngTemplateOutlet="backButton; context:{name:'Зарплата'}"></ng-container>
+    <app-extended-menu-item [link]="['/salary','table']" caption="Зарплатная таблица" icon="table_chart"></app-extended-menu-item>
+    <app-extended-menu-item [link]="['/salary','estimation']" caption="Подсчет работ" icon="exposure_plus_2"></app-extended-menu-item>
+    <app-extended-menu-item [link]="['/salary','works']" caption="Список работ" icon="construction"></app-extended-menu-item>
+    <app-extended-menu-item [link]="['/salary','paid-actions']" caption="Платные действия" icon="toc"></app-extended-menu-item>
 </ng-template>
 
 <ng-template #backButton let-name="name">

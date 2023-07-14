@@ -59,23 +59,23 @@
 
 <ng-template #metadata>
     <div class="metadata">
-        <span class="caption-header">Информация о файле</span>
+        <span class="caption size-big">Информация о файле</span>
         <div class="flexed column gap3 p5">
             <div class="flexed hcenter gap3">
-                <span class="caption-secondary">Имя</span>
-                <span class="caption-inline-param">{{media?.name}}</span>
+                <span class="caption size-small wt-bold f-color-500">Имя</span>
+                <span class="caption size-small f-inline">{{media?.name}}</span>
             </div>
             <div class="flexed hcenter gap3">
-                <span class="caption-secondary">Размер файла</span>
-                <span class="caption-inline-param">{{((media?.size ?? 0) / 1048576).toFixed(2)}} Мбайт</span>
+                <span class="caption size-small wt-bold f-color-500">Размер файла</span>
+                <span class="caption size-small f-inline">{{((media?.size ?? 0) / 1048576).toFixed(2)}} Мбайт</span>
             </div>
             <div class="flexed hcenter gap3">
-                <span class="caption-secondary">Дата создания</span>
-                <span class="caption-inline-param">{{media?.modified|date}}</span>
+                <span class="caption size-small wt-bold f-color-500">Дата создания</span>
+                <span class="caption size-small f-inline">{{media?.modified|date}}</span>
             </div>
             <div class="flexed hcenter gap3">
-                <span class="caption-secondary">Дата добавления</span>
-                <span class="caption-inline-param">{{media?.created|date}}</span>
+                <span class="caption size-small wt-bold f-color-500">Дата добавления</span>
+                <span class="caption size-small f-inline">{{media?.created|date}}</span>
             </div>
         </div>
         <div class="stretched"></div>

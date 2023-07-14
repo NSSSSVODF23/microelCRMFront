@@ -7,27 +7,38 @@ import {
     Chat,
     ChatMessage,
     City,
-    Comment, DefaultObservers,
+    Comment,
+    DefaultObservers,
     Department,
     Employee,
     EmployeeStatus,
     FieldItem,
     FileData,
-    FilterModelItem,
     INotification,
     MessageData,
     ModelItem,
     Page,
-    Position, SuperMessage,
-    Task, TaskCreationBody,
+    PaidAction,
+    PaidActionFilter,
+    PaidActionForm,
+    PaidWork,
+    PaidWorkForm,
+    PaidWorkGroupForm,
+    Position,
+    SuperMessage,
+    Task,
+    TaskCreationBody,
     TaskEvent,
-    TaskFieldsSnapshot, TaskFiltrationConditions,
+    TaskFieldsSnapshot,
+    TaskFiltrationConditions,
     TaskTag,
     TokenChain,
+    TreeDragDropEvent,
+    TreeElementPosition,
     Wireframe,
     WorkLog
 } from "../transport-interfaces";
-import {MessageService} from "primeng/api";
+import {MessageService, TreeNode} from "primeng/api";
 import {cyrb53, Storage, Utils} from "../util";
 import {Duration} from "@fullcalendar/core";
 import {AddressCorrecting, OldTracker} from "../parsing-interfaces";
@@ -53,7 +64,7 @@ export class ApiService {
     }
 
     getWireframes(includingRemoved?: boolean): Observable<Wireframe[]> {
-        if(includingRemoved === undefined || includingRemoved === null){
+        if (includingRemoved === undefined || includingRemoved === null) {
             return this.sendGet('api/private/wireframes');
         }
         return this.sendGet('api/private/wireframes', {includingRemoved});
@@ -88,7 +99,7 @@ export class ApiService {
         return this.sendGet<Task>(url);
     }
 
-    getWorkLogsByTaskId(taskId: number): Observable<WorkLog[]>{
+    getWorkLogsByTaskId(taskId: number): Observable<WorkLog[]> {
         return this.sendGet(`api/private/task/${taskId}/work-logs`);
     }
 
@@ -151,7 +162,7 @@ export class ApiService {
         return this.sendGet(`api/private/available-observers/${query}`);
     }
 
-    createComment(text: string|null, taskId: number, files: FileData[]|null, replyComment?: number): Observable<Comment> {
+    createComment(text: string | null, taskId: number, files: FileData[] | null, replyComment?: number): Observable<Comment> {
         return this.sendPost<Comment>("api/private/comment", {
             taskId,
             text: text ? text : '',
@@ -270,7 +281,7 @@ export class ApiService {
         return this.sendGet<Employee>("api/private/me");
     }
 
-    setAvatar(avatar: string){
+    setAvatar(avatar: string) {
         return this.sendPost<Employee>("api/private/employee/avatar", avatar)
     }
 
@@ -310,7 +321,7 @@ export class ApiService {
         return this.sendGet<Employee[]>("api/private/employees/installers");
     }
 
-    assignInstallersToTask(taskId: number, targetInstallers:{installers: Employee[], description: String}) {
+    assignInstallersToTask(taskId: number, targetInstallers: { installers: Employee[], description: String }) {
         return this.sendPost("api/private/task/" + taskId + "/assign-installers", targetInstallers);
     }
 
@@ -443,7 +454,7 @@ export class ApiService {
         return this.sendGet<Page<SuperMessage>>("api/private/chat/" + chatId + "/messages", {first, limit});
     }
 
-    setMessagesAsRead(messageIds: number[]){
+    setMessagesAsRead(messageIds: number[]) {
         return this.sendPatch<void>("api/private/chat/messages/read", messageIds);
     }
 
@@ -544,8 +555,85 @@ export class ApiService {
     getAddressSuggestions(query: string) {
         return this.sendGet<Address[]>("api/private/suggestions/address", {query});
     }
+
     getCountOfUnreadMessages(chatId: number) {
         return this.sendGet<number>("api/private/chat/" + chatId + "/messages/unread-count");
+    }
+
+    getPageOfPaidActions(page: number, filter: PaidActionFilter) {
+        return this.sendGet<Page<PaidAction>>(`api/private/salary/paid-actions/${page}`, filter);
+    }
+
+    getListAvailablePaidActions() {
+        return this.sendGet<PaidAction[]>('api/private/salary/paid-actions/available');
+    }
+
+    createPaidAction(paidActionForm: PaidActionForm) {
+        return this.sendPost("api/private/salary/paid-action", paidActionForm);
+    }
+
+    editPaidAction(paidActionId: number, paidActionForm: PaidActionForm) {
+        return this.sendPatch("api/private/salary/paid-action/" + paidActionId, paidActionForm);
+    }
+
+    deletePaidAction(paidActionId: number) {
+        return this.sendDelete("api/private/salary/paid-action/" + paidActionId);
+    }
+
+    getRootTreeOfWorks(groupsUndraggable?: boolean) {
+        return this.sendGet<TreeNode<any>[]>('api/private/salary/paid-works-tree/root', {groupsUndraggable: groupsUndraggable ?? false});
+    }
+
+    getWorksOfGroup(groupId: string, groupsUndraggable?: boolean) {
+        return this.sendGet<TreeNode<any>[]>(`api/private/salary/paid-works-tree/${groupId}`, {groupsUndraggable: groupsUndraggable ?? false});
+    }
+
+    treeWorksDragDrop(event: TreeDragDropEvent) {
+        return this.sendPatch('api/private/salary/tree-works/drag-drop', event);
+    }
+
+    createPaidWorkGroup(paidWorkGroupForm: PaidWorkGroupForm) {
+        return this.sendPost('api/private/salary/paid-work-group', paidWorkGroupForm);
+    }
+
+    editPaidWorkGroup(paidWorkGroupId: number, paidWorkGroupForm: PaidWorkGroupForm) {
+        return this.sendPatch('api/private/salary/paid-work-group/' + paidWorkGroupId, paidWorkGroupForm);
+    }
+
+    deletePaidWorkGroup(paidWorkGroupId: number) {
+        return this.sendDelete('api/private/salary/paid-work-group/' + paidWorkGroupId);
+    }
+
+    createPaidWork(formValue: PaidWorkForm) {
+        return this.sendPost('api/private/salary/paid-work', formValue);
+    }
+
+    editPaidWork(paidWorkId: number, formValue: PaidWorkForm) {
+        return this.sendPatch('api/private/salary/paid-work/' + paidWorkId, formValue);
+    }
+
+    deletePaidWork(paidWorkId: number) {
+        return this.sendDelete('api/private/salary/paid-work/' + paidWorkId);
+    }
+
+    getPaidWorkById(paidWorkId: number) {
+        return this.sendGet<PaidWork>('api/private/salary/paid-work/' + paidWorkId);
+    }
+
+    paidWorkTreeReposition(positionList: TreeElementPosition[]) {
+        return this.sendPatch('api/private/salary/tree-works/reposition', positionList);
+    }
+
+    getUncalculatedWorkLogs() {
+        return this.sendGet<WorkLog[]>('api/private/work-logs/uncalculated');
+    }
+
+    sendWorkCalculation(form: any){
+        return this.sendPost('api/private/salary/work-сalculation', form);
+    }
+    
+    getSalaryTable(filter:any){
+        return this.sendGet<any>('api/private/salary/table', filter);
     }
 
     // Результаты запросов на сервер кэшируются по таймауту, чтобы не было доп нагрузки на сервер
@@ -573,6 +661,7 @@ export class ApiService {
         }
         return observable;
     }
+
     // Результаты запросов на сервер кэшируются по таймауту, чтобы не было доп нагрузки на сервер
 
     private sendGetSilent<T>(uri: string, query?: any) {
@@ -591,7 +680,6 @@ export class ApiService {
         return observable;
     }
 
-
     private sendPost<T>(uri: string, body: any) {
         return this.client.post<T>(uri, body)
             .pipe(catchError(async (err, caught) => {
@@ -603,6 +691,7 @@ export class ApiService {
     private sendPatch<T>(uri: string, body: any) {
         return this.client.patch<T>(uri, body)
             .pipe(catchError((err, caught) => {
+                console.log(err)
                 this.toast.add({severity: 'error', summary: "Ошибка запроса", detail: err.error.message})
                 throw err;
             }));

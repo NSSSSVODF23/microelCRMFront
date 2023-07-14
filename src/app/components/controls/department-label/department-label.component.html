@@ -19,7 +19,7 @@
 
 <ng-template #info>
     <app-avatar [name]="department?.name"  [size]="size" [shape]="inline?'square':'circle'"></app-avatar>
-    <span class="caption-main-small">
+    <span class="caption size-small">
         {{department?.name}}
     </span>
 </ng-template>
@@ -30,10 +30,10 @@
         <div class="department-preview">
             <app-avatar class="avatar" [size]="6" shape="square" [deleted]="department?.deleted"
                 [name]="department?.name"></app-avatar>
-            <div class="name caption-header">
+            <div class="name caption size-big">
                 {{department?.name}}
             </div>
-            <div class="description caption-sub-header">{{department?.description}}</div>
+            <div class="description caption size-small f-color-500">{{department?.description}}</div>
         </div>
     </ng-template>
 </p-overlayPanel>

@@ -5,7 +5,7 @@
                         [src]="_employee?.avatar" [status]="_employee?.status"></app-avatar>
             <app-avatar *ngIf="!showStatus" [deleted]="_employee?.deleted" [name]="_employee?.fullName ?? ''" [shape]="'circle'" [size]="size"
                         [src]="_employee?.avatar"></app-avatar>
-            <span class="caption-main-small one-line">
+            <span class="caption size-small one-line">
                 {{_employee?.fullName}}
             </span>
         </ng-container>
@@ -43,15 +43,15 @@
         <div class="employee-preview">
             <app-avatar class="avatar" [size]="6" shape="square" [deleted]="_employee?.deleted"
                         [src]="_employee?.avatar" [name]="_employee?.fullName ?? ''" [status]="_employee?.status"></app-avatar>
-            <div class="name caption-header">
+            <div class="name caption size-big">
                 {{_employee?.fullName}}
             </div>
             <div class="status">
-                <span *ngIf="status" class="caption-secondary" [style]="statusStyle">{{status}}</span>
-                <span class="caption-main-small" *ngIf="_employee?.deleted">(удален)</span>
+                <span *ngIf="status" class="caption size-small wt-bold f-color-500" [style]="statusStyle">{{status}}</span>
+                <span class="caption size-small" *ngIf="_employee?.deleted">(удален)</span>
             </div>
-            <div class="department caption-sub-header">{{_employee?.department?.name}}</div>
-            <div class="position caption-sub-header">{{_employee?.position?.name}}</div>
+            <div class="department caption size-small f-color-500">{{_employee?.department?.name}}</div>
+            <div class="position caption size-small f-color-500">{{_employee?.position?.name}}</div>
         </div>
     </ng-template>
 </p-overlayPanel>

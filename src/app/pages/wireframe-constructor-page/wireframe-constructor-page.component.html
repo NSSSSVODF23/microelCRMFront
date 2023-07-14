@@ -1,4 +1,4 @@
-<div [ngSwitch]="constructStage" appExtendPageHeight class="flexed hcenter column gap15" [style.padding-bottom]="'2rem'">
+<div [ngSwitch]="constructStage" appExtendPageHeight class="flexed vcenter column gap15" [style.padding-bottom]="'2rem'">
     <ng-container *ngSwitchCase="'FIELDS'">
         <div class="flexed column gap10 panel p10">
             <div class="flexed gap5">
@@ -69,9 +69,9 @@
                                 model="p-button-success"></app-button>
                     <p-orderList (onReorder)="reorderStages()" [dragdrop]="true" [value]="this.wireframe.stages??[]">
                         <ng-template let-stage pTemplate="item">
-                            <div class="flexed hcenter gap5 caption-main">
+                            <div class="flexed hcenter gap5 caption">
                                 <span class="material-icons-round drag-icon">drag_indicator</span>
-                                <span class="caption-sub-header">{{stage.orderIndex+1}}.</span>
+                                <span class="caption size-small f-color-500">{{stage.orderIndex+1}}.</span>
                                 <input (mousedown)="mouseDown($event)" [(ngModel)]="stage.label" class="inline-input">
                                 <div class="stretched"></div>
                                 <app-icon-button (mousedown)="mouseDown($event)" (onClick)="removeStage(stage.stageId)" [size]="1.4"
@@ -147,11 +147,11 @@
             <app-select-field-to-view-button (selectView)="selectFieldToView($event)"
                                              [fields]="wireframeFieldsList"
                                              [index]="1"
-                                             classes="caption-main"></app-select-field-to-view-button>
+                                             classes="caption"></app-select-field-to-view-button>
             <div class="stretched"></div>
             <div class="flexed gap5">
                 <app-avatar [size]="1.8"></app-avatar>
-                <span class="caption-main">Creator</span>
+                <span class="caption">Creator</span>
             </div>
         </div>
         <div *ngSwitchCase="'COMPOSITE'" class="flexed p8 hcenter item-example">
@@ -159,16 +159,16 @@
                 <app-select-field-to-view-button (selectView)="selectFieldToView($event)"
                                                  [fields]="wireframeFieldsList"
                                                  [index]="1"
-                                                 classes="caption-main"></app-select-field-to-view-button>
+                                                 classes="caption"></app-select-field-to-view-button>
                 <app-select-field-to-view-button (selectView)="selectFieldToView($event)"
                                                  [fields]="wireframeFieldsList"
                                                  [index]="2"
-                                                 classes="caption-secondary"></app-select-field-to-view-button>
+                                                 classes="caption size-small wt-bold f-color-500"></app-select-field-to-view-button>
             </div>
             <div class="stretched"></div>
             <div class="flexed gap5">
                 <app-avatar [size]="1.8"></app-avatar>
-                <span class="caption-main">Creator</span>
+                <span class="caption">Creator</span>
             </div>
         </div>
         <div *ngSwitchCase="'DETAILED'" class="flexed p8 hcenter item-example">
@@ -177,22 +177,22 @@
                     <app-select-field-to-view-button (selectView)="selectFieldToView($event)"
                                                      [fields]="wireframeFieldsList"
                                                      [index]="1"
-                                                     classes="caption-main"></app-select-field-to-view-button>
-                    <span class="caption-main">-</span>
+                                                     classes="caption"></app-select-field-to-view-button>
+                    <span class="caption">-</span>
                     <app-select-field-to-view-button (selectView)="selectFieldToView($event)"
                                                      [fields]="wireframeFieldsList"
                                                      [index]="2"
-                                                     classes="caption-main-small"></app-select-field-to-view-button>
+                                                     classes="caption size-small"></app-select-field-to-view-button>
                 </div>
                 <app-select-field-to-view-button (selectView)="selectFieldToView($event)"
                                                  [fields]="wireframeFieldsList"
                                                  [index]="3"
-                                                 classes="caption-secondary"></app-select-field-to-view-button>
+                                                 classes="caption size-small wt-bold f-color-500"></app-select-field-to-view-button>
             </div>
             <div class="stretched"></div>
             <div class="flexed gap5">
                 <app-avatar [size]="1.8"></app-avatar>
-                <span class="caption-main">Creator</span>
+                <span class="caption">Creator</span>
             </div>
         </div>
     </ng-container>

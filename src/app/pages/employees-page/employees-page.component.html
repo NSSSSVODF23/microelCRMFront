@@ -18,7 +18,7 @@
                             <i class="mdi-search"></i>
                             <input formControlName="query" pInputText placeholder="Поиск..." type="text">
                         </span>
-                        <span class="caption-sub-header flexed column hcenter">
+                        <span class="caption size-small f-color-500 flexed column hcenter">
                             <p-inputSwitch [falseValue]="false"
                                            [ngStyle]="{lineHeight:'0'}" [trueValue]="true"
                                            formControlName="showDeleted"></p-inputSwitch>
@@ -34,7 +34,7 @@
                             <app-avatar [deleted]="employee.deleted ?? false" [name]="employee.fullName" [size]="2.5"
                                         [src]="employee.avatar"></app-avatar>
                             <div class="flexed column">
-                                <span class="caption-main">{{employee.fullName}}</span>
+                                <span class="caption">{{employee.fullName}}</span>
                                 <div class="flexed gap5 hcenter">
                             <span appColorize>
                                 {{employee.department?.name}}
@@ -73,11 +73,11 @@
                     <div class="list-view">
                         <div *ngFor="let department of departments; trackBy: trackByDepartment" class="list-view-item bordered">
                             <div class="flexed column gap5">
-                                    <span appColorize class="caption-sub-header">
+                                    <span appColorize class="caption size-small f-color-500">
                                         {{department.name}}
                                     </span>
                                 <div *ngIf="department.description" [style]="{maxWidth:'20rem',marginLeft:'.5rem'}"
-                                     class="caption-main-small">
+                                     class="caption size-small">
                                     {{department.description}}
                                 </div>
                             </div>
@@ -109,11 +109,11 @@
                     <div class="list-view">
                         <div *ngFor="let position of positions; trackBy: trackByPosition" class="list-view-item bordered">
                             <div class="flexed column gap5">
-                                    <span appColorize class="caption-sub-header">
+                                    <span appColorize class="caption size-small f-color-500">
                                         {{position?.name}}
                                     </span>
                                 <div *ngIf="position.description" [style]="{maxWidth:'20rem',marginLeft:'.5rem'}"
-                                     class="caption-main-small">
+                                     class="caption size-small">
                                     {{position.description}}
                                 </div>
                             </div>

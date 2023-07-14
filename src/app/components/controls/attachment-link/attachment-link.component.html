@@ -15,7 +15,7 @@
     <span>
         {{attachment?.name}}
     </span>
-    <span class="caption-secondary">
+    <span class="caption size-small wt-bold f-color-500">
         {{((attachment?.size ?? 0) / 1048576).toFixed(2)}} Мбайт
     </span>
     <div *ngIf="attachment?.type==='PHOTO' && hovered" class="photo-preview-panel">

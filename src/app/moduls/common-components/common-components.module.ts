@@ -151,6 +151,7 @@ import {
 } from "../../components/controls/observer-selector-input/observer-selector-input.component";
 import {AutoCompleteModule} from "primeng/autocomplete";
 import {TaskTagSelectorComponent} from "../../components/controls/task-tag-selector/task-tag-selector.component";
+import {TickerDirective} from "../../directives/ticker.directive";
 
 
 @NgModule({
@@ -230,7 +231,8 @@ import {TaskTagSelectorComponent} from "../../components/controls/task-tag-selec
         EmployeeSelectorComponent,
         DataRangeInputComponent,
         ObserverSelectorInputComponent,
-        TaskTagSelectorComponent
+        TaskTagSelectorComponent,
+        TickerDirective
     ],
     exports: [
         AccountPanelComponent,
@@ -308,7 +310,8 @@ import {TaskTagSelectorComponent} from "../../components/controls/task-tag-selec
         EmployeeSelectorComponent,
         DataRangeInputComponent,
         ObserverSelectorInputComponent,
-        TaskTagSelectorComponent
+        TaskTagSelectorComponent,
+        TickerDirective
     ],
     imports: [
         CommonPipesModule,

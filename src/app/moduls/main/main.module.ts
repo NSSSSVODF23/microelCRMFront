@@ -16,8 +16,8 @@ import {InputSwitchModule} from "primeng/inputswitch";
 import {RouterOutlet} from "@angular/router";
 import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {
-    AsyncPipe,
-    DatePipe, JsonPipe, KeyValuePipe,
+    AsyncPipe, CurrencyPipe,
+    DatePipe, DecimalPipe, JsonPipe, KeyValuePipe,
     NgClass,
     NgForOf,
     NgIf,
@@ -71,6 +71,18 @@ import {ProgressBarModule} from "primeng/progressbar";
 import {ParseAddressPageComponent} from "../../pages/parse-address-page/parse-address-page.component";
 import {SelectButtonModule} from "primeng/selectbutton";
 import {AutoFocusModule} from "primeng/autofocus";
+import {SalaryTablePageComponent} from "../../pages/salary-table-page/salary-table-page.component";
+import {PaidActionsPageComponent} from "../../pages/paid-actions-page/paid-actions-page.component";
+import {WorksPageComponent} from "../../pages/works-page/works-page.component";
+import {BreadcrumbModule} from "primeng/breadcrumb";
+import {TreeModule} from "primeng/tree";
+import {RippleModule} from "primeng/ripple";
+import {SalaryEstimationPageComponent} from "../../pages/salary-estimation-page/salary-estimation-page.component";
+import {TreeTableModule} from "primeng/treetable";
+import {DragDropModule} from "primeng/dragdrop";
+import {TableModule} from "primeng/table";
+import {SliderModule} from "primeng/slider";
+import {SlideMenuModule} from "primeng/slidemenu";
 
 
 @NgModule({
@@ -87,7 +99,11 @@ import {AutoFocusModule} from "primeng/autofocus";
         IncomingTasksPageComponent,
         TaskCalendarPageComponent,
         ParseTaskPageComponent,
-        ParseAddressPageComponent
+        ParseAddressPageComponent,
+        SalaryTablePageComponent,
+        PaidActionsPageComponent,
+        WorksPageComponent,
+        SalaryEstimationPageComponent
     ],
     imports: [
         CommonComponentsModule,
@@ -148,7 +164,17 @@ import {AutoFocusModule} from "primeng/autofocus";
         SlicePipe,
         SelectButtonModule,
         AutoFocusModule,
-        TitleCasePipe
+        TitleCasePipe,
+        CurrencyPipe,
+        BreadcrumbModule,
+        TreeModule,
+        RippleModule,
+        TreeTableModule,
+        DragDropModule,
+        TableModule,
+        SliderModule,
+        DecimalPipe,
+        SlideMenuModule
     ],
     providers: [MessageService, {provide: LOCALE_ID, useValue: 'ru'}, ConfirmationService]
 })

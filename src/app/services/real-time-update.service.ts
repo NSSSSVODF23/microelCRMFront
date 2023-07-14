@@ -5,12 +5,12 @@ import {
     Chat, ChatUnreadCounter,
     Comment,
     Department,
-    Employee, INotification,
+    Employee, INotification, PaidAction, PaidWork,
     Position,
     SuperMessage,
     Task,
     TaskEvent,
-    TaskTag, Wireframe, WorkLog
+    TaskTag, TreeElementPosition, TreeNodeMoveEvent, TreeNodeUpdateEvent, Wireframe, WorkLog
 } from "../transport-interfaces";
 import {cyrb53} from "../util";
 import {OldTracker, SimpleMessage} from "../parsing-interfaces";
@@ -187,6 +187,41 @@ export class RealTimeUpdateService {
     wireframeDeleted(wireframeId?: number) {
         if(wireframeId) return this.watch<Wireframe>('wireframe', wireframeId.toString(), 'delete')
         return this.watch<Wireframe>('wireframe', 'delete');
+    }
+
+    paidActionCreated() {
+        return this.watch<PaidAction>('paid-action', 'create')
+    }
+
+    paidActionUpdated(paidActionId?: number) {
+        if(paidActionId) return this.watch<PaidAction>('paid-action', paidActionId.toString(), 'update')
+        return this.watch<PaidAction>('paid-action', 'update')
+    }
+
+    paidActionDeleted(paidActionId?: number) {
+        if(paidActionId) return this.watch<PaidAction>('paid-action', paidActionId.toString(), 'delete')
+        return this.watch<PaidAction>('paid-action', 'delete')
+    }
+
+    paidWorksTreeMoved() {
+        return this.watch<TreeNodeMoveEvent>('paid-works', 'tree', 'move')
+    }
+
+    paidWorksTreeUpdated(){
+        return this.watch<TreeNodeUpdateEvent>('paid-works', 'tree', 'update')
+    }
+
+    paidWorksTreeCreated(){
+        return this.watch<TreeNodeUpdateEvent>('paid-works', 'tree', 'create')
+    }
+
+    worksTreeReposition(){
+        return this.watch<TreeElementPosition[]>('paid-works', 'tree', 'reposition')
+    }
+
+    paidWorkUpdated(id?: number){
+        if(id) return this.watch<PaidWork>('paid-work', id.toString(), 'update')
+        return this.watch<PaidWork>('paid-work', 'update')
     }
 
     private watchUnicast<T>(...path: string[]): Observable<T> {

@@ -8851,6 +8851,27 @@
 }
 
 .mds {
+
+  &-sync{
+    @include mds("sync");
+  }
+
+  &-sync_alt{
+    @include mds("sync_alt");
+  }
+
+  &-release_alert{
+    @include mds("release_alert");
+  }
+
+  &-folder{
+    @include mds("folder");
+  }
+
+  &-construction{
+    @include mds("construction");
+  }
+
   &-10k {
     @include mds("10k");
   }
@@ -9521,6 +9542,10 @@
 
   &-align_vertical_top {
     @include mds("align_vertical_top");
+  }
+
+  &-inbox {
+    @include mds("inbox");
   }
 
   &-all_inbox {
@@ -11513,6 +11538,22 @@
 
   &-content_paste_search {
     @include mds("content_paste_search");
+  }
+
+  &-list{
+    @include mds("list");
+  }
+
+  &-receipt_long{
+    @include mds("receipt_long");
+  }
+
+  &-search {
+    @include mds("search");
+  }
+
+  &-search_off {
+    @include mds("search_off");
   }
 
   &-contract {

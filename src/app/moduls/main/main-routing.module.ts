@@ -16,6 +16,10 @@ import {IncomingTasksPageComponent} from "../../pages/incoming-tasks-page/incomi
 import {TaskCalendarPageComponent} from "../../pages/task-calendar-page/task-calendar-page.component";
 import {ParseTaskPageComponent} from "../../pages/parse-task-page/parse-task-page.component";
 import {ParseAddressPageComponent} from "../../pages/parse-address-page/parse-address-page.component";
+import {SalaryTablePageComponent} from "../../pages/salary-table-page/salary-table-page.component";
+import {PaidActionsPageComponent} from "../../pages/paid-actions-page/paid-actions-page.component";
+import {WorksPageComponent} from "../../pages/works-page/works-page.component";
+import {SalaryEstimationPageComponent} from "../../pages/salary-estimation-page/salary-estimation-page.component";
 
 const routes: Routes = [
     {
@@ -34,10 +38,15 @@ const routes: Routes = [
             {path: 'employees', component: EmployeesPageComponent},
             {path: 'testing', component: TestingPageComponent},
             {path: 'parser/tracker', component: ParseTaskPageComponent},
-            {path: 'parser/address', component: ParseAddressPageComponent}
+            {path: 'parser/address', component: ParseAddressPageComponent},
+            {path: 'salary/table', component: SalaryTablePageComponent},
+            {path: 'salary/paid-actions', redirectTo: '/salary/paid-actions/1?includeDeleted=false', pathMatch: 'full'},
+            {path: 'salary/paid-actions/:page', component: PaidActionsPageComponent},
+            {path: 'salary/works', component: WorksPageComponent},
+            {path: 'salary/estimation', component: SalaryEstimationPageComponent}
         ]
     },
-    // {path: '**', redirectTo: 'tasks/status/all', pathMatch: 'full'},
+    // {breadcrumb: '**', redirectTo: 'tasks/status/all', pathMatch: 'full'},
 ];
 
 @NgModule({

@@ -16,7 +16,7 @@
            [position]="'right'" (onShow)="notifyService.load()" (onHide)="notifyService.readAllNotifications()"
            [style]="{width:'max-content', maxWidth: '30vw'}">
     <ng-template pTemplate="header">
-        <span class="caption-header flexed inline hcenter gap3"><i class="mdi-circle_notifications"></i> Уведомления</span>
+        <span class="caption size-big flexed inline hcenter gap3"><i class="mdi-circle_notifications"></i> Уведомления</span>
         <div class="stretched"></div>
         <p-button styleClass="p-button-text" icon="mdi-clear_all" label="Отчистить"
                   [disabled]="!notifyService.isHasUnread" (onClick)="notifyService.readAllNotifications()"></p-button>
@@ -26,7 +26,7 @@
             <app-notification-item [notification]="notify" *ngFor="let notify of notifyService.list"></app-notification-item>
         </div>
         <div class="flexed hcenter vcenter column p10" [style.padding-top]="'10rem'" *ngIf="notifyService.isEmpty">
-            <span class="flexed hcenter gap5 caption-common-message"><i class="mdi-inventory"></i> Новых уведомлений пока нет</span>
+            <span class="flexed hcenter gap5 caption size-big wt-bold f-color-500"><i class="mdi-inventory"></i> Новых уведомлений пока нет</span>
             <p-button label="Показать предыдущие" styleClass="p-button-text one-line" (onClick)="notifyService.changeNotificationViewMode('ALL')"></p-button>
         </div>
     </ng-template>

@@ -6,6 +6,7 @@ import {TaskStatusPipe} from "../../pipes/task-status.pipe";
 import {TaskEventTranslatePipe} from "../../pipes/task-event-translate.pipe";
 import {ModelItemValuePipe} from "../../pipes/model-item-value.pipe";
 import {FloorPipe} from "../../pipes/floor.pipe";
+import {UnitNamePipe} from "../../pipes/unit-name.pipe";
 
 
 @NgModule({
@@ -15,7 +16,8 @@ import {FloorPipe} from "../../pipes/floor.pipe";
         TaskStatusPipe,
         TaskEventTranslatePipe,
         ModelItemValuePipe,
-        FloorPipe
+        FloorPipe,
+        UnitNamePipe
     ],
     imports: [
         CommonModule
@@ -26,7 +28,8 @@ import {FloorPipe} from "../../pipes/floor.pipe";
         TaskStatusPipe,
         TaskEventTranslatePipe,
         ModelItemValuePipe,
-        FloorPipe
+        FloorPipe,
+        UnitNamePipe
     ]
 })
 export class CommonPipesModule {

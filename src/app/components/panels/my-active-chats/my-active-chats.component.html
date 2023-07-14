@@ -6,21 +6,21 @@
 <p-overlayPanel #overlayPanelEl appendTo="body" [baseZIndex]="2000">
     <ng-template pTemplate="content">
         <ng-container *ngIf="chatService.chats.length>0">
-            <div class="caption-header title">Активные чаты</div>
+            <div class="caption size-big title">Активные чаты</div>
             <div class="chats list-view" [style.max-height]="'30rem'">
                 <ng-container *ngFor="let chat of chatService.chats; trackBy: trackByChat">
                     <ng-container *ngTemplateOutlet="chatListItem; context: {$implicit: chat}"></ng-container>
                 </ng-container>
             </div>
         </ng-container>
-        <div *ngIf="chatService.chats.length==0" class="caption-common-message flexed hcenter gap3"><i class="mdi-speaker_notes_off"></i> <span>Нет активных чатов</span></div>
+        <div *ngIf="chatService.chats.length==0" class="caption size-big wt-bold f-color-500 flexed hcenter gap3"><i class="mdi-speaker_notes_off"></i> <span>Нет активных чатов</span></div>
     </ng-template>
 </p-overlayPanel>
 
 <ng-template #chatListItem let-chat>
     <div [ngClass]="{'without-msg':!chat.lastMessage}" class="chat-list-item" (click)="chatService.open.emit(chat.chatId); overlayPanelEl.hide()">
-        <div class="caption-header flexed column">
-            <span class="caption-tiny flexed hcenter gap2" *ngIf="chatService.unreadMessagesCount[chat.chatId]">
+        <div class="caption size-big flexed column">
+            <span class="caption size-tiny wt-bold f-color-500 flexed hcenter gap2" *ngIf="chatService.unreadMessagesCount[chat.chatId]">
                 <i class="mdi-save_alt"></i>
                 <span>
                     Новых: {{chatService.unreadMessagesCount[chat.chatId]}}
@@ -28,13 +28,13 @@
             </span>
             <span>{{chat.title}}</span>
         </div>
-        <div *ngIf="chat.lastMessage" class="caption-secondary">
-            <span class="caption-tiny">{{chat.lastMessage.author.fullName}}: </span>
+        <div *ngIf="chat.lastMessage" class="caption size-small wt-bold f-color-500">
+            <span class="caption size-tiny wt-bold f-color-500">{{chat.lastMessage.author.fullName}}: </span>
             <span>{{chat.lastMessage.text}}</span>
         </div>
         <div class="meta">
             <app-avatar-list [employees]="chat.members" [size]="1.2"></app-avatar-list>
-            <span class="caption-tiny">{{chat.created | date:"dd-MM-yyyy HH:mm"}}</span>
+            <span class="caption size-tiny wt-bold f-color-500">{{chat.created | date:"dd-MM-yyyy HH:mm"}}</span>
         </div>
     </div>
 </ng-template>

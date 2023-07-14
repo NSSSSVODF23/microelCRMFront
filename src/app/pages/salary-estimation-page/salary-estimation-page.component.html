@@ -1,0 +1,359 @@
+<div appExtendPageHeight class="flexed vcenter">
+    <div [style]="{marginBottom: '1rem'}" class="responsive-wrapper flexed gap10">
+        <app-main-menu-panel></app-main-menu-panel>
+        <div class="flexed column gap10 stretched">
+            <div class="flexed column gap10 stretched panel p10">
+                <ng-container *ngIf="!selectedWorkLog">
+                    <ng-container *ngTemplateOutlet="uncalculatedListTemp"></ng-container>
+                </ng-container>
+                <ng-container *ngIf="selectedWorkLog">
+                    <ng-container *ngTemplateOutlet="selectedWorkTemp"></ng-container>
+                </ng-container>
+            </div>
+            <ng-container *ngIf="selectedWorkLog">
+                <div class="flexed column gap15 stretched panel p20">
+                    <div class="flexed gap10 hcenter spbtw">
+                        <span class="caption size-huge">
+                            Распределение по сотрудникам
+                        </span>
+                        <p-button (onClick)="equalize()" icon="mdi-equalizer" label="Равные доли"
+                                  styleClass="p-button-text p-button-secondary"></p-button>
+                    </div>
+                    <div [formGroup]="employeeRatioForm" class="flexed gap10 sparnd">
+                        <div *ngFor="let employee of selectedWorkLog?.employees; trackBy: trackByEmployee"
+                             class="flexed column vcenter gap5">
+                            <app-avatar [deleted]="employee.deleted" [name]="employee.fullName" [size]="5"
+                                        [src]="employee.avatar"></app-avatar>
+                            <div class="caption size-big">{{employee.fullName}}</div>
+                            <ng-container [formGroupName]="employee.login">
+                                <div class="flexed gap10 hcenter w-full">
+                                    <p-slider [max]="1" [min]="0" [step]=".01" class="w-full"
+                                              formControlName="ratio"></p-slider>
+                                    <span class="caption size-tiny wt-bold f-color-500">
+                                        {{employeeRatioForm.value[employee.login].ratio * 100 | number:'1.2-2'}}%
+                                    </span>
+                                </div>
+                                <p-inputNumber [disabled]="totalCostOfWork === 0" formControlName="sum"
+                                               suffix=" руб."></p-inputNumber>
+                                <div *ngIf="hasWorkActionRatio(employee.login)" class="flexed column gap2">
+                                    <span class="caption size-tiny wt-bold">Доп. коэффициенты:</span>
+                                    <div class="flexed column gap2">
+                                        <div *ngFor="let war of getFactorsActions(employee.login); trackBy: trackByWar"
+                                             class="flexed hcenter gap3">
+                                            <span class="caption">{{war?.name}}</span>
+                                            <span class="caption size-tiny wt-bold f-color-primary">x{{war?.factor}}</span>
+                                            <span *ngIf="war"
+                                                  [class]="'caption ' +( getWorkActionsRatioSum(war.uuid) > 0 ? 'f-color-success' : 'f-color-danger')">
+                                                {{getWorkActionsRatioSum(war.uuid)}}руб.
+                                            </span>
+                                            <app-tiny-button (onClick)="removeWorkActionRatio(war.uuid)" [size]=".8" icon="delete"
+                                                             model="danger"></app-tiny-button>
+                                        </div>
+                                    </div>
+                                    <span class="caption">Итог: {{getEmployeeTotalPayment(employee.login)}} руб.</span>
+                                </div>
+
+                            </ng-container>
+                        </div>
+                    </div>
+                    <div class="flexed vend hcenter gap10">
+                        <span class="caption wt-bold f-color-500">
+                            Распределенная сумма: {{allMoney}} руб.
+                        </span>
+                        <span class="caption size-big wt-bold f-color-primary">
+                            Итог вместе с коэф.: {{allMoneyWithRatio}} руб.
+                        </span>
+                        <p-button (onClick)="sendCalculation()" [loading]="isSendingCalculation" icon="mdi-currency_exchange"
+                                  label="Рассчитать"></p-button>
+                    </div>
+                </div>
+            </ng-container>
+        </div>
+    </div>
+</div>
+
+<ng-template #uncalculatedListTemp>
+    <div class="caption size-huge wt-tiny f-color-600">Список не рассчитанных</div>
+    <ng-container [ngSwitch]="loadingState">
+        <ng-container *ngSwitchCase="'LOADING'">
+            <div class="stretched relative">
+                <p-progressSpinner class="primary-spinner center-of-content" strokeWidth="1"></p-progressSpinner>
+            </div>
+        </ng-container>
+        <ng-container *ngSwitchCase="'ERROR'">
+            <div class="stretched relative">
+                <div class="flexed column vcenter center-of-content caption size-huge f-color-danger wt-bold">
+                    <span class="mds-error"></span>
+                    <span>Ошибка загрузки</span>
+                </div>
+            </div>
+        </ng-container>
+        <ng-container *ngSwitchCase="'READY'">
+            <div class="flexed column">
+                <div *ngFor="let work of uncalculatedWorkLogs; trackBy: trackByWorkLog"
+                     class="flexed gap3 p10 split-line">
+                    <div class="flexed column gap3">
+                        <div class="flexed gap5 hcenter">
+                            <span class="caption size-small wt-bold f-color-600">#{{work.workLogId}}</span>
+                            <span class="caption">Работа по задаче <app-task-link
+                                    [task]="work.task"></app-task-link> </span>
+                        </div>
+                        <div class="flexed gap5 hcenter">
+                            <span class="caption size-small wt-bold f-color-600">Назначена: {{work.created | date:"EEEE, dd MMMM yyyy HH:mm" | titlecase}}</span>
+                            <app-employee-label [employee]="work.creator" [size]="1.2"></app-employee-label>
+                        </div>
+                        <div class="flexed gap5 hcenter">
+                            <span class="caption size-small wt-bold f-color-600">Завершена: {{work.closed | date:"EEEE, dd MMMM yyyy HH:mm" | titlecase}}</span>
+                            <app-avatar-list [employees]="work.employees" [size]="1.2"></app-avatar-list>
+                        </div>
+                    </div>
+                    <div class="stretched"></div>
+                    <div class="flexed hcenter">
+                        <p-button (onClick)="selectWork(work)" label="Расcчитать"
+                                  styleClass="p-button-outlined p-button-success"></p-button>
+                    </div>
+                </div>
+            </div>
+        </ng-container>
+        <ng-container *ngSwitchCase="'EMPTY'">
+            <div class="stretched relative">
+                <div class="flexed column vcenter center-of-content caption size-huge f-color-400 wt-bold">
+                    <span class="mds-release_alert"></span>
+                    <span>Пока нет работ</span>
+                </div>
+            </div>
+        </ng-container>
+    </ng-container>
+</ng-template>
+
+<ng-template #selectedWorkTemp>
+    <div class="flexed hcenter gap10">
+        <p-button (onClick)="unselectWork()" [disabled]="isSendingCalculation" icon="mdi-arrow_back" styleClass="p-button-text p-button-icon"></p-button>
+        <span class="caption wt-tiny f-color-600 size-huge">Работа по задаче #{{selectedWorkLog?.task?.taskId}}</span>
+        <span *ngIf="selectedWorkLog?.isForceClosed" class="caption f-color-danger wt-bold size-big">(Принудительно закрыта)</span>
+    </div>
+    <div class="flexed column p-sides-20 gap10">
+        <div class="flexed column gap3">
+            <div class="caption f-color-700 size-big with-icon">
+                <span class="mdi-info"></span>
+                <span>
+                    Информация по задаче
+                </span>
+            </div>
+            <div class="flexed column p-sides-20 gap5">
+                <div *ngFor="let field of selectedWorkLog?.task?.fields ?? []; trackBy: trackByField"
+                     class="flexed gap1 column">
+                    <div class="caption size-small wt-bold f-color-500">{{field.name}}</div>
+                    <div class="caption">
+                        {{field.textRepresentation}}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="flexed column gap3">
+            <div *ngIf="selectedWorkLog?.targetDescription" class="caption f-color-700 size-big with-icon">
+                <span class="mdi-radar"></span>
+                <span>
+                Цель
+            </span>
+            </div>
+            <div *ngIf="selectedWorkLog?.targetDescription" class="flexed column p-sides-20">
+                {{selectedWorkLog?.targetDescription}}
+            </div>
+        </div>
+        <div class="flexed column gap3">
+            <div class="caption f-color-700 size-big with-icon">
+                <span class="mdi-feed"></span>
+                <span>
+                {{selectedWorkLog?.isForceClosed ? 'Причина закрытия' : 'Отчет'}}
+            </span>
+            </div>
+            <div class="caption prewrap p-sides-20">
+                {{selectedWorkLog?.report}}
+            </div>
+        </div>
+        <div class="terminator"></div>
+        <div [style]="{grid:'min-content 1fr / max-content max-content 1fr', marginBottom:'1.5rem'}"
+             class="grided gap5">
+
+            <div class="caption size-big wt-bold f-color-500">
+                Доступные работы
+            </div>
+
+            <span></span>
+
+            <div class="caption size-big wt-bold f-color-500">
+                Выполненные работы
+            </div>
+
+            <div class="table-wrapper">
+                <p-tabView styleClass="tab-content-unpadding">
+                    <p-tabPanel header="Работы">
+                        <p-table [loading]="worksTableLoading" [rowHover]="true" [value]="treeMenuWorksItems"
+                                 styleClass="p-datatable-sm">
+                            <ng-template let-node pTemplate="body">
+                                <ng-container [ngSwitch]="node.type">
+                                    <tr (dblclick)="workingTableBack()" *ngSwitchCase="'back'" class="not-selectable">
+                                        <td class="caption size-small with-icon">
+                                            <span [style.font-size]="'1em'" class="mdi-subdirectory_arrow_left"></span>
+                                            <span>Назад</span>
+                                        </td>
+                                        <td>
+                                        </td>
+                                    </tr>
+                                    <tr (dblclick)="loadWorksByGroup(node.key)" *ngSwitchCase="'group'"
+                                        class="not-selectable">
+                                        <td class="caption size-small with-icon">
+                                            <span [class]="node.icon" [style.font-size]="'1em'"></span>
+                                            <span class="caption f-inline">{{node.label}}</span>
+                                        </td>
+                                        <td>
+                                        </td>
+                                    </tr>
+                                    <tr (onDragStart)="workDragging(node.data)" *ngSwitchCase="'work'"
+                                        class="not-selectable cursor-move"
+                                        dragEffect="move" pDraggable="dd">
+                                        <td class="caption size-small with-icon">
+                                            <span [class]="node.icon" [style.font-size]="'1em'"></span>
+                                            <span class="caption f-inline">{{node.label}}</span>
+                                        </td>
+                                        <td class="caption size-small">
+                                            {{workCost(node.data)}} руб.
+                                        </td>
+                                    </tr>
+                                </ng-container>
+                            </ng-template>
+                        </p-table>
+                    </p-tabPanel>
+                    <p-tabPanel header="Действия">
+                        <p-table [loading]="actionsTableLoading" [rowHover]="true" [value]="tableMenuActionsItems"
+                                 styleClass="p-datatable-sm">
+                            <ng-template let-action pTemplate="body">
+                                <tr (onDragStart)="actionDragging(action)" class="not-selectable cursor-move"
+                                    dragEffect="move"
+                                    pDraggable="dd">
+                                    <td class="caption size-small with-icon">
+                                        <span [style.font-size]="'1em'" class="mdi-directions_run"></span>
+                                        <span class="caption f-inline">{{action.name}}</span>
+                                    </td>
+                                    <td>
+                                        {{action.cost}} руб/{{action.unit | unitName}}
+                                    </td>
+                                </tr>
+                            </ng-template>
+                        </p-table>
+                    </p-tabPanel>
+                </p-tabView>
+            </div>
+
+            <span class="mds-sync_alt caption size-huge self-center"></span>
+
+            <div (onDragEnter)="dragEnter()" (onDragLeave)="dragLeave()" (onDrop)="dropped()"
+                 [ngClass]="{'drop-zone': isDragging}" class="stretched flexed column table-wrapper" pDroppable="dd">
+                <p-table [value]="actionsTaken" class="stretched" groupRowsBy="workId" rowGroupMode="rowspan"
+                         sortField="workName" sortMode="single">
+                    <ng-template pTemplate="header">
+                        <tr>
+                            <th>Работа</th>
+                            <th>Действие</th>
+                            <th>Кол-во</th>
+                            <th>Стоимость</th>
+                            <th>Коэф.</th>
+                            <th>Уд.?</th>
+                        </tr>
+                    </ng-template>
+                    <ng-template let-rowNode let-rowgroup="rowgroup" let-rowspan="rowspan" pTemplate="body">
+                        <tr *ngIf="rowNode.workId">
+                            <td *ngIf="rowgroup" [attr.rowspan]="rowspan">{{rowNode.workName}}</td>
+                            <td>{{rowNode.actionName}}</td>
+                            <td pEditableColumn>
+                                <p-cellEditor>
+                                    <ng-template pTemplate="input">
+                                        <p-inputNumber (ngModelChange)="updateActionCount($event, rowNode)"
+                                                       (onFocus)="selectAllValue($event)" [(ngModel)]="rowNode.count"
+                                                       [allowEmpty]="false"
+                                                       [max]="99999" [min]="1"
+                                                       [size]="4"></p-inputNumber>
+                                    </ng-template>
+                                    <ng-template pTemplate="output">
+                                        {{rowNode.count}} {{rowNode.unit|unitName}}
+                                    </ng-template>
+                                </p-cellEditor>
+                            </td>
+                            <td>{{rowNode.cost}} руб.</td>
+                            <td *ngIf="rowgroup" [attr.rowspan]="rowspan">
+                                <p-button (onClick)="selectWorkActions(rowNode.workId, rowNode.workName); ratioMenu.toggle($event)"
+                                          icon="mdi-exposure_plus_2"
+                                          styleClass="p-button-text p-button-icon p-button-success"></p-button>
+                            </td>
+                            <td *ngIf="rowgroup" [attr.rowspan]="rowspan">
+                                <p-button (click)="removeWork(rowNode.workId)" icon="mdi-delete"
+                                          styleClass="p-button-text p-button-icon p-button-danger"></p-button>
+                            </td>
+                        </tr>
+                        <tr *ngIf="!rowNode.workId">
+                            <td></td>
+                            <td>{{rowNode.actionName}}</td>
+                            <td pEditableColumn>
+                                <p-cellEditor>
+                                    <ng-template pTemplate="input">
+                                        <p-inputNumber (ngModelChange)="updateActionCount($event, rowNode)"
+                                                       [(ngModel)]="rowNode.count" [allowEmpty]="false" [max]="99999"
+                                                       [min]="1" (onFocus)="selectAllValue($event)"
+                                                       [size]="4"></p-inputNumber>
+                                    </ng-template>
+                                    <ng-template pTemplate="output">
+                                        {{rowNode.count}} {{rowNode.unit|unitName}}
+                                    </ng-template>
+                                </p-cellEditor>
+                            </td>
+                            <td>{{rowNode.cost}} руб.</td>
+                            <td>
+                                <p-button
+                                        (onClick)="selectAction(rowNode.uuid, rowNode.actionName); ratioMenu.toggle($event)"
+                                        icon="mdi-exposure_plus_2"
+                                        styleClass="p-button-text p-button-icon p-button-success"></p-button>
+                            </td>
+                            <td>
+                                <p-button (click)="removeAction(rowNode.uuid)" icon="mdi-delete"
+                                          styleClass="p-button-text p-button-icon p-button-danger"></p-button>
+                            </td>
+                        </tr>
+                    </ng-template>
+                </p-table>
+                <div class="flexed hcenter vend caption f-color-400 wt-tiny size-huge p5">
+                    Общая стоимость работ: {{totalCostOfWork}} руб.
+                </div>
+            </div>
+        </div>
+    </div>
+</ng-template>
+
+<p-slideMenu #ratioMenu (onHide)="deselectFactor()" [model]="workActionsRatioMenu" [popup]="true" [style]="{width:'max-content'}"
+             appendTo="body"></p-slideMenu>
+
+<!--Диалог подтверждения пустого расчета работы-->
+<p-dialog [(visible)]="emptyCalculationConformationDialogVisible" [draggable]="false" [modal]="true" [resizable]="false"
+          [style]="{width: '50vw', minWidth: 'fit-content'}"
+          header="Отправить пустой расчет?">
+    <ng-template pTemplate="content">
+        <div class="flexed column gap10">
+            <div class="input-label-wrapper">
+                <label>Причина пустого расчета работы</label>
+                <textarea [(ngModel)]="emptyCalculationDescription" [autoResize]="true" [rows]="5" class="stretched"
+                          pInputTextarea></textarea>
+            </div>
+            <div class="flexed hcenter vend gap10">
+                <p-button (onClick)="emptyCalculationConformationDialogVisible = false; emptyCalculationDescription=''"
+                          icon="mdi-close"
+                          [disabled]="isSendingCalculation"
+                          label="Отменить"
+                          styleClass="p-button-secondary p-button-text"></p-button>
+                <p-button (onClick)="sendEmptyCalculation()" [disabled]="!emptyCalculationDescription"
+                          [loading]="isSendingCalculation"
+                          icon="mdi-check"
+                          label="Отправить" styleClass="p-button-danger"></p-button>
+            </div>
+        </div>
+    </ng-template>
+</p-dialog>

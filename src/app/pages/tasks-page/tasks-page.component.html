@@ -19,7 +19,7 @@
             </div>
             <ng-container [ngSwitch]="taskService.loadingState">
                 <div *ngSwitchCase="'LOADING'"
-                     class="flexed stretched hcenter vcenter caption-common-message">
+                     class="flexed stretched hcenter vcenter caption size-big wt-bold f-color-500">
                     <p-progressSpinner class="primary-spinner" strokeWidth="1"></p-progressSpinner>
                 </div>
 
@@ -30,14 +30,13 @@
                     </div>
                 </ng-container>
 
-                <div *ngSwitchCase="'EMPTY'"
-                     class="flexed stretched hcenter vcenter caption-common-message">
-                    <i class="mdi-search_off"></i>
+                <div *ngSwitchCase="'EMPTY'" class="flexed column stretched hcenter vcenter caption size-big wt-bold f-color-500">
+                    <i class="mds-search_off"></i>
                     <span>Задач не найдено</span>
                 </div>
 
                 <div *ngSwitchCase="'ERROR'"
-                     class="flexed stretched hcenter vcenter caption-common-error">
+                     class="flexed stretched hcenter vcenter caption size-big wt-bold f-color-danger">
                     <i class="mdi-error"></i>
                     <span>Произошла ошибка</span>
                 </div>

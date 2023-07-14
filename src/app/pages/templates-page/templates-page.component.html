@@ -26,13 +26,13 @@
                     </ng-container>
                 </ng-container>
                 <ng-container *ngSwitchCase="'ERROR'">
-                    <div class="flexed hcenter vcenter p20 caption-common-error">
+                    <div class="flexed hcenter vcenter p20 caption size-big wt-bold f-color-danger">
                         <i class="mdi-alert"></i>
                         <span>Ошибка загрузки шаблонов</span>
                     </div>
                 </ng-container>
                 <ng-container *ngSwitchCase="'EMPTY'">
-                    <div class="flexed hcenter vcenter p20 caption-common-message">
+                    <div class="flexed hcenter vcenter p20 caption size-big wt-bold f-color-500">
                         <i class="mdi-alert"></i>
                         <span>Нет шаблонов</span>
                     </div>
@@ -55,13 +55,13 @@
                     <app-task-tag-list-item *ngFor="let tag of availableTags; trackBy: trackByTag" [tag]="tag"></app-task-tag-list-item>
                 </ng-container>
                 <ng-container *ngSwitchCase="'ERROR'">
-                    <div class="flexed hcenter vcenter p20 caption-common-error">
+                    <div class="flexed hcenter vcenter p20 caption size-big wt-bold f-color-danger">
                         <i class="mdi-alert"></i>
                         <span>Ошибка загрузки тегов</span>
                     </div>
                 </ng-container>
                 <ng-container *ngSwitchCase="'EMPTY'">
-                    <div class="flexed hcenter vcenter p20 caption-common-message">
+                    <div class="flexed hcenter vcenter p20 caption size-big wt-bold f-color-500">
                         <i class="mdi-alert"></i>
                         <span>Нет тегов</span>
                     </div>
@@ -74,16 +74,16 @@
 <ng-template #templateItem let-item>
     <div class="template-item flexed hcenter gap5">
         <div class="flexed column gap5 stretched">
-            <span class="flexed hcenter caption-main stretched hcenter gap3" [style.opacity]="item.deleted ? 0.5 : 1">
+            <span class="flexed hcenter caption stretched hcenter gap3" [style.opacity]="item.deleted ? 0.5 : 1">
                 <i class="mdi-not_interested" *ngIf="item.deleted"></i>
                 <span>
                     {{item.name}}
                 </span>
-                <span class="caption-tiny indent1">
+                <span class="caption size-tiny wt-bold f-color-500 indent1">
                     Создана: {{item.created|date:"dd MMMM yyyy HH:mm"}}
                 </span>
             </span>
-            <span *ngIf="item.description" class="caption-secondary">
+            <span *ngIf="item.description" class="caption size-small wt-bold f-color-500">
                 {{item.description}}
             </span>
         </div>
