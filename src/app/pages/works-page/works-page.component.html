@@ -207,7 +207,7 @@
 </ng-template>
 
 <ng-template #nodeTitleRef let-node>
-    <ng-container [ngSwitch]="node.type">
+    <ng-container *ngIf="node" [ngSwitch]="node.type">
         <ng-container *ngSwitchCase="'group'">
             <div class="caption size-huge f-color-500 wt-bold f-inline">
                 <span>
