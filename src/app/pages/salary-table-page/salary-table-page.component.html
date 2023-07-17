@@ -16,17 +16,17 @@
                         <p-dropdown [options]="positions" formControlName="position" placeholder="Должность"></p-dropdown>
                     </div>
                 </div>
-                <p-table [columns]="mainTableColumns" [value]="tableRow" >
+                <p-table [columns]="mainTableColumns" [value]="tableRow" styleClass="p-datatable-sm">
                     <ng-template pTemplate="header" let-columns>
                         <tr>
-                            <th *ngFor="let name of columns">
+                            <th *ngFor="let name of columns" class="caption size-tiny">
                                 {{name}}
                             </th>
                         </tr>
                     </ng-template>
                     <ng-template pTemplate="body" let-rowData let-columns="columns">
                         <tr>
-                            <td *ngFor="let row of rowData" class="caption f-inline">
+                            <td *ngFor="let row of rowData" class="caption size-tiny f-inline">
                                 {{row}}
                             </td>
                         </tr>

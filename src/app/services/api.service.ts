@@ -589,7 +589,7 @@ export class ApiService {
     }
 
     treeWorksDragDrop(event: TreeDragDropEvent) {
-        return this.sendPatch('api/private/salary/tree-works/drag-drop', event);
+        return this.sendPatch('api/private/salary/paid-works-tree/drag-drop', event);
     }
 
     createPaidWorkGroup(paidWorkGroupForm: PaidWorkGroupForm) {
@@ -621,7 +621,7 @@ export class ApiService {
     }
 
     paidWorkTreeReposition(positionList: TreeElementPosition[]) {
-        return this.sendPatch('api/private/salary/tree-works/reposition', positionList);
+        return this.sendPatch('api/private/salary/paid-works-tree/reposition', positionList);
     }
 
     getUncalculatedWorkLogs() {

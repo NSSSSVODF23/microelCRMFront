@@ -20,12 +20,10 @@
                         </div>
                     </ng-template>
                     <ng-template pTemplate="empty">
-                        <div class="flexed column group hcenter vcenter caption size-big wt-bold f-color-500 p10">
-                            <span class="mds-receipt_long"></span>
-                            <span>
-                                Нет элементов
-                            </span>
-                        </div>
+                        <span class="flexed p10 w-full vcenter">
+                            <p-button label="Создать" icon="mdi-add" styleClass="p-button-secondary p-button-text"
+                                      (onClick)="inViewContextMenu.toggle($event)"></p-button>
+                        </span>
                     </ng-template>
                 </p-tree>
                 <ng-container [ngSwitch]="loadingTreeState">
@@ -247,7 +245,7 @@
 </ng-template>
 
 <ng-template #backButtonRef>
-    <div class="group-list-el primary" (click)="back()" pRipple>
+    <div class="group-list-el primary" *ngIf="selectedNodeInTree" (click)="back()" pRipple>
         <span class="mds-arrow_top_left"></span>
         <span class="name">Назад</span>
     </div>

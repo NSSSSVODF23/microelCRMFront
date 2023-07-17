@@ -1,6 +1,6 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
 import {ApiService} from "../../services/api.service";
-import {TreeDragDropService, TreeNode} from "primeng/api";
+import {ConfirmationService, TreeDragDropService, TreeNode} from "primeng/api";
 import {
     LoadingState,
     PaidAction,
@@ -81,7 +81,7 @@ export class WorksPageComponent implements OnInit, OnDestroy {
         {label: 'Создать работу', icon: 'mdi-construction', command: () => this.openCreateWorkDialog(this.selectedNodeInTree ? this.selectedNodeInTree.key : undefined)}
     ];
 
-    constructor(private api: ApiService, private rt: RealTimeUpdateService) {
+    constructor(private api: ApiService, private rt: RealTimeUpdateService, private confirmation: ConfirmationService) {
         Tree.prototype.isNodeLeaf = (node) => node.leaf
     }
 
@@ -161,6 +161,7 @@ export class WorksPageComponent implements OnInit, OnDestroy {
                         {
                             label: "Удалить",
                             icon: "mdi-delete",
+                            command: () => this.deleteGroup()
                         }
                     ]
 
@@ -175,6 +176,7 @@ export class WorksPageComponent implements OnInit, OnDestroy {
                         {
                             label: "Удалить",
                             icon: "mdi-delete",
+                            command: () => this.deleteWork()
                         }
                     ]
                     break;
@@ -373,6 +375,25 @@ export class WorksPageComponent implements OnInit, OnDestroy {
                 }
             }
         ))
+        this.subscriptions.addSubscription('trDel', this.rt.paidWorksTreeDeleted().subscribe((event: TreeNodeUpdateEvent) => {
+            const node = this.foundNodeByPath(event.path);
+            if (node && node.children) {
+                const index = node.children.findIndex(n => (n.key === event.object.key));
+                if(this.selectedNodeInTree === node.children[index]){
+                    this.selectedNodeInTree = undefined
+                }
+                if(index > -1) {
+                    node.children?.splice(index, 1);
+                }
+            }else if(!node){
+                const rootIndex = this.treeMenuItems.findIndex(n => (n.key === event.object.key));
+                if(this.selectedNodeInTree === this.treeMenuItems[rootIndex]){
+                    this.selectedNodeInTree = undefined
+                }
+                if(rootIndex > -1)
+                    this.treeMenuItems.splice(rootIndex, 1);
+            }
+        }))
         this.subscriptions.addSubscription('workUp', this.rt.paidWorkUpdated().subscribe(
             {
                 next: (work) => {
@@ -467,7 +488,7 @@ export class WorksPageComponent implements OnInit, OnDestroy {
                     type: node.type,
                     position: index
                 }
-            }), ...dragNode.children.map((node: any, index: number) => {
+            }), ...dropNode.children.map((node: any, index: number) => {
                 return {
                     id: node.key.substring(1),
                     type: node.type,
@@ -588,5 +609,33 @@ export class WorksPageComponent implements OnInit, OnDestroy {
         if (this.selectedNodeInTree) this.selectedNodeInTree.expanded = false;
         this.selectedNodeInTree = this.selectedNodeInTree?.parent;
         this.changeBreadcrumbs()
+    }
+
+    deleteGroup() {
+        if (!this.selectedNodeInTree?.key) return;
+        this.editingGroupId = parseInt(this.selectedNodeInTree?.key.substring(1))
+        this.confirmation.confirm({
+            header:"Подтверждение",
+            message:"Удалить группу работ? (Работы в группе удалены не будут)",
+            accept: () => {
+                if (!this.editingGroupId) return;
+                this.api.deletePaidWorkGroup(this.editingGroupId).subscribe(() => {
+                })
+            }
+        })
+    }
+
+    deleteWork(){
+        if (!this.selectedNodeInTree?.key) return;
+        this.editingWorkId = parseInt(this.selectedNodeInTree?.key.substring(1))
+        this.confirmation.confirm({
+            header:"Подтверждение",
+            message:"Удалить работу?",
+            accept: () => {
+                if (!this.editingWorkId) return;
+                this.api.deletePaidWork(this.editingWorkId).subscribe(() => {
+                })
+            }
+        })
     }
 }

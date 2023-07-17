@@ -215,6 +215,10 @@ export class RealTimeUpdateService {
         return this.watch<TreeNodeUpdateEvent>('paid-works', 'tree', 'create')
     }
 
+    paidWorksTreeDeleted() {
+        return this.watch<TreeNodeUpdateEvent>('paid-works', 'tree', 'delete')
+    }
+
     worksTreeReposition(){
         return this.watch<TreeElementPosition[]>('paid-works', 'tree', 'reposition')
     }
