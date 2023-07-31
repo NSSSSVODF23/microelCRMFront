@@ -1,13 +1,14 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, OnDestroy, OnInit} from '@angular/core';
 import {ApiService} from "../../services/api.service";
 import {fade, flow, swipeChild} from "../../animations";
 import {FieldItem, ModelItem, Task, TaskCreationBody, Wireframe} from "../../transport-interfaces";
 import {ActivatedRoute} from "@angular/router";
 import {FormArray, FormControl, FormGroup} from "@angular/forms";
-import {FormToModelItemConverter} from "../../util";
+import {FormToModelItemConverter, SubscriptionsHolder} from "../../util";
 import {PersonalityService} from "../../services/personality.service";
 import {CustomValidators} from "../../custom-validators";
 import {MessageService} from "primeng/api";
+import {TaskCreationMode, TaskCreatorService} from "../../services/task-creator.service";
 
 enum ControlsType {
     NEXT_ONLY = "NEXT_ONLY", BOTH = "BOTH", PREV_FIN = "PREV_FIN", FIN_ONLY = "FIN_ONLY", NONE = "NONE"
@@ -18,7 +19,7 @@ enum ControlsType {
     styleUrls: ['./task-creation-page.component.scss'],
     animations: [fade, flow, swipeChild]
 })
-export class TaskCreationPageComponent implements OnInit {
+export class TaskCreationPageComponent implements OnInit, OnDestroy {
 
     /* Поля связанные с выбором шаблона */
     // Список доступных для выбора шаблонов
@@ -39,7 +40,12 @@ export class TaskCreationPageComponent implements OnInit {
     // Объект формы для создания задачи
     taskCreationForm: FormArray<FormGroup> = new FormArray([] as FormGroup[]);
 
-    constructor(readonly api: ApiService, readonly route: ActivatedRoute, readonly personality: PersonalityService, readonly toast: MessageService) {
+    openMode: TaskCreationMode = "standard";
+
+    subscriptions = new SubscriptionsHolder();
+    defaultValues: any;
+
+    constructor(readonly api: ApiService, readonly route: ActivatedRoute, readonly personality: PersonalityService, readonly toast: MessageService, private taskCreation: TaskCreatorService) {
         document.body.classList.add("whited");
     }
 
@@ -83,16 +89,42 @@ export class TaskCreationPageComponent implements OnInit {
     }
 
     ngOnInit(): void {
+        window.addEventListener('message', (event) => {
+            const data = event.data;
+            this.openMode = data.mode;
+            switch (data.mode) {
+                case "standard":
+                    break;
+                case "parent":
+                    this.parentId = data.dependencyIdentifier;
+                    break;
+                case "child":
+                    this.childId = data.dependencyIdentifier;
+                    break;
+                case "billing":
+                    if(data.wireframeId) {
+                        this.defaultValues = data.billingInfo;
+                        this.api.getWireframe(data.wireframeId).subscribe(this.openBillingCreationWindowHandle)
+                    }else {
+                        window.close()
+                    }
+                    break;
+                }
+        }, false);
+    }
 
-        // Подписываемся на изменение параметров страницы
-        this.route.queryParams.subscribe(params => {
-            const {child, parent} = params;
-            if (child)
-                this.childId = parseInt(child);
-            else if (parent)
-                this.parentId = parseInt(parent);
-        })
+    ngOnDestroy(): void {
+        this.subscriptions.unsubscribeAll();
+    }
 
+    openBillingCreationWindowHandle = {
+        next: (wireframe: Wireframe) => {
+            this.selectedTemplate = wireframe;
+            this.selectTemplateForTask();
+        },
+        error: () => {
+            window.close()
+        }
     }
 
     // Выбор шаблона для создания задачи
@@ -102,10 +134,15 @@ export class TaskCreationPageComponent implements OnInit {
 
         this.taskCreationForm = new FormArray(
             this.selectedTemplate.steps.map(step => {
-                 return  new FormGroup(
+                 return new FormGroup(
                     step.fields.reduce(
                         (prev, field) => {
-                            return {...prev, [field.id]: new FormControl(null, [CustomValidators.taskInput(field.type, field.variation)])};
+                            let defaultValue = null;
+                            switch (field.name.toLowerCase()) {
+                                case "логин": defaultValue = this.defaultValues.login; break;
+                                case "адрес": defaultValue = this.defaultValues.address; break;
+                            }
+                            return {...prev, [field.id]: new FormControl(defaultValue, [CustomValidators.taskInput(field.type, field.variation)])};
                         }, {}
                     )
                 )

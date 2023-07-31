@@ -112,7 +112,7 @@ export class ParseTaskPageComponent implements OnInit, OnDestroy {
             const [key, value] = e;
             if (addressEntry[0] == null || addressEntry[1] == null) return;
             if (value.streetRaw === addressEntry[1].streetRaw) {
-                if(this.addressCorrectingPool)
+                if(this.addressCorrectingPool && this.currentCorrectingStreetAddress.street)
                     this.addressCorrectingPool[key].address.street = {...this.currentCorrectingStreetAddress.street};
                 this.listOfCorrectedStreets = [...this.listOfCorrectedStreets, key];
             }

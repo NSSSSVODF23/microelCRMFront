@@ -1,0 +1,47 @@
+<div class="flex flex-column gap-4">
+    <div [formGroup]="employeeRatioForm" class="flexed gap10 sparnd">
+        <div *ngFor="let employee of employees; trackBy: trackByEmployee"
+             class="flexed column vcenter gap5">
+            <app-avatar [deleted]="employee.deleted" [name]="employee.fullName" [size]="5"
+                        [src]="employee.avatar"></app-avatar>
+            <div class="caption size-big">{{employee.fullName}}</div>
+            <ng-container [formGroupName]="employee.login">
+                <div class="flexed gap10 hcenter w-full">
+                    <p-slider [max]="1" [min]="0" [step]=".01" class="w-full"
+                              formControlName="ratio"></p-slider>
+                    <span class="caption size-tiny wt-bold f-color-500">
+                                        {{employeeRatioForm.value[employee.login].ratio * 100 | number:'1.2-2'}}%
+                                    </span>
+                </div>
+                <p-inputNumber [disabled]="totalCostOfWork === 0" formControlName="sum"
+                               suffix=" руб."></p-inputNumber>
+                <div *ngIf="hasWorkActionRatio(employee.login)" class="flexed column gap2">
+                    <span class="caption size-tiny wt-bold">Доп. коэффициенты:</span>
+                    <div class="flexed column gap2">
+                        <div *ngFor="let war of getFactorsActions(employee.login); trackBy: trackByWar"
+                             class="flexed hcenter gap3">
+                            <span class="caption">{{war?.name}}</span>
+                            <span class="caption size-tiny wt-bold f-color-primary">x{{war?.factor}}</span>
+                            <span *ngIf="war"
+                                  [class]="'caption ' +( getWorkActionsRatioSum(war.uuid) > 0 ? 'f-color-success' : 'f-color-danger')">
+                                                {{getWorkActionsRatioSum(war.uuid)}}руб.
+                                            </span>
+                            <app-tiny-button (onClick)="removeWorkActionRatio(war.uuid)" [size]=".8" icon="delete"
+                                             model="danger"></app-tiny-button>
+                        </div>
+                    </div>
+                    <span class="caption">Итог: {{getEmployeeTotalPayment(employee.login)}} руб.</span>
+                </div>
+
+            </ng-container>
+        </div>
+    </div>
+    <div class="flexed vend hcenter gap10">
+    <span class="caption wt-bold f-color-500">
+        Распределенная сумма: {{allMoney}} руб.
+    </span>
+        <span class="caption size-big wt-bold f-color-primary">
+        Итог вместе с коэф.: {{allMoneyWithRatio}} руб.
+    </span>
+    </div>
+</div>

@@ -1,5 +1,5 @@
 <div (click)="onClick.emit(item)" [ngClass]="{processing: item?.taskStatus === 'PROCESSING', inlined, hovered: isHover}" [routerLink]="!viewExample && !customClickHandler ? ['/task', item?.taskId] : null"
-     class="task-item">
+     class="task-item outline-none">
     <div class="task-item-header">
         <p-checkbox (click)="$event.stopPropagation()" (ngModelChange)="checkChange.emit($event)" [(ngModel)]="check"
                     [name]="checkGroup" *ngIf="check"

@@ -1,8 +1,9 @@
 import {Component, OnInit} from '@angular/core';
-import {FieldItem, WireframeFieldType} from "../../transport-interfaces";
+import {BillingUserItemData, FieldItem, WireframeFieldType} from "../../transport-interfaces";
 import {v4} from "uuid";
 import {FormControl, FormGroup} from "@angular/forms";
 import {ApiService} from "../../services/api.service";
+import {debounceTime, distinctUntilChanged, Observable, of, switchMap} from "rxjs";
 
 @Component({
     templateUrl: './testing-page.component.html',
@@ -23,6 +24,34 @@ export class TestingPageComponent implements OnInit {
     ]
     form: FormGroup = new FormGroup({});
     employees$ = this.api.getEmployees();
+    users: BillingUserItemData[] = [];
+    filterForm = new FormGroup({
+        mode: new FormControl('login'),
+        query: new FormControl(''),
+    })
+    filterChange$ = this.filterForm.valueChanges.pipe( debounceTime(1000), distinctUntilChanged(),switchMap((value:any) => {
+        if (!value.query) return of([] as any[]);
+        switch (value.mode) {
+            case 'login':
+                return this.api.getBillingUsersByLogin(value.query);
+            case 'fio':
+                return this.api.getBillingUsersByFio(value.query);
+            case 'address':
+                return this.api.getBillingUsersByAddress(value.query);
+        }
+        return of([] as any[]);
+    }));
+    filterModeItems = [
+        {label: "Логин", value: "login"},
+        {label: "ФИО", value: "fio"},
+        {label: "Адрес", value: "address"},
+    ]
+
+    usersHandler = {
+        next: (users: BillingUserItemData[]) => {
+            this.users = users;
+        }
+    }
 
     constructor(readonly api: ApiService) {
     }
@@ -34,8 +63,12 @@ export class TestingPageComponent implements OnInit {
         for (const field of this.fields) {
             this.form.addControl(field.id, new FormControl(null));
         }
+        this.filterChange$.subscribe(this.usersHandler)
         this.form.valueChanges.subscribe(value => console.log(value))
+        this.workPickerControl.valueChanges.subscribe(console.log)
     }
+
+    workPickerControl = new FormControl(null);
 
     //Method to generate a random string and push it to the items array
     generateRandomString() {

@@ -1,5 +1,7 @@
 <div appExtendPageHeight class="flexed gap10 column" [style.padding]="'0 2rem 2rem 2rem'">
-    <ng-container *ngIf="isTemplateSelected; then selectedTemplatePanel else unselectedTemplatePanel"></ng-container>
+    <ng-container *ngIf="openMode != 'billing'">
+        <ng-container *ngIf="isTemplateSelected; then selectedTemplatePanel else unselectedTemplatePanel"></ng-container>
+    </ng-container>
     <div *ngIf="isTemplateSelected" @flow class="stage-view">
         <div class="caption">Этап {{this.currentStep + 1}}
             : {{this.selectedTemplate ? this.selectedTemplate.steps[currentStep].name : ""}}</div>

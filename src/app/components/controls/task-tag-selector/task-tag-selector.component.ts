@@ -1,8 +1,9 @@
-import {Component, OnDestroy, OnInit, ViewChild} from '@angular/core';
+import {Component, Input, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {ControlValueAccessor, FormControl, NG_VALUE_ACCESSOR} from "@angular/forms";
 import {TaskTag} from "../../../transport-interfaces";
 import {ApiService} from "../../../services/api.service";
 import {AutoComplete} from "primeng/autocomplete";
+import {Subscription} from "rxjs";
 
 @Component({
     selector: 'app-task-tag-selector',
@@ -18,6 +19,8 @@ import {AutoComplete} from "primeng/autocomplete";
 })
 export class TaskTagSelectorComponent implements OnInit, OnDestroy, ControlValueAccessor {
 
+    private _autoAccept = false;
+
     control = new FormControl<TaskTag[]>([]);
 
     suggestions: TaskTag[] = [];
@@ -28,7 +31,23 @@ export class TaskTagSelectorComponent implements OnInit, OnDestroy, ControlValue
 
     previousVariableValue: string = '';
 
+    @Input() set autoAccept(autoAccept: boolean) {
+        this._autoAccept = autoAccept;
+        if(autoAccept){
+            this.changeSubscription?.unsubscribe()
+            this.changeSubscription = this.control.valueChanges.subscribe(value => {
+                this.onChange(value);
+            })
+        }
+    }
+
+    get autoAccept(): boolean {
+        return this._autoAccept;
+    }
+
     @ViewChild('inputEl') inputEl?: AutoComplete;
+
+    changeSubscription?: Subscription;
 
     constructor(private api: ApiService) {
     }
@@ -76,6 +95,7 @@ export class TaskTagSelectorComponent implements OnInit, OnDestroy, ControlValue
     }
 
     ngOnDestroy(): void {
+        this.changeSubscription?.unsubscribe();
     }
 
     accept() {

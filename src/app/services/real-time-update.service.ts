@@ -2,11 +2,11 @@ import {Injectable} from '@angular/core';
 import {StompClientService} from "./stomp-client.service";
 import {finalize, map, Observable, share} from "rxjs";
 import {
-    Chat, ChatUnreadCounter,
+    Chat, ChatUnreadCounter, City,
     Comment,
     Department,
-    Employee, INotification, PaidAction, PaidWork,
-    Position,
+    Employee, House, INotification, PaidAction, PaidWork,
+    Position, Street,
     SuperMessage,
     Task,
     TaskEvent,
@@ -14,7 +14,6 @@ import {
 } from "../transport-interfaces";
 import {cyrb53} from "../util";
 import {OldTracker, SimpleMessage} from "../parsing-interfaces";
-
 
 @Injectable({
     providedIn: 'root'
@@ -226,6 +225,48 @@ export class RealTimeUpdateService {
     paidWorkUpdated(id?: number){
         if(id) return this.watch<PaidWork>('paid-work', id.toString(), 'update')
         return this.watch<PaidWork>('paid-work', 'update')
+    }
+
+    cityCreated() {
+        return this.watch<City>('city', 'create')
+    }
+
+    cityUpdated(id?: number) {
+        if(id) return this.watch<City>('city', id.toString(), 'update')
+        return this.watch<City>('city', 'update')
+    }
+
+    cityDeleted(id?: number) {
+        if(id) return this.watch<City>('city', id.toString(), 'delete')
+        return this.watch<City>('city', 'delete')
+    }
+
+    streetCreated() {
+        return this.watch<Street>('street', 'create')
+    }
+
+    streetUpdated(id?: number) {
+        if(id) return this.watch<Street>('street', id.toString(), 'update')
+        return this.watch<Street>('street', 'update')
+    }
+
+    streetDeleted(id?: number) {
+        if(id) return this.watch<Street>('street', id.toString(), 'delete')
+        return this.watch<Street>('street', 'delete')
+    }
+
+    houseCreated() {
+        return this.watch<House>('house', 'create')
+    }
+
+    houseUpdated(id?: number) {
+        if(id) return this.watch<House>('house', id.toString(), 'update')
+        return this.watch<House>('house', 'update')
+    }
+
+    houseDeleted(id?: number) {
+        if(id) return this.watch<House>('house', id.toString(), 'delete')
+        return this.watch<House>('house', 'delete')
     }
 
     private watchUnicast<T>(...path: string[]): Observable<T> {

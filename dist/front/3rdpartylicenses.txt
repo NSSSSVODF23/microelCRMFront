@@ -640,6 +640,9 @@ Apache-2.0
 @tinymce/tinymce-angular
 MIT
 
+angular8-yandex-maps
+MIT
+
 bootstrap
 MIT
 The MIT License (MIT)

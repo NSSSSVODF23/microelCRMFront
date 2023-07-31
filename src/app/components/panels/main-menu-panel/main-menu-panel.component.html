@@ -9,6 +9,9 @@
         <ng-container *ngSwitchCase="'salary'">
             <ng-container *ngTemplateOutlet="salary"></ng-container>
         </ng-container>
+        <ng-container *ngSwitchCase="'addresses'">
+            <ng-container *ngTemplateOutlet="addresses"></ng-container>
+        </ng-container>
         <ng-container *ngSwitchDefault>
             <ng-container *ngTemplateOutlet="main"></ng-container>
         </ng-container>
@@ -17,8 +20,8 @@
 
 <ng-template #main>
     <app-extended-menu-item [link]="['/tasks','incoming']" caption="Задачи" icon="task"></app-extended-menu-item>
-    <app-extended-menu-item caption="Абоненты" icon="group"></app-extended-menu-item>
-    <app-extended-menu-item caption="Дома" icon="home_work"></app-extended-menu-item>
+    <app-extended-menu-item [link]="['/billing','search']" caption="Абоненты" icon="group"></app-extended-menu-item>
+    <app-extended-menu-item [link]="['/addresses','list']" caption="Адреса" icon="home_work"></app-extended-menu-item>
     <app-extended-menu-item caption="Коммутаторы" icon="dns"></app-extended-menu-item>
     <app-extended-menu-item caption="Склад" icon="warehouse"></app-extended-menu-item>
     <app-extended-menu-item [link]="['/employees']" caption="Сотрудники" icon="account_circle"></app-extended-menu-item>
@@ -40,8 +43,15 @@
     <ng-container *ngTemplateOutlet="backButton; context:{name:'Зарплата'}"></ng-container>
     <app-extended-menu-item [link]="['/salary','table']" caption="Зарплатная таблица" icon="table_chart"></app-extended-menu-item>
     <app-extended-menu-item [link]="['/salary','estimation']" caption="Подсчет работ" icon="exposure_plus_2"></app-extended-menu-item>
+    <app-extended-menu-item [link]="['/salary','estimation','bypass']" caption="Подсчет работ (алт.)" icon="auto_awesome"></app-extended-menu-item>
     <app-extended-menu-item [link]="['/salary','works']" caption="Список работ" icon="construction"></app-extended-menu-item>
     <app-extended-menu-item [link]="['/salary','paid-actions']" caption="Платные действия" icon="toc"></app-extended-menu-item>
+</ng-template>
+
+<ng-template #addresses>
+    <ng-container *ngTemplateOutlet="backButton; context:{name:'Адреса'}"></ng-container>
+    <app-extended-menu-item [link]="['/addresses','list']" caption="Список" icon="view_list"></app-extended-menu-item>
+    <app-extended-menu-item [link]="['/addresses','schemes']" caption="Схемы домов" icon="schema"></app-extended-menu-item>
 </ng-template>
 
 <ng-template #backButton let-name="name">

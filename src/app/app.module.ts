@@ -13,8 +13,10 @@ import {FormsModule} from "@angular/forms";
 import {RouterModule, RouterOutlet} from "@angular/router";
 import {ToastModule} from "primeng/toast";
 import {CommonComponentsModule} from "./moduls/common-components/common-components.module";
+import {AngularYandexMapsModule, YaConfig} from "angular8-yandex-maps";
 
 registerLocaleData(localeRu, 'ru');
+
 
 @NgModule({
     declarations: [AppComponent],

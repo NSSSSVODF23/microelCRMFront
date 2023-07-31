@@ -21,9 +21,14 @@
   border-radius: .5rem;
   color: var(--tc-800);
   font-size: 1.2rem;
-  transition: color 0.15s ease-out;
+  transition: color 0.15s ease-out, background-color 0.15s ease-out;
+  outline: none;
 
   &:hover {
     color: var(--mc-400);
+  }
+  &:active{
+    color: var(--mc-0);
+    background-color: var(--mc-300);
   }
 }

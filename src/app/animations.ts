@@ -100,3 +100,32 @@ export const swipeChild = trigger('swipeChild', [
         ],{optional: true}),
     ]),
 ])
+
+export const swipe =trigger('swipe', [
+    state(
+        'default',
+        style({
+            opacity: 1,
+            transform: 'translateX(0)',
+        })
+    ),
+    state(
+        'right',
+        style({
+            opacity: 0,
+            transform: 'translateX(10%) scale(0.9)',
+            transformOrigin: 'center right',
+        })
+    ),
+    state(
+        'left',
+        style({
+            opacity: 0,
+            transform: 'translateX(-10%) scale(0.9)',
+            transformOrigin: 'center left',
+        })
+    ),
+    transition('default <=> right', animate('200ms ease-out')),
+    transition('default <=> left', animate('200ms ease-out')),
+    transition('right <=> left', animate('0s')),
+])

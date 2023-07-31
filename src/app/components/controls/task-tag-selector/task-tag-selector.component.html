@@ -20,6 +20,6 @@
             </div>
         </ng-template>
     </p-autoComplete>
-    <button pButton icon="mdi-save" (click)="accept()"></button>
+    <button pButton icon="mdi-save" (click)="accept()" *ngIf="!autoAccept"></button>
 </div>
 

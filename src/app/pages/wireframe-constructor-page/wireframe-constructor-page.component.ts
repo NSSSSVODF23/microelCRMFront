@@ -282,49 +282,50 @@ export class WireframeConstructorPageComponent implements OnInit {
         });
     }
 
-    private viewTestFieldsFromWireframe(wireframe: Wireframe) {
-        const phoneData = {'test': '8 (999) 123-45-67', 'test2': '8 (898) 555-35-35'};
-        const stringData = 'Принимая во внимание показатели успешности, экономическая повестка сегодняшнего дня выявляет срочную потребность приоретизации разума над эмоциями. Но глубокий уровень погружения предполагает независимые способы реализации укрепления моральных ценностей. Принимая во внимание показатели успешности, перспективное планирование не оставляет шанса для системы обучения кадров, соответствующей насущным потребностям. С другой стороны, консультация с широким активом способствует подготовке и реализации распределения внутренних резервов и ресурсов.';
-        const integerData = 23;
-        const floatData = 325.56;
-        const addressData: Address = {
-            city: {
-                name: 'Волгодонск',
-            },
-            district: {
-                name: 'В-8',
-            },
-            street: {
-                name: 'К.Маркса',
-            },
-            houseNum: 44,
-            apartmentNum: 46,
-            entrance: 2,
-            floor: 5
-        }
-        const booleanData = true;
-        const timestampData = "1995-09-01T17:30:00";
-
-        const modelItems: ModelItem[] = [];
-        wireframe.steps.forEach((step => {
-            step.fields.forEach(field => {
-                if (typeof field.orderPosition === 'number') {
-                    modelItems.push({
-                        name: field.name,
-                        id: field.id,
-                        wireframeFieldType: field.type,
-                        modelItemId: 0,
-                        phoneData,
-                        stringData,
-                        integerData,
-                        floatData,
-                        addressData,
-                        booleanData,
-                        timestampData
-                    })
-                }
-            })
-        }))
-        return modelItems;
-    }
+    // private viewTestFieldsFromWireframe(wireframe: Wireframe) {
+    //     const phoneData = {'test': '8 (999) 123-45-67', 'test2': '8 (898) 555-35-35'};
+    //     const stringData = 'Принимая во внимание показатели успешности, экономическая повестка сегодняшнего дня выявляет срочную потребность приоретизации разума над эмоциями. Но глубокий уровень погружения предполагает независимые способы реализации укрепления моральных ценностей. Принимая во внимание показатели успешности, перспективное планирование не оставляет шанса для системы обучения кадров, соответствующей насущным потребностям. С другой стороны, консультация с широким активом способствует подготовке и реализации распределения внутренних резервов и ресурсов.';
+    //     const integerData = 23;
+    //     const floatData = 325.56;
+    //     const addressData: Address = {
+    //         city: {
+    //             cityId:0,
+    //             name: 'Волгодонск',
+    //         },
+    //         district: {
+    //             name: 'В-8',
+    //         },
+    //         street: {
+    //             name: 'К.Маркса',
+    //         },
+    //         houseNum: 44,
+    //         apartmentNum: 46,
+    //         entrance: 2,
+    //         floor: 5
+    //     }
+    //     const booleanData = true;
+    //     const timestampData = "1995-09-01T17:30:00";
+    //
+    //     const modelItems: ModelItem[] = [];
+    //     wireframe.steps.forEach((step => {
+    //         step.fields.forEach(field => {
+    //             if (typeof field.orderPosition === 'number') {
+    //                 modelItems.push({
+    //                     name: field.name,
+    //                     id: field.id,
+    //                     wireframeFieldType: field.type,
+    //                     modelItemId: 0,
+    //                     phoneData,
+    //                     stringData,
+    //                     integerData,
+    //                     floatData,
+    //                     addressData,
+    //                     booleanData,
+    //                     timestampData
+    //                 })
+    //             }
+    //         })
+    //     }))
+    //     return modelItems;
+    // }
 }

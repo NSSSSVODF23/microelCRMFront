@@ -1,0 +1,16 @@
+.subscriber-item {
+  display: grid;
+  grid: auto-flow / 1fr;
+  gap: .5rem;
+  padding: 1rem;
+  cursor: pointer;
+  transition: background-color .1s ease-in-out, color .1s ease-in-out;
+
+  &:hover {
+    background-color: var(--mc-0);
+  }
+
+  &:hover .caption{
+    color: var(--mc-500);
+  }
+}

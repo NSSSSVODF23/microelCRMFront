@@ -8856,6 +8856,14 @@
     @include mds("sync");
   }
 
+  &-person{
+    @include mds("person");
+  }
+
+  &-person_search{
+    @include mds("person_search");
+  }
+
   &-sync_alt{
     @include mds("sync_alt");
   }

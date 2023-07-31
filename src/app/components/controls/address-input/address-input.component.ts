@@ -111,6 +111,7 @@ export class AddressInputComponent implements OnInit, ControlValueAccessor, Afte
                 .subscribe()
             this.subscriptions.addSubscription('inpChg', inputSub);
             this.subscriptions.addSubscription('kdown', kdownSub);
+            this.setAddressAsInputValue();
         }
     }
 
@@ -172,6 +173,8 @@ export class AddressInputComponent implements OnInit, ControlValueAccessor, Afte
         this.isLoading = false;
         if (suggestions.length === 0) {
             this.isEmpty = true;
+        }else if(suggestions.length === 1){
+            this.selectedSuggestion = 0;
         }
         this.reAlignOverlay()
     }

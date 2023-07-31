@@ -152,6 +152,14 @@ import {
 import {AutoCompleteModule} from "primeng/autocomplete";
 import {TaskTagSelectorComponent} from "../../components/controls/task-tag-selector/task-tag-selector.component";
 import {TickerDirective} from "../../directives/ticker.directive";
+import {PreventInputDirective} from "../../directives/prevent-input.directive";
+import {WorksPickerComponent} from "../../components/controls/works-picker/works-picker.component";
+import {TableModule} from "primeng/table";
+import {SlideMenuModule} from "primeng/slidemenu";
+import {DragDropModule} from "primeng/dragdrop";
+import {
+    EmployeeSumDistributionComponent
+} from "../../components/controls/employee-sum-distribution/employee-sum-distribution.component";
 
 
 @NgModule({
@@ -232,7 +240,10 @@ import {TickerDirective} from "../../directives/ticker.directive";
         DataRangeInputComponent,
         ObserverSelectorInputComponent,
         TaskTagSelectorComponent,
-        TickerDirective
+        TickerDirective,
+        PreventInputDirective,
+        WorksPickerComponent,
+        EmployeeSumDistributionComponent
     ],
     exports: [
         AccountPanelComponent,
@@ -311,7 +322,10 @@ import {TickerDirective} from "../../directives/ticker.directive";
         DataRangeInputComponent,
         ObserverSelectorInputComponent,
         TaskTagSelectorComponent,
-        TickerDirective
+        TickerDirective,
+        PreventInputDirective,
+        WorksPickerComponent,
+        EmployeeSumDistributionComponent
     ],
     imports: [
         CommonPipesModule,
@@ -356,7 +370,9 @@ import {TickerDirective} from "../../directives/ticker.directive";
         AnimateModule,
         SelectButtonModule,
         AutoCompleteModule,
-
+        TableModule,
+        SlideMenuModule,
+        DragDropModule,
     ],
     providers: [
         {

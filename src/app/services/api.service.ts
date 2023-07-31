@@ -4,6 +4,8 @@ import {catchError, map, Observable, share, tap, zip} from "rxjs";
 import {
     Address,
     Attachment,
+    BillingTotalUserInfo,
+    BillingUserItemData,
     Chat,
     ChatMessage,
     City,
@@ -14,6 +16,7 @@ import {
     EmployeeStatus,
     FieldItem,
     FileData,
+    House,
     INotification,
     MessageData,
     ModelItem,
@@ -146,7 +149,12 @@ export class ApiService {
     //     return this.sendGet<Page<Task>>('api/private/tasks', query);
     // }
 
-    getStreets(cityId: number): Observable<any> {
+    getHouses(id: number) {
+        return this.sendGet<House[]>(`api/private/houses/${id}`);
+    }
+
+    getStreets(cityId: number, filter?: string): Observable<any> {
+        if (filter) return this.sendGet('api/private/streets/' + cityId, {filter});
         return this.sendGet('api/private/streets/' + cityId);
     }
 
@@ -628,12 +636,72 @@ export class ApiService {
         return this.sendGet<WorkLog[]>('api/private/work-logs/uncalculated');
     }
 
-    sendWorkCalculation(form: any){
-        return this.sendPost('api/private/salary/work-сalculation', form);
+    sendWorkCalculation(form: any) {
+        return this.sendPost('api/private/salary/work-calculation', form);
     }
-    
-    getSalaryTable(filter:any){
+
+    sendBypassWorkCalculation(form: any) {
+        return this.sendPost('api/private/salary/work-calculation/bypass', form);
+    }
+
+    getSalaryTable(filter: any) {
         return this.sendGet<any>('api/private/salary/table', filter);
+    }
+
+    getBillingUsersByLogin(login: string) {
+        return this.sendGet<BillingUserItemData[]>(`api/private/billing/users/by-login`, {login});
+    }
+
+    getBillingUsersByFio(query: string) {
+        return this.sendGet<BillingUserItemData[]>(`api/private/billing/users/by-fio`, {query});
+    }
+
+    getBillingUsersByAddress(address: Address) {
+        return this.sendGet<BillingUserItemData[]>(`api/private/billing/users/by-address`, {address: JSON.stringify(address, (k, v) => v ?? undefined)});
+    }
+
+    getBillingUserInfo(login: string) {
+        return this.sendGet<BillingTotalUserInfo>(`api/private/billing/user/${encodeURIComponent(login)}`);
+    }
+
+    convertBillingAddress(addressString: string | undefined) {
+        return this.sendGet<Address | null>('api/private/convert/billing-address-string', {addressString});
+    }
+
+    createCity(cityForm: any) {
+        return this.sendPost('api/private/city', cityForm);
+    }
+
+    editCity(cityId: number, cityForm: any) {
+        return this.sendPatch(`api/private/city/${cityId}`, cityForm);
+    }
+
+    deleteCity(cityId: number) {
+        return this.sendDelete(`api/private/city/${cityId}`);
+    }
+
+    createStreet(cityId: number, streetForm: any) {
+        return this.sendPost(`api/private/city/${cityId}/street`, streetForm);
+    }
+
+    editStreet(streetId: number, streetForm: any) {
+        return this.sendPatch(`api/private/street/${streetId}`, streetForm);
+    }
+
+    deleteStreet(streetId: number) {
+        return this.sendDelete(`api/private/street/${streetId}`);
+    }
+
+    createHouse(streetId: number, houseForm: any) {
+        return this.sendPost(`api/private/street/${streetId}/house`, houseForm);
+    }
+
+    editHouse(houseId: number, houseForm: any) {
+        return this.sendPatch(`api/private/house/${houseId}`, houseForm);
+    }
+
+    deleteHouse(houseId: number) {
+        return this.sendDelete(`api/private/house/${houseId}`);
     }
 
     // Результаты запросов на сервер кэшируются по таймауту, чтобы не было доп нагрузки на сервер
@@ -662,8 +730,6 @@ export class ApiService {
         return observable;
     }
 
-    // Результаты запросов на сервер кэшируются по таймауту, чтобы не было доп нагрузки на сервер
-
     private sendGetSilent<T>(uri: string, query?: any) {
         const requestHash = this.generateHash(uri, query);
         let observable: Observable<T> | null = null;
@@ -679,6 +745,8 @@ export class ApiService {
         }
         return observable;
     }
+
+    // Генерируем хэш запроса по URI и параметрам запроса
 
     private sendPost<T>(uri: string, body: any) {
         return this.client.post<T>(uri, body)
@@ -704,8 +772,6 @@ export class ApiService {
                 throw err;
             }));
     }
-
-    // Генерируем хэш запроса по URI и параметрам запроса
 
     private generateHash(uri: string, query: any) {
         return cyrb53(uri + JSON.stringify(query), 0);

@@ -32,6 +32,7 @@ import {
 } from "../../components/panels/task-linking-dialog/task-selecting-dialog.component";
 import {ChatService} from "../../services/chat.service";
 import {WorkLogsDialogComponent} from "../../components/panels/work-logs-dialog/work-logs-dialog.component";
+import {TaskCreatorService} from "../../services/task-creator.service";
 
 @Component({
     templateUrl: './task-page.component.html',
@@ -146,7 +147,8 @@ export class TaskPageComponent implements OnInit, OnDestroy {
                 readonly confirmation: ConfirmationService,
                 readonly toast: MessageService,
                 readonly customNav: CustomNavigationService,
-                readonly rt: RealTimeUpdateService) {
+                readonly rt: RealTimeUpdateService,
+                readonly taskCreator: TaskCreatorService) {
     }
 
     _taskId: number = 0;
@@ -820,7 +822,7 @@ export class TaskPageComponent implements OnInit, OnDestroy {
                                     {
                                         label: "Создать",
                                         icon: 'mdi-add',
-                                        command: this.createLinkedTask.bind(this, "child")
+                                        command: ()=> this.taskCreator.dependency("child", this._taskId)
                                     },
                                     {
                                         label: "Назначить",
@@ -838,7 +840,7 @@ export class TaskPageComponent implements OnInit, OnDestroy {
                                     {
                                         label: "Создать",
                                         icon: 'mdi-add',
-                                        command: this.createLinkedTask.bind(this, "parent")
+                                        command: ()=> this.taskCreator.dependency("parent", this._taskId)
                                     },
                                     {
                                         label: "Назначить",

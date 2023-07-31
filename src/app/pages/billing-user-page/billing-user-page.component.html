@@ -1,0 +1,272 @@
+<div appExtendPageHeight class="flexed vcenter">
+    <div [style]="{marginBottom: '1rem'}" class="responsive-wrapper flexed gap10">
+        <ng-container [ngSwitch]="loadingState">
+            <ng-container *ngSwitchCase="'LOADING'">
+                <div class="flexed hcenter vcenter stretched panel">
+                    <p-progressSpinner class="primary-spinner" strokeWidth="1"></p-progressSpinner>
+                </div>
+            </ng-container>
+            <ng-container *ngSwitchCase="'ERROR'">
+                <div class="flexed hcenter vcenter stretched panel">
+                    <div class="flexed column vcenter caption f-color-danger size-huge wt-tiny">
+                        <span class="mds-error"></span>
+                        <span>Произошла ошибка</span>
+                    </div>
+                </div>
+            </ng-container>
+            <ng-container *ngSwitchCase="'READY'">
+                <ng-container *ngTemplateOutlet="infoViewTemp"></ng-container>
+            </ng-container>
+        </ng-container>
+    </div>
+</div>
+
+<ng-template #infoViewTemp>
+    <div class="flexed column stretched h-min panel">
+        <div class="flexed gap10 p10 hcenter terminator-bottom">
+            <p-button styleClass="p-button-secondary p-button-text p-button-icon" icon="mdi-arrow_back" (onClick)="customNav.backOrDefault(['/billing','search'])"></p-button>
+            <span class="caption size-huge wt-tiny f-color-600 with-icon">
+                <span class="mds-person caption size-xlarge"></span>
+                <span>
+                    {{userInfo?.uname}}
+                </span>
+            </span>
+            <ng-container *ngTemplateOutlet="titleTagsTemp"></ng-container>
+            <div class="stretched"></div>
+            <span class="caption size-tiny wt-black f-color-300">Обновлено <app-time-elapsed [startTime]="loadingTimestamp"></app-time-elapsed> назад</span>
+            <p-button styleClass="p-button-text p-button-icon" icon="mdi-refresh" (onClick)="load()"></p-button>
+        </div>
+        <div class="flexed column gap10 p20 terminator-bottom">
+            <ng-container *ngTemplateOutlet="mainUserInfoTemp"></ng-container>
+            <ng-container *ngTemplateOutlet="hardwareInfoTemp"></ng-container>
+            <ng-container *ngTemplateOutlet="tariffInfoTemp"></ng-container>
+        </div>
+        <div class="flexed gap10 p10 hcenter">
+            <p-button label="Создать задачу" icon="mdi-add" styleClass="p-button-success p-button-text" (onClick)="createTaskMenu.toggle($event)"></p-button>
+            <div class="stretched"></div>
+            <span *ngIf="creditAmount" class="caption wt-tiny size-huge f-color-danger">
+                Кредит:
+                {{creditAmount | currency: 'RUB'}}
+            </span>
+            <span class="caption wt-tiny size-huge f-color-primary" [ngClass]="{'f-color-primary': moneyAmount>=0, 'f-color-danger': moneyAmount<0}">
+                Баланс:
+                {{moneyAmount | currency: 'RUB'}}
+            </span>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #titleTagsTemp>
+    <div class="flexed gap5 hcenter" >
+        <ng-container [ngSwitch]="userInfo?.newTarif?.state">
+            <ng-container *ngSwitchCase="1">
+                <app-colored-tag caption="Активный" color="var(--mc-500)"></app-colored-tag>
+            </ng-container>
+            <ng-container *ngSwitchCase="100">
+                <app-colored-tag caption="Неактивный" color="var(--danger-600)"></app-colored-tag>
+            </ng-container>
+            <ng-container *ngSwitchCase="7">
+                <app-colored-tag caption="Нет денег" color="var(--warm-500)"></app-colored-tag>
+            </ng-container>
+            <ng-container *ngSwitchCase="10">
+                <app-colored-tag caption="Древний" color="var(--danger-600)"></app-colored-tag>
+            </ng-container>
+            <ng-container *ngSwitchCase="9">
+                <app-colored-tag caption="Нет тарифа" color="var(--danger-600)"></app-colored-tag>
+            </ng-container>
+            <ng-container *ngSwitchCase="11">
+                <app-colored-tag caption="Отключен" color="var(--danger-600)"></app-colored-tag>
+            </ng-container>
+            <ng-container *ngSwitchDefault>
+                <app-colored-tag caption="Неактивный" color="var(--danger-600)"></app-colored-tag>
+            </ng-container>
+        </ng-container>
+        <app-colored-tag [caption]="isOnline ? 'Онлайн' : 'Офлайн'"
+                         [color]="isOnline ? 'var(--scs-500)' : 'var(--danger-500)'"></app-colored-tag>
+        <app-colored-tag *ngIf="hasCredit" caption="Кредит" color="var(--warm-500)"></app-colored-tag>
+    </div>
+</ng-template>
+
+<ng-template #mainUserInfoTemp>
+    <div class="flexed column">
+        <span class="caption wt-bold size-big f-color-600">
+            Пользователь
+        </span>
+        <div class="flexed column gap5 p10">
+            <span>
+                <span class="caption wt-black size-small f-color-500">
+                    Адрес:
+                </span>
+                <span class="caption">
+                    {{userInfo?.ibase?.addr}}
+                </span>
+            </span>
+            <span>
+                <span class="caption wt-black size-small f-color-500">
+                    ФИО:
+                </span>
+                <span class="caption">
+                    {{userInfo?.ibase?.fio}}
+                </span>
+            </span>
+            <span>
+                <span class="caption wt-black size-small f-color-500">
+                    Телефон:
+                </span>
+                <span class="caption">
+                    {{userInfo?.ibase?.phone}}
+                </span>
+            </span>
+            <span>
+                <span class="caption wt-black size-small f-color-500">
+                    Договор заключен:
+                </span>
+                <span class="caption">
+                    {{userInfo?.ibase?.ddog | date: 'EEEE dd MMMM yyyy' | titlecase}}г.
+                </span>
+            </span>
+            <span *ngIf="userInfo?.ibase?.coment">
+                <span class="caption wt-black size-small f-color-500">
+                    Комментарий:
+                </span>
+                <span class="caption">
+                    {{userInfo?.ibase?.coment}}
+                </span>
+            </span>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #hardwareInfoTemp>
+    <div class="flexed column">
+        <span class="caption wt-bold size-big f-color-600">
+            Оборудование
+        </span>
+        <div class="flexed column gap5 p10">
+            <span>
+                <span class="caption wt-black size-small f-color-500">
+                    IP:
+                </span>
+                <span class="caption">
+                    <span>
+                        {{userInfo?.newTarif?.intIp}}
+                    </span>
+                    <span class="caption wt-bold" [style.color]="isOnline ? 'var(--scs-500)' : 'var(--danger-500)'">
+                        {{isOnline ? 'Онлайн' : 'Офлайн'}}
+                    </span>
+                </span>
+            </span>
+            <span>
+                <span class="caption wt-black size-small f-color-500">
+                    Активность:
+                </span>
+                <span class="caption">
+                    {{userInfo?.newTarif?.last | date: 'dd MMMM yyyy HH:mm:ss' | titlecase}}
+                    ({{userInfo?.newTarif?.last | elapsedTime:'':' назад':false:true}})
+                </span>
+                <span class="mdi-help_outline caption size-big f-color-300" pTooltip="Момент времени, когда оборудование отправило запрос серверу."></span>
+            </span>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #tariffInfoTemp>
+    <div class="flexed column">
+        <span class="caption wt-bold size-big f-color-600">
+            Тарифы
+        </span>
+        <div class="flexed column gap5 p10">
+            <span>
+                <span class="caption wt-black size-small f-color-500">
+                    Основной:
+                </span>
+                <span class="caption">
+                    <span>
+                        {{mainTariff?.service ? mainTariff?.service : 'Нет тарифа'}}
+                    </span>
+                    <span *ngIf="mainTariff?.service" class="caption wt-bold size-small f-color-primary">
+                        {{mainTariff?.price}} руб/период
+                    </span>
+                </span>
+            </span>
+            <span *ngIf="services.length>0" class="flexed gap5 hstart">
+                <span class="caption wt-black size-small f-color-500">
+                    Сервисы:
+                </span>
+                <div class="flexed column gap5">
+                    <span *ngFor="let service of services">
+                        <span>
+                            {{service?.service}}
+                        </span>
+                        <span class="caption wt-bold size-small f-color-primary">
+                            {{service?.price}} руб/период
+                        </span>
+                    </span>
+                </div>
+            </span>
+            <span>
+                <span class="caption wt-black size-small f-color-500">
+                    Общая стоймость:
+                </span>
+                <span class="caption">
+                    {{totalCost}} руб/период
+                </span>
+            </span>
+            <span class="flexed gap5 hstart">
+                <span class="caption wt-black size-small f-color-500">
+                    Скорость:
+                </span>
+                <div class="flexed column gap5">
+                    <span>
+                        <span>
+                            По тарифу
+                        </span>
+                        <span class="caption wt-bold size-small f-color-primary">
+                            {{userInfo?.newTarif?.tspeed}} Мбит/с
+                        </span>
+                    </span>
+                    <span>
+                        <span>
+                            Фактическая
+                        </span>
+                        <span class="caption wt-bold size-small f-color-primary">
+                            {{userInfo?.newTarif?.speed}} Мбит/с
+                        </span>
+                    </span>
+                </div>
+            </span>
+            <span *ngIf="userInfo?.newTarif?.hdate">
+                <span class="caption wt-black size-small f-color-500">
+                    Период тарифа:
+                </span>
+                <span class="caption">
+                    {{userInfo?.newTarif?.hdate | date: 'dd MMMM yyyy HH:mm' | titlecase}}
+                </span>
+                -
+                <span class="caption">
+                    {{userInfo?.newTarif?.edate | date: 'dd MMMM yyyy HH:mm' | titlecase}}
+                </span>
+                <span class="mdi-help_outline caption size-big f-color-300" pTooltip="Дата начала и окончания действия основного тарифа. (Дата списания)"></span>
+            </span>
+            <span *ngIf="isEndTariffDateAfter">
+                <span class="caption wt-black size-small f-color-500">
+                    Списание через:
+                </span>
+                <span class="caption">
+                    {{userInfo?.newTarif?.edate | elapsedTime:'':'':false:true}}
+                </span>
+            </span>
+            <span *ngIf="userInfo?.newTarif?.endstate">
+                <span class="caption wt-black size-small f-color-500">
+                    Изм. состояния:
+                </span>
+                <span class="caption">
+                    {{userInfo?.newTarif?.endstate | date: 'dd MMMM yyyy HH:mm' | titlecase}}
+                </span>
+                <span class="mdi-help_outline caption size-big f-color-300" pTooltip="Момент времени, когда произойдет изменение состояния абонента. (Прим. закончится отл. платеж)"></span>
+            </span>
+        </div>
+    </div>
+</ng-template>
+
+<p-menu #createTaskMenu [model]="wireframes" [popup]="true" appendTo="body"></p-menu>

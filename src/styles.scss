@@ -30,6 +30,18 @@
   --mc-800: #0E61B3;
   --mc-900: #0C559E;
 
+  --scs-000: #FBFFFC;
+  --scs-100: #CFFDDC;
+  --scs-200: #A7FBBE;
+  --scs-300: #83F9A3;
+  --scs-400: #62F88A;
+  --scs-500: #44F774;
+  --scs-600: #26F65E;
+  --scs-700: #0BF54A;
+  --scs-800: #09DD42;
+  --scs-900: #08C73B;
+
+
   --warm-100: #FFECDE;
   --warm-200: #FFC499;
   --warm-300: #FFA15E;
@@ -576,9 +588,73 @@ html:not(.whited), body:not(.whited) {
   }
 }
 
+.m-sides {
+  &-1 {
+    margin: 0 .1rem;
+  }
+  &-2 {
+    margin: 0 .2rem;
+  }
+  &-3 {
+    margin: 0 .3rem;
+  }
+  &-4 {
+    margin: 0 .4rem;
+  }
+  &-5 {
+    margin: 0 .5rem;
+  }
+  &-6 {
+    margin: 0 .6rem;
+  }
+  &-7 {
+    margin: 0 .7rem;
+  }
+  &-8 {
+    margin: 0 .8rem;
+  }
+  &-9 {
+    margin: 0 .9rem;
+  }
+  &-10 {
+    margin: 0 1rem;
+  }
+  &-11 {
+    margin: 0 1.1rem;
+  }
+  &-12 {
+    margin: 0 1.2rem;
+  }
+  &-13 {
+    margin: 0 1.3rem;
+  }
+  &-14 {
+    margin: 0 1.4rem;
+  }
+  &-15 {
+    margin: 0 1.5rem;
+  }
+  &-16 {
+    margin: 0 1.6rem;
+  }
+  &-17 {
+    margin: 0 1.7rem;
+  }
+  &-18 {
+    margin: 0 1.8rem;
+  }
+  &-19 {
+    margin: 0 1.9rem;
+  }
+  &-20 {
+    margin: 0 2rem;
+  }
+}
+
 .list-view {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid: auto-flow/1fr;
+  align-content: flex-start;
   overflow-y: auto;
   height: 100%;
 
@@ -790,6 +866,10 @@ fieldset.node {
 
     &-huge {
       font-size: 1.4rem;
+    }
+
+    &-xlarge {
+      font-size: 2rem;
     }
   }
 
@@ -1372,8 +1452,12 @@ markdown > p:last-child {
 }
 
 .terminator {
-  border-bottom: 1px solid var(--bgc-300);
-  height: 0;
+  &-bottom{
+    border-bottom: 1px solid var(--bgc-200);
+  }
+  &-right{
+    border-right: 1px solid var(--bgc-200);
+  }
 }
 
 .p-breadcrumb {
@@ -1395,4 +1479,43 @@ markdown > p:last-child {
 
 .p-inputgroup-addon > i{
   font-size: 1.35rem !important;
+}
+
+.active-element{
+  transition: background-color .1s ease-in-out;
+  user-select: none;
+  cursor: pointer;
+  & *{
+      transition: color .1s ease-in-out;
+  }
+  &:hover *{
+    color: var(--mc-400) !important;
+  }
+  &:hover{
+    background-color: var(--mc-0);
+  }
+}
+
+.cover-element{
+  position: relative;
+  &::after{
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    animation-duration: .2s;
+    animation-name: flow;
+    backdrop-filter: brightness(.7);
+  }
+}
+
+@keyframes flow {
+  from{
+    backdrop-filter: brightness(1);
+  }
+  to{
+    backdrop-filter: brightness(.8);
+  }
 }

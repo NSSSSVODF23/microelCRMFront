@@ -4,6 +4,7 @@ import {NotificationsService} from "../../services/notifications.service";
 import {ChatService} from "../../services/chat.service";
 import {ChatPanelComponent} from "../../components/panels/chat-panel/chat-panel.component";
 import {Subscription} from "rxjs";
+import {TaskCreatorService} from "../../services/task-creator.service";
 
 @Component({
     templateUrl: './main-bootstrap.component.html',
@@ -15,7 +16,7 @@ export class MainBootstrapComponent implements OnInit, OnDestroy {
     @ViewChild('chatPanelEl') chatPanelEl?: ChatPanelComponent;
     openChatSub?:Subscription;
 
-    constructor(readonly router: Router, readonly notifyService: NotificationsService, readonly chatService: ChatService) {
+    constructor(readonly router: Router, readonly notifyService: NotificationsService, readonly chatService: ChatService, readonly taskCreator: TaskCreatorService) {
     }
 
     ngOnInit(): void {
@@ -27,12 +28,5 @@ export class MainBootstrapComponent implements OnInit, OnDestroy {
 
     ngOnDestroy() {
         this.openChatSub?.unsubscribe();
-    }
-
-    openCreateTaskPage() {
-        const width = 800;
-        const height = 800;
-        // Open new tab for create new parent task with taskId parameter, using Window.open() method
-        window.open('/task/create', '_blank', `popup=yes,width=${width},height=${height},left=${(screen.width / 2) - (width / 2)},top=${(screen.height / 2) - (height / 2)}`);
     }
 }

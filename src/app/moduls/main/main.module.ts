@@ -83,8 +83,19 @@ import {DragDropModule} from "primeng/dragdrop";
 import {TableModule} from "primeng/table";
 import {SliderModule} from "primeng/slider";
 import {SlideMenuModule} from "primeng/slidemenu";
+import {SplitButtonModule} from "primeng/splitbutton";
+import {BillingSearchUserPageComponent} from "../../pages/billing-search-user-page/billing-search-user-page.component";
+import {BillingUserPageComponent} from "../../pages/billing-user-page/billing-user-page.component";
+import {AddressesListPageComponent} from "../../pages/addresses-list-page/addresses-list-page.component";
+import {ChipsModule} from "primeng/chips";
+import {InputMaskModule} from "primeng/inputmask";
+import {AngularYandexMapsModule, YaConfig} from "angular8-yandex-maps";
+import {BypassWorkCalculationComponent} from "../../pages/bypass-work-calculation/bypass-work-calculation.component";
 
-
+const mapConfig: YaConfig = {
+    apikey: '008574e5-f34b-4270-b3d5-91aaabd036e8',
+    lang: 'ru_RU',
+};
 @NgModule({
     declarations: [
         TasksPageComponent,
@@ -103,7 +114,11 @@ import {SlideMenuModule} from "primeng/slidemenu";
         SalaryTablePageComponent,
         PaidActionsPageComponent,
         WorksPageComponent,
-        SalaryEstimationPageComponent
+        SalaryEstimationPageComponent,
+        BillingSearchUserPageComponent,
+        BillingUserPageComponent,
+        AddressesListPageComponent,
+        BypassWorkCalculationComponent
     ],
     imports: [
         CommonComponentsModule,
@@ -174,7 +189,11 @@ import {SlideMenuModule} from "primeng/slidemenu";
         TableModule,
         SliderModule,
         DecimalPipe,
-        SlideMenuModule
+        SlideMenuModule,
+        SplitButtonModule,
+        ChipsModule,
+        InputMaskModule,
+        AngularYandexMapsModule.forRoot(mapConfig)
     ],
     providers: [MessageService, {provide: LOCALE_ID, useValue: 'ru'}, ConfirmationService]
 })

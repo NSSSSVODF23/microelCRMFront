@@ -20,6 +20,10 @@ import {SalaryTablePageComponent} from "../../pages/salary-table-page/salary-tab
 import {PaidActionsPageComponent} from "../../pages/paid-actions-page/paid-actions-page.component";
 import {WorksPageComponent} from "../../pages/works-page/works-page.component";
 import {SalaryEstimationPageComponent} from "../../pages/salary-estimation-page/salary-estimation-page.component";
+import {BillingSearchUserPageComponent} from "../../pages/billing-search-user-page/billing-search-user-page.component";
+import {BillingUserPageComponent} from "../../pages/billing-user-page/billing-user-page.component";
+import {AddressesListPageComponent} from "../../pages/addresses-list-page/addresses-list-page.component";
+import {BypassWorkCalculationComponent} from "../../pages/bypass-work-calculation/bypass-work-calculation.component";
 
 const routes: Routes = [
     {
@@ -43,7 +47,11 @@ const routes: Routes = [
             {path: 'salary/paid-actions', redirectTo: '/salary/paid-actions/1?includeDeleted=false', pathMatch: 'full'},
             {path: 'salary/paid-actions/:page', component: PaidActionsPageComponent},
             {path: 'salary/works', component: WorksPageComponent},
-            {path: 'salary/estimation', component: SalaryEstimationPageComponent}
+            {path: 'salary/estimation', component: SalaryEstimationPageComponent},
+            {path: 'salary/estimation/bypass', component: BypassWorkCalculationComponent},
+            {path: 'billing/search', component: BillingSearchUserPageComponent},
+            {path: 'billing/user/:login', component: BillingUserPageComponent},
+            {path: 'addresses/list', component: AddressesListPageComponent},
         ]
     },
     // {breadcrumb: '**', redirectTo: 'tasks/status/all', pathMatch: 'full'},

@@ -1,6 +1,5 @@
 <span class="p-input-icon-left wrapper">
     <i [class]="(value?'mdi-domain active':'mdi-domain_disabled unactive')+' icon'"></i>
-<!--    <i class="pi pi-search"></i>-->
     <input #inputEl [disabled]="disabled" [ngClass]="{unconfirmed:!value, confirmed:value}" [placeholder]="placeholder" [spellcheck]="false" autocomplete="off" class="address-input"
            pInputText type="text" (blur)="onTouched(); onBlur.emit()"/>
 </span>

@@ -1,0 +1,156 @@
+<div [style]="{grid:'min-content 1fr / max-content max-content 1fr'}"
+     class="grided gap5">
+
+    <div class="caption size-big wt-bold f-color-500">
+        Доступные работы
+    </div>
+
+    <span></span>
+
+    <div class="caption size-big wt-bold f-color-500">
+        Выполненные работы
+    </div>
+
+    <div class="table-wrapper">
+        <p-tabView styleClass="tab-content-unpadding">
+            <p-tabPanel header="Работы">
+                <p-table [loading]="worksTableLoading" [rowHover]="true" [value]="treeMenuWorksItems"
+                         styleClass="p-datatable-sm">
+                    <ng-template let-node pTemplate="body">
+                        <ng-container [ngSwitch]="node.type">
+                            <tr (dblclick)="workingTableBack()" *ngSwitchCase="'back'" class="not-selectable">
+                                <td class="caption size-small with-icon">
+                                    <span [style.font-size]="'1em'" class="mdi-subdirectory_arrow_left"></span>
+                                    <span>Назад</span>
+                                </td>
+                                <td>
+                                </td>
+                            </tr>
+                            <tr (dblclick)="loadWorksByGroup(node.key)" *ngSwitchCase="'group'"
+                                class="not-selectable">
+                                <td class="caption size-small with-icon">
+                                    <span [class]="node.icon" [style.font-size]="'1em'"></span>
+                                    <span class="caption f-inline">{{node.label}}</span>
+                                </td>
+                                <td>
+                                </td>
+                            </tr>
+                            <tr (onDragStart)="workDragging(node.data)" *ngSwitchCase="'work'"
+                                class="not-selectable cursor-move"
+                                dragEffect="move" pDraggable="dd">
+                                <td class="caption size-small with-icon">
+                                    <span [class]="node.icon" [style.font-size]="'1em'"></span>
+                                    <span class="caption f-inline">{{node.label}}</span>
+                                </td>
+                                <td class="caption size-small">
+                                    {{workCost(node.data)}} руб.
+                                </td>
+                            </tr>
+                        </ng-container>
+                    </ng-template>
+                </p-table>
+            </p-tabPanel>
+            <p-tabPanel header="Действия">
+                <p-table [loading]="actionsTableLoading" [rowHover]="true" [value]="tableMenuActionsItems"
+                         styleClass="p-datatable-sm">
+                    <ng-template let-action pTemplate="body">
+                        <tr (onDragStart)="actionDragging(action)" class="not-selectable cursor-move"
+                            dragEffect="move"
+                            pDraggable="dd">
+                            <td class="caption size-small with-icon">
+                                <span [style.font-size]="'1em'" class="mdi-directions_run"></span>
+                                <span class="caption f-inline">{{action.name}}</span>
+                            </td>
+                            <td>
+                                {{action.cost}} руб/{{action.unit | unitName}}
+                            </td>
+                        </tr>
+                    </ng-template>
+                </p-table>
+            </p-tabPanel>
+        </p-tabView>
+    </div>
+
+    <span class="mds-sync_alt caption size-huge self-center"></span>
+
+    <div (onDragEnter)="dragEnter()" (onDragLeave)="dragLeave()" (onDrop)="dropped()"
+         [ngClass]="{'drop-zone': isDragging}" class="stretched flexed column table-wrapper" pDroppable="dd">
+        <p-table [value]="actionsTaken" class="stretched" groupRowsBy="workId" rowGroupMode="rowspan"
+                 sortField="workName" sortMode="single">
+            <ng-template pTemplate="header">
+                <tr>
+                    <th>Работа</th>
+                    <th>Действие</th>
+                    <th>Кол-во</th>
+                    <th>Стоимость</th>
+                    <th>Коэф.</th>
+                    <th>Уд.?</th>
+                </tr>
+            </ng-template>
+            <ng-template let-rowNode let-rowgroup="rowgroup" let-rowspan="rowspan" pTemplate="body">
+                <tr *ngIf="rowNode.workId">
+                    <td *ngIf="rowgroup" [attr.rowspan]="rowspan">{{rowNode.workName}}</td>
+                    <td>{{rowNode.actionName}}</td>
+                    <td pEditableColumn="">
+                        <p-cellEditor>
+                            <ng-template pTemplate="input">
+                                <p-inputNumber (ngModelChange)="updateActionCount($event, rowNode)"
+                                               (onFocus)="selectAllValue($event)" [(ngModel)]="rowNode.count"
+                                               [allowEmpty]="false"
+                                               [max]="99999" [min]="1"
+                                               [size]="4"></p-inputNumber>
+                            </ng-template>
+                            <ng-template pTemplate="output">
+                                {{rowNode.count}} {{rowNode.unit|unitName}}
+                            </ng-template>
+                        </p-cellEditor>
+                    </td>
+                    <td>{{rowNode.cost}} руб.</td>
+                    <td *ngIf="rowgroup" [attr.rowspan]="rowspan">
+                        <p-button (onClick)="selectWorkActions(rowNode.workId, rowNode.workName); ratioMenu.toggle($event)"
+                                  icon="mdi-percent"
+                                  styleClass="p-button-text p-button-icon p-button-success"></p-button>
+                    </td>
+                    <td *ngIf="rowgroup" [attr.rowspan]="rowspan">
+                        <p-button (click)="removeWork(rowNode.workId)" icon="mdi-delete"
+                                  styleClass="p-button-text p-button-icon p-button-danger"></p-button>
+                    </td>
+                </tr>
+                <tr *ngIf="!rowNode.workId">
+                    <td></td>
+                    <td>{{rowNode.actionName}}</td>
+                    <td pEditableColumn="">
+                        <p-cellEditor>
+                            <ng-template pTemplate="input">
+                                <p-inputNumber (ngModelChange)="updateActionCount($event, rowNode)"
+                                               [(ngModel)]="rowNode.count" [allowEmpty]="false" [max]="99999"
+                                               [min]="1" (onFocus)="selectAllValue($event)"
+                                               [size]="4"></p-inputNumber>
+                            </ng-template>
+                            <ng-template pTemplate="output">
+                                {{rowNode.count}} {{rowNode.unit|unitName}}
+                            </ng-template>
+                        </p-cellEditor>
+                    </td>
+                    <td>{{rowNode.cost}} руб.</td>
+                    <td>
+                        <p-button
+                                (onClick)="selectAction(rowNode.uuid, rowNode.actionName); ratioMenu.toggle($event)"
+                                icon="mdi-percent"
+                                styleClass="p-button-text p-button-icon p-button-success"></p-button>
+                    </td>
+                    <td>
+                        <p-button (click)="removeAction(rowNode.uuid)" icon="mdi-delete"
+                                  styleClass="p-button-text p-button-icon p-button-danger"></p-button>
+                    </td>
+                </tr>
+            </ng-template>
+        </p-table>
+        <div class="flexed hcenter vend caption f-color-400 wt-tiny size-huge p5">
+            Общая стоимость работ: {{totalCostOfWork}} руб.
+        </div>
+    </div>
+</div>
+
+<p-slideMenu #ratioMenu (onHide)="deselectFactor()" [model]="workActionsRatioMenu" [popup]="true" [style]="{width:'max-content'}"
+             appendTo="body"></p-slideMenu>

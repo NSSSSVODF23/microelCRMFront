@@ -1,0 +1,105 @@
+<div appExtendPageHeight class="flex justify-content-center">
+    <div class="flex gap-3 responsive-wrapper mb-3">
+        <app-main-menu-panel></app-main-menu-panel>
+        <div class="flex flex-column flex-grow-1 panel">
+            <span class="caption size-huge wt-tiny f-color-600 p-3 terminator-bottom">Создание задачи и подсчет работ</span>
+            <div class="flex flex-column px-4">
+                <section class="flex gap-4 p-4 terminator-bottom">
+                    <div>
+                        <div class="flex flex-column gap-1">
+                            <span class="caption wt-bold f-color-500">Тип задачи</span>
+                            <p-listbox (onChange)="selectTemplate($event.value)"
+                                       [disabled]="templateLoadingState === 'LOADING'"
+                                       [hidden]="wireframesLoadingState !== 'READY'"
+                                       *ngIf="wireframes$ | async as wireframes"
+                                       [options]="wireframes"></p-listbox>
+                            <ng-container *ngTemplateOutlet="wireframesLoadingTemp"></ng-container>
+                        </div>
+                    </div>
+                    <div [formGroup]="taskInformationForm" class="flex flex-grow-1 flex-column gap-2">
+                        <span class="caption wt-bold f-color-500">Информация о задаче</span>
+                        <ng-container *ngIf="templateLoadingState==='READY'">
+                            <app-task-template-input *ngFor="let field of taskFields"
+                                                     [field]="field"
+                                                     [formControlName]="field.id"></app-task-template-input>
+                        </ng-container>
+                        <ng-container [ngSwitch]="templateLoadingState">
+                            <div *ngSwitchCase="'EMPTY'" class="flex justify-content-center">
+                                <div class="flex align-items-center caption size-big wt-bold f-color-400">
+                                    <span class="mds-done"></span>
+                                    <span>Выберите тип задачи</span>
+                                </div>
+                            </div>
+                            <div *ngSwitchCase="'LOADING'" class="flex justify-content-center">
+                                <p-progressSpinner class="primary-spinner" strokeWidth="1"></p-progressSpinner>
+                            </div>
+                        </ng-container>
+                    </div>
+                </section>
+                <section *ngIf="templateLoadingState==='READY'" class="flex gap-4 p-4 terminator-bottom" [formGroup]="installersReportForm">
+                    <div class="flex flex-column gap-1">
+                        <span class="caption wt-bold f-color-500">Назначенные монтажники</span>
+                        <p-listbox [checkbox]="true" [metaKeySelection]="false" [multiple]="true"
+                                   [options]="installers" formControlName="installers">
+                            <ng-template let-installer pTemplate="item">
+                                <app-employee-label [employee]="installer"></app-employee-label>
+                            </ng-template>
+                        </p-listbox>
+                    </div>
+                    <div class="flex flex-column gap-2 flex-grow-1">
+                        <div class="flex flex-column gap-1">
+                            <span class="caption wt-bold f-color-500">Дата выполнения работ</span>
+                            <p-calendar selectionMode="single" [readonlyInput]="true" [selectOtherMonths]="true"
+                                        appendTo="body" formControlName="date"></p-calendar>
+                        </div>
+                        <div class="flex flex-column gap-1">
+                            <span class="caption wt-bold f-color-500">Теги задачи</span>
+                            <app-task-tag-selector [autoAccept]="true" formControlName="tags"></app-task-tag-selector>
+                        </div>
+                        <div class="flex flex-column gap-1 flex-grow-1">
+                            <span class="caption wt-bold f-color-500">Отчет о выполненных работах</span>
+                            <textarea [autoResize]="true" [rows]="4" pInputTextarea formControlName="report"></textarea>
+                        </div>
+                    </div>
+                </section>
+                <section *ngIf="templateLoadingState==='READY'" class="flex gap-4 p-4 terminator-bottom">
+                    <app-works-picker [employees]="installersReportForm.value.installers"
+                                      [formControl]="worksPickerForm" class="flex-grow-1"></app-works-picker>
+                </section>
+                <section *ngIf="templateLoadingState==='READY'" class="flex gap-4 p-4 terminator-bottom">
+                    <app-employee-sum-distribution class="w-full" [formControl]="employeeRatioForm"
+                                                   [employees]="installersReportForm.value.installers"
+                                                   [actionsTaken]="worksPickerForm.value?.actionsTaken"
+                                                   [factorsActions]="worksPickerForm.value?.factorsActions"
+                    (onRemoveFactorAction)="removeFactorActionHandler($event)"></app-employee-sum-distribution>
+                </section>
+                <p-button (onClick)="createTaskAndCalculate()" class="align-self-end my-3"
+                          [disabled]="!taskInformationForm.valid || !worksPickerForm.valid || !installersReportForm.valid"
+                          *ngIf="templateLoadingState === 'READY'" [loading]="isSendingCalculation"
+                          icon="mdi-currency_exchange" label="Рассчитать"></p-button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<ng-template #wireframesLoadingTemp>
+    <div *ngIf="wireframesLoadingState!=='READY'" [ngSwitch]="wireframesLoadingState"
+         class="border-round-md border-1 border-solid border-300 p-3 flex flex-column gap-2">
+                                <span *ngSwitchCase="'ERROR'"
+                                      class="flex flex-grow-1 gap-1 h-10rem align-items-center justify-content-center caption wt-bold f-color-danger">
+                                    <span class="mdi-error"></span>
+                                    <span>Ошибка</span>
+                                </span>
+        <span *ngSwitchCase="'EMPTY'"
+              class="flex flex-grow-1 gap-1 h-10rem align-items-center justify-content-center caption wt-bold f-color-300">
+                                    <span class="mdi-backpack"></span>
+                                    <span>Пусто</span>
+                                </span>
+        <ng-container *ngSwitchCase="'LOADING'">
+            <p-skeleton width="10rem" height="2.8rem"></p-skeleton>
+            <p-skeleton width="10rem" height="2.8rem"></p-skeleton>
+            <p-skeleton width="10rem" height="2.8rem"></p-skeleton>
+        </ng-container>
+    </div>
+</ng-template>

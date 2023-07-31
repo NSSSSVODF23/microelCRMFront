@@ -251,8 +251,8 @@ export interface Address {
 }
 
 export interface City {
-    cityId?: number;
-    name?: string;
+    cityId: number;
+    name: string;
     deleted?: boolean;
 }
 
@@ -263,11 +263,26 @@ export interface District {
 }
 
 export interface Street {
-    streetId?: number;
-    name?: string;
-    prefix?: string;
-    city?: City;
+    streetId: number;
+    name: string;
+    altNames?: string;
+    billingAlias?: string;
+    prefix: string;
+    city: City;
     deleted?: boolean;
+    nameWithPrefix: string;
+    streetName: string;
+}
+
+export interface House{
+    houseId: number;
+    houseNum: number;
+    fraction: number;
+    letter: string;
+    build: number;
+    houseName: string;
+    addressName: string;
+    streetId: number;
 }
 
 export interface Pipeline {
@@ -732,6 +747,272 @@ export interface SalaryRow{
     employee: Employee;
     salaryPoints: SalaryPoint[]
     sum: number;
+}
+
+export interface BillingUserItemData{
+    tarif: string;
+    uname: string;
+    last: string;
+    phone: string;
+    coment: string;
+    utype: string;
+    state: string;
+    addr: string;
+    fio: string;
+}
+
+// @Getter
+// @Setter
+// public static class UserMainInfo {
+//     private String addr;
+//     private String coment;
+//     private Float credit;
+//     private Date ddog;
+//     private String fio;
+//     private Float money;
+//     private String ndog;
+//     private String phone;
+//
+//     public static UserMainInfo from(Object o) {
+//     SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+//     UserMainInfo u = new UserMainInfo();
+//     Map<String,String> map = (Map<String,String>) o;
+//     u.addr = map.get("addr");
+//     u.coment = map.get("coment");
+//     u.credit = Float.valueOf(map.get("credit"));
+//     try {
+//     u.ddog = format.parse(map.get("ddog"));
+// } catch (ParseException e) {
+//     u.ddog = null;
+// }
+// u.fio = map.get("fio");
+// u.money = Float.valueOf(map.get("money"));
+// u.ndog = map.get("ndog");
+// u.phone = map.get("phone");
+// return u;
+// }
+// }
+//
+// @Getter
+// @Setter
+// public static class UserNewTarif {
+//     private String cntDhcp;
+//     private String cntVpn;
+//     private String dstate;
+//     private Date edate;
+//     private Date endstate;
+//     private String extIp;
+//     private Date hdate;
+//     private String intIp;
+//     private String ipDhcp;
+//     private String ipNat;
+//     private String ipUser;
+//     private String ipVpn;
+//     private Date last;
+//     private Date lastDhcp;
+//     private Date lastVpn;
+//     private String ndog;
+//     private Integer online;
+//     private Integer pstate;
+//     private Integer speed;
+//     private Integer staj;
+//     private Integer state;
+//     private String tarif;
+//     private Integer tspeed;
+//     private Integer tstate;
+//     private String uname;
+//     private String xservice;
+//
+//     public static UserNewTarif from(Object o) {
+//     SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+//
+//     UserNewTarif u = new UserNewTarif();
+//     Map<String,String> map = (Map<String,String>) o;
+//     u.cntDhcp = map.get("cnt_dhcp");
+//     u.cntVpn = map.get("cnt_vpn");
+//     u.dstate = map.get("dstate");
+//     try {
+//     u.edate = format.parse(map.get("edate"));
+// } catch (ParseException e) {
+//     u.edate = null;
+// }
+// try {
+//     u.endstate = format.parse(map.get("endstate"));
+// } catch (ParseException e) {
+//     u.endstate = null;
+// }
+// u.extIp = map.get("ext_ip");
+// try {
+//     u.hdate = format.parse(map.get("hdate"));
+// } catch (ParseException e) {
+//     u.hdate = null;
+// }
+// u.intIp = map.get("int_ip");
+// u.ipDhcp = map.get("ip_dhcp");
+// u.ipNat = map.get("ip_nat");
+// u.ipUser = map.get("ip_user");
+// u.ipVpn = map.get("ip_vpn");
+// try {
+//     u.last = format.parse(map.get("last"));
+// } catch (ParseException e) {
+//     u.last = null;
+// }
+// try {
+//     u.lastDhcp = format.parse(map.get("last_dhcp"));
+// } catch (ParseException e) {
+//     u.lastDhcp = null;
+// }
+// try {
+//     u.lastVpn = format.parse(map.get("last_vpn"));
+// } catch (ParseException e) {
+//     u.lastVpn = null;
+// }
+// u.ndog = map.get("ndog");
+// u.online = Integer.valueOf(map.get("online"));
+// u.pstate = Integer.valueOf(map.get("pstate"));
+// u.speed = Integer.valueOf(map.get("speed"));
+// u.staj = Integer.valueOf(map.get("staj"));
+// u.state = Integer.valueOf(map.get("state"));
+// u.tarif = map.get("tarif");
+// u.tspeed = Integer.valueOf(map.get("tspeed"));
+// u.tstate = Integer.valueOf(map.get("tstate"));
+// u.uname = map.get("uname");
+// u.xservice = map.get("xservice");
+//
+// return u;
+// }
+// }
+//
+// @Getter
+// @Setter
+// public static class OldTarifItem {
+//     private Date adate;
+//     private Date edate;
+//     private Date hdate;
+//     private String iExt;
+//     private Date mdate;
+//     private Float price;
+//     private String service;
+//     private Integer state;
+//     private Integer stype;
+//
+//     public static OldTarifItem from(Object o) {
+//     SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+//
+//     OldTarifItem u = new OldTarifItem();
+//     Map<String,String> map = (Map<String,String>) o;
+//     try {
+//     u.adate = format.parse(map.get("adate"));
+// } catch (ParseException e) {
+//     u.adate = null;
+// }
+// try {
+//     u.edate = format.parse(map.get("edate"));
+// } catch (ParseException e) {
+//     u.edate = null;
+// }
+// try {
+//     u.hdate = format.parse(map.get("hdate"));
+// } catch (ParseException e) {
+//     u.hdate = null;
+// }
+// u.iExt = map.get("i_ext");
+// try {
+//     u.mdate = format.parse(map.get("mdate"));
+// } catch (ParseException e) {
+//     u.mdate = null;
+// }
+// u.price = Float.valueOf(map.get("price"));
+// u.service = map.get("service");
+// u.state = Integer.valueOf(map.get("state"));
+// u.stype = Integer.valueOf(map.get("stype"));
+// return u;
+// }
+// }
+//
+// @Getter
+// @Setter
+// public static class TotalUserInfo {
+//     private UserMainInfo ibase;
+//     private Integer karma;
+//     private UserNewTarif newTarif;
+//     private List<OldTarifItem> oldTarif;
+//     private String state;
+//     private String uname;
+//
+//     public static TotalUserInfo from(Object o) {
+//     TotalUserInfo u = new TotalUserInfo();
+//     Map<String,Object> map = (Map<String,Object>) o;
+//     u.ibase = UserMainInfo.from(map.get("ibase"));
+//     u.karma = Integer.valueOf((String) map.get("karma"));
+//     u.newTarif = UserNewTarif.from(map.get("new_tarif"));
+//     Object[] oTarifs = (Object[]) map.get("old_tarif");
+//     u.oldTarif = Stream.of(oTarifs).map(OldTarifItem::from).collect(Collectors.toList());
+//     u.state = (String) map.get("state");
+//     u.uname = (String) map.get("uname");
+//     return u;
+// }
+// }
+
+export interface BillingUserMainInfo{
+    addr: string;
+    coment: string;
+    credit: number;
+    ddog: Date;
+    fio: string;
+    money: number;
+    ndog: string;
+    phone: string;
+}
+
+export interface BillingUserNewTarif{
+    cntDhcp: number;
+    cntVpn: number;
+    dstate: number;
+    edate: Date;
+    endstate: Date;
+    extIp: string;
+    hdate: Date;
+    intIp: string;
+    ipDhcp: string;
+    ipNat: string;
+    ipUser: string;
+    ipVpn: string;
+    last: Date;
+    lastDhcp: Date;
+    lastVpn: Date;
+    ndog: string;
+    online: number;
+    pstate: number;
+    speed: number;
+    staj: number;
+    state: number;
+    tarif: string;
+    tspeed: number;
+    tstate: number;
+    uname: string;
+    xservice: string;
+}
+
+export interface BillingOldTarifItem{
+    adate: Date;
+    edate: Date;
+    hdate: Date;
+    iExt: string;
+    mdate: Date;
+    price: number;
+    service: string;
+    state: number;
+    stype: number;
+}
+
+export interface BillingTotalUserInfo{
+    ibase: BillingUserMainInfo;
+    karma: number;
+    newTarif: BillingUserNewTarif;
+    oldTarif: BillingOldTarifItem[];
+    state: string;
+    uname: string;
 }
 
 export class CacheUnit<T> {

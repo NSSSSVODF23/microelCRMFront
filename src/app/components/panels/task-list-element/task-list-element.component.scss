@@ -35,6 +35,10 @@
     outline: 1px solid var(--mc-200);
   }
 
+  &:active{
+    background-color: var(--bgc-001);
+  }
+
   &.processing {
     border: 1px solid var(--warm-400);
   }
