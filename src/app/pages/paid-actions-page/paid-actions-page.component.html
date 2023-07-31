@@ -79,10 +79,10 @@
 </div>
 
 <p-dialog [(visible)]="createDialogVisible" [draggable]="false" [header]="createDialogHeader" [modal]="true"
-          [resizable]="false" appendTo="body">
+          [resizable]="false" [style]="{width:'40rem'}" appendTo="body">
     <ng-template pTemplate="content">
         <div [formGroup]="createForm" [style.margin-top]="'.2rem'" class="grided gap10">
-            <input [style.max-width]="'15rem'" formControlName="name" pInputText placeholder="Наименование..."
+            <input formControlName="name" pInputText placeholder="Наименование..."
                    type="text">
             <textarea [autoResize]="true" [cols]="50" [rows]="5" formControlName="description"
                       pInputTextarea placeholder="Описание..."></textarea>

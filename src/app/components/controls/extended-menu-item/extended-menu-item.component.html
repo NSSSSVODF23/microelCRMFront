@@ -1,6 +1,6 @@
 <div #wrapperElem class="flexed column wrapper">
     <div #titleElem (click)="toggle()" [routerLink]="link" class="title flexed gap6 hcenter"
-         [routerLinkActiveOptions]="{ exact: true }" routerLinkActive="active">
+         [routerLinkActiveOptions]="{ exact }" routerLinkActive="active">
         <span class="material-icons-round title-icon">{{icon}}</span> {{caption}}
         <div class="stretched"></div>
         <app-colored-tag *ngIf="badge" [caption]="badge" color="var(--mc-500)"></app-colored-tag>

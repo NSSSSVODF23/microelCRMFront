@@ -24,6 +24,7 @@ export class ExtendedMenuItemComponent implements OnInit, AfterViewInit {
     @Input() elements: ExtendedMenuModel[] = [];
     @Input() link?: string[];
     @Input() badge?: string;
+    @Input() exact = false;
 
     animationTimer?: any;
 
