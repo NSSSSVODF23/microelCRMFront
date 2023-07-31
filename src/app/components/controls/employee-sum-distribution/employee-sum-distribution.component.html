@@ -8,12 +8,12 @@
             <ng-container [formGroupName]="employee.login">
                 <div class="flexed gap10 hcenter w-full">
                     <p-slider [max]="1" [min]="0" [step]=".01" class="w-full"
-                              formControlName="ratio"></p-slider>
+                              formControlName="ratio" [disabled]="isDisabled"></p-slider>
                     <span class="caption size-tiny wt-bold f-color-500">
                                         {{employeeRatioForm.value[employee.login].ratio * 100 | number:'1.2-2'}}%
                                     </span>
                 </div>
-                <p-inputNumber [disabled]="totalCostOfWork === 0" formControlName="sum"
+                <p-inputNumber [disabled]="totalCostOfWork === 0 || isDisabled" formControlName="sum"
                                suffix=" руб."></p-inputNumber>
                 <div *ngIf="hasWorkActionRatio(employee.login)" class="flexed column gap2">
                     <span class="caption size-tiny wt-bold">Доп. коэффициенты:</span>
@@ -27,7 +27,7 @@
                                                 {{getWorkActionsRatioSum(war.uuid)}}руб.
                                             </span>
                             <app-tiny-button (onClick)="removeWorkActionRatio(war.uuid)" [size]=".8" icon="delete"
-                                             model="danger"></app-tiny-button>
+                                             model="danger" [disabled]="isDisabled"></app-tiny-button>
                         </div>
                     </div>
                     <span class="caption">Итог: {{getEmployeeTotalPayment(employee.login)}} руб.</span>

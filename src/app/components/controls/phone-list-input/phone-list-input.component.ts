@@ -18,6 +18,7 @@ import {KeyValue} from "@angular/common";
 export class PhoneListInputComponent implements OnInit, ControlValueAccessor, AfterViewInit {
 
     controlValue: { [key: string]: string; } = {};
+    disable = false;
 
     @Output() onBlur = new EventEmitter();
 
@@ -27,6 +28,10 @@ export class PhoneListInputComponent implements OnInit, ControlValueAccessor, Af
     get count() {
         if (!this.controlValue) return 0;
         return Object.keys(this.controlValue).length;
+    }
+
+    setDisabledState(isDisabled: boolean) {
+        this.disable = isDisabled;
     }
 
     ngAfterViewInit(): void {

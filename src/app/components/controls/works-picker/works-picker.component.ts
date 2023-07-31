@@ -6,6 +6,7 @@ import {SubscriptionsHolder} from "../../../util";
 import {v4} from "uuid";
 import {ApiService} from "../../../services/api.service";
 import {RealTimeUpdateService} from "../../../services/real-time-update.service";
+import {Table} from "primeng/table";
 
 export type WorksPickerValue = {
     actionsTaken: any[],
@@ -331,4 +332,8 @@ export class WorksPickerComponent implements OnInit, OnDestroy, ControlValueAcce
         this.selectedWorkName = actionName;
     }
 
+    filterTable(event: Event, actionTableRef: Table) {
+        const target: HTMLInputElement = <HTMLInputElement> event.target;
+        actionTableRef.filterGlobal(target.value, 'contains')
+    }
 }

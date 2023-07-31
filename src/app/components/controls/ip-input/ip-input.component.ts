@@ -21,6 +21,10 @@ export class IpInputComponent implements ControlValueAccessor {
     @ViewChild('two') two!: ElementRef<HTMLInputElement>;
     @ViewChild('three') three!: ElementRef<HTMLInputElement>;
     @ViewChild('four') four!: ElementRef<HTMLInputElement>;
+    disable = false;
+    @Input() setDisabledState(isDisabled: boolean) {
+        this.disable = isDisabled;
+    }
 
     get ipValue() {
         return this._ipValue.join('.');

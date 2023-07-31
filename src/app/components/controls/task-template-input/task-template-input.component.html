@@ -11,6 +11,7 @@
                     {label:'Нет',value:false},
                     {label:'Не выбрано',value:null}
                 ]"
+                [disabled]="disable"
         ></p-dropdown>
     </div>
 
@@ -18,6 +19,7 @@
         <ng-container *ngTemplateOutlet="label"></ng-container>
         <input (blur)="onTouched()"
                (ngModelChange)="onChange($event)"
+               [disabled]="disable"
                [(ngModel)]="controlValue" pInputText>
     </div>
 
@@ -25,12 +27,14 @@
         <ng-container *ngTemplateOutlet="label"></ng-container>
         <textarea (blur)="onTouched()" (ngModelChange)="onChange($event)"
                   [(ngModel)]="controlValue" [autoResize]="true"
+                  [disabled]="disable"
                   [rows]="7" pInputTextarea></textarea>
     </div>
 
     <div *ngSwitchCase="'INTEGER'" class="input-label-wrapper">
         <ng-container *ngTemplateOutlet="label"></ng-container>
         <p-inputNumber (ngModelChange)="onChange($event)" (onBlur)="onTouched()"
+                       [disabled]="disable"
                        [(ngModel)]="controlValue"></p-inputNumber>
     </div>
 
@@ -38,48 +42,56 @@
         <ng-container *ngTemplateOutlet="label"></ng-container>
         <p-inputNumber (ngModelChange)="onChange($event)" (onBlur)="onTouched()"
                        [(ngModel)]="controlValue"
+                       [disabled]="disable"
                        [minFractionDigits]="1"></p-inputNumber>
     </div>
 
     <div *ngSwitchCase="'ADDRESS'" class="input-label-wrapper">
         <ng-container *ngTemplateOutlet="label"></ng-container>
         <app-address-input (ngModelChange)="onChange($event)" (onBlur)="onTouched()"
+                           [disabled]="disable"
                            [(ngModel)]="controlValue"></app-address-input>
     </div>
 
     <div *ngSwitchCase="'LOGIN'" class="input-label-wrapper">
         <ng-container *ngTemplateOutlet="label"></ng-container>
         <input (blur)="onTouched()" (ngModelChange)="onChange($event)" [(ngModel)]="controlValue"
+               [disabled]="disable"
                appRegexPatternChecker pInputText patternRx="^[\dA-z_]+$">
     </div>
 
     <div *ngSwitchCase="'AD_SOURCE'" class="input-label-wrapper">
         <ng-container *ngTemplateOutlet="label"></ng-container>
         <input (blur)="onTouched()" (ngModelChange)="onChange($event)" [(ngModel)]="controlValue"
+               [disabled]="disable"
                appRegexPatternChecker pInputText patternRx="^[\dA-z_]+$">
     </div>
 
     <div *ngSwitchCase="'REQUEST_INITIATOR'" class="input-label-wrapper">
         <ng-container *ngTemplateOutlet="label"></ng-container>
         <input (blur)="onTouched()" (ngModelChange)="onChange($event)" [(ngModel)]="controlValue"
+               [disabled]="disable"
                appRegexPatternChecker pInputText patternRx="^[\dA-z_]+$">
     </div>
 
     <div *ngSwitchCase="'IP'" class="input-label-wrapper">
         <ng-container *ngTemplateOutlet="label"></ng-container>
         <app-ip-input (ngModelChange)="onChange($event)" (onBlur)="onTouched()"
+                      [disabled]="disable"
                       [(ngModel)]="controlValue"></app-ip-input>
     </div>
 
     <div *ngSwitchCase="'EQUIPMENTS'" class="input-label-wrapper">
         <ng-container *ngTemplateOutlet="label"></ng-container>
         <input (blur)="onTouched()" (ngModelChange)="onChange($event)" [(ngModel)]="controlValue"
+               [disabled]="disable"
                appRegexPatternChecker pInputText patternRx="^[\dA-z_]+$">
     </div>
 
     <div *ngSwitchCase="'CONNECTION_SERVICES'" class="input-label-wrapper">
         <ng-container *ngTemplateOutlet="label"></ng-container>
         <input (blur)="onTouched()" (ngModelChange)="onChange($event)" [(ngModel)]="controlValue"
+               [disabled]="disable"
                appRegexPatternChecker pInputText patternRx="^[\dA-z_]+$">
     </div>
 
@@ -89,6 +101,7 @@
                 <ng-container *ngTemplateOutlet="label"></ng-container>
             </legend>
             <app-phone-list-input (ngModelChange)="onChange($event)" (onBlur)="onTouched()"
+                                  [disabled]="disable"
                                   [(ngModel)]="controlValue"></app-phone-list-input>
         </fieldset>
     </div>

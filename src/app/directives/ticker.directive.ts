@@ -27,12 +27,12 @@ export class TickerDirective implements OnInit, OnDestroy{
   ngOnInit(): void {
     const element = this.elementRef.nativeElement;
 
-    const mover$ = interval(100).pipe(
+    const mover$ = interval(60).pipe(
         takeWhile(()=> {
           return element.scrollWidth > element.scrollLeft + element.clientWidth
         }),
         tap(()=> {
-          let distance = Math.floor((element.scrollWidth - element.clientWidth) / 15);
+          let distance = Math.floor((element.scrollWidth - element.clientWidth) / 55);
           if(distance < 1) distance = 1
           element.scrollBy({left: distance})
         }),

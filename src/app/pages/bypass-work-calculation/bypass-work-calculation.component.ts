@@ -121,6 +121,13 @@ export class BypassWorkCalculationComponent implements OnInit, OnDestroy {
         if (!employees
             || !this.worksPickerForm.value?.actionsTaken
             || !this.selectedWireframe) return;
+
+        this.isSendingCalculation = true;
+        this.worksPickerForm.disable()
+        this.employeeRatioForm.disable()
+        this.installersReportForm.disable()
+        this.taskInformationForm.disable()
+
         this.api.sendBypassWorkCalculation({
             taskInfo: {
                 wireframeId: this.selectedWireframe.wireframeId,
@@ -144,7 +151,28 @@ export class BypassWorkCalculationComponent implements OnInit, OnDestroy {
                     })),
                 }
             })
-        }).subscribe()
+        }).subscribe(this.sendingCalculationHandler)
+    }
+
+    sendingCalculationHandler = {
+        next:()=>{
+            this.isSendingCalculation = false;
+            this.worksPickerForm.enable()
+            this.employeeRatioForm.enable()
+            this.installersReportForm.enable()
+            this.taskInformationForm.enable()
+            this.worksPickerForm.reset()
+            this.employeeRatioForm.reset()
+            this.installersReportForm.reset()
+            this.taskInformationForm.reset()
+        },
+        error:()=>{
+            this.isSendingCalculation = false;
+            this.worksPickerForm.enable()
+            this.employeeRatioForm.enable()
+            this.installersReportForm.enable()
+            this.taskInformationForm.enable()
+        }
     }
 
     removeFactorActionHandler(event: TFactorAction[]) {

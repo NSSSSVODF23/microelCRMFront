@@ -30,6 +30,7 @@ export class TaskTemplateInputComponent implements OnInit, ControlValueAccessor 
     @Input() field?: FieldItem | ModelItem;
     controlValue: any;
     @Input() isExample: boolean = false;
+    disable = false;
 
     constructor(readonly api: ApiService) {
     }
@@ -75,6 +76,10 @@ export class TaskTemplateInputComponent implements OnInit, ControlValueAccessor 
 
     writeValue(obj: any): void {
         this.controlValue = obj;
+    }
+
+    setDisabledState(isDisabled: boolean) {
+        this.disable = isDisabled;
     }
 
     onChange = (value: any) => {
