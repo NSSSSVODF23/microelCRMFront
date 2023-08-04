@@ -1,13 +1,13 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
 import {ApiService} from "../../services/api.service";
-import {LoadingState, PaidAction, PaidWork, WorkLog} from "../../transport-interfaces";
-import {ConfirmationService, TreeDragDropService, TreeNode} from "primeng/api";
-import {FormControl, FormGroup} from "@angular/forms";
+import {LoadingState, WorkLog} from "../../transport-interfaces";
+import {ConfirmationService, TreeDragDropService} from "primeng/api";
+import {FormControl} from "@angular/forms";
 import {SubscriptionsHolder} from "../../util";
-import {v4} from "uuid";
 import {RealTimeUpdateService} from "../../services/real-time-update.service";
-import {count, delay, filter, map, merge, of, repeat, tap, zip} from "rxjs";
+import {filter, map, Observable, of, switchMap} from "rxjs";
 import {TFactorAction, WorksPickerValue} from "../../components/controls/works-picker/works-picker.component";
+import {ActivatedRoute, Router} from "@angular/router";
 
 @Component({
     templateUrl: './salary-estimation-page.component.html',
@@ -23,12 +23,14 @@ export class SalaryEstimationPageComponent implements OnInit, OnDestroy {
 
     actionsTaken: any[] = [];
 
-    employeeRatioForm = new FormControl<{[key: string]: {ratio: number, sum: number}}>({});
+    employeeRatioForm = new FormControl<{ [key: string]: { ratio: number, sum: number } }>({});
 
     factorsActions: TFactorAction[] = [];
 
     emptyCalculationConformationDialogVisible = false;
     emptyCalculationDescription = "";
+    recalculationConformationDialogVisible = false;
+    recalculationDescription = "";
     isSendingCalculation = false;
 
     subscriptions: SubscriptionsHolder = new SubscriptionsHolder();
@@ -47,6 +49,8 @@ export class SalaryEstimationPageComponent implements OnInit, OnDestroy {
             this.isSendingCalculation = false;
             this.emptyCalculationConformationDialogVisible = false;
             this.emptyCalculationDescription = '';
+            this.recalculationConformationDialogVisible = false;
+            this.recalculationDescription = '';
             this.resetCalculation()
             if (this.selectedWorkLog) {
                 this.uncalculatedWorkLogs = this.uncalculatedWorkLogs.filter(wl => wl.workLogId !== this.selectedWorkLog?.workLogId);
@@ -59,9 +63,32 @@ export class SalaryEstimationPageComponent implements OnInit, OnDestroy {
             this.isSendingCalculation = false;
         }
     }
-    worksPicker = new FormControl<WorksPickerValue | null>(null);
+    worksPickerForm = new FormControl<WorksPickerValue | null>(null);
 
-    constructor(readonly api: ApiService, private confirmation: ConfirmationService, private rt: RealTimeUpdateService) {
+    workLogId$: Observable<number | undefined> = <Observable<number | undefined>>this.route.queryParams.pipe(map(params => params['workLogId']));
+
+    selectedWorkLog$ = this.workLogId$.pipe(
+        switchMap(id => {
+            if (!id) return of(undefined);
+            return this.api.getWorkLog(id, true)
+        })
+    )
+
+    setupFormValues$ = this.selectedWorkLog$.pipe(
+        switchMap(workLog => {
+            if (workLog)
+                return this.api.getAlreadyCalculatedWorkForm(workLog?.workLogId)
+            else
+                return of(null)
+        }),
+    )
+
+    recalculate$ = this.setupFormValues$.pipe(
+        map(workLog=>workLog?"RECALCULATE":"CALCULATE"),
+    )
+
+    constructor(readonly api: ApiService, private confirmation: ConfirmationService, private rt: RealTimeUpdateService,
+                private router: Router, private route: ActivatedRoute) {
     }
 
     get totalCostOfWork() {
@@ -82,10 +109,23 @@ export class SalaryEstimationPageComponent implements OnInit, OnDestroy {
 
     ngOnInit(): void {
         this.loadUncalculatedWorkLogs()
-        this.subscriptions.addSubscription('wp', this.worksPicker.valueChanges.subscribe(value => {
+        this.subscriptions.addSubscription('wp', this.worksPickerForm.valueChanges.subscribe(value => {
             if (!value) return;
             this.actionsTaken = value.actionsTaken;
             this.factorsActions = value.factorsActions ?? [];
+        }))
+        this.subscriptions.addSubscription('chQue', this.selectedWorkLog$.subscribe(value => this.selectedWorkLog = value))
+        this.subscriptions.addSubscription('setupForm', this.setupFormValues$.subscribe(value => {
+            if (value) {
+                this.worksPickerForm.setValue({
+                    actionsTaken: value.actions,
+                    factorsActions: value.factorsActions
+                });
+                this.employeeRatioForm.setValue(value.employeesRatio);
+            }else{
+                this.worksPickerForm.reset();
+                this.employeeRatioForm.reset();
+            }
         }))
     }
 
@@ -112,16 +152,18 @@ export class SalaryEstimationPageComponent implements OnInit, OnDestroy {
     }
 
     selectWork(work: WorkLog) {
-        this.selectedWorkLog = work;
+        // this.selectedWorkLog = work;
+        this.router.navigate(['.'], {relativeTo: this.route, queryParams: {workLogId: work.workLogId}}).then();
     }
 
     unselectWork() {
-        this.selectedWorkLog = undefined;
+        // this.selectedWorkLog = undefined;
+        this.router.navigate(['.'], {relativeTo: this.route}).then();
         this.resetCalculation();
     }
 
     resetCalculation() {
-        this.worksPicker.reset();
+        this.worksPickerForm.reset();
         this.employeeRatioForm.reset();
     }
 
@@ -160,6 +202,36 @@ export class SalaryEstimationPageComponent implements OnInit, OnDestroy {
         })
     }
 
+    openRecalculationConformationDialog() {
+        this.recalculationConformationDialogVisible = true;
+    }
+
+    sendRecalculation() {
+        if (!this.selectedWorkLog) return;
+        this.isSendingCalculation = true;
+        this.api.sendWorkCalculation({
+            workLogId: this.selectedWorkLog.workLogId,
+            actions: this.actionsTaken.map(at => ({
+                workId: at.workId,
+                actionId: at.actionId,
+                count: at.count,
+                uuid: at.uuid
+            })),
+            editingDescription: this.recalculationDescription,
+            spreading: this.selectedWorkLog.employees.map(emp => {
+                return {
+                    login: emp.login,
+                    ratio: this.employeeRatioForm.value ? this.employeeRatioForm.value[emp.login].ratio : 0,
+                    factorsActions: this.getFactorsActions(emp.login).filter(war => war).map((war: any) => ({
+                        factor: war.factor,
+                        name: war.name,
+                        actionUuids: war.actionUuids,
+                    })),
+                }
+            })
+        }).subscribe(this.sendingCalculationHandlers)
+    }
+
     sendEmptyCalculation() {
         if (!this.selectedWorkLog) return;
         this.isSendingCalculation = true;
@@ -175,7 +247,7 @@ export class SalaryEstimationPageComponent implements OnInit, OnDestroy {
             spreading: this.selectedWorkLog.employees.map(emp => {
                 return {
                     login: emp.login,
-                    ratio: this.employeeRatioForm.value? this.employeeRatioForm.value[emp.login].ratio:0,
+                    ratio: this.employeeRatioForm.value ? this.employeeRatioForm.value[emp.login].ratio : 0,
                     factorsActions: this.getFactorsActions(emp.login).filter(war => war).map((war: any) => ({
                         factor: war.factor,
                         name: war.name,
@@ -184,21 +256,6 @@ export class SalaryEstimationPageComponent implements OnInit, OnDestroy {
                 }
             })
         }).subscribe(this.sendingCalculationHandlers)
-    }
-
-    getWorkActionsRatioSum(uuid: string) {
-        const factorAction = this.factorsActions.find(war => war.uuid === uuid);
-        if (factorAction) {
-            const costOfWork = factorAction.actionUuids.reduce((prev, curr) => {
-                const actionTaken = this.actionsTaken.find(at => at.uuid === curr);
-                if (!actionTaken) return prev;
-                return prev + actionTaken.cost;
-            }, 0);
-            const employeeRatio = this.employeeRatioForm.value ? this.employeeRatioForm.value[factorAction.login].ratio : 0;
-            const cost = costOfWork * employeeRatio;
-            return Math.floor((cost * factorAction.factor) - cost);
-        }
-        return 0;
     }
 
     getFactorsActions(login: string) {
@@ -213,16 +270,10 @@ export class SalaryEstimationPageComponent implements OnInit, OnDestroy {
         return this.factorsActions.find(w => w.login === login)
     }
 
-    getEmployeeTotalPayment(login: string) {
-        return (this.employeeRatioForm.value ? this.employeeRatioForm.value[login].sum : 0) + this.getFactorsActions(login).reduce((prev, curr) => {
-            return prev + this.getWorkActionsRatioSum(curr.uuid);
-        }, 0)
-    }
-
     onRemoveFactorAction(event: TFactorAction[]) {
-        if (this.worksPicker.value)
-            this.worksPicker.setValue({
-                actionsTaken: this.worksPicker.value.actionsTaken,
+        if (this.worksPickerForm.value)
+            this.worksPickerForm.setValue({
+                actionsTaken: this.worksPickerForm.value.actionsTaken,
                 factorsActions: event
             })
     }

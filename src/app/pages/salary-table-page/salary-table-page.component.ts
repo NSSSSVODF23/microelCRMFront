@@ -2,7 +2,15 @@ import {Component, OnDestroy, OnInit} from '@angular/core';
 import {SubscriptionsHolder} from "../../util";
 import {FormControl, FormGroup} from "@angular/forms";
 import {ApiService} from "../../services/api.service";
-import {Position, SalaryRow} from "../../transport-interfaces";
+import {Employee, LoadingState, WorkReport} from "../../transport-interfaces";
+import {map, mergeMap, Observable, of, shareReplay, Subject, switchMap, tap} from "rxjs";
+
+interface SalaryTableCell {
+    employee: Employee,
+    sumWithNDFL: number,
+    sumWithoutNDFL: number
+    date: Date
+}
 
 @Component({
     templateUrl: './salary-table-page.component.html', styleUrls: ['./salary-table-page.component.scss']
@@ -11,76 +19,85 @@ export class SalaryTablePageComponent implements OnInit, OnDestroy {
 
     filtrationForm = new FormGroup({
         date: new FormControl(new Date()),
-        position: new FormControl(null),
+        position: new FormControl<number|null>(null),
     })
 
     subscriptions: SubscriptionsHolder = new SubscriptionsHolder();
-    mainTableColumns: string[] = [];
-    tableRow: any[] = [];
-    salaryRows: SalaryRow[] = [];
-    positions: any[] = [];
-    tableLoadHandler = {
-        next: (rows: SalaryRow[]) => {
-            this.salaryRows = rows;
-            for (const row of rows) {
-                const tbRow = [row.employee.fullName];
-                for (let i = 0; i < this.numberDaysOfMonth; i++) {
-                    const salaryPoints = row.salaryPoints.filter(point => new Date(point.date).getDate() === (i + 1));
-                    if (salaryPoints.length > 0) {
-                        tbRow.push(salaryPoints.reduce((prev, curr) => prev + curr.value, 0).toString());
-                    } else {
-                        tbRow.push("0");
-                    }
-                }
-                tbRow.push(row.sum.toString());
-                this.tableRow.push(tbRow);
-            }
-        }, error: () => {
 
-        },
-    }
-    filtrationHandler = {
-        next: (filters: any) => {
-            this.mainTableColumns = ["Сотрудник"];
-            for (let i = 0; i < this.numberDaysOfMonth; i++) {
-                this.mainTableColumns.push((i + 1).toString());
-            }
-            this.tableRow = [];
-            this.mainTableColumns.push("Сумма");
-            this.api.getSalaryTable(this.filtrationForm.value).subscribe(this.tableLoadHandler)
-        }, error: () => {
+    salaryTable$ = this.filtrationForm.valueChanges.pipe(
+        tap(()=> {
+            this.tableLoadingState = LoadingState.LOADING
+            this.selectDay(null)
+        }),
+        switchMap(filters => this.api.getSalaryTable(filters)),
+        tap({
+            next:()=>this.tableLoadingState=LoadingState.READY,
+            error:()=>this.tableLoadingState=LoadingState.ERROR
+        })
+    )
 
-        },
-    }
-    positionsLoadHandler = {
-        next: (positions: Position[]) => {
-            this.positions = positions.map(position=>({value:position.positionId,label:position.name}));
-            this.filtrationForm.patchValue({position: this.positions[0].value});
-        },
-        error: () => {
+    tableLoadingState = LoadingState.LOADING;
 
+    ndflSwitch = new FormControl(false);
+    ndflValue$ = this.ndflSwitch.valueChanges.pipe(
+        shareReplay(1)
+    );
+
+    positions$ =  this.api.getPositions()
+        .pipe(
+            map(positions=>positions.map(({name,positionId})=>({label:name,value:positionId}))),
+            tap(items=>this.filtrationForm.patchValue({position: items[0].value}))
+        )
+
+    selectedDaySubject = new Subject<SalaryTableCell|null>();
+
+    selectedDay$:Observable<SalaryTableCell|null> = this.selectedDaySubject.pipe(shareReplay(1));
+
+    workingDay$ = this.selectedDay$.pipe(
+        map((day:any)=>day?[new Date(day.date),day.employee.login]:null),
+        tap(()=>this.calculatedLoadingState = LoadingState.LOADING),
+        mergeMap((day)=> {
+            if (day) {
+                return this.api.getWorkingDay(day[0], day[1])
+            } else return of(null)
+        }),
+        tap({
+            next:(workingDay)=>this.calculatedLoadingState= workingDay===null?LoadingState.EMPTY:LoadingState.READY,
+            error:()=>this.calculatedLoadingState=LoadingState.ERROR
+        })
+    )
+
+    highlightedDay?: {row:number,col:number};
+    calculatedLoadingState = LoadingState.LOADING;
+
+    trackByCell(index:number, cell:SalaryTableCell|null){
+        return cell?.date;
+    };
+
+    selectDay(cell:SalaryTableCell|null, rowIndex?:number, colIndex?:number){
+        this.selectedDaySubject.next(cell);
+        if(rowIndex !== undefined && colIndex !== undefined){
+            this.highlightedDay = {row:rowIndex,col:colIndex};
+            return;
         }
+        this.highlightedDay = undefined;
+    }
+
+    getReport(reports: WorkReport[], targetLogin: string){
+        return reports.find(report=>report.author.login === targetLogin)?.description;
     }
 
     constructor(private api: ApiService) {
     }
 
-    get numberDaysOfMonth() {
-        if (this.filtrationForm.value.date) return new Date(this.filtrationForm.value.date.getFullYear(), this.filtrationForm.value.date.getMonth() + 1, 0).getDate();
-        return 0;
-    }
-
-    get totalSalary() {
-        return this.salaryRows.reduce((prev, curr) => prev + curr.sum, 0);
-    };
-
     ngOnInit(): void {
-        this.api.getPositions().subscribe(this.positionsLoadHandler)
-        this.subscriptions.addSubscription('flCh', this.filtrationForm.valueChanges.subscribe(this.filtrationHandler));
     }
 
     ngOnDestroy(): void {
         this.subscriptions.unsubscribeAll();
     }
 
+    isSelected(row: number, col: number) {
+        return this.highlightedDay?.row === row && this.highlightedDay?.col === col;
+    }
 }

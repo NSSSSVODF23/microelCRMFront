@@ -15,16 +15,14 @@ import {
     switchMap,
     tap
 } from "rxjs";
-import {City, House, LoadingState, Street} from "../../transport-interfaces";
+import {City, House, LoadingState, Place, Street} from "../../transport-interfaces";
 import {ConfirmationService, MessageService} from "primeng/api";
 import {FormControl, FormGroup, Validators} from "@angular/forms";
 import {SubscriptionsHolder} from "../../util";
 import {RealTimeUpdateService} from "../../services/real-time-update.service";
 import {swipe} from "../../animations";
-import IMapOptions = ymaps.IMapOptions;
 import {YaEvent} from "angular8-yandex-maps";
-import Placemark = ymaps.Placemark;
-import IPointGeometry = ymaps.IPointGeometry;
+import IMapOptions = ymaps.IMapOptions;
 
 @Component({
     templateUrl: './addresses-list-page.component.html',
@@ -64,6 +62,7 @@ export class AddressesListPageComponent implements OnInit, OnDestroy {
         letter: new FormControl<string | null>(null),
         fraction: new FormControl<number | null>(null),
         build: new FormControl<number | null>(null),
+        isApartmentHouse: new FormControl<boolean>(false),
     });
     subscriptions = new SubscriptionsHolder();
     cityLoad$ = of(null).pipe(
@@ -194,9 +193,24 @@ export class AddressesListPageComponent implements OnInit, OnDestroy {
             this.beginRequest$.next(false)
         }
     }
+
     mapOptions: IMapOptions = {
         avoidFractionalZoom: true,
     };
+    housePlace?: Place;
+
+    centerOfMap = [47.519624, 42.206329];
+    zoom = 12;
+
+    updateCenterOfMap() {
+        if(this.housePlace) {
+            this.centerOfMap = [this.housePlace.latitude, this.housePlace.longitude];
+            this.zoom = 17
+            return;
+        }
+        this.centerOfMap = [47.519624, 42.206329];
+        this.zoom = 12
+    }
 
     private _houseViewAnimation = new BehaviorSubject([0, 0]);
     animationState$ = this._houseViewAnimation.pipe(
@@ -213,9 +227,6 @@ export class AddressesListPageComponent implements OnInit, OnDestroy {
             return 'default';
         }),
     )
-
-    mapClick$ = new Subject<YaEvent>();
-    mapPins: number[][] = [];
 
     constructor(readonly api: ApiService, readonly rt: RealTimeUpdateService, readonly toast: MessageService, private confirmationService: ConfirmationService) {
     }
@@ -239,7 +250,13 @@ export class AddressesListPageComponent implements OnInit, OnDestroy {
     }
 
     houseSort(a: House, b: House) {
-        return a.houseNum - b.houseNum || a.letter?.localeCompare(b.letter) || a.fraction - b.fraction || a.build - b.build;
+        return a.houseNum - b.houseNum || a.letter?.localeCompare(b.letter ?? "") || (a.fraction ?? 0) - (b.fraction ?? 0) || (a.build ?? 0) - (b.build ?? 0);
+    }
+
+    onMapClick(yaEvent: YaEvent) {
+        const {target, event} = yaEvent;
+        const [latitude, longitude] = event.get('coords');
+        this.housePlace = {placeId: 0 ,latitude, longitude};
     }
 
     ngOnInit(): void {
@@ -268,10 +285,7 @@ export class AddressesListPageComponent implements OnInit, OnDestroy {
                 this.houseBeginningNavigate = false
             })
         );
-        this.mapClick$.subscribe(({target,event})=>{
-            const [lat, lng] = event.get('coords');
-            this.mapPins.push([lat, lng]);
-        })
+
         this.subscriptions.addSubscription("bgreq", this.beginRequest$.subscribe(
             (status) => {
                 if (status) {
@@ -355,11 +369,19 @@ export class AddressesListPageComponent implements OnInit, OnDestroy {
     selectHouse(house: House) {
         this.viewMode = 'houseView';
         this.selectedHouse = house;
+        if(house.place){
+            this.housePlace = house.place;
+            this.updateCenterOfMap()
+        }else{
+            this.housePlace = undefined;
+            this.updateCenterOfMap()
+        }
         this.houseEditingForm.setValue({
             houseNum: house.houseNum,
-            letter: house.letter,
-            fraction: house.fraction,
-            build: house.build
+            letter: house.letter ?? null,
+            fraction: house.fraction ?? null,
+            build: house.build ?? null,
+            isApartmentHouse: house.isApartmentHouse
         })
     }
 
@@ -495,7 +517,10 @@ export class AddressesListPageComponent implements OnInit, OnDestroy {
             accept: () => {
                 if (this.selectedHouse?.houseId) {
                     this.beginRequest$.next(true);
-                    this.api.editHouse(this.selectedHouse.houseId, this.houseEditingForm.value).pipe(tap(this.requestStatusHandler)).subscribe();
+                    const form: any = this.houseEditingForm.value;
+                    if(this.housePlace)
+                        form.place = this.housePlace;
+                    this.api.editHouse(this.selectedHouse.houseId, form).pipe(tap(this.requestStatusHandler)).subscribe();
                 } else {
                     this.toast.add({
                         severity: 'error',

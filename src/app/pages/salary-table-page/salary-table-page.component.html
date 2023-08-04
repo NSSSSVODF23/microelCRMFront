@@ -1,40 +1,190 @@
 <div appExtendPageHeight class="flexed vcenter">
     <div class="flexed gap10">
         <app-main-menu-panel></app-main-menu-panel>
-        <div class="flexed column gap15 stretched">
-            <div class="flexed column panel overflow">
-                <div class="flexed gap10 p5" [formGroup]="filtrationForm">
+        <div class="flex flex-column gap-3 flex-grow-1">
+            <div class="flex flex-column panel overflow-hidden">
+                <div [formGroup]="filtrationForm" class="flex gap-3 p-2">
                     <div class="p-inputgroup w-max">
                         <span class="p-inputgroup-addon"><i class="mdi-calendar_month"></i></span>
-                        <p-calendar view="month" inputStyleClass="border-noround-left" [readonlyInput]="true" appendTo="body" dateFormat="MM yy" formControlName="date"></p-calendar>
+                        <p-calendar [readonlyInput]="true" appendTo="body" dateFormat="MM yy"
+                                    formControlName="date" inputStyleClass="border-noround-left"
+                                    view="month"></p-calendar>
                     </div>
-                    <div class="flexed gap5 hcenter">
+                    <div *ngIf="positions$|async as pos" class="flex gap-2 align-items-center">
                         <span class="caption wt-black f-color-500 size-small with-icon">
                             <i class="mdi-group"></i>
                             <span>Должность</span>
                         </span>
-                        <p-dropdown [options]="positions" formControlName="position" placeholder="Должность"></p-dropdown>
+                        <p-dropdown [options]="pos" appendTo="body" formControlName="position"
+                                    placeholder="Должность"></p-dropdown>
                     </div>
+                    <div class="flex-grow-1"></div>
+                    <p-toggleButton [formControl]="ndflSwitch" offLabel="БЕЗ НДФЛ" onLabel="С НДФЛ"></p-toggleButton>
                 </div>
-                <p-table [columns]="mainTableColumns" [value]="tableRow" styleClass="p-datatable-sm">
-                    <ng-template pTemplate="header" let-columns>
-                        <tr>
-                            <th *ngFor="let name of columns" class="caption size-tiny">
-                                {{name}}
-                            </th>
-                        </tr>
-                    </ng-template>
-                    <ng-template pTemplate="body" let-rowData let-columns="columns">
-                        <tr>
-                            <td *ngFor="let row of rowData" class="caption size-tiny f-inline">
-                                {{row}}
-                            </td>
-                        </tr>
-                    </ng-template>
-                </p-table>
-                <div class="flexed gap5 vend caption size-big wt-tiny p10">
-                    <span>Итог:</span>
-                    <span>{{totalSalary}} руб.</span>
+                <ng-container *ngIf="salaryTable$|async as salaryTable">
+                    <ng-container *ngIf="tableLoadingState==='READY'">
+                        <p-table [columns]="salaryTable.headers" [value]="salaryTable.payload"
+                                 styleClass="p-datatable-sm">
+                            <ng-template let-columns pTemplate="header">
+                                <tr>
+                                    <th *ngFor="let name of columns" class="caption size-tiny">
+                                        {{name}}
+                                    </th>
+                                </tr>
+                            </ng-template>
+                            <ng-template let-columns="columns" let-i="rowIndex" let-rowData pTemplate="body">
+                                <tr>
+                                    <td>
+                                        <app-employee-label [employee]="salaryTable.employees[i]"></app-employee-label>
+                                    </td>
+                                    <td (click)="selectDay(cell, i, colI)"
+                                        *ngFor="let cell of rowData; let colI = index; trackBy: trackByCell"
+                                        [ngClass]="{ 'text-primary-400 bg-blue-50': isSelected(i, colI) }"
+                                        class="caption size-tiny f-inline cursor-pointer hover:text-primary-400">
+                                        {{(ndflValue$|async) ? cell.sumWithNDFL : cell.sumWithoutNDFL}}
+                                    </td>
+                                    <td class="caption size-tiny">
+                                        {{(ndflValue$|async) ? salaryTable.totalSum[i].sumWithNDFL : salaryTable.totalSum[i].sumWithoutNDFL}}
+                                    </td>
+                                </tr>
+                            </ng-template>
+                        </p-table>
+                        <div class="flexed gap5 vend caption size-big wt-tiny p10">
+                            <span>Итог:</span>
+                            <span>{{(ndflValue$|async) ? salaryTable.totalSumAllEmployees.sumWithNDFL : salaryTable.totalSumAllEmployees.sumWithoutNDFL}}
+                                руб.</span>
+                        </div>
+                    </ng-container>
+                </ng-container>
+                <ng-container *ngIf="tableLoadingState!=='READY'" [ngSwitch]="tableLoadingState">
+                    <div *ngSwitchCase="'LOADING'" [style.width]="'64rem'"
+                         class="flex align-items-center justify-content-center p-3">
+                        <p-progressSpinner class="primary-spinner" strokeWidth="1"></p-progressSpinner>
+                    </div>
+                </ng-container>
+            </div>
+            <div *ngIf="selectedDay$|async as selectedDay" class="flex flex-column panel p-3 gap-3">
+                <div class="flex align-items-center gap-3">
+                    <app-employee-label [employee]="selectedDay.employee"></app-employee-label>
+                    <span class="caption text-sm text-bluegray-400">{{selectedDay.date | date: 'EEEE, dd MMMM yyyy' | titlecase}}</span>
+                </div>
+                <div class="flex flex-column gap-1">
+                    <span class="text-bluegray-400 text-lg font-semibold">Подсчитанные работы</span>
+                    <ng-container *ngIf="workingDay$|async as workingDay">
+                        <p-table *ngIf="calculatedLoadingState === 'READY'"
+                                 [value]="workingDay.calculations" dataKey="workCalculationId"
+                                 styleClass="border-round-md border-1 border-bluegray-100 overflow-hidden">
+                            <ng-template pTemplate="header">
+                                <tr class="text-sm">
+                                    <th>
+                                    </th>
+                                    <th>
+                                        ИД
+                                    </th>
+                                    <th>
+                                        Задача
+                                    </th>
+                                    <th>
+                                        Отчёт
+                                    </th>
+                                    <th>
+                                        Доля
+                                    </th>
+                                    <th>
+                                        Считал
+                                    </th>
+                                    <th>
+                                        Сумма
+                                    </th>
+                                    <th>
+                                        Сумма без НДФЛ
+                                    </th>
+                                    <th>
+                                        Пересчитать
+                                    </th>
+                                </tr>
+                            </ng-template>
+                            <ng-template let-expanded="expanded" let-rowData pTemplate="body">
+                                <tr class="text-bluegray-500">
+                                    <td>
+                                        <button [icon]="expanded ? 'pi pi-chevron-down' : 'pi pi-chevron-right'"
+                                                [pRowToggler]="rowData" *ngIf="rowData.lastEdit"
+                                                class="p-button-text p-button-rounded p-button-plain" pButton
+                                                pRipple
+                                                type="button"></button>
+                                    </td>
+                                    <td>
+                                        {{rowData.workCalculationId}}
+                                    </td>
+                                    <td>
+                                        <app-task-link [task]="rowData.workLog.task"></app-task-link>
+                                    </td>
+                                    <td>
+                                        <span [style.max-width]="'20rem'" appTooltip class="text-max-lines-3 text-sm">
+                                            {{getReport(rowData.workLog.workReports, selectedDay.employee.login)}}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        {{rowData.ratio * 100 | number:'1.2-2'}}%
+                                    </td>
+                                    <td>
+                                        <app-employee-label
+                                                [employee]="rowData.lastEdit ? rowData.lastEdit.employee : rowData.creator"></app-employee-label>
+                                    </td>
+                                    <td>
+                                        {{rowData.sum}}руб.
+                                    </td>
+                                    <td>
+                                        {{rowData.sumWithoutNDFL}}руб.
+                                    </td>
+                                    <td>
+                                        <p-button [queryParams]="{'workLogId': rowData.workLog.workLogId}"
+                                                  [routerLink]="['/salary','estimation']"
+                                                  icon="mdi-edit"
+                                                  styleClass="p-button-icon p-button-warning p-button-text"></p-button>
+                                    </td>
+                                </tr>
+                            </ng-template>
+                            <ng-template pTemplate="rowexpansion" let-rowData>
+                                <tr>
+                                    <td colspan="9">
+                                        <div class="flex flex-column">
+                                            <div class="grid split-line py-3" *ngFor="let intervention of rowData.editedBy">
+                                                <div class="col-10 gap-2 flex flex-column">
+                                                    <div class="flex align-items-center font-bold text-bluegray-500">
+                                                        <span class="mdi-autorenew"></span>
+                                                        <span>Пересчитан</span>
+                                                    </div>
+                                                    <span class="text-sm text-primary-400 ml-3" [style.max-width]="'50rem'">{{intervention.description}}</span>
+                                                </div>
+                                                <div class="col-2">
+                                                    <app-employee-label [employee]="intervention.employee"></app-employee-label>
+                                                    <span class="text-xs text-bluegray-400 font-semibold">{{intervention.timestamp | date : 'EEEE, dd MMMM yyyy HH:mm' | titlecase}}</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </ng-template>
+                        </p-table>
+                    </ng-container>
+                    <div *ngIf="calculatedLoadingState !== 'READY'"
+                         class="flex align-items-center justify-content-center p-3 border-round-md border-1 border-bluegray-100 overflow-hidden">
+                        <ng-container [ngSwitch]="calculatedLoadingState">
+                            <p-progressSpinner *ngSwitchCase="'LOADING'" class="primary-spinner"
+                                               strokeWidth="1"></p-progressSpinner>
+                            <div *ngSwitchCase="'ERROR'"
+                                 class="flex flex-column text-danger align-items-center text-xl">
+                                <span class="mds-error"></span>
+                                <span>Ошибка загрузки</span>
+                            </div>
+                            <div *ngSwitchCase="'EMPTY'"
+                                 class="flex flex-column text-bluegray-400 align-items-center text-xl">
+                                <span class="mds-error"></span>
+                                <span>Нет данных</span>
+                            </div>
+                        </ng-container>
+                    </div>
                 </div>
             </div>
         </div>

@@ -592,60 +592,79 @@ html:not(.whited), body:not(.whited) {
   &-1 {
     margin: 0 .1rem;
   }
+
   &-2 {
     margin: 0 .2rem;
   }
+
   &-3 {
     margin: 0 .3rem;
   }
+
   &-4 {
     margin: 0 .4rem;
   }
+
   &-5 {
     margin: 0 .5rem;
   }
+
   &-6 {
     margin: 0 .6rem;
   }
+
   &-7 {
     margin: 0 .7rem;
   }
+
   &-8 {
     margin: 0 .8rem;
   }
+
   &-9 {
     margin: 0 .9rem;
   }
+
   &-10 {
     margin: 0 1rem;
   }
+
   &-11 {
     margin: 0 1.1rem;
   }
+
   &-12 {
     margin: 0 1.2rem;
   }
+
   &-13 {
     margin: 0 1.3rem;
   }
+
   &-14 {
     margin: 0 1.4rem;
   }
+
   &-15 {
     margin: 0 1.5rem;
   }
+
   &-16 {
     margin: 0 1.6rem;
   }
+
   &-17 {
     margin: 0 1.7rem;
   }
+
   &-18 {
     margin: 0 1.8rem;
   }
+
   &-19 {
     margin: 0 1.9rem;
   }
+
   &-20 {
     margin: 0 2rem;
   }
@@ -845,6 +864,72 @@ fieldset.node {
 
 }
 
+.text-max-lines {
+
+  &-2 {
+    display: -webkit-box;
+    overflow: hidden;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+  }
+
+  &-3 {
+    display: -webkit-box;
+    overflow: hidden;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
+  }
+
+  &-4 {
+    display: -webkit-box;
+    overflow: hidden;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 4;
+  }
+
+  &-5 {
+    display: -webkit-box;
+    overflow: hidden;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 5;
+  }
+
+  &-6 {
+    display: -webkit-box;
+    overflow: hidden;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 6;
+  }
+
+  &-7 {
+    display: -webkit-box;
+    overflow: hidden;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 7;
+  }
+
+  &-8 {
+    display: -webkit-box;
+    overflow: hidden;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 8;
+  }
+
+  &-9 {
+    display: -webkit-box;
+    overflow: hidden;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 9;
+  }
+
+  &-10 {
+    display: -webkit-box;
+    overflow: hidden;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 10;
+  }
+}
+
 .caption {
   font-size: 1rem;
   font-weight: 400;
@@ -918,7 +1003,7 @@ fieldset.node {
       color: var(--warm-400);
     }
 
-    &-success{
+    &-success {
       color: var(--green-400);
     }
 
@@ -953,20 +1038,20 @@ fieldset.node {
     gap: .25em;
   }
 
-  &.prewrap{
+  &.prewrap {
     white-space: pre-line;
   }
 }
 
-.not-selectable{
+.not-selectable {
   user-select: none;
 }
 
-.drop-zone{
+.drop-zone {
   outline: 2px solid var(--mc-400);
 }
 
-.p-tabview.tab-content-unpadding > .p-tabview-panels{
+.p-tabview.tab-content-unpadding > .p-tabview-panels {
   padding: 0;
 }
 
@@ -1452,10 +1537,11 @@ markdown > p:last-child {
 }
 
 .terminator {
-  &-bottom{
+  &-bottom {
     border-bottom: 1px solid var(--bgc-200);
   }
-  &-right{
+
+  &-right {
     border-right: 1px solid var(--bgc-200);
   }
 }
@@ -1477,28 +1563,32 @@ markdown > p:last-child {
   height: 100%;
 }
 
-.p-inputgroup-addon > i{
+.p-inputgroup-addon > i {
   font-size: 1.35rem !important;
 }
 
-.active-element{
+.active-element {
   transition: background-color .1s ease-in-out;
   user-select: none;
   cursor: pointer;
-  & *{
-      transition: color .1s ease-in-out;
+
+  & * {
+    transition: color .1s ease-in-out;
   }
-  &:hover *{
+
+  &:hover * {
     color: var(--mc-400) !important;
   }
-  &:hover{
+
+  &:hover {
     background-color: var(--mc-0);
   }
 }
 
-.cover-element{
+.cover-element {
   position: relative;
-  &::after{
+
+  &::after {
     content: "";
     position: absolute;
     top: 0;
@@ -1512,10 +1602,10 @@ markdown > p:last-child {
 }
 
 @keyframes flow {
-  from{
+  from {
     backdrop-filter: brightness(1);
   }
-  to{
+  to {
     backdrop-filter: brightness(.8);
   }
 }

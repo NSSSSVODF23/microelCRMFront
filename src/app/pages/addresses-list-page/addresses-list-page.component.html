@@ -184,26 +184,30 @@
                       styleClass="p-button-text p-button-info"></p-button>
         </div>
         <div class="flex flex-column gap-3 flex-grow-1 p-3" [formGroup]="houseEditingForm" [@swipe]="animationState$ | async" (@swipe.done)="animationEnd$.next(true)">
-            <div class="input-label-wrapper">
+            <div class="flex gap-1 flex-column">
                 <label class="caption size-small wt-bold f-color-500">Номер дома</label>
                 <p-inputNumber formControlName="houseNum"></p-inputNumber>
             </div>
-            <div class="input-label-wrapper">
+            <div class="flex gap-1 flex-column">
                 <label class="caption size-small wt-bold f-color-500">Дробь (если есть)</label>
                 <p-inputNumber formControlName="fraction"></p-inputNumber>
             </div>
-            <div class="input-label-wrapper">
+            <div class="flex gap-1 flex-column">
                 <label class="caption size-small wt-bold f-color-500">Литера (если есть)</label>
                 <input pInputText formControlName="letter" type="text">
             </div>
-            <div class="input-label-wrapper">
+            <div class="flex gap-1 flex-column">
                 <label class="caption size-small wt-bold f-color-500">Строение (если есть)</label>
                 <p-inputNumber formControlName="build"></p-inputNumber>
             </div>
+            <div class="flex gap-1 align-items-center">
+                <p-checkbox formControlName="isApartmentHouse" [binary]="true"></p-checkbox>
+                <label class="caption size-small wt-bold f-color-500">Многоквартирный дом?</label>
+            </div>
             <p-button label="Сохранить" class="align-self-end" (onClick)="saveHouse()" [loading]="(beginRequest$|async) ?? false"
                       styleClass="p-button-success" icon="mdi-save" [disabled]="!houseEditingForm.valid || houseEditingForm.pristine"></p-button>
-            <ya-map (yaclick)="mapClick$.next($event)" [center]="[47.519624, 42.206329]" [zoom]="12" [options]="mapOptions" class="flex-grow-1">
-                <ya-placemark *ngFor="let placemark of mapPins" [geometry]="placemark"></ya-placemark>
+            <ya-map (yaclick)="onMapClick($event)" [center]="centerOfMap" [zoom]="zoom" [options]="mapOptions" class="flex-grow-1">
+                <ya-placemark *ngIf="housePlace" [geometry]="[housePlace.latitude,housePlace.longitude]"></ya-placemark>
             </ya-map>
         </div>
     </div>

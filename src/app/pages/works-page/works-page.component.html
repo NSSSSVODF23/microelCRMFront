@@ -140,7 +140,7 @@
 </p-dialog>
 
 <p-dialog [(visible)]="createWorkDialogVisible"
-          [autoZIndex]="false" [baseZIndex]="999"
+          [autoZIndex]="false" [baseZIndex]="4400"
           [header]="createWorkDialogMode==='create'? 'Создание работы': 'Изменение работы'" [resizable]="false">
     <ng-template pTemplate="content">
         <div [formGroup]="createWorkForm" class="flexed column gap10 p1">
@@ -148,13 +148,13 @@
             <textarea [autoResize]="true" cols="70" formControlName="description" pInputTextarea
                       placeholder="Описание работы..." rows="5"></textarea>
             <p-pickList (onMoveToSource)="unselectPaidAction($event)" (onMoveToTarget)="selectPaidAction($event)" [dragdrop]="true"
-                        [showSourceControls]="false" [showTargetControls]="false"
-                        [source]="availablePaidActions"
+                        [showSourceControls]="false" [showTargetControls]="false" [source]="availablePaidActions"
+                        [sourceStyle]="{'height':'30rem'}" [targetStyle]="{'height':'30rem'}"
                         [target]="selectedPaidActions" sourceHeader="Доступные действия" targetHeader="Выбранные действия">
                 <ng-template let-item pTemplate="item">
                     <div class="flexed gap5">
                         <div class="flexed column gap5 stretched">
-                            <span class="caption size-big w-max">
+                            <span class="caption white-space-nowrap overflow-hidden" [style.max-width]="'15rem'" appTicker>
                                 {{item.name}}
                             </span>
                             <span class="caption size-small f-color-500">

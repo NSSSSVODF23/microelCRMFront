@@ -27,7 +27,7 @@ import {
     PaidWork,
     PaidWorkForm,
     PaidWorkGroupForm,
-    Position,
+    Position, SalaryTable,
     SuperMessage,
     Task,
     TaskCreationBody,
@@ -38,7 +38,7 @@ import {
     TokenChain,
     TreeDragDropEvent,
     TreeElementPosition,
-    Wireframe,
+    Wireframe, WorkCalculationForm, WorkingDay,
     WorkLog
 } from "../transport-interfaces";
 import {MessageService, TreeNode} from "primeng/api";
@@ -645,7 +645,7 @@ export class ApiService {
     }
 
     getSalaryTable(filter: any) {
-        return this.sendGet<any>('api/private/salary/table', filter);
+        return this.sendGet<SalaryTable>('api/private/salary/table', filter);
     }
 
     getBillingUsersByLogin(login: string) {
@@ -702,6 +702,14 @@ export class ApiService {
 
     deleteHouse(houseId: number) {
         return this.sendDelete(`api/private/house/${houseId}`);
+    }
+
+    getWorkingDay(date: Date, login: string) {
+        return this.sendGet<WorkingDay>('api/private/working-day/', {date, login});
+    }
+
+    getAlreadyCalculatedWorkForm(workLogId: number){
+        return this.sendGet<any|null>(`api/private/salary/already-calculated-work/${workLogId}/form`);
     }
 
     // Результаты запросов на сервер кэшируются по таймауту, чтобы не было доп нагрузки на сервер

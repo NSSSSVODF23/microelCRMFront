@@ -160,6 +160,7 @@ import {DragDropModule} from "primeng/dragdrop";
 import {
     EmployeeSumDistributionComponent
 } from "../../components/controls/employee-sum-distribution/employee-sum-distribution.component";
+import {TooltipDirective} from "../../directives/tooltip.directive";
 
 
 @NgModule({
@@ -243,7 +244,8 @@ import {
         TickerDirective,
         PreventInputDirective,
         WorksPickerComponent,
-        EmployeeSumDistributionComponent
+        EmployeeSumDistributionComponent,
+        TooltipDirective
     ],
     exports: [
         AccountPanelComponent,
@@ -325,7 +327,8 @@ import {
         TickerDirective,
         PreventInputDirective,
         WorksPickerComponent,
-        EmployeeSumDistributionComponent
+        EmployeeSumDistributionComponent,
+        TooltipDirective
     ],
     imports: [
         CommonPipesModule,

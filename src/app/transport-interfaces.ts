@@ -1,5 +1,4 @@
 import {Subscription} from "rxjs";
-import {TreeNode, TreeNodeDragEvent} from "primeng/api";
 
 export enum WireframeFieldType {
     BOOLEAN = "BOOLEAN",
@@ -274,15 +273,23 @@ export interface Street {
     streetName: string;
 }
 
-export interface House{
+export interface House {
     houseId: number;
     houseNum: number;
-    fraction: number;
-    letter: string;
-    build: number;
+    fraction?: number;
+    letter?: string;
+    build?: number;
     houseName: string;
     addressName: string;
     streetId: number;
+    isApartmentHouse: boolean;
+    place?: Place;
+}
+
+export interface Place {
+    placeId: number;
+    latitude: number;
+    longitude: number;
 }
 
 export interface Pipeline {
@@ -563,7 +570,7 @@ export enum LoadingState {
     EMPTY = "EMPTY"
 }
 
-export interface PaidAction{
+export interface PaidAction {
     paidActionId: number;
     identifier: string;
     name: string;
@@ -594,7 +601,7 @@ export interface PaidActionFilter {
     includeDeleted?: boolean;
 }
 
-export interface PaidWorkGroup{
+export interface PaidWorkGroup {
     paidWorkGroupId: number;
     name: string;
     description?: string;
@@ -608,7 +615,7 @@ export interface PaidWorkGroupForm {
     parentGroupId?: number;
 }
 
-export interface PaidWork{
+export interface PaidWork {
     paidWorkId: number;
     name: string;
     description?: string;
@@ -628,7 +635,7 @@ export interface TreeNodeMoveEvent {
     object: TreeNodeDto;
 }
 
-export interface TreeNodeUpdateEvent{
+export interface TreeNodeUpdateEvent {
     path: number[];
     object: TreeNodeDto;
 }
@@ -643,20 +650,21 @@ export class TreeDragDropEvent {
         const dropNode = event.dropNode;
         this.index = event.index;
         this.source = new TreeNodeDto(dragNode);
-        if(dropNode.children && dropNode.children.includes(dragNode)){
+        if (dropNode.children && dropNode.children.includes(dragNode)) {
             this.target = new TreeNodeDto(dropNode);
-        }else{
+        } else {
             this.target = dropNode.parent ? new TreeNodeDto(dropNode.parent) : null;
         }
     }
 }
 
-export class TreeNodeDto{
+export class TreeNodeDto {
     key!: string;
     label!: string;
     icon!: string;
     // data!: any;
     type!: string;
+
     // children!: TreeNodeDto[]
 
     constructor(node: any) {
@@ -669,25 +677,25 @@ export class TreeNodeDto{
     }
 }
 
-export interface PaidActionTemplate{
+export interface PaidActionTemplate {
     paidActionTemplateId: number;
     action: PaidAction;
     count: number;
 }
 
-export interface PaidActionTemplateForm{
+export interface PaidActionTemplateForm {
     actionId: number;
     count: number;
 }
 
-export interface TreeElementPosition{
+export interface TreeElementPosition {
     id: number;
     type: string;
     position: number;
     path?: number[];
 }
 
-export interface WorkActionItemForm{
+export interface WorkActionFormItem {
     workName: string;
     workId: number;
     actionName: string;
@@ -698,13 +706,28 @@ export interface WorkActionItemForm{
     actionId: number;
 }
 
-export interface WorkCalculationForm{
+export interface WorkCalculationForm {
     workLogId: number;
-    employeeRatio: {[login: string]: {ratio: number, sum:number}};
-    actions: WorkActionItemForm[];
+    emptyDescription?: string;
+    actions: WorkActionFormItem[];
+    spreading: SpreadingItem[];
+    editingDescription?: string;
 }
 
-export interface FactorAction{
+export interface EmployeeIntervention {
+    employeeInterventionId: number;
+    employee: Employee;
+    timestamp: string;
+    description?: string;
+}
+
+export interface SpreadingItem {
+    login: string;
+    ratio: number;
+    factorsActions: FactorAction[];
+}
+
+export interface FactorAction {
     name: string;
     factor: number;
     actionUuids: string[];
@@ -718,7 +741,7 @@ export interface ActionTaken {
     uuid: string;
 }
 
-export  interface WorkCalculation{
+export interface WorkCalculation {
     workCalculationId: number;
     workLog: WorkLog;
     actions: ActionTaken[];
@@ -729,27 +752,40 @@ export  interface WorkCalculation{
     creator: Employee;
     empty: boolean;
     emptyDescription: string;
+    sum: number;
+    sumWithoutNDFL: number;
+    lastEdit?: EmployeeIntervention;
 }
 
-export interface WorkingDay{
+export interface WorkingDay {
     workingDayId: number;
     date: string;
     employee: Employee;
     calculations: WorkCalculation[]
 }
 
-export interface SalaryPoint {
-    date: string;
-    value: number;
-}
-
-export interface SalaryRow{
+export interface SalaryTableCell {
     employee: Employee;
-    salaryPoints: SalaryPoint[]
-    sum: number;
+    sumWithNDFL: number;
+    sumWithoutNDFL: number;
+    date: Date;
 }
 
-export interface BillingUserItemData{
+export interface SalaryTableTotalCell {
+    employee: Employee;
+    sumWithNDFL: number;
+    sumWithoutNDFL: number;
+}
+
+export interface SalaryTable {
+    headers: string[];
+    employees: Employee[];
+    payload: SalaryTableCell[][];
+    totalSum: SalaryTableTotalCell[];
+    totalSumAllEmployees: SalaryTableTotalCell;
+}
+
+export interface BillingUserItemData {
     tarif: string;
     uname: string;
     last: string;
@@ -954,7 +990,7 @@ export interface BillingUserItemData{
 // }
 // }
 
-export interface BillingUserMainInfo{
+export interface BillingUserMainInfo {
     addr: string;
     coment: string;
     credit: number;
@@ -965,7 +1001,7 @@ export interface BillingUserMainInfo{
     phone: string;
 }
 
-export interface BillingUserNewTarif{
+export interface BillingUserNewTarif {
     cntDhcp: number;
     cntVpn: number;
     dstate: number;
@@ -994,7 +1030,7 @@ export interface BillingUserNewTarif{
     xservice: string;
 }
 
-export interface BillingOldTarifItem{
+export interface BillingOldTarifItem {
     adate: Date;
     edate: Date;
     hdate: Date;
@@ -1006,7 +1042,7 @@ export interface BillingOldTarifItem{
     stype: number;
 }
 
-export interface BillingTotalUserInfo{
+export interface BillingTotalUserInfo {
     ibase: BillingUserMainInfo;
     karma: number;
     newTarif: BillingUserNewTarif;

@@ -39,7 +39,7 @@ export class EmployeeSumDistributionComponent implements OnInit, OnDestroy, Cont
         const initRatio = 1 / employeesCount;
         this.employeeRatioForm = new FormGroup(employees.reduce((prev, curr) => {
             const employeeGroup = new FormGroup({
-                ratio: new FormControl(initRatio), sum: new FormControl(Math.floor(initRatio * this.totalCostOfWork))
+                ratio: new FormControl(initRatio), sum: new FormControl(Math.round(initRatio * this.totalCostOfWork))
             })
             this.employeeRatioSubscriptions.addSubscription(curr.login + 'rt', employeeGroup.controls.ratio.valueChanges.subscribe((currRatio) => {
                 if (currRatio === null) return;
@@ -59,18 +59,19 @@ export class EmployeeSumDistributionComponent implements OnInit, OnDestroy, Cont
                         const ratio = this.employeeRatioForm.value[login].ratio;
                         const ratioPercent = ratio / sumOfOtherRatios;
                         patchValue[login].ratio = ratio - (delta * ratioPercent);
-                        patchValue[login].sum = Math.floor(patchValue[login].ratio * this.totalCostOfWork);
+                        patchValue[login].sum = Math.round(patchValue[login].ratio * this.totalCostOfWork);
                     }
                     patchValue[currentLogin].ratio = currRatio;
-                    patchValue[currentLogin].sum = Math.floor(currRatio * this.totalCostOfWork);
+                    patchValue[currentLogin].sum = Math.round(currRatio * this.totalCostOfWork);
                     this.employeeRatioForm.patchValue(patchValue, {emitEvent: false});
                 } else {
                     this.employeeRatioForm.patchValue({
                         [currentLogin]: {
-                            ratio: currRatio, sum: Math.floor(currRatio * this.totalCostOfWork)
+                            ratio: currRatio, sum: Math.round(currRatio * this.totalCostOfWork)
                         }
                     }, {emitEvent: false});
                 }
+                console.log(currentLogin,currRatio)
             }));
             this.employeeRatioSubscriptions.addSubscription(curr.login + 'sum', employeeGroup.controls.sum.valueChanges.subscribe((currSum) => {
                 if (currSum !== null && currSum > this.totalCostOfWork) currSum = this.totalCostOfWork;
@@ -90,19 +91,20 @@ export class EmployeeSumDistributionComponent implements OnInit, OnDestroy, Cont
                         if (login === currentLogin) continue;
                         const sum = this.employeeRatioForm.value[login].sum;
                         const ratioPercent = sum / sumOfOtherAmounts;
-                        patchValue[login].sum = Math.floor(sum - (delta * ratioPercent));
+                        patchValue[login].sum = Math.round(sum - (delta * ratioPercent));
                         patchValue[login].ratio = patchValue[login].sum / this.totalCostOfWork;
                     }
-                    patchValue[currentLogin].sum = Math.floor(currSum);
+                    patchValue[currentLogin].sum = Math.round(currSum);
                     patchValue[currentLogin].ratio = currSum / this.totalCostOfWork;
                     this.employeeRatioForm.patchValue(patchValue, {emitEvent: false});
                 } else {
                     this.employeeRatioForm.patchValue({
                         [currentLogin]: {
-                            ratio: currSum / this.totalCostOfWork, sum: Math.floor(currSum)
+                            ratio: currSum / this.totalCostOfWork, sum: Math.round(currSum)
                         }
                     }, {emitEvent: false});
                 }
+                console.log(currentLogin,Math.round(currSum))
             }));
             return {
                 ...prev, [curr.login]: employeeGroup
@@ -176,7 +178,8 @@ export class EmployeeSumDistributionComponent implements OnInit, OnDestroy, Cont
     };
 
     ngOnInit(): void {
-        setTimeout(()=>this.onChange(this.employeeRatioForm.value));
+        // setTimeout(()=>this.onChange(this.employeeRatioForm.value));
+        this.employeeRatioForm.valueChanges.subscribe(console.log)
     }
 
     ngOnDestroy(): void {
@@ -194,13 +197,10 @@ export class EmployeeSumDistributionComponent implements OnInit, OnDestroy, Cont
     equalize() {
         const employeesCount = this.employees.length;
         const initRatio = 1 / employeesCount;
-        Object.keys(this.employeeRatioForm.value).forEach(login => {
-            this.employeeRatioForm.patchValue({
-                [login]: {
-                    ratio: initRatio, sum: Math.floor(initRatio * this.totalCostOfWork)
-                }
-            }, {emitEvent: false});
-        })
+        const ratios = Object.keys(this.employeeRatioForm.value).map(login=>login).reduce((prev, curr) => {
+            return  {...prev,[curr]:{ratio:initRatio,sum:Math.round(initRatio * this.totalCostOfWork)}}
+        },{})
+        this.employeeRatioForm.patchValue(ratios);
     }
 
     setDisabledState(isDisabled: boolean): void {
@@ -208,7 +208,7 @@ export class EmployeeSumDistributionComponent implements OnInit, OnDestroy, Cont
     }
 
     writeValue(obj: any): void {
-        this.employeeRatioForm.patchValue(obj);
+        this.employeeRatioForm.patchValue(obj,{emitEvent: false});
     }
 
     trackByEmployee(index: number, employee: any) {
@@ -248,7 +248,7 @@ export class EmployeeSumDistributionComponent implements OnInit, OnDestroy, Cont
             }, 0);
             const employeeRatio = this.employeeRatioForm.value[factorAction.login].ratio;
             const cost = costOfWork * employeeRatio;
-            return Math.floor((cost * factorAction.factor) - cost);
+            return Math.round((cost * factorAction.factor) - cost);
         }
         return 0;
     }
@@ -258,7 +258,7 @@ export class EmployeeSumDistributionComponent implements OnInit, OnDestroy, Cont
             const current = this.employeeRatioForm.value[login];
             this.employeeRatioForm.patchValue({
                 [login]: {
-                    ratio: current.ratio, sum: Math.floor(current.ratio * this.totalCostOfWork)
+                    ratio: current.ratio, sum: Math.round(current.ratio * this.totalCostOfWork)
                 }
             }, {emitEvent: false});
         }

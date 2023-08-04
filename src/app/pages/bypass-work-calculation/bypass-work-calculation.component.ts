@@ -163,7 +163,12 @@ export class BypassWorkCalculationComponent implements OnInit, OnDestroy {
             this.taskInformationForm.enable()
             this.worksPickerForm.reset()
             this.employeeRatioForm.reset()
-            this.installersReportForm.reset()
+            this.installersReportForm.reset({
+                installers: [],
+                report: '',
+                tags: [],
+                date: new Date(),
+            })
             this.taskInformationForm.reset()
         },
         error:()=>{

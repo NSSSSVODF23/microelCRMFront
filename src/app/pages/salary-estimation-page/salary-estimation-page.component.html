@@ -10,23 +10,30 @@
                     <ng-container *ngTemplateOutlet="selectedWorkTemp"></ng-container>
                 </ng-container>
             </div>
-            <ng-container *ngIf="selectedWorkLog && worksPicker.valueChanges | async as pickerValue">
+            <ng-container *ngIf="selectedWorkLog">
                 <div class="flexed column gap15 stretched panel p20">
-                    <div class="flexed gap10 hcenter spbtw">
-                        <span class="caption size-huge">
-                            Распределение по сотрудникам
-                        </span>
-                        <p-button (onClick)="sumDistr?.equalize()" icon="mdi-equalizer" label="Равные доли"
-                                  styleClass="p-button-text p-button-secondary"></p-button>
-                    </div>
-                    <app-employee-sum-distribution #sumDistr (onRemoveFactorAction)="onRemoveFactorAction($event)"
-                                                   [actionsTaken]="pickerValue.actionsTaken"
-                                                   [employees]="selectedWorkLog?.employees"
-                                                   [factorsActions]="pickerValue.factorsActions"
-                                                   [formControl]="employeeRatioForm"></app-employee-sum-distribution>
-                    <p-button (onClick)="sendCalculation()" [loading]="isSendingCalculation" class="align-self-end"
-                              icon="mdi-currency_exchange"
-                              label="Рассчитать"></p-button>
+                    <ng-container *ngIf="worksPickerForm.valueChanges | async as pickerValue">
+                        <div class="flexed gap10 hcenter spbtw">
+                            <span class="caption size-huge">
+                                Распределение по сотрудникам
+                            </span>
+                            <p-button (onClick)="sumDistr?.equalize()" icon="mdi-equalizer" label="Равные доли"
+                                      styleClass="p-button-text p-button-secondary"></p-button>
+                        </div>
+                        <app-employee-sum-distribution #sumDistr (onRemoveFactorAction)="onRemoveFactorAction($event)"
+                                                       [actionsTaken]="pickerValue.actionsTaken"
+                                                       [employees]="selectedWorkLog?.employees"
+                                                       [factorsActions]="pickerValue.factorsActions"
+                                                       [formControl]="employeeRatioForm"></app-employee-sum-distribution>
+                    </ng-container>
+                    <ng-container *ngIf="recalculate$ | async as recalculate">
+                        <p-button (onClick)="sendCalculation()" *ngIf="recalculate === 'CALCULATE'" [loading]="isSendingCalculation"
+                                  class="align-self-end"
+                                  icon="mdi-currency_exchange" label="Рассчитать"></p-button>
+                        <p-button (onClick)="openRecalculationConformationDialog()" *ngIf="recalculate === 'RECALCULATE'" [loading]="isSendingCalculation"
+                                  class="align-self-end"
+                                  icon="mdi-currency_exchange" label="Пересчитать"></p-button>
+                    </ng-container>
                 </div>
             </ng-container>
         </div>
@@ -135,7 +142,7 @@
             </div>
         </div>
         <div class="terminator-bottom"></div>
-        <app-works-picker [employees]="selectedWorkLog?.employees" [formControl]="worksPicker"
+        <app-works-picker [employees]="selectedWorkLog?.employees" [formControl]="worksPickerForm"
                           class="mb-4"></app-works-picker>
     </div>
 </ng-template>
@@ -161,6 +168,32 @@
                           [loading]="isSendingCalculation"
                           icon="mdi-check"
                           label="Отправить" styleClass="p-button-danger"></p-button>
+            </div>
+        </div>
+    </ng-template>
+</p-dialog>
+
+<!--Диалог подтверждения перерасчета работы-->
+<p-dialog [(visible)]="recalculationConformationDialogVisible" [draggable]="false" [modal]="true" [resizable]="false"
+          [style]="{width: '50vw', minWidth: 'fit-content'}"
+          header="Причина пересчета работ?">
+    <ng-template pTemplate="content">
+        <div class="flexed column gap10">
+            <div class="input-label-wrapper">
+                <label>Причина пересчета работы</label>
+                <textarea [(ngModel)]="recalculationDescription" [autoResize]="true" [rows]="5" class="stretched"
+                          pInputTextarea></textarea>
+            </div>
+            <div class="flexed hcenter vend gap10">
+                <p-button (onClick)="recalculationConformationDialogVisible = false; recalculationDescription=''"
+                          [disabled]="isSendingCalculation"
+                          icon="mdi-close"
+                          label="Отменить"
+                          styleClass="p-button-secondary p-button-text"></p-button>
+                <p-button (onClick)="sendRecalculation()" [disabled]="!recalculationDescription"
+                          [loading]="isSendingCalculation"
+                          icon="mdi-check"
+                          label="Отправить" styleClass="p-button-success"></p-button>
             </div>
         </div>
     </ng-template>
