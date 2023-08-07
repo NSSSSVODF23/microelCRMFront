@@ -217,6 +217,7 @@ export class SalaryEstimationPageComponent implements OnInit, OnDestroy {
                 count: at.count,
                 uuid: at.uuid
             })),
+            emptyDescription: this.actionsTaken.length === 0 ? this.recalculationDescription : null,
             editingDescription: this.recalculationDescription,
             spreading: this.selectedWorkLog.employees.map(emp => {
                 return {
