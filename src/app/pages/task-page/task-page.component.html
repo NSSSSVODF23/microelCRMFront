@@ -1,7 +1,7 @@
 <div appExtendPageHeight class="flexed column vcenter gap20">
     <ng-container [ngSwitch]="loadingState">
         <ng-container *ngSwitchCase="'LOADING'">
-            <p-progressSpinner strokeWidth="1" class="primary-spinner center-of-page"></p-progressSpinner>
+            <p-progressSpinner strokeWidth="1" class="custom-spinner custom-spinner-8xl custom-spinner-primary center-of-page"></p-progressSpinner>
         </ng-container>
         <ng-container *ngSwitchCase="'ERROR'">
             <div class="panel flexed column hcenter vcenter gap15 p20 caption size-big wt-bold f-color-danger responsive-wrapper">
@@ -364,7 +364,7 @@
         <div class="stretched"></div>
         <div class="flexed vend hcenter sticky bottom0">
             <app-button (onClick)="doEditTask()" [disabled]="!editTaskForm.valid" [loading]="editBlocked" icon="save"
-                        label="Сохранить" model="p-button-raised"></app-button>
+                        label="Сохранить" model="p-button-success"></app-button>
         </div>
     </div>
 </p-dialog>

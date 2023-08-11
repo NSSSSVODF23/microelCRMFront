@@ -5,7 +5,7 @@
         <ng-container [ngSwitch]="loadingState">
             <ng-container *ngSwitchCase="'LOADING'">
                 <div class="list flexed hcenter vcenter">
-                    <p-progressSpinner class="primary-spinner" strokeWidth="1"></p-progressSpinner>
+                    <p-progressSpinner class="custom-spinner custom-spinner-8xl custom-spinner-primary" strokeWidth="1"></p-progressSpinner>
                 </div>
             </ng-container>
             <ng-container *ngSwitchCase="'ERROR'">

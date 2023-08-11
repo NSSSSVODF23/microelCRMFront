@@ -35,3 +35,13 @@
 <p-confirmDialog></p-confirmDialog>
 <app-media-viewer></app-media-viewer>
 <app-chat-panel #chatPanelEl></app-chat-panel>
+<p-toast position="bottom-center" key="darktoast">
+    <ng-template let-message pTemplate="message">
+        <div class="flex gap-3 flex-grow-1 h-full align-items-center">
+            <span [class]="message.icon+' text-xl'" *ngIf="message.icon"></span>
+            <span class="font-bold">
+                {{message.detail}}
+            </span>
+        </div>
+    </ng-template>
+</p-toast>

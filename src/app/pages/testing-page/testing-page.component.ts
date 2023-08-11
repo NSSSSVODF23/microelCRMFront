@@ -3,7 +3,8 @@ import {BillingUserItemData, FieldItem, WireframeFieldType} from "../../transpor
 import {v4} from "uuid";
 import {FormControl, FormGroup} from "@angular/forms";
 import {ApiService} from "../../services/api.service";
-import {debounceTime, distinctUntilChanged, Observable, of, switchMap} from "rxjs";
+import {bufferTime, debounceTime, distinctUntilChanged, map, Observable, of, range, scan, switchMap} from "rxjs";
+import {RealTimeUpdateService} from "../../services/real-time-update.service";
 
 @Component({
     templateUrl: './testing-page.component.html',
@@ -22,6 +23,7 @@ export class TestingPageComponent implements OnInit {
         {name: 'Адрес', id: v4(), type: WireframeFieldType.ADDRESS, orderPosition: 1, listViewIndex: 1},
         {name: 'Телефон', id: v4(), type: WireframeFieldType.PHONE_ARRAY, orderPosition: 1, listViewIndex: 1},
     ]
+    ips$ = range(1,150).pipe(map(i => `10.163.35.${i}`), bufferTime(1000));
     form: FormGroup = new FormGroup({});
     employees$ = this.api.getEmployees();
     users: BillingUserItemData[] = [];
@@ -53,7 +55,10 @@ export class TestingPageComponent implements OnInit {
         }
     }
 
-    constructor(readonly api: ApiService) {
+    ips=["10.163.35.26"];
+    // ips=["8.8.8.8","193.111.3.1","10.163.35.140","10.163.35.254"];
+
+    constructor(readonly api: ApiService, readonly rt: RealTimeUpdateService) {
     }
 
     ngOnInit(): void {
@@ -71,6 +76,7 @@ export class TestingPageComponent implements OnInit {
     workPickerControl = new FormControl(null);
 
     //Method to generate a random string and push it to the items array
+    unsub = true;
     generateRandomString() {
         const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
         let result1 = '';

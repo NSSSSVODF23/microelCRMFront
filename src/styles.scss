@@ -1194,27 +1194,107 @@ fieldset.node {
   padding: 1rem !important;
 }
 
-.white-spinner .p-progress-spinner-circle {
-  animation: p-progress-spinner-dash 1.5s ease-in-out infinite, white-progress-spinner-color 6s ease-in-out infinite !important;
-}
+.custom-spinner {
+  display: block;
 
-.primary-spinner .p-progress-spinner-circle {
-  animation: p-progress-spinner-dash 1.5s ease-in-out infinite, primary-progress-spinner-color 6s ease-in-out infinite !important;
-}
+  &.custom-spinner-xs {
+    width: .75rem;
+    height: .75rem;
+  }
 
-@keyframes white-progress-spinner-color {
-  100%,
-  0% {
-    stroke: var(--tc-100);
+  &.custom-spinner-sm {
+    width: .875rem;
+    height: .875rem;
+  }
+
+  &.custom-spinner-md {
+    width: 1rem;
+    height: 1rem;
+  }
+
+  &.custom-spinner-lg {
+    width: 1.125rem;
+    height: 1.125rem;
+  }
+
+  &.custom-spinner-xl {
+    width: 1.25rem;
+    height: 1.25rem;
+  }
+
+  &.custom-spinner-2xl {
+    width: 1.5rem;
+    height: 1.5rem;
+  }
+
+  &.custom-spinner-3xl {
+    width: 1.75rem;
+    height: 1.75rem;
+  }
+
+  &.custom-spinner-4xl {
+    width: 2rem;
+    height: 2rem;
+  }
+
+  &.custom-spinner-5xl {
+    width: 2.5rem;
+    height: 2.5rem;
+  }
+
+  &.custom-spinner-6xl {
+    width: 3rem;
+    height: 3rem;
+  }
+
+  &.custom-spinner-7xl {
+    width: 4rem;
+    height: 4rem;
+  }
+
+  &.custom-spinner-8xl {
+    width: 6rem;
+    height: 6rem;
   }
 }
 
-@keyframes primary-progress-spinner-color {
+.custom-spinner > .p-progress-spinner {
+  width: inherit !important;
+  height: inherit !important;
+  display: block !important;
+}
+
+.custom-spinner.custom-spinner-primary .p-progress-spinner-circle {
+  animation: p-progress-spinner-dash 1.5s ease-in-out infinite, primary-spinner-color 6s ease-in-out infinite !important;
+}
+
+.custom-spinner.custom-spinner-white .p-progress-spinner-circle {
+  animation: p-progress-spinner-dash 1.5s ease-in-out infinite, white-spinner-color 6s ease-in-out infinite !important;
+}
+
+.custom-spinner.custom-spinner-gray .p-progress-spinner-circle {
+  animation: p-progress-spinner-dash 1.5s ease-in-out infinite, gray-spinner-color 6s ease-in-out infinite !important;
+}
+
+@keyframes white-spinner-color {
   100%,
   0% {
-    stroke: var(--mc-400);
+    stroke: var(--gray-50);
   }
+}
 
+@keyframes primary-spinner-color {
+  100%,
+  0% {
+    stroke: var(--primary-400);
+  }
+}
+
+@keyframes gray-spinner-color {
+  100%,
+  0% {
+    stroke: var(--bluegray-400);
+  }
 }
 
 markdown > p:last-child {
@@ -1409,6 +1489,16 @@ markdown > p:last-child {
   0px 9px 16px rgba(0, 0, 0, 0.07) !important;
 }
 
+.p-toast-message-dark {
+  background-color: var(--bluegray-700);
+  color: var(--bluegray-50);
+  border: solid 1px var(--bluegray-500);
+  border-radius: .75rem !important;
+  .p-toast-icon-close {
+    color: var(--bluegray-50);
+  }
+}
+
 .responsive-wrapper {
   width: 100vw;
 
@@ -1447,7 +1537,7 @@ markdown > p:last-child {
   background-color: transparent;
 }
 
-.p-autocomplete.task-tag-selector > .p-autocomplete-multiple-container {
+.p-autocomplete.transparent-ac-token > .p-autocomplete-multiple-container {
   & > .p-autocomplete-token {
     background-color: transparent;
     border: none;
@@ -1456,78 +1546,6 @@ markdown > p:last-child {
 
     & > .p-autocomplete-token-icon {
       margin-left: .2rem;
-    }
-  }
-}
-
-.w {
-  &-max {
-    width: max-content;
-  }
-
-  &-min {
-    width: min-content;
-  }
-
-  &-full {
-    width: 100%;
-  }
-
-  &-fit {
-    width: fit-content;
-  }
-
-  &.max {
-    &-fit {
-      width: fit-content;
-    }
-
-    &-min {
-      width: min-content;
-    }
-
-    &-full {
-      width: 100%;
-    }
-
-    &-max {
-      width: max-content;
-    }
-  }
-}
-
-.h {
-  &-max {
-    height: max-content;
-  }
-
-  &-min {
-    height: min-content;
-  }
-
-  &-full {
-    height: 100%;
-  }
-
-  &-fit {
-    height: fit-content;
-  }
-
-  &.max {
-    &-fit {
-      height: fit-content;
-    }
-
-    &-min {
-      height: min-content;
-    }
-
-    &-full {
-      height: 100%;
-    }
-
-    &-max {
-      height: max-content;
     }
   }
 }

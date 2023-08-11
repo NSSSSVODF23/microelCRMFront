@@ -31,6 +31,7 @@ export class TaskTemplateInputComponent implements OnInit, ControlValueAccessor 
     controlValue: any;
     @Input() isExample: boolean = false;
     disable = false;
+    connectionTypes$ = this.api.getConnectionTypesList();
 
     constructor(readonly api: ApiService) {
     }
@@ -47,7 +48,10 @@ export class TaskTemplateInputComponent implements OnInit, ControlValueAccessor 
         if ('type' in this.field) {
             switch (this.field.type) {
                 case WireframeFieldType.ADDRESS:
-                    return [{id:"ALL", name:"Все данные"}, {id:"APARTMENT_ONLY", name: "Только номер квартиры"}, {id:"HOUSE_ONLY", name: "Только номер дома"}];
+                    return [{id: "ALL", name: "Все данные"}, {
+                        id: "APARTMENT_ONLY",
+                        name: "Только номер квартиры"
+                    }, {id: "HOUSE_ONLY", name: "Только номер дома"}];
                 default:
                     return [];
             }
@@ -56,14 +60,14 @@ export class TaskTemplateInputComponent implements OnInit, ControlValueAccessor 
     }
 
     get currentVariation(): string {
-        if(!this.field) return '';
-        if('variation' in this.field) return this.field.variation ?? '';
+        if (!this.field) return '';
+        if ('variation' in this.field) return this.field.variation ?? '';
         return '';
     }
 
     set currentVariation(value: string) {
-        if(!this.field) return;
-        if('type' in this.field) this.field.variation = value;
+        if (!this.field) return;
+        if ('type' in this.field) this.field.variation = value;
     }
 
     registerOnChange(fn: any): void {
@@ -89,6 +93,7 @@ export class TaskTemplateInputComponent implements OnInit, ControlValueAccessor 
     };
 
     ngOnInit(): void {
+        console.log(this.type, this.currentVariation);
     }
 
     isName(field: any) {

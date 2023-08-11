@@ -38,19 +38,7 @@ export class WireframeConstructorPageComponent implements OnInit {
     wireframeFieldsList: any[] = [];
     stepsContextMenu: MenuItem[] = [];
     chooseFieldTypeDialogVisible = false;
-    fieldTypeOptions = [{label: 'Логическое значение', value: WireframeFieldType.BOOLEAN}, {
-        label: 'Малый текст', value: WireframeFieldType.SMALL_TEXT
-    }, {label: 'Текст', value: WireframeFieldType.LARGE_TEXT}, {
-        label: 'Целочисленное', value: WireframeFieldType.INTEGER
-    }, {label: 'Не целочисленное', value: WireframeFieldType.FLOAT}, {
-        label: 'Адрес', value: WireframeFieldType.ADDRESS
-    }, {label: 'Логин', value: WireframeFieldType.LOGIN}, {
-        label: 'Рекламный источник', value: WireframeFieldType.AD_SOURCE
-    }, {label: 'Тип принятия заявки', value: WireframeFieldType.REQUEST_INITIATOR}, {
-        label: 'IP Адрес', value: WireframeFieldType.IP
-    }, {label: 'Абонентское оборудование', value: WireframeFieldType.EQUIPMENTS}, {
-        label: 'Подключаемые услуги', value: WireframeFieldType.CONNECTION_SERVICES
-    }, {label: 'Телефонные номера', value: WireframeFieldType.PHONE_ARRAY}]
+    fieldTypeOptions = this.api.getWireframeFieldTypesList();
     createFieldType = WireframeFieldType.SMALL_TEXT;
     editingId?: number;
     constructStage = "FIELDS";

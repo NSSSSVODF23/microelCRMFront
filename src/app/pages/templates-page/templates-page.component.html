@@ -17,7 +17,7 @@
             <ng-container [ngSwitch]="templateLoadingState">
                 <ng-container *ngSwitchCase="'LOADING'">
                     <div class="flexed hcenter vcenter p20">
-                        <p-progressSpinner class="primary-spinner" strokeWidth="1"></p-progressSpinner>
+                        <p-progressSpinner class="custom-spinner custom-spinner-8xl custom-spinner-primary" strokeWidth="1"></p-progressSpinner>
                     </div>
                 </ng-container>
                 <ng-container *ngSwitchCase="'READY'">
@@ -48,7 +48,7 @@
             <ng-container [ngSwitch]="tagLoadingState">
                 <ng-container *ngSwitchCase="'LOADING'">
                     <div class="flexed hcenter vcenter p20">
-                        <p-progressSpinner class="primary-spinner" strokeWidth="1"></p-progressSpinner>
+                        <p-progressSpinner class="custom-spinner custom-spinner-8xl custom-spinner-primary" strokeWidth="1"></p-progressSpinner>
                     </div>
                 </ng-container>
                 <ng-container *ngSwitchCase="'READY'">

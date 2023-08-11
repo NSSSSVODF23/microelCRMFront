@@ -1,0 +1,15 @@
+<p-autoComplete (onBlur)="onTouched()" placeholder="Выберите услугу"
+                [suggestions]="(connectionServices$ | async) ?? []"
+                styleClass="w-full block transparent-ac-token" inputStyleClass="w-5rem"
+                [formControl]="control"
+                (completeMethod)="connectionServicesSuggestions.next($event.query)" [multiple]="true" appendTo="body"
+                [completeOnFocus]="true">
+    <ng-template let-value pTemplate="selectedItem">
+        <span class="px-2 py-1 bg-primary-50 text-primary-400 border-round-md font-bold text-xs">{{value.label}}</span>
+    </ng-template>
+    <ng-template let-value pTemplate="item">
+        <div>
+            {{value.label}}
+        </div>
+    </ng-template>
+</p-autoComplete>

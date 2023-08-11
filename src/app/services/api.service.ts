@@ -27,7 +27,8 @@ import {
     PaidWork,
     PaidWorkForm,
     PaidWorkGroupForm,
-    Position, SalaryTable,
+    Position,
+    SalaryTable,
     SuperMessage,
     Task,
     TaskCreationBody,
@@ -38,7 +39,8 @@ import {
     TokenChain,
     TreeDragDropEvent,
     TreeElementPosition,
-    Wireframe, WorkCalculationForm, WorkingDay,
+    Wireframe,
+    WorkingDay,
     WorkLog
 } from "../transport-interfaces";
 import {MessageService, TreeNode} from "primeng/api";
@@ -708,12 +710,35 @@ export class ApiService {
         return this.sendGet<WorkingDay>('api/private/working-day/', {date, login});
     }
 
-    getAlreadyCalculatedWorkForm(workLogId: number){
-        return this.sendGet<any|null>(`api/private/salary/already-calculated-work/${workLogId}/form`);
+    getAlreadyCalculatedWorkForm(workLogId: number) {
+        return this.sendGet<any | null>(`api/private/salary/already-calculated-work/${workLogId}/form`);
+    }
+
+    getDhcpBindingsByLogin(login: string) {
+        return this.sendGet<any[]>('api/private/acp/dhcp/bindings', {login});
+    }
+
+    checkRemoteControl(ipaddr: any) {
+        return this.sendGet<any>(`api/private/remote-control/${ipaddr}/check-access`);
+    }
+
+    getWireframeFieldTypesList(){
+        return this.sendGet<{label: string, value: string}[]>('api/private/types/wireframe-field');
+    }
+
+    getConnectionServicesList(){
+        return this.sendGet<{label: string, value: string}[]>('api/private/types/connection-service');
+    }
+
+    getConnectionServicesSuggestionsList(query: string){
+        return this.sendGet<{label: string, value: string}[]>('api/private/types/connection-service/suggestions', {query});
+    }
+
+    getConnectionTypesList(){
+        return this.sendGet<{label: string, value: string}[]>('api/private/types/connection-type');
     }
 
     // Результаты запросов на сервер кэшируются по таймауту, чтобы не было доп нагрузки на сервер
-
     private sendGet<T>(uri: string, query?: any) {
         // Генерируем хэш запроса на основе конечной точки и параметров запроса
         const requestHash = this.generateHash(uri, query);
@@ -738,6 +763,8 @@ export class ApiService {
         return observable;
     }
 
+    // Генерируем хэш запроса по URI и параметрам запроса
+
     private sendGetSilent<T>(uri: string, query?: any) {
         const requestHash = this.generateHash(uri, query);
         let observable: Observable<T> | null = null;
@@ -753,8 +780,6 @@ export class ApiService {
         }
         return observable;
     }
-
-    // Генерируем хэш запроса по URI и параметрам запроса
 
     private sendPost<T>(uri: string, body: any) {
         return this.client.post<T>(uri, body)

@@ -1,10 +1,10 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
 import {ApiService} from "../../services/api.service";
 import {ActivatedRoute} from "@angular/router";
-import {Address, BillingTotalUserInfo, LoadingState} from "../../transport-interfaces";
+import {BillingTotalUserInfo, LoadingState} from "../../transport-interfaces";
 import {SubscriptionsHolder} from "../../util";
 import {CustomNavigationService} from "../../services/custom-navigation.service";
-import {tap} from "rxjs";
+import {map, merge, Subject, switchMap, tap} from "rxjs";
 import {TaskCreatorService} from "../../services/task-creator.service";
 import {MessageService} from "primeng/api";
 
@@ -20,7 +20,9 @@ export class BillingUserPageComponent implements OnInit, OnDestroy {
 
     currentLogin?: string;
 
-    pathChange$ = this.route.params.pipe(tap(params => this.currentLogin = params['login']));
+    pathChange$ = this.route.params.pipe(tap(params => this.currentLogin = params['login']), map(params => params['login']));
+    update$ = new Subject<string>();
+    loadUser$ = merge(this.pathChange$, this.update$);
 
     subscriptions = new SubscriptionsHolder();
 
@@ -40,6 +42,8 @@ export class BillingUserPageComponent implements OnInit, OnDestroy {
     }
 
     wireframes: any[] = [];
+
+    dhcpBindings$ = this.loadUser$.pipe(switchMap(login => this.api.getDhcpBindingsByLogin(login)));
 
     constructor(private api: ApiService, private route: ActivatedRoute, readonly customNav: CustomNavigationService, readonly taskCreation: TaskCreatorService, readonly toast: MessageService) {
     }
@@ -88,17 +92,25 @@ export class BillingUserPageComponent implements OnInit, OnDestroy {
         return this.userInfo?.ibase?.money ?? 0;
     }
 
+    trackByDhcpBinding(index: number, item: any) {
+        return index;
+    };
+
     ngOnInit(): void {
         this.subscriptions.addSubscription('pch',
-            this.pathChange$.subscribe(this.load.bind(this))
+            this.loadUser$.subscribe(this.load.bind(this))
         )
         this.api.getWireframesNames().subscribe(wf => {
             this.wireframes = wf.map(value => ({
                 label: value.name,
                 command: () => {
-                    this.api.convertBillingAddress(this.userInfo?.ibase?.addr).subscribe((address)=>{
+                    this.api.convertBillingAddress(this.userInfo?.ibase?.addr).subscribe((address) => {
                         if (!this.currentLogin) {
-                            this.toast.add({severity: 'error', summary: "Ошибка запроса", detail: "Не найден логин для создания задачи"})
+                            this.toast.add({
+                                severity: 'error',
+                                summary: "Ошибка запроса",
+                                detail: "Не найден логин для создания задачи"
+                            })
                             return;
                         }
                         this.taskCreation.wireframe(value.wireframeId, {
@@ -123,4 +135,14 @@ export class BillingUserPageComponent implements OnInit, OnDestroy {
         this.subscriptions.unsubscribeAll();
     }
 
+    checkRemoteControl(ipaddr: any) {
+        this.api.checkRemoteControl(ipaddr).subscribe({
+            next: (res) => {
+                console.log("Next ", res);
+            },
+            error: (err) => {
+                console.log("Error ", err);
+            }
+        })
+    }
 }

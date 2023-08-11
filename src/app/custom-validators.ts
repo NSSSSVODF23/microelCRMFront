@@ -16,9 +16,16 @@ export class CustomValidators {
             case WireframeFieldType.IP:
             case WireframeFieldType.LOGIN:
             case WireframeFieldType.LARGE_TEXT:
+            case WireframeFieldType.CONNECTION_TYPE:
             case WireframeFieldType.SMALL_TEXT:
                 return (control: AbstractControl): ValidationErrors | null => {
                     if (CustomValidators.isValueEmpty(control.value)) return {'required': true};
+                    return null;
+                }
+            case WireframeFieldType.CONNECTION_SERVICES:
+                return (control: AbstractControl): ValidationErrors | null => {
+                    if (CustomValidators.isValueEmpty(control.value)) return {'required': true};
+                    if (!Array.isArray(control.value) || control.value.length === 0) return {'required': true};
                     return null;
                 }
             case WireframeFieldType.PHONE_ARRAY:

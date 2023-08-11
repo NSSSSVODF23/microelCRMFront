@@ -138,9 +138,11 @@ export class TaskCreationPageComponent implements OnInit, OnDestroy {
                     step.fields.reduce(
                         (prev, field) => {
                             let defaultValue = null;
-                            switch (field.name.toLowerCase()) {
-                                case "логин": defaultValue = this.defaultValues.login; break;
-                                case "адрес": defaultValue = this.defaultValues.address; break;
+                            if(this.defaultValues){
+                                switch (field.name.toLowerCase()) {
+                                    case "логин": defaultValue = this.defaultValues.login; break;
+                                    case "адрес": defaultValue = this.defaultValues.address; break;
+                                }
                             }
                             return {...prev, [field.id]: new FormControl(defaultValue, [CustomValidators.taskInput(field.type, field.variation)])};
                         }, {}

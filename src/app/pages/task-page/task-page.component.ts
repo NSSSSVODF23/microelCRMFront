@@ -639,7 +639,7 @@ export class TaskPageComponent implements OnInit, OnDestroy {
                 this.currentTask?.fields.reduce((acc, field) => {
                     return {
                         ...acc,
-                        [field.modelItemId]: new FormControl(Utils.getValueFromModelItem(field), CustomValidators.taskInput(field.wireframeFieldType))
+                        [field.modelItemId]: new FormControl(Utils.getValueFromModelItem(field), CustomValidators.taskInput(field.wireframeFieldType, field.variation))
                     };
                 }, {}) : {});
 

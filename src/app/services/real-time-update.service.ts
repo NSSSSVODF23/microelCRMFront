@@ -5,7 +5,7 @@ import {
     Chat, ChatUnreadCounter, City,
     Comment,
     Department,
-    Employee, House, INotification, PaidAction, PaidWork,
+    Employee, House, INotification, PaidAction, PaidWork, PingMonitoring,
     Position, Street,
     SuperMessage,
     Task,
@@ -267,6 +267,10 @@ export class RealTimeUpdateService {
     houseDeleted(id?: number) {
         if(id) return this.watch<House>('house', id.toString(), 'delete')
         return this.watch<House>('house', 'delete')
+    }
+
+    pingMonitoring(ip: string) {
+        return this.watch<PingMonitoring>('monitoring', 'ping', ip)
     }
 
     private watchUnicast<T>(...path: string[]): Observable<T> {

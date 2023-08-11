@@ -134,7 +134,7 @@
 <p-dialog [(visible)]="chooseFieldTypeDialogVisible" [modal]="true" [style]="{width:'30vw'}" header="Выбор типа данных">
     <ng-template pTemplate="content">
         <div class="flexed column p10 gap10">
-            <p-dropdown [(ngModel)]="createFieldType" [options]="fieldTypeOptions" appendTo="body"
+            <p-dropdown [(ngModel)]="createFieldType" [options]="(fieldTypeOptions | async) ?? []" appendTo="body"
                         styleClass="full-width"></p-dropdown>
             <app-button (onClick)="createField(createFieldType)" icon="add" label="Добавить"></app-button>
         </div>

@@ -3,7 +3,7 @@
         <ng-container [ngSwitch]="loadingState">
             <ng-container *ngSwitchCase="'LOADING'">
                 <div class="flexed hcenter vcenter stretched panel">
-                    <p-progressSpinner class="primary-spinner" strokeWidth="1"></p-progressSpinner>
+                    <p-progressSpinner class="custom-spinner custom-spinner-8xl custom-spinner-primary" strokeWidth="1"></p-progressSpinner>
                 </div>
             </ng-container>
             <ng-container *ngSwitchCase="'ERROR'">
@@ -24,7 +24,8 @@
 <ng-template #infoViewTemp>
     <div class="flexed column stretched h-min panel">
         <div class="flexed gap10 p10 hcenter terminator-bottom">
-            <p-button styleClass="p-button-secondary p-button-text p-button-icon" icon="mdi-arrow_back" (onClick)="customNav.backOrDefault(['/billing','search'])"></p-button>
+            <p-button (onClick)="customNav.backOrDefault(['/billing','search'])" icon="mdi-arrow_back"
+                      styleClass="p-button-secondary p-button-text p-button-icon"></p-button>
             <span class="caption size-huge wt-tiny f-color-600 with-icon">
                 <span class="mds-person caption size-xlarge"></span>
                 <span>
@@ -33,22 +34,30 @@
             </span>
             <ng-container *ngTemplateOutlet="titleTagsTemp"></ng-container>
             <div class="stretched"></div>
-            <span class="caption size-tiny wt-black f-color-300">Обновлено <app-time-elapsed [startTime]="loadingTimestamp"></app-time-elapsed> назад</span>
-            <p-button styleClass="p-button-text p-button-icon" icon="mdi-refresh" (onClick)="load()"></p-button>
+            <span class="caption size-tiny wt-black f-color-300">Обновлено <app-time-elapsed
+                    [startTime]="loadingTimestamp"></app-time-elapsed> назад</span>
+            <p-button *ngIf="currentLogin" (onClick)="update$.next(currentLogin)" icon="mdi-refresh" styleClass="p-button-text p-button-icon"></p-button>
         </div>
-        <div class="flexed column gap10 p20 terminator-bottom">
-            <ng-container *ngTemplateOutlet="mainUserInfoTemp"></ng-container>
-            <ng-container *ngTemplateOutlet="hardwareInfoTemp"></ng-container>
-            <ng-container *ngTemplateOutlet="tariffInfoTemp"></ng-container>
+        <div class="flex gap-3 p-6 terminator-bottom flex-grow-1">
+            <div class="flex flex-column gap-3">
+                <ng-container *ngTemplateOutlet="mainUserInfoTemp"></ng-container>
+                <ng-container *ngTemplateOutlet="hardwareInfoTemp"></ng-container>
+                <ng-container *ngTemplateOutlet="tariffInfoTemp"></ng-container>
+            </div>
+            <div class="flex flex-column flex-grow-1">
+                <ng-container *ngTemplateOutlet="acpInfo"></ng-container>
+            </div>
         </div>
         <div class="flexed gap10 p10 hcenter">
-            <p-button label="Создать задачу" icon="mdi-add" styleClass="p-button-success p-button-text" (onClick)="createTaskMenu.toggle($event)"></p-button>
+            <p-button (onClick)="createTaskMenu.toggle($event)" icon="mdi-add" label="Создать задачу"
+                      styleClass="p-button-success p-button-text"></p-button>
             <div class="stretched"></div>
             <span *ngIf="creditAmount" class="caption wt-tiny size-huge f-color-danger">
                 Кредит:
                 {{creditAmount | currency: 'RUB'}}
             </span>
-            <span class="caption wt-tiny size-huge f-color-primary" [ngClass]="{'f-color-primary': moneyAmount>=0, 'f-color-danger': moneyAmount<0}">
+            <span [ngClass]="{'f-color-primary': moneyAmount>=0, 'f-color-danger': moneyAmount<0}"
+                  class="caption wt-tiny size-huge f-color-primary">
                 Баланс:
                 {{moneyAmount | currency: 'RUB'}}
             </span>
@@ -57,7 +66,7 @@
 </ng-template>
 
 <ng-template #titleTagsTemp>
-    <div class="flexed gap5 hcenter" >
+    <div class="flexed gap5 hcenter">
         <ng-container [ngSwitch]="userInfo?.newTarif?.state">
             <ng-container *ngSwitchCase="1">
                 <app-colored-tag caption="Активный" color="var(--mc-500)"></app-colored-tag>
@@ -151,7 +160,7 @@
                     <span>
                         {{userInfo?.newTarif?.intIp}}
                     </span>
-                    <span class="caption wt-bold" [style.color]="isOnline ? 'var(--scs-500)' : 'var(--danger-500)'">
+                    <span [style.color]="isOnline ? 'var(--scs-500)' : 'var(--danger-500)'" class="caption wt-bold">
                         {{isOnline ? 'Онлайн' : 'Офлайн'}}
                     </span>
                 </span>
@@ -164,7 +173,8 @@
                     {{userInfo?.newTarif?.last | date: 'dd MMMM yyyy HH:mm:ss' | titlecase}}
                     ({{userInfo?.newTarif?.last | elapsedTime:'':' назад':false:true}})
                 </span>
-                <span class="mdi-help_outline caption size-big f-color-300" pTooltip="Момент времени, когда оборудование отправило запрос серверу."></span>
+                <span class="mdi-help_outline caption size-big f-color-300"
+                      pTooltip="Момент времени, когда оборудование отправило запрос серверу."></span>
             </span>
         </div>
     </div>
@@ -246,7 +256,8 @@
                 <span class="caption">
                     {{userInfo?.newTarif?.edate | date: 'dd MMMM yyyy HH:mm' | titlecase}}
                 </span>
-                <span class="mdi-help_outline caption size-big f-color-300" pTooltip="Дата начала и окончания действия основного тарифа. (Дата списания)"></span>
+                <span class="mdi-help_outline caption size-big f-color-300"
+                      pTooltip="Дата начала и окончания действия основного тарифа. (Дата списания)"></span>
             </span>
             <span *ngIf="isEndTariffDateAfter">
                 <span class="caption wt-black size-small f-color-500">
@@ -263,8 +274,39 @@
                 <span class="caption">
                     {{userInfo?.newTarif?.endstate | date: 'dd MMMM yyyy HH:mm' | titlecase}}
                 </span>
-                <span class="mdi-help_outline caption size-big f-color-300" pTooltip="Момент времени, когда произойдет изменение состояния абонента. (Прим. закончится отл. платеж)"></span>
+                <span class="mdi-help_outline caption size-big f-color-300"
+                      pTooltip="Момент времени, когда произойдет изменение состояния абонента. (Прим. закончится отл. платеж)"></span>
             </span>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #acpInfo>
+    <div class="flex flex-column overflow-hidden border-round-md border-bluegray-100 border-1">
+        <div class="p-3 text-sm text-bluegray-400 bg-bluegray-50 border-bottom-1 border-bluegray-100">
+            Оборудование абонента
+        </div>
+        <div class="flex flex-column p-3 gap-2 overflow-auto" [style.max-height]="'15rem'">
+            <div *ngFor="let binding of (dhcpBindings$ | async); trackBy: trackByDhcpBinding"
+                 class="flex border-round-md border-bluegray-100 border-1 p-2 text-sm">
+                <div class="flex flex-column gap-2 flex-grow-1">
+                    <div class="flex gap-2 align-items-center">
+                        <span [style]="{backgroundColor:binding.onlineStatus === 'ONLINE' ? 'var(--green-400)' : 'var(--red-400)'}"
+                              class="border-circle w-1rem h-1rem"></span>
+                        <span class="font-bold text-bluegray-600">{{binding.macaddr}}</span>
+                        <span class="text-primary-400">{{binding.dhcpHostname}}</span>
+                        <span *ngIf="binding.isAuth" class="text-green-400 font-bold">Авторизован</span>
+                    </div>
+                    <div class="flex gap-2 align-items-center">
+                        <app-ip-view *ngIf="binding.ipaddr" [ip]="binding.ipaddr"></app-ip-view>
+                        <span>VLAN: {{binding.vlanid}}</span>
+                        <span>Смена состояния: <app-time-elapsed [startTime]="binding.sessionTime" type="short"></app-time-elapsed> назад</span>
+                    </div>
+                </div>
+                <div class="flex align-items-center">
+                    <p-button icon="mdi-more_vert" styleClass="p-button-rounded p-button-icon p-button-text p-button-secondary"></p-button>
+                </div>
+            </div>
         </div>
     </div>
 </ng-template>

@@ -1,3 +1,8 @@
 <div appExtendPageHeight class="flexed column gap10 hcenter vcenter p10">
-    <app-works-picker [formControl]="workPickerControl" [employees]="[{fullName: 'Все сотрудники', login:'s'}]"></app-works-picker>
+    <ng-container *ngIf="unsub">
+        <ng-container *ngFor="let ip of ips">
+            <app-ip-view [ip]="ip"></app-ip-view>
+        </ng-container>
+    </ng-container>
+    <p-button (onClick)="unsub=!unsub" icon="mdi-close" label="Отключить"></p-button>
 </div>

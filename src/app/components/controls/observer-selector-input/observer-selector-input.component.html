@@ -1,5 +1,12 @@
 <p-autoComplete [formControl]="control" [showClear]="true" [showEmptyMessage]="true"
-                [suggestions]="suggestions" emptyMessage="Наблюдатели не найдены"
+                [suggestions]="suggestions" emptyMessage="Наблюдатели не найдены" styleClass="w-full block transparent-ac-token" inputStyleClass="w-5rem"
                 field="name" [forceSelection]="true" placeholder="Наблюдатели" (onBlur)="onTouched()"
                 (completeMethod)="search($event)" appendTo="body" [completeOnFocus]="true"
-                [multiple]="true"></p-autoComplete>
+                [multiple]="true">
+    <ng-template let-value pTemplate="selectedItem">
+        <div class="text-xs text-primary-400 px-2 py-1 bg-primary-50 border-round-md font-bold">{{value.name}}</div>
+    </ng-template>
+    <ng-template let-value pTemplate="item">
+        <span>{{value.name}}</span>
+    </ng-template>
+</p-autoComplete>

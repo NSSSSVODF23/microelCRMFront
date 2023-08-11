@@ -13,6 +13,7 @@ export enum WireframeFieldType {
     IP = "IP",
     EQUIPMENTS = "EQUIPMENTS",
     CONNECTION_SERVICES = "CONNECTION_SERVICES",
+    CONNECTION_TYPE = "CONNECTION_TYPE",
     PHONE_ARRAY = "PHONE_ARRAY",
 }
 
@@ -223,6 +224,7 @@ export interface ModelItem {
     id: string;
     name?: string;
     wireframeFieldType: WireframeFieldType;
+    variation?: string;
     addressData?: Address;
     booleanData?: boolean;
     integerData?: number;
@@ -230,6 +232,7 @@ export interface ModelItem {
     stringData?: string;
     timestampData?: string;
     phoneData?: { [id: string]: string };
+    connectionServicesData?: { connectionService: string }[];
     textRepresentation?: string;
 }
 
@@ -1049,6 +1052,14 @@ export interface BillingTotalUserInfo {
     oldTarif: BillingOldTarifItem[];
     state: string;
     uname: string;
+}
+
+export interface PingMonitoring{
+    ip: string;
+    reachablePercentage: number;
+    delayAvg: number;
+    isReachable: boolean;
+    chartData: any;
 }
 
 export class CacheUnit<T> {

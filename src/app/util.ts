@@ -146,7 +146,10 @@ export class Utils {
             case WireframeFieldType.LARGE_TEXT:
             case WireframeFieldType.LOGIN:
             case WireframeFieldType.SMALL_TEXT:
+            case WireframeFieldType.CONNECTION_TYPE:
                 return modelItem.stringData;
+            case WireframeFieldType.CONNECTION_SERVICES:
+                return modelItem.connectionServicesData;
             default:
                 return null;
         }
@@ -172,8 +175,12 @@ export class Utils {
             case WireframeFieldType.IP:
             case WireframeFieldType.LARGE_TEXT:
             case WireframeFieldType.LOGIN:
+            case WireframeFieldType.CONNECTION_TYPE:
             case WireframeFieldType.SMALL_TEXT:
                 fieldItem.stringData = formValue;
+                break;
+            case WireframeFieldType.CONNECTION_SERVICES:
+                fieldItem.connectionServicesData = formValue;
                 break;
             default:
                 break;
@@ -213,6 +220,7 @@ export class FormToModelItemConverter {
                 id: fieldItem.id,
                 wireframeFieldType: fieldItem.type,
                 name: fieldItem.name,
+                variation: fieldItem.variation
             }
 
             switch (fieldItem.type) {
@@ -220,6 +228,7 @@ export class FormToModelItemConverter {
                 case WireframeFieldType.LARGE_TEXT:
                 case WireframeFieldType.LOGIN:
                 case WireframeFieldType.IP:
+                case WireframeFieldType.CONNECTION_TYPE:
                     modelItem.stringData = formValue;
                     break;
                 case WireframeFieldType.ADDRESS:
@@ -236,6 +245,9 @@ export class FormToModelItemConverter {
                     break;
                 case WireframeFieldType.FLOAT:
                     modelItem.floatData = formValue;
+                    break;
+                case WireframeFieldType.CONNECTION_SERVICES:
+                    modelItem.connectionServicesData = formValue;
                     break;
             }
 

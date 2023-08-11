@@ -59,7 +59,7 @@
                 <ng-container *ngIf="tableLoadingState!=='READY'" [ngSwitch]="tableLoadingState">
                     <div *ngSwitchCase="'LOADING'" [style.width]="'64rem'"
                          class="flex align-items-center justify-content-center p-3">
-                        <p-progressSpinner class="primary-spinner" strokeWidth="1"></p-progressSpinner>
+                        <p-progressSpinner class="custom-spinner custom-spinner-8xl custom-spinner-primary" strokeWidth="1"></p-progressSpinner>
                     </div>
                 </ng-container>
             </div>
@@ -171,7 +171,7 @@
                     <div *ngIf="calculatedLoadingState !== 'READY'"
                          class="flex align-items-center justify-content-center p-3 border-round-md border-1 border-bluegray-100 overflow-hidden">
                         <ng-container [ngSwitch]="calculatedLoadingState">
-                            <p-progressSpinner *ngSwitchCase="'LOADING'" class="primary-spinner"
+                            <p-progressSpinner *ngSwitchCase="'LOADING'" class="custom-spinner custom-spinner-8xl custom-spinner-primary"
                                                strokeWidth="1"></p-progressSpinner>
                             <div *ngSwitchCase="'ERROR'"
                                  class="flex flex-column text-danger align-items-center text-xl">

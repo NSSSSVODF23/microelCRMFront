@@ -90,9 +90,14 @@
 
     <div *ngSwitchCase="'CONNECTION_SERVICES'" class="input-label-wrapper">
         <ng-container *ngTemplateOutlet="label"></ng-container>
-        <input (blur)="onTouched()" (ngModelChange)="onChange($event)" [(ngModel)]="controlValue"
-               [disabled]="disable"
-               appRegexPatternChecker pInputText patternRx="^[\dA-z_]+$">
+        <app-connection-services-input (onBlur)="onTouched()" [isDisabled]="disable" (ngModelChange)="onChange($event)"
+                                       [(ngModel)]="controlValue"></app-connection-services-input>
+    </div>
+
+    <div *ngSwitchCase="'CONNECTION_TYPE'" class="input-label-wrapper">
+        <ng-container *ngTemplateOutlet="label"></ng-container>
+        <p-dropdown (onBlur)="onTouched()" (ngModelChange)="onChange($event)" placeholder="Тип подключения" appendTo="body" [(ngModel)]="controlValue"
+                    [disabled]="disable" [options]="(connectionTypes$ | async) ?? []"></p-dropdown>
     </div>
 
     <div *ngSwitchCase="'PHONE_ARRAY'" class="input-label-wrapper">

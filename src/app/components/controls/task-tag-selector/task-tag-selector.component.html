@@ -9,7 +9,7 @@
     </p-overlay>
 </div>
 <div class="p-inputgroup" *ngIf="focused">
-    <p-autoComplete #inputEl [formControl]="control" [suggestions]="suggestions" styleClass="task-tag-selector w-full"
+    <p-autoComplete #inputEl [formControl]="control" [suggestions]="suggestions" styleClass="transparent-ac-token w-full" inputStyleClass="w-full"
                     (completeMethod)="search($event)" [multiple]="true" appendTo="body" [completeOnFocus]="true">
         <ng-template let-value pTemplate="selectedItem">
             <span class="tags-view-item" [style.background-color]="value.color">{{value.name}}</span>

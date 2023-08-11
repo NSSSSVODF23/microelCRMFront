@@ -20,7 +20,7 @@
             <ng-container [ngSwitch]="taskService.loadingState">
                 <div *ngSwitchCase="'LOADING'"
                      class="flexed stretched hcenter vcenter caption size-big wt-bold f-color-500">
-                    <p-progressSpinner class="primary-spinner" strokeWidth="1"></p-progressSpinner>
+                    <p-progressSpinner class="custom-spinner custom-spinner-8xl custom-spinner-primary" strokeWidth="1"></p-progressSpinner>
                 </div>
 
                 <ng-container *ngSwitchCase="'READY'">

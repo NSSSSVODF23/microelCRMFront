@@ -1,0 +1,41 @@
+<ng-container *ngIf="ping$ | async as ping">
+    <div (mouseenter)="chartVisibleChange$.next(true)" (mouseleave)="chartVisibleChange$.next(false)"
+         class="flex align-items-center border-1 border-bluegray-100 border-round-md cursor-auto">
+        <span [class]="(ping.isReachable ? 'mdi-check text-green-400':'mdi-close text-red-400') + ' text-sm p-2 terminator-right'"></span>
+        <span class="text-sm font-bold px-2 select-none
+         transition-colors transition-duration-150 transition-ease-in-out terminator-right" [style.color]="breath$ | async">
+            {{ip}}
+        </span>
+        <span (click)="copyMessage(ip)" class="mdi-copy text-sm p-2 cursor-pointer text-primary-400 hover:text-primary" pTooltip="Скопировать"></span>
+        <ng-container *ngIf="remoteAccess$ | async as remoteAccess">
+            <span *ngIf="remoteAccess.webPort" (click)="openWeb(ip, remoteAccess.webPort)" pTooltip="Удаленное управление"
+                  class="mdi-public text-sm p-2 cursor-pointer text-primary-400 hover:text-primary"></span>
+        </ng-container>
+    </div>
+    <p-overlay [visible]="(chartVisible$ | async)??false" appendTo="body"
+               contentStyleClass="overlay pointer-events-none">
+        <ng-template pTemplate="content">
+            <div class="flex gap-1 p-2 align-items-center text-xs text-bluegray-400 font-bold">
+                <span class="mdi-network_ping"></span> <span>Ping</span>
+            </div>
+            <p-chart [data]="ping.chartData" [options]="chartOptions" type="line"></p-chart>
+            <div class="flex gap-3 font-bold text-xs text-bluegray-300 p-2 justify-content-end">
+                <span>
+                    Сред.: {{ping.delayAvg|number:'1.2-2'}}мс
+                </span>
+                <span [ngClass]="{'text-red-400': ping.reachablePercentage < 100}">
+                    Потери: {{100 - ping.reachablePercentage|number:'1.2-2'}}%
+                </span>
+            </div>
+        </ng-template>
+    </p-overlay>
+</ng-container>
+<ng-container *ngIf="!(ping$|async)">
+    <div class="flex align-items-center border-1 border-bluegray-100 border-round-md cursor-auto">
+        <div class="p-2 terminator-right">
+            <p-progressSpinner animationDuration=".5s" class="custom-spinner custom-spinner-sm custom-spinner-gray"
+                               strokeWidth="2"></p-progressSpinner>
+        </div>
+        <span class="text-sm font-bold text-bluegray-400 px-2 select-none">{{ip}}</span>
+    </div>
+</ng-container>

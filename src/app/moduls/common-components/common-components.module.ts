@@ -161,6 +161,12 @@ import {
     EmployeeSumDistributionComponent
 } from "../../components/controls/employee-sum-distribution/employee-sum-distribution.component";
 import {TooltipDirective} from "../../directives/tooltip.directive";
+import {IpViewComponent} from "../../components/panels/ip-view/ip-view.component";
+import {ChartModule} from "primeng/chart";
+import {CopyClipboardDirective} from "../../directives/copy-clipboard.directive";
+import {
+    ConnectionServicesInputComponent
+} from "../../components/controls/connection-services-input/connection-services-input.component";
 
 
 @NgModule({
@@ -245,7 +251,10 @@ import {TooltipDirective} from "../../directives/tooltip.directive";
         PreventInputDirective,
         WorksPickerComponent,
         EmployeeSumDistributionComponent,
-        TooltipDirective
+        TooltipDirective,
+        IpViewComponent,
+        CopyClipboardDirective,
+        ConnectionServicesInputComponent
     ],
     exports: [
         AccountPanelComponent,
@@ -328,7 +337,10 @@ import {TooltipDirective} from "../../directives/tooltip.directive";
         PreventInputDirective,
         WorksPickerComponent,
         EmployeeSumDistributionComponent,
-        TooltipDirective
+        TooltipDirective,
+        IpViewComponent,
+        CopyClipboardDirective,
+        ConnectionServicesInputComponent
     ],
     imports: [
         CommonPipesModule,
@@ -376,6 +388,7 @@ import {TooltipDirective} from "../../directives/tooltip.directive";
         TableModule,
         SlideMenuModule,
         DragDropModule,
+        ChartModule,
     ],
     providers: [
         {
