@@ -225,7 +225,6 @@ export class TaskCalendarPageComponent implements OnInit, OnDestroy {
     }
 
     private scheduleResizing(event: EventResizeDoneArg) {
-        console.log(event)
     }
 
     /* Проверяет запланирована ли задача, есть ли уже в календаре, находится ли дата в диапазоне календаря.
@@ -239,7 +238,6 @@ export class TaskCalendarPageComponent implements OnInit, OnDestroy {
         if (task.actualFrom) {
             const startMs = new Date(task.actualFrom).getTime();
             startPass = this.currentCalendarRange.start <= startMs && startMs <= this.currentCalendarRange.end;
-            console.log(task, startPass, this.currentCalendarRange);
         }
         if (task.actualTo) {
             const endMs = new Date(task.actualTo).getTime();

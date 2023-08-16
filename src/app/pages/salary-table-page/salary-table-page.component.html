@@ -3,14 +3,14 @@
         <app-main-menu-panel></app-main-menu-panel>
         <div class="flex flex-column gap-3 flex-grow-1">
             <div class="flex flex-column panel overflow-hidden">
-                <div [formGroup]="filtrationForm" class="flex gap-3 p-2">
+                <div [formGroup]="cache.filtrationForm" class="flex gap-3 p-2">
                     <div class="p-inputgroup w-max">
                         <span class="p-inputgroup-addon"><i class="mdi-calendar_month"></i></span>
                         <p-calendar [readonlyInput]="true" appendTo="body" dateFormat="MM yy"
                                     formControlName="date" inputStyleClass="border-noround-left"
                                     view="month"></p-calendar>
                     </div>
-                    <div *ngIf="positions$|async as pos" class="flex gap-2 align-items-center">
+                    <div *ngIf="cache.positions$|async as pos" class="flex gap-2 align-items-center">
                         <span class="caption wt-black f-color-500 size-small with-icon">
                             <i class="mdi-group"></i>
                             <span>Должность</span>
@@ -19,10 +19,10 @@
                                     placeholder="Должность"></p-dropdown>
                     </div>
                     <div class="flex-grow-1"></div>
-                    <p-toggleButton [formControl]="ndflSwitch" offLabel="БЕЗ НДФЛ" onLabel="С НДФЛ"></p-toggleButton>
+                    <p-toggleButton [formControl]="cache.ndflSwitch" offLabel="БЕЗ НДФЛ" onLabel="С НДФЛ"></p-toggleButton>
                 </div>
-                <ng-container *ngIf="salaryTable$|async as salaryTable">
-                    <ng-container *ngIf="tableLoadingState==='READY'">
+                <ng-container *ngIf="cache.salaryTable$|async as salaryTable">
+                    <ng-container *ngIf="cache.tableLoadingState==='READY'">
                         <p-table [columns]="salaryTable.headers" [value]="salaryTable.payload"
                                  styleClass="p-datatable-sm">
                             <ng-template let-columns pTemplate="header">
@@ -37,41 +37,41 @@
                                     <td>
                                         <app-employee-label [employee]="salaryTable.employees[i]"></app-employee-label>
                                     </td>
-                                    <td (click)="selectDay(cell, i, colI)"
-                                        *ngFor="let cell of rowData; let colI = index; trackBy: trackByCell"
-                                        [ngClass]="{ 'text-primary-400 bg-blue-50': isSelected(i, colI) }"
+                                    <td (click)="cache.selectDay(cell, i, colI)"
+                                        *ngFor="let cell of rowData; let colI = index; trackBy: cache.trackByCell"
+                                        [ngClass]="{ 'text-primary-400 bg-blue-50': cache.isSelected(i, colI) }"
                                         class="caption size-tiny f-inline cursor-pointer hover:text-primary-400">
-                                        {{(ndflValue$|async) ? cell.sumWithNDFL : cell.sumWithoutNDFL}}
+                                        {{(cache.ndflValue$|async) ? cell.sumWithNDFL : cell.sumWithoutNDFL}}
                                     </td>
                                     <td class="caption size-tiny">
-                                        {{(ndflValue$|async) ? salaryTable.totalSum[i].sumWithNDFL : salaryTable.totalSum[i].sumWithoutNDFL}}
+                                        {{(cache.ndflValue$|async) ? salaryTable.totalSum[i].sumWithNDFL : salaryTable.totalSum[i].sumWithoutNDFL}}
                                     </td>
                                 </tr>
                             </ng-template>
                         </p-table>
                         <div class="flexed gap5 vend caption size-big wt-tiny p10">
                             <span>Итог:</span>
-                            <span>{{(ndflValue$|async) ? salaryTable.totalSumAllEmployees.sumWithNDFL : salaryTable.totalSumAllEmployees.sumWithoutNDFL}}
+                            <span>{{(cache.ndflValue$|async) ? salaryTable.totalSumAllEmployees.sumWithNDFL : salaryTable.totalSumAllEmployees.sumWithoutNDFL}}
                                 руб.</span>
                         </div>
                     </ng-container>
                 </ng-container>
-                <ng-container *ngIf="tableLoadingState!=='READY'" [ngSwitch]="tableLoadingState">
+                <ng-container *ngIf="cache.tableLoadingState!=='READY'" [ngSwitch]="cache.tableLoadingState">
                     <div *ngSwitchCase="'LOADING'" [style.width]="'64rem'"
                          class="flex align-items-center justify-content-center p-3">
                         <p-progressSpinner class="custom-spinner custom-spinner-8xl custom-spinner-primary" strokeWidth="1"></p-progressSpinner>
                     </div>
                 </ng-container>
             </div>
-            <div *ngIf="selectedDay$|async as selectedDay" class="flex flex-column panel p-3 gap-3">
+            <div *ngIf="cache.selectedDay$|async as selectedDay" class="flex flex-column panel p-3 gap-3">
                 <div class="flex align-items-center gap-3">
                     <app-employee-label [employee]="selectedDay.employee"></app-employee-label>
                     <span class="caption text-sm text-bluegray-400">{{selectedDay.date | date: 'EEEE, dd MMMM yyyy' | titlecase}}</span>
                 </div>
                 <div class="flex flex-column gap-1">
                     <span class="text-bluegray-400 text-lg font-semibold">Подсчитанные работы</span>
-                    <ng-container *ngIf="workingDay$|async as workingDay">
-                        <p-table *ngIf="calculatedLoadingState === 'READY'"
+                    <ng-container *ngIf="cache.workingDay$|async as workingDay">
+                        <p-table *ngIf="cache.calculatedLoadingState === 'READY'"
                                  [value]="workingDay.calculations" dataKey="workCalculationId"
                                  styleClass="border-round-md border-1 border-bluegray-100 overflow-hidden">
                             <ng-template pTemplate="header">
@@ -121,7 +121,7 @@
                                     </td>
                                     <td>
                                         <span [style.max-width]="'20rem'" appTooltip class="text-max-lines-3 text-sm">
-                                            {{getReport(rowData.workLog.workReports, selectedDay.employee.login)}}
+                                            {{cache.getReport(rowData.workLog.workReports, selectedDay.employee.login)}}
                                         </span>
                                     </td>
                                     <td>
@@ -168,9 +168,9 @@
                             </ng-template>
                         </p-table>
                     </ng-container>
-                    <div *ngIf="calculatedLoadingState !== 'READY'"
+                    <div *ngIf="cache.calculatedLoadingState !== 'READY'"
                          class="flex align-items-center justify-content-center p-3 border-round-md border-1 border-bluegray-100 overflow-hidden">
-                        <ng-container [ngSwitch]="calculatedLoadingState">
+                        <ng-container [ngSwitch]="cache.calculatedLoadingState">
                             <p-progressSpinner *ngSwitchCase="'LOADING'" class="custom-spinner custom-spinner-8xl custom-spinner-primary"
                                                strokeWidth="1"></p-progressSpinner>
                             <div *ngSwitchCase="'ERROR'"

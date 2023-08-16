@@ -160,7 +160,6 @@ export class TrackerBindingsInputComponent implements OnInit, ControlValueAccess
 
     ngOnInit(): void {
         this.bindingsForm.valueChanges.subscribe(value => {
-            console.log(value);
             this.onChange(value);
         })
     }

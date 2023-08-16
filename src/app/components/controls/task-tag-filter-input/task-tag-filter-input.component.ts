@@ -55,7 +55,6 @@ export class TaskTagFilterInputComponent implements OnInit, OnDestroy, ControlVa
         this.subscription.addSubscription('change', this.control.valueChanges
             .pipe(map(value => value ?? []))
             .subscribe(value => {
-                console.log(value);
                 this.onChange(value);
             }))
     }

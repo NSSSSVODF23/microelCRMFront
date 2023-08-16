@@ -28,6 +28,12 @@ export class CustomValidators {
                     if (!Array.isArray(control.value) || control.value.length === 0) return {'required': true};
                     return null;
                 }
+            case WireframeFieldType.EQUIPMENTS:
+                return (control: AbstractControl): ValidationErrors | null => {
+                    if (CustomValidators.isValueEmpty(control.value)) return {'required': true};
+                    if (!Array.isArray( control.value) || control.value.length === 0) return {'required': true};
+                    return null;
+                }
             case WireframeFieldType.PHONE_ARRAY:
                 return (control: AbstractControl): ValidationErrors | null => {
                     if (CustomValidators.isValueEmpty(control.value)) return {'required': true};
@@ -97,14 +103,12 @@ export class CustomValidators {
     static isValidUUID(uuid: any) {
         if (typeof uuid !== 'string') return false;
         const regexExp = /^[0-9a-fA-F]{8}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{12}$/gi;
-        console.log(`isValidUUID: ${uuid} ${regexExp.test(uuid)}`);
         return regexExp.test(uuid);
     }
 
     static isValidPhone(phone: any) {
         if (typeof phone !== 'string') return false;
         const regexExp = /^8 \(\d{3}\) \d{3}-\d{2}-\d{2}$/;
-        console.log(`isValidPhone: ${phone} ${regexExp.test(phone)}`);
         return regexExp.test(phone);
     }
 }

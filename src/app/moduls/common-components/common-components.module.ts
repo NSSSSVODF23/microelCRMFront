@@ -167,6 +167,10 @@ import {CopyClipboardDirective} from "../../directives/copy-clipboard.directive"
 import {
     ConnectionServicesInputComponent
 } from "../../components/controls/connection-services-input/connection-services-input.component";
+import {
+    ClientEquipmentListInputComponent
+} from "../../components/controls/client-equipment-list-input/client-equipment-list-input.component";
+import {CountInputComponent} from "../../components/controls/count-input/count-input.component";
 
 
 @NgModule({
@@ -254,7 +258,9 @@ import {
         TooltipDirective,
         IpViewComponent,
         CopyClipboardDirective,
-        ConnectionServicesInputComponent
+        ConnectionServicesInputComponent,
+        ClientEquipmentListInputComponent,
+        CountInputComponent
     ],
     exports: [
         AccountPanelComponent,
@@ -340,7 +346,9 @@ import {
         TooltipDirective,
         IpViewComponent,
         CopyClipboardDirective,
-        ConnectionServicesInputComponent
+        ConnectionServicesInputComponent,
+        ClientEquipmentListInputComponent,
+        CountInputComponent
     ],
     imports: [
         CommonPipesModule,

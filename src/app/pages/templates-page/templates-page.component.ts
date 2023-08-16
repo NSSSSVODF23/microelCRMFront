@@ -1,10 +1,11 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
 import {ApiService} from "../../services/api.service";
-import {LoadingState, TaskTag, Wireframe} from "../../transport-interfaces";
+import {ClientEquipment, LoadingState, TaskTag, Wireframe} from "../../transport-interfaces";
 import {RealTimeUpdateService} from "../../services/real-time-update.service";
 import {SubscriptionsHolder} from "../../util";
 import {ConfirmationService} from "primeng/api";
-import {FormControl} from "@angular/forms";
+import {FormControl, FormGroup, Validators} from "@angular/forms";
+import {map, merge, of, shareReplay, switchMap, tap} from "rxjs";
 
 @Component({
     templateUrl: './templates-page.component.html',
@@ -23,6 +24,8 @@ export class TemplatesPageComponent implements OnInit, OnDestroy {
 
     templateLoadingState: LoadingState = LoadingState.LOADING;
     tagLoadingState: LoadingState = LoadingState.LOADING;
+    equipmentLoadingState = LoadingState.LOADING;
+
     templateLoadingHandler = {
         next: (response: Wireframe[]) => {
             this.templateLoadingState = response.length > 0 ? LoadingState.READY : LoadingState.EMPTY;
@@ -41,6 +44,66 @@ export class TemplatesPageComponent implements OnInit, OnDestroy {
             this.tagLoadingState = LoadingState.ERROR
         }
     }
+
+    equipmentsFilterForm = new FormGroup({
+        query: new FormControl(''),
+        isDeleted: new FormControl(false)
+    });
+    changeEquipmentFilters$ = this.equipmentsFilterForm.valueChanges.pipe(shareReplay(1));
+    equipmentsLoading$ = merge(this.changeEquipmentFilters$, of({query: '', isDeleted: false})).pipe(
+        tap(() => this.equipmentLoadingState = LoadingState.LOADING),
+        switchMap((filters) => this.api.getClientEquipments(filters.query, filters.isDeleted)),
+        tap({
+            next: (value) => this.equipmentLoadingState = value.length > 0 ? LoadingState.READY : LoadingState.EMPTY,
+            error: () => this.equipmentLoadingState = LoadingState.ERROR
+        }),
+        shareReplay(1)
+    );
+    equipmentsCreating$ = this.rt.clientEquipmentsCreated().pipe(
+        switchMap((create) => this.equipmentsLoading$.pipe(
+            map(equipments => {
+                const index = equipments.findIndex(e => e.clientEquipmentId === create.clientEquipmentId);
+                if (index === -1)
+                    equipments.unshift(create);
+                return equipments
+            })
+        ))
+    )
+    equipmentsUpdating$ = this.rt.clientEquipmentsUpdated().pipe(
+        switchMap((update) => this.equipmentsLoading$.pipe(
+            map(equipments => {
+                const index = equipments.findIndex(e => e.clientEquipmentId === update.clientEquipmentId);
+                if (index !== -1)
+                    equipments[index] = update;
+                return equipments
+            })
+        ))
+    );
+    equipmentDeleting$ = this.rt.clientEquipmentsDeleted().pipe(
+        switchMap((del) => this.equipmentsLoading$.pipe(
+            map(equipments => {
+                const index = equipments.findIndex(e => e.clientEquipmentId === del.clientEquipmentId);
+                if (this.equipmentsFilterForm.value.isDeleted) {
+                    equipments[index] = del;
+                } else {
+                    if (index !== -1)
+                        equipments.splice(index, 1);
+                }
+                return equipments
+            })
+        ))
+    )
+
+    equipments$ = merge(this.equipmentsLoading$, this.equipmentsCreating$, this.equipmentsUpdating$, this.equipmentDeleting$).pipe(shareReplay(1));
+    showEquipmentDialog = false;
+    isEquipmentCreating = false;
+    editionEquipmentId?: number;
+
+    equipmentForm = new FormGroup({
+        name: new FormControl('', [Validators.required]),
+        description: new FormControl(''),
+        price: new FormControl(0, [Validators.required]),
+    })
 
     constructor(readonly api: ApiService, readonly rt: RealTimeUpdateService, readonly confirmation: ConfirmationService) {
     }
@@ -64,8 +127,9 @@ export class TemplatesPageComponent implements OnInit, OnDestroy {
         this.api.getTaskTags().subscribe(this.tagLoadingHandler);
         this.subscription.addSubscription('swDelTag', this.deletedTagsSwitcher.valueChanges.subscribe(value => {
             this.tagLoadingState = LoadingState.LOADING;
-            this.api.getTaskTags(value??false).subscribe(this.tagLoadingHandler);
+            this.api.getTaskTags(value ?? false).subscribe(this.tagLoadingHandler);
         }));
+
     }
 
     ngOnDestroy(): void {
@@ -86,7 +150,7 @@ export class TemplatesPageComponent implements OnInit, OnDestroy {
     tagDeleted(tag: TaskTag) {
         const index = this.availableTags.findIndex(item => item.taskTagId === tag.taskTagId);
         if (index >= 0) {
-            if(tag.deleted && this.deletedTagsSwitcher.value) {
+            if (tag.deleted && this.deletedTagsSwitcher.value) {
                 this.availableTags[index].deleted = true;
                 return;
             }
@@ -108,7 +172,7 @@ export class TemplatesPageComponent implements OnInit, OnDestroy {
     templateDeleted(wireframe: Wireframe) {
         const index = this.templateItems.findIndex(item => item.wireframeId === wireframe.wireframeId);
         if (index >= 0) {
-            if(wireframe.deleted && this.deletedTemplatesSwitcher.value) {
+            if (wireframe.deleted && this.deletedTemplatesSwitcher.value) {
                 this.templateItems[index].deleted = true;
                 return;
             }
@@ -142,6 +206,18 @@ export class TemplatesPageComponent implements OnInit, OnDestroy {
         this.showCreateTagDialog = true;
     }
 
+    openCreateEquipmentDialog() {
+        this.equipmentForm.reset();
+        this.showEquipmentDialog = true;
+        this.editionEquipmentId = undefined;
+    }
+
+    openEditEquipmentDialog(equipment: ClientEquipment) {
+        this.equipmentForm.patchValue(equipment);
+        this.showEquipmentDialog = true;
+        this.editionEquipmentId = equipment.clientEquipmentId;
+    }
+
     confirmDeleteWireframe(event: Event, wireframeId: number) {
         event.stopPropagation();
         this.confirmation.confirm({
@@ -157,6 +233,46 @@ export class TemplatesPageComponent implements OnInit, OnDestroy {
 
     trackByTag(index: number, item: TaskTag) {
         return item.taskTagId + item.name + item.color;
+    }
+
+    trackByClientEquipment(index: number, item: ClientEquipment) {
+        return item.clientEquipmentId + item.name + item.description + item.price;
+    };
+
+    createEquipment() {
+        this.isEquipmentCreating = true;
+        this.api.createClientEquipment(this.equipmentForm.value).subscribe({
+            next: () => {
+                this.isEquipmentCreating = false;
+                this.showEquipmentDialog = false;
+            },
+            error: () => {
+                this.isEquipmentCreating = false;
+            }
+        })
+    }
+
+    editEquipment() {
+        if (!this.editionEquipmentId) return;
+        this.isEquipmentCreating = true;
+        this.api.editClientEquipment(this.editionEquipmentId, this.equipmentForm.value).subscribe({
+            next: () => {
+                this.isEquipmentCreating = false;
+                this.showEquipmentDialog = false;
+            },
+            error: () => {
+                this.isEquipmentCreating = false;
+            }
+        })
+    }
+
+    confirmDeleteEquipment(event: MouseEvent, equipment: ClientEquipment) {
+        event.stopPropagation();
+        this.confirmation.confirm({
+            header: "Подтверждение",
+            message: "Удалить оборудование?",
+            accept: () => this.api.deleteClientEquipment(equipment.clientEquipmentId).subscribe()
+        })
     }
 
     // Private methods to convert hsl color value to hex color value

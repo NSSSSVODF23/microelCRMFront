@@ -91,6 +91,9 @@ import {ChipsModule} from "primeng/chips";
 import {InputMaskModule} from "primeng/inputmask";
 import {AngularYandexMapsModule, YaConfig} from "angular8-yandex-maps";
 import {BypassWorkCalculationComponent} from "../../pages/bypass-work-calculation/bypass-work-calculation.component";
+import {BillingSettingsPageComponent} from "../../pages/billing-settings-page/billing-settings-page.component";
+import {TelegramSettingsPageComponent} from "../../pages/telegram-settings-page/telegram-settings-page.component";
+import {AcpSettingsPageComponent} from "../../pages/acp-settings-page/acp-settings-page.component";
 
 const mapConfig: YaConfig = {
     apikey: '008574e5-f34b-4270-b3d5-91aaabd036e8',
@@ -118,7 +121,10 @@ const mapConfig: YaConfig = {
         BillingSearchUserPageComponent,
         BillingUserPageComponent,
         AddressesListPageComponent,
-        BypassWorkCalculationComponent
+        BypassWorkCalculationComponent,
+        BillingSettingsPageComponent,
+        TelegramSettingsPageComponent,
+        AcpSettingsPageComponent
     ],
     imports: [
         CommonComponentsModule,

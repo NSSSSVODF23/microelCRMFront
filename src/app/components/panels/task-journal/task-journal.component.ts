@@ -282,7 +282,6 @@ export class TaskJournalComponent implements OnInit, OnDestroy{
 
     selectCommentToReply(entry: Comment) {
         this.replyComment = entry;
-        console.log(this.replyComment)
         this.replyCommentChange.emit(this.replyComment);
     }
 

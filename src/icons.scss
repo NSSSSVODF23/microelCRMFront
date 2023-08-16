@@ -8852,6 +8852,10 @@
 
 .mds {
 
+  &-router{
+    @include mds("router");
+  }
+
   &-sync{
     @include mds("sync");
   }

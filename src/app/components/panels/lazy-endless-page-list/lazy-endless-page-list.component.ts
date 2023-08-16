@@ -46,7 +46,6 @@ export class LazyEndlessPageListComponent implements OnInit, AfterViewInit {
             this.topScrollPosition = window.scrollY;
         this.bottomScrollPosition = window.scrollY + window.innerHeight;
         this.viewportHeight = this.bottomScrollPosition - this.topScrollPosition;
-        if(this.endlessWrapper) console.log(`Top: ${-this.endlessWrapper.nativeElement.getBoundingClientRect().y} Bottom: ${this.bottomScrollPosition} Viewport: ${this.viewportHeight}`);
     }
 
 }

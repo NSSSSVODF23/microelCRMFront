@@ -741,14 +741,12 @@ export class TaskPageComponent implements OnInit, OnDestroy {
     }
 
     private workLogCreated(workLog: WorkLog) {
-        console.log(workLog.task.taskId, this._taskId);
         if (workLog.task.taskId === this._taskId) {
             this.activeWorkLog = workLog;
         }
     }
 
     private workLogClosed(workLog: WorkLog) {
-        console.log(workLog.task.taskId, this._taskId);
         if (workLog.task.taskId === this._taskId) {
             this.activeWorkLog = undefined;
         }

@@ -207,7 +207,6 @@ export class WireframeConstructorPageComponent implements OnInit {
 
     selectFieldToView(event: { id: string, index: number }) {
         this._wireframe.steps.forEach((step) => {
-            console.log(step.fields, event)
             step.fields.forEach(field => {
                 if (field.id === event.id) {
                     field.listViewIndex = event.index;

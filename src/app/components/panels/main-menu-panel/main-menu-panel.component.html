@@ -12,6 +12,9 @@
         <ng-container *ngSwitchCase="'addresses'">
             <ng-container *ngTemplateOutlet="addresses"></ng-container>
         </ng-container>
+        <ng-container *ngSwitchCase="'system'">
+            <ng-container *ngTemplateOutlet="system"></ng-container>
+        </ng-container>
         <ng-container *ngSwitchDefault>
             <ng-container *ngTemplateOutlet="main"></ng-container>
         </ng-container>
@@ -19,39 +22,47 @@
 </div>
 
 <ng-template #main>
-    <app-extended-menu-item [link]="['/tasks','incoming']" caption="Задачи" icon="task"></app-extended-menu-item>
-    <app-extended-menu-item [link]="['/billing','search']" caption="Абоненты" icon="group"></app-extended-menu-item>
-    <app-extended-menu-item [link]="['/addresses','list']" caption="Адреса" icon="home_work"></app-extended-menu-item>
-    <app-extended-menu-item caption="Коммутаторы" icon="dns"></app-extended-menu-item>
-    <app-extended-menu-item caption="Склад" icon="warehouse"></app-extended-menu-item>
-    <app-extended-menu-item [link]="['/employees']" caption="Сотрудники" icon="account_circle"></app-extended-menu-item>
-    <app-extended-menu-item [link]="['/salary','table']" caption="Зарплата" icon="currency_ruble"></app-extended-menu-item>
+    <app-extended-menu-item [link]="['/tasks','incoming']" caption="Задачи" icon="mdi-task"></app-extended-menu-item>
+    <app-extended-menu-item [link]="['/billing','search']" caption="Абоненты" icon="mdi-group"></app-extended-menu-item>
+    <app-extended-menu-item [link]="['/addresses','list']" caption="Адреса" icon="mdi-home_work"></app-extended-menu-item>
+    <app-extended-menu-item caption="Коммутаторы" icon="mdi-dns"></app-extended-menu-item>
+    <app-extended-menu-item caption="Склад" icon="mdi-warehouse"></app-extended-menu-item>
+    <app-extended-menu-item [link]="['/employees']" caption="Сотрудники" icon="mdi-account_circle"></app-extended-menu-item>
+    <app-extended-menu-item [link]="['/salary','table']" caption="Зарплата" icon="mdi-currency_ruble"></app-extended-menu-item>
+    <app-extended-menu-item [link]="['/system','billing']" caption="Система" icon="mdi-settings"></app-extended-menu-item>
 </ng-template>
 
 <ng-template #tasks>
     <ng-container *ngTemplateOutlet="backButton; context:{name:'Задачи'}"></ng-container>
-    <app-extended-menu-item [link]="['/tasks','incoming']" caption="Входящие" icon="inbox" [badge]="(incomingCount$ | async)??''"></app-extended-menu-item>
-    <app-extended-menu-item [link]="['/tasks','calendar']" caption="Календарь" icon="calendar_month"></app-extended-menu-item>
+    <app-extended-menu-item [link]="['/tasks','incoming']" caption="Входящие" icon="mdi-inbox" [badge]="(incomingCount$ | async)??''"></app-extended-menu-item>
+    <app-extended-menu-item [link]="['/tasks','calendar']" caption="Календарь" icon="mdi-calendar_month"></app-extended-menu-item>
     <app-extended-menu-item [link]="['/tasks','list']" caption="Список"
-                            icon="format_list_bulleted"></app-extended-menu-item>
+                            icon="mdi-format_list_bulleted"></app-extended-menu-item>
     <app-extended-menu-item [elements]="stagesMenuItems" [isExtended]="stageMenuExtended" caption="Доска"
-                            icon="checklist"></app-extended-menu-item>
-    <app-extended-menu-item [link]="['/tasks','templates']" caption="Теги/Шаблоны" icon="ballot"></app-extended-menu-item>
+                            icon="mdi-checklist"></app-extended-menu-item>
+    <app-extended-menu-item [link]="['/tasks','templates']" caption="Теги/Шаблоны" icon="mdi-ballot"></app-extended-menu-item>
 </ng-template>
 
 <ng-template #salary>
     <ng-container *ngTemplateOutlet="backButton; context:{name:'Зарплата'}"></ng-container>
-    <app-extended-menu-item [link]="['/salary','table']" caption="Зарплатная таблица" icon="table_chart"></app-extended-menu-item>
-    <app-extended-menu-item [link]="['/salary','estimation']" [exact]="true" caption="Подсчет работ" icon="exposure_plus_2"></app-extended-menu-item>
-    <app-extended-menu-item [link]="['/salary','estimation','bypass']" caption="Подсчет работ (альт.)" icon="auto_awesome"></app-extended-menu-item>
-    <app-extended-menu-item [link]="['/salary','works']" caption="Список работ" icon="construction"></app-extended-menu-item>
-    <app-extended-menu-item [link]="['/salary','paid-actions']" caption="Платные действия" icon="toc"></app-extended-menu-item>
+    <app-extended-menu-item [link]="['/salary','table']" caption="Зарплатная таблица" icon="mdi-table_chart"></app-extended-menu-item>
+    <app-extended-menu-item [link]="['/salary','estimation']" [exact]="true" caption="Подсчет работ" icon="mdi-exposure_plus_2"></app-extended-menu-item>
+    <app-extended-menu-item [link]="['/salary','estimation','bypass']" caption="Подсчет работ (альт.)" icon="mdi-auto_awesome"></app-extended-menu-item>
+    <app-extended-menu-item [link]="['/salary','works']" caption="Список работ" icon="mdi-construction"></app-extended-menu-item>
+    <app-extended-menu-item [link]="['/salary','paid-actions']" caption="Платные действия" icon="mdi-toc"></app-extended-menu-item>
 </ng-template>
 
 <ng-template #addresses>
     <ng-container *ngTemplateOutlet="backButton; context:{name:'Адреса'}"></ng-container>
-    <app-extended-menu-item [link]="['/addresses','list']" caption="Список" icon="view_list"></app-extended-menu-item>
-    <app-extended-menu-item [link]="['/addresses','schemes']" caption="Схемы домов" icon="schema"></app-extended-menu-item>
+    <app-extended-menu-item [link]="['/addresses','list']" caption="Список" icon="mdi-view_list"></app-extended-menu-item>
+    <app-extended-menu-item [link]="['/addresses','schemes']" caption="Схемы домов" icon="mdi-schema"></app-extended-menu-item>
+</ng-template>
+
+<ng-template #system>
+    <ng-container *ngTemplateOutlet="backButton; context:{name:'Система'}"></ng-container>
+    <app-extended-menu-item [link]="['/system','billing']" caption="Биллинг" icon="mdi-person_search"></app-extended-menu-item>
+    <app-extended-menu-item [link]="['/system','telegram']" caption="Telegram" icon="pi pi-telegram text-2xl"></app-extended-menu-item>
+    <app-extended-menu-item [link]="['/system','acp']" caption="ACP" icon="mdi-developer_board"></app-extended-menu-item>
 </ng-template>
 
 <ng-template #backButton let-name="name">

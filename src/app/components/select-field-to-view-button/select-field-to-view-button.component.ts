@@ -23,7 +23,6 @@ export class SelectFieldToViewButtonComponent implements OnInit,AfterViewInit {
             field.command = () => {
                 this.selectedField = field;
                 field.listViewIndex = this.index;
-                console.log("Пункт меню:",field.id, this.index);
                 this.selectView.emit({id: field.id, index: this.index});
             }
             return field;

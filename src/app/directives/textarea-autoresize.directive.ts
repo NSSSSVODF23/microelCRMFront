@@ -66,7 +66,6 @@ export class TextareaAutoresizeDirective implements AfterViewInit, OnDestroy {
         let additionalHeight = 0;
         if (value[value.length - 1] === '\n') {
             additionalHeight = parseFloat(window.getComputedStyle(textAreaElement).fontSize) + 5;
-            console.log(additionalHeight)
         }
         if (textAreaElement.value.length === 0) {
             this.measureElement.style.boxSizing = 'content-box';

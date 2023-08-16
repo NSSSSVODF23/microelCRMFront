@@ -248,7 +248,6 @@ export class WorksPageComponent implements OnInit, OnDestroy {
         this.createWorkForm.controls.actions.clear();
         this.createWorkForm.patchValue({parentGroupId: rootId ? parseInt(rootId.substring(1)) : null});
         this.selectedPaidActions = [];
-        console.log(this.createWorkForm.value);
         this.api.getListAvailablePaidActions().subscribe({
             next: actions => this.availablePaidActions = actions
         })
@@ -549,7 +548,6 @@ export class WorksPageComponent implements OnInit, OnDestroy {
     createWork() {
         if (!this.createWorkForm.valid) return;
         const formValue: any = this.createWorkForm.value;
-        console.log(this.createWorkForm.value);
         this.api.createPaidWork(formValue).subscribe({
             next: () => {
                 this.createWorkDialogVisible = false;

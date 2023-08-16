@@ -93,7 +93,6 @@ export class TaskTemplateInputComponent implements OnInit, ControlValueAccessor 
     };
 
     ngOnInit(): void {
-        console.log(this.type, this.currentVariation);
     }
 
     isName(field: any) {

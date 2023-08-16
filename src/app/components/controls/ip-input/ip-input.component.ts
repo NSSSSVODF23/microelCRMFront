@@ -1,5 +1,6 @@
-import {Component, ElementRef, EventEmitter, forwardRef, Input, Output, ViewChild} from '@angular/core';
-import {ControlValueAccessor, NG_VALUE_ACCESSOR} from '@angular/forms';
+import {Component, EventEmitter, forwardRef, OnDestroy, OnInit, Output} from '@angular/core';
+import {ControlValueAccessor, FormArray, FormControl, FormGroup, NG_VALUE_ACCESSOR} from '@angular/forms';
+import {map, Subscription} from "rxjs";
 
 @Component({
     selector: 'app-ip-input',
@@ -13,67 +14,67 @@ import {ControlValueAccessor, NG_VALUE_ACCESSOR} from '@angular/forms';
         }
     ]
 })
-export class IpInputComponent implements ControlValueAccessor {
+export class IpInputComponent implements ControlValueAccessor, OnInit, OnDestroy {
 
-    _ipValue: number[] = []; // notice the '_'
     @Output() onBlur = new EventEmitter();
-    @ViewChild('one') one!: ElementRef<HTMLInputElement>;
-    @ViewChild('two') two!: ElementRef<HTMLInputElement>;
-    @ViewChild('three') three!: ElementRef<HTMLInputElement>;
-    @ViewChild('four') four!: ElementRef<HTMLInputElement>;
-    disable = false;
-    @Input() setDisabledState(isDisabled: boolean) {
-        this.disable = isDisabled;
+    control1 = new FormControl(0);
+    control2 = new FormControl(0);
+    control3 = new FormControl(0);
+    control4 = new FormControl(0);
+    formGroup = new FormGroup({octets:new FormArray([this.control1, this.control2, this.control3, this.control4])});
+    subscription?: Subscription;
+
+    setDisabledState(isDisabled: boolean) {
+        if (isDisabled) {
+            this.formGroup.disable({emitEvent: false});
+        } else {
+            this.formGroup.enable({emitEvent: false});
+        }
     }
 
-    get ipValue() {
-        return this._ipValue.join('.');
+    parseString(value?: string) {
+        if (!value) return [0, 0, 0, 0];
+        return value
+            .trim()
+            .split(".")
+            .map(octet => {
+                let digit = parseInt(octet.replace(/\D/g, ""));
+                return isNaN(digit) ? 0 : digit;
+            })
+            .slice(0, 4);
     }
 
-    @Input() set ipValue(val: string) {
-        this._ipValue = this.ipFormat(val);
-        this.propagateChange(this.ipValue);
-        if(this.one) this.one.nativeElement.value = this._ipValue[0].toString();
-        if(this.two) this.two.nativeElement.value = this._ipValue[1].toString();
-        if(this.three) this.three.nativeElement.value = this._ipValue[2].toString();
-        if(this.four) this.four.nativeElement.value = this._ipValue[3].toString();
-    }
-
-    ipFormat(value?: string) {
-        if(!value) return [0,0,0,0];
-        let octets = value.trim().split(".");
-        return octets.map(octet => {
-            let digit = parseInt(octet.replace(/\D/g, ""));
-            if (isNaN(digit)) return 0;
-            if (digit < 0) {
-                return 0;
-            } else if (digit > 255) {
-                return 255;
-            }
-            return digit;
-        }).slice(0, 4)
-    }
-
-    propagateChange = (_: any) => {
+    onChange = (_: any) => {
     };
+    onTouch = () => {
+    }
 
     registerOnChange(fn: (value: any) => void) {
-        this.propagateChange = fn;
+        this.onChange = fn;
     }
 
-    registerOnTouched() {
+    registerOnTouched(fn: ()=>void) {
+        this.onTouch = fn;
     }
 
-    writeValue(obj: string): void {
-        if (obj) this.ipValue = "0.0.0.0";
-        this.ipValue = obj;
+    writeValue(obj?: string | any[]): void {
+        if (obj) {
+            if (typeof obj === "string") {
+                obj = this.parseString(obj);
+            }
+            if (obj.length !== 4) {
+                obj = [0, 0, 0, 0];
+            }
+            this.formGroup.patchValue({octets:this.mapOctets(obj)});
+        }
     }
 
-    octetChange(octetNum: number, event: Event) {
-        const target: HTMLInputElement = <HTMLInputElement>event.target;
-        this._ipValue[octetNum] = parseInt(target.value);
-        this.ipValue = this._ipValue.join(".");
-        target.value = this._ipValue[octetNum].toString();
+    mapOctets(octets: any[]) {
+        return octets.map(octet => {
+            octet = parseInt(octet);
+            if (typeof octet !== "number" || isNaN(octet)) return 0;
+            return Math.min(Math.max(0, octet), 255)
+        })
     }
 
     octetFocus(event: FocusEvent) {
@@ -81,16 +82,31 @@ export class IpInputComponent implements ControlValueAccessor {
         target.select();
     }
 
-    octetKeyUp(octetNum: number, event: KeyboardEvent) {
-        const target: HTMLInputElement = <HTMLInputElement>event.target;
-        if (event.key === " " || event.key === "," || event.key === "." || target.value.length === 3){
-            if(octetNum === 0){
-                this.two.nativeElement.focus();
-            }else if(octetNum === 1){
-                this.three.nativeElement.focus();
-            }else if(octetNum === 2){
-                this.four.nativeElement.focus();
+    ngOnInit(): void {
+        this.subscription = this.formGroup.valueChanges.pipe(map(value => {
+            let octets = value.octets;
+            if(octets === undefined) {
+                this.formGroup.patchValue({octets: [0, 0, 0, 0]}, {emitEvent: false});
+                return "0.0.0.0";
             }
+            octets = this.mapOctets(octets);
+            this.formGroup.patchValue({octets}, {emitEvent: false, onlySelf: true});
+            return octets.join(".")
+        })).subscribe(value => {
+            this.onChange(value);
+            this.onTouch();
+        })
+    }
+
+    ngOnDestroy(): void {
+        this.subscription?.unsubscribe();
+    }
+
+    focusNext(event: Event, next: HTMLInputElement) {
+        const target = (event.target as HTMLInputElement)
+        let value = target.value;
+        if(value.length === 3) {
+            next.focus();
         }
     }
 }

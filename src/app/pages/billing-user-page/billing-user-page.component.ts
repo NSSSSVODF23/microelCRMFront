@@ -138,7 +138,6 @@ export class BillingUserPageComponent implements OnInit, OnDestroy {
     checkRemoteControl(ipaddr: any) {
         this.api.checkRemoteControl(ipaddr).subscribe({
             next: (res) => {
-                console.log("Next ", res);
             },
             error: (err) => {
                 console.log("Error ", err);

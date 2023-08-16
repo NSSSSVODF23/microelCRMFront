@@ -2,8 +2,8 @@ import {Component, EventEmitter, forwardRef, Input, OnDestroy, OnInit, Output} f
 import {ControlValueAccessor, FormControl, FormGroup, NG_VALUE_ACCESSOR} from "@angular/forms";
 import {Employee} from "../../../transport-interfaces";
 import {SubscriptionsHolder} from "../../../util";
-import {TFactorAction} from "../works-picker/works-picker.component";
-import {Subscription} from "rxjs";
+import {TFactorAction, WorksPickerValue} from "../works-picker/works-picker.component";
+import {filter, Observable, Subscription} from "rxjs";
 
 @Component({
     selector: 'app-employee-sum-distribution',
@@ -71,7 +71,6 @@ export class EmployeeSumDistributionComponent implements OnInit, OnDestroy, Cont
                         }
                     }, {emitEvent: false});
                 }
-                console.log(currentLogin,currRatio)
             }));
             this.employeeRatioSubscriptions.addSubscription(curr.login + 'sum', employeeGroup.controls.sum.valueChanges.subscribe((currSum) => {
                 if (currSum !== null && currSum > this.totalCostOfWork) currSum = this.totalCostOfWork;
@@ -104,7 +103,6 @@ export class EmployeeSumDistributionComponent implements OnInit, OnDestroy, Cont
                         }
                     }, {emitEvent: false});
                 }
-                console.log(currentLogin,Math.round(currSum))
             }));
             return {
                 ...prev, [curr.login]: employeeGroup
@@ -118,35 +116,53 @@ export class EmployeeSumDistributionComponent implements OnInit, OnDestroy, Cont
         })
     }
 
+    actionPicker$?: Observable<WorksPickerValue|null>;
+    actionPickerSub?: Subscription;
+
+    @Input() set actionPicker(actionPicker: Observable<WorksPickerValue|null> | null | undefined) {
+        this.actionPickerSub?.unsubscribe();
+        if (actionPicker === null || actionPicker === undefined) {
+            this.actionPicker$ = undefined;
+            return;
+        }
+        this.actionPicker$ = actionPicker;
+        this.actionPickerSub = this.actionPicker$.subscribe(value => {
+            if(!value) return;
+            this._actionsTaken = value.actionsTaken;
+            this._factorsActions = value.factorsActions ?? [];
+            this.recalculateAmountsForEmployees();
+        })
+    }
+
     private _factorsActions: TFactorAction[] = [];
 
     get factorsActions(): TFactorAction[] {
         return this._factorsActions
     }
-
-    @Input() set factorsActions(factorsActions: TFactorAction[] | null | undefined) {
-        if (factorsActions === null || factorsActions === undefined) {
-            this._factorsActions = [];
-            return;
-        }
-        this._factorsActions = factorsActions;
-        this.recalculateAmountsForEmployees();
-    }
+    //
+    // @Input() set factorsActions(factorsActions: TFactorAction[] | null | undefined) {
+    //     if (factorsActions === null || factorsActions === undefined) {
+    //         this._factorsActions = [];
+    //         return;
+    //     }
+    //     this._factorsActions = factorsActions;
+    //     this.recalculateAmountsForEmployees();
+    // }
 
     private _actionsTaken: any[] = [];
 
     get actionsTaken(): any[] {
         return this._actionsTaken
     }
-
-    @Input() set actionsTaken(actionsTaken: any[] | null | undefined) {
-        if (actionsTaken === null || actionsTaken === undefined) {
-            this._actionsTaken = [];
-            return;
-        }
-        this._actionsTaken = actionsTaken;
-        this.recalculateAmountsForEmployees();
-    }
+    //
+    // @Input() set actionsTaken(actionsTaken: any[] | null | undefined) {
+    //     if (actionsTaken === null || actionsTaken === undefined) {
+    //         this._actionsTaken = [];
+    //         return;
+    //     }
+    //     this._actionsTaken = actionsTaken;
+    //     this.recalculateAmountsForEmployees();
+    // }
 
     get totalCostOfWork() {
         return this.actionsTaken.reduce((total, action) => total + action.cost, 0);
@@ -228,8 +244,7 @@ export class EmployeeSumDistributionComponent implements OnInit, OnDestroy, Cont
     }
 
     removeWorkActionRatio(uuid: string) {
-        this.factorsActions = this.factorsActions.filter(w => w.uuid !== uuid);
-        this.onRemoveFactorAction.emit(this.factorsActions);
+        this.onRemoveFactorAction.emit(this.factorsActions.filter(w => w.uuid !== uuid));
     }
 
     getEmployeeTotalPayment(login: string) {

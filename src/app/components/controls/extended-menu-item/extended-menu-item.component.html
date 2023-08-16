@@ -1,7 +1,7 @@
 <div #wrapperElem class="flexed column wrapper">
     <div #titleElem (click)="toggle()" [routerLink]="link" class="title flexed gap6 hcenter"
          [routerLinkActiveOptions]="{ exact }" routerLinkActive="active">
-        <span class="material-icons-round title-icon">{{icon}}</span> {{caption}}
+        <span [class]="icon"></span> {{caption}}
         <div class="stretched"></div>
         <app-colored-tag *ngIf="badge" [caption]="badge" color="var(--mc-500)"></app-colored-tag>
         <span *ngIf="hasChild()" [ngClass]="{rotated:_isExtended}" class="material-icons-round title-expanded-icon">expand_more</span>

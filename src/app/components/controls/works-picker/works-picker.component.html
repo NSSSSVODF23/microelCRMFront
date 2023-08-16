@@ -59,7 +59,7 @@
                                type="text"/>
                     </span>
                     <p-table #actionTableRef [globalFilterFields]="['name']" [loading]="actionsTableLoading"
-                             [rowHover]="true" [value]="tableMenuActionsItems"
+                             [rowHover]="true" [value]="tableMenuActionsItems" [rowTrackBy]="trackByActionItems"
                              scrollHeight="200px" styleClass="p-datatable-sm">
                         <ng-template let-action pTemplate="body">
                             <tr (onDragStart)="actionDragging(action)" class="not-selectable cursor-move"

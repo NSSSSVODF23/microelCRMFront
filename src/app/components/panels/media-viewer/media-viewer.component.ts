@@ -51,11 +51,9 @@ export class MediaViewerComponent implements OnInit {
 
     imageLoad(event: Event) {
         this.imageLoadingIndicator = false;
-        console.log("Loadend:", event)
     }
 
     imageLoadError(event: ErrorEvent) {
-        console.log("Load error:", event)
     }
 
     goPrev() {

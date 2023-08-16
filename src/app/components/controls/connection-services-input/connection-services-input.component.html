@@ -1,4 +1,4 @@
-<p-autoComplete (onBlur)="onTouched()" placeholder="Выберите услугу"
+<p-autoComplete (onBlur)="onTouched()" placeholder="Выберите"
                 [suggestions]="(connectionServices$ | async) ?? []"
                 styleClass="w-full block transparent-ac-token" inputStyleClass="w-5rem"
                 [formControl]="control"

@@ -1,7 +1,7 @@
 <div appExtendPageHeight class="flexed vcenter">
     <div class="responsive-wrapper flexed gap10">
         <app-main-menu-panel></app-main-menu-panel>
-        <div class="flexed column stretched gap10 panel overflow" [style.margin-bottom]="'1rem'">
+        <div [style.margin-bottom]="'1rem'" class="flexed column stretched gap10 panel overflow">
             <ng-container *ngTemplateOutlet="tabview"></ng-container>
         </div>
     </div>
@@ -10,14 +10,17 @@
 <ng-template #tabview>
     <p-tabView>
         <p-tabPanel header="Шаблоны" leftIcon="mdi-list_alt">
-            <div class="flexed gap10" [style.padding-bottom]="'1rem'">
-                <p-button [routerLink]="['constructor']" styleClass="p-button-outlined p-button-success" icon="mdi-add" label="Создать"></p-button>
-                <p-toggleButton onLabel="Скрыть удаленные" offLabel="Показать удаленные" [formControl]="deletedTemplatesSwitcher"></p-toggleButton>
+            <div [style.padding-bottom]="'1rem'" class="flexed gap10">
+                <p-button [routerLink]="['constructor']" icon="mdi-add" label="Создать"
+                          styleClass="p-button-outlined p-button-success"></p-button>
+                <p-toggleButton [formControl]="deletedTemplatesSwitcher" offLabel="Показать удаленные"
+                                onLabel="Скрыть удаленные"></p-toggleButton>
             </div>
             <ng-container [ngSwitch]="templateLoadingState">
                 <ng-container *ngSwitchCase="'LOADING'">
                     <div class="flexed hcenter vcenter p20">
-                        <p-progressSpinner class="custom-spinner custom-spinner-8xl custom-spinner-primary" strokeWidth="1"></p-progressSpinner>
+                        <p-progressSpinner class="custom-spinner custom-spinner-8xl custom-spinner-primary"
+                                           strokeWidth="1"></p-progressSpinner>
                     </div>
                 </ng-container>
                 <ng-container *ngSwitchCase="'READY'">
@@ -41,18 +44,22 @@
 
         </p-tabPanel>
         <p-tabPanel header="Теги" leftIcon="mdi-local_offer">
-            <div class="flexed gap10" [style.padding-bottom]="'1rem'">
-                <p-button (click)="openCreateTagDialog()" styleClass="p-button-outlined p-button-success" icon="mdi-add" label="Создать"></p-button>
-                <p-toggleButton onLabel="Скрыть удаленные" offLabel="Показать удаленные" [formControl]="deletedTagsSwitcher"></p-toggleButton>
+            <div [style.padding-bottom]="'1rem'" class="flexed gap10">
+                <p-button (click)="openCreateTagDialog()" icon="mdi-add" label="Создать"
+                          styleClass="p-button-outlined p-button-success"></p-button>
+                <p-toggleButton [formControl]="deletedTagsSwitcher" offLabel="Показать удаленные"
+                                onLabel="Скрыть удаленные"></p-toggleButton>
             </div>
             <ng-container [ngSwitch]="tagLoadingState">
                 <ng-container *ngSwitchCase="'LOADING'">
                     <div class="flexed hcenter vcenter p20">
-                        <p-progressSpinner class="custom-spinner custom-spinner-8xl custom-spinner-primary" strokeWidth="1"></p-progressSpinner>
+                        <p-progressSpinner class="custom-spinner custom-spinner-8xl custom-spinner-primary"
+                                           strokeWidth="1"></p-progressSpinner>
                     </div>
                 </ng-container>
                 <ng-container *ngSwitchCase="'READY'">
-                    <app-task-tag-list-item *ngFor="let tag of availableTags; trackBy: trackByTag" [tag]="tag"></app-task-tag-list-item>
+                    <app-task-tag-list-item *ngFor="let tag of availableTags; trackBy: trackByTag"
+                                            [tag]="tag"></app-task-tag-list-item>
                 </ng-container>
                 <ng-container *ngSwitchCase="'ERROR'">
                     <div class="flexed hcenter vcenter p20 caption size-big wt-bold f-color-danger">
@@ -68,14 +75,76 @@
                 </ng-container>
             </ng-container>
         </p-tabPanel>
+        <p-tabPanel header="Абон. оборудование" leftIcon="mdi-router">
+            <div class="flex gap-3 pb-3">
+                <p-button (click)="openCreateEquipmentDialog()" icon="mdi-add" label="Создать"
+                          styleClass="p-button-outlined p-button-success"></p-button>
+                <ng-container [formGroup]="equipmentsFilterForm">
+                    <p-toggleButton formControlName="isDeleted" offLabel="Показать удаленные"
+                                    onLabel="Скрыть удаленные"></p-toggleButton>
+                    <span class="p-input-icon-left">
+                        <i class="mdi-search"></i>
+                        <input formControlName="query" pInputText placeholder="Поиск по названию...">
+                    </span>
+                </ng-container>
+            </div>
+            <ng-container *ngIf="equipments$ | async as equipments">
+                <ng-container [ngSwitch]="equipmentLoadingState">
+                    <ng-container *ngSwitchCase="'LOADING'">
+                        <div class="flex align-items-center justify-content-center py-8">
+                            <p-progressSpinner class="custom-spinner custom-spinner-8xl custom-spinner-primary"
+                                               strokeWidth="1"></p-progressSpinner>
+                        </div>
+                    </ng-container>
+                    <ng-container *ngSwitchCase="'READY'">
+                        <div *ngFor="let equipment of equipments; trackBy: trackByClientEquipment"
+                             [ngClass]="{'opacity-80': equipment.deleted}" class="flex p-3 gap-3 split-line">
+                            <div class="flex flex-column justify-content-center gap-1 flex-grow-1">
+                                <div class="flex gap-2 align-items-baseline">
+                                    <span *ngIf="equipment.deleted"
+                                          class="mdi-not_interested text-bluegray-300 text-sm"></span>
+                                    <span [class]="equipment.deleted?'text-bluegray-300':'text-bluegray-600'">{{equipment.name}}</span>
+                                    <span class="text-primary-400 text-sm">{{equipment.price}}руб.</span>
+                                </div>
+                                <span *ngIf="equipment.description"
+                                      class="text-bluegray-300 text-sm font-bold">{{equipment.description}}</span>
+                            </div>
+                            <div *ngIf="!equipment.deleted" class="flex">
+                                <p-button (onClick)="openEditEquipmentDialog(equipment)" icon="mdi-edit"
+                                          label="Редактировать"
+                                          styleClass="p-button-warning p-button-text"></p-button>
+                                <p-button (onClick)="confirmDeleteEquipment($event, equipment)" icon="mdi-delete"
+                                          label="Удалить"
+                                          styleClass="p-button-danger p-button-text"></p-button>
+                            </div>
+                            <div *ngIf="equipment.deleted">
+
+                            </div>
+                        </div>
+                    </ng-container>
+                    <ng-container *ngSwitchCase="'ERROR'">
+                        <div class="flex flex-column py-8 align-items-center font-bold text-red-400 text-lg">
+                            <i class="mds-error"></i>
+                            <span>Ошибка загрузки клиентского оборудования</span>
+                        </div>
+                    </ng-container>
+                    <ng-container *ngSwitchCase="'EMPTY'">
+                        <div class="flex flex-column py-8 align-items-center font-bold text-bluegray-400 text-lg">
+                            <i class="mds-router"></i>
+                            <span>Нет клиентского оборудования</span>
+                        </div>
+                    </ng-container>
+                </ng-container>
+            </ng-container>
+        </p-tabPanel>
     </p-tabView>
 </ng-template>
 
 <ng-template #templateItem let-item>
     <div class="template-item flexed hcenter gap5">
         <div class="flexed column gap5 stretched">
-            <span class="flexed hcenter caption stretched hcenter gap3" [style.opacity]="item.deleted ? 0.5 : 1">
-                <i class="mdi-not_interested" *ngIf="item.deleted"></i>
+            <span [style.opacity]="item.deleted ? 0.5 : 1" class="flexed hcenter caption stretched hcenter gap3">
+                <i *ngIf="item.deleted" class="mdi-not_interested"></i>
                 <span>
                     {{item.name}}
                 </span>
@@ -87,16 +156,18 @@
                 {{item.description}}
             </span>
         </div>
-        <p-button label="Редактировать" [routerLink]="['constructor']" [disabled]="item.deleted" icon="mdi-edit"
-                  [queryParams]="{editingId:item.wireframeId}" styleClass="p-button-warning p-button-text">
+        <p-button [disabled]="item.deleted" [queryParams]="{editingId:item.wireframeId}" [routerLink]="['constructor']"
+                  icon="mdi-edit"
+                  label="Редактировать" styleClass="p-button-warning p-button-text">
         </p-button>
         <p-button (onClick)="confirmDeleteWireframe($event, item.wireframeId)"
-                  styleClass="p-button-danger p-button-text" icon="mdi-delete" label="Удалить"
-                  [disabled]="item.deleted"></p-button>
+                  [disabled]="item.deleted" icon="mdi-delete" label="Удалить"
+                  styleClass="p-button-danger p-button-text"></p-button>
     </div>
 </ng-template>
 
-<p-dialog [(visible)]="showCreateTagDialog" [breakpoints]="{'960px': '75vw'}" [draggable]="false" [modal]="true" [resizable]="false"
+<p-dialog [(visible)]="showCreateTagDialog" [breakpoints]="{'960px': '75vw'}" [draggable]="false" [modal]="true"
+          [resizable]="false"
           [style]="{width: 'max-content'}" header="Создать тег">
     <div class="flexed column gap10 p3">
         <div class="flexed hcenter gap15">
@@ -108,5 +179,33 @@
         </div>
         <app-button (onClick)="createTag()" [disabled]="!tagNameToCreate && !tagColorToCreate" [loading]="isTagCreating"
                     icon="check" label="Создать"></app-button>
+    </div>
+</p-dialog>
+
+<p-dialog [(visible)]="showEquipmentDialog" [breakpoints]="{'960px':'450px'}" [draggable]="false"
+          [header]="editionEquipmentId? 'Редактировать оборудование' : 'Создать оборудование'"
+          [modal]="true"
+          [resizable]="false"
+          [style]="{width: '450px'}">
+    <div [formGroup]="equipmentForm" class="flex flex-column gap-3 p-1">
+        <div class="input-label-wrapper">
+            <label>Название</label>
+            <input formControlName="name" pInputText>
+        </div>
+        <div class="input-label-wrapper">
+            <label>Описание</label>
+            <textarea [autoResize]="true" [style.min-height]="'5rem'" formControlName="description"
+                      pInputTextarea></textarea>
+        </div>
+        <div class="input-label-wrapper">
+            <label>Стоимость</label>
+            <p-inputNumber currency="RUB" formControlName="price" locale="ru-RU" mode="currency"></p-inputNumber>
+        </div>
+        <div class="flex justify-content-end">
+            <p-button (onClick)="editionEquipmentId ? editEquipment() : createEquipment()"
+                      [disabled]="!equipmentForm.valid"
+                      [label]="editionEquipmentId ? 'Редактировать' : 'Создать'" [loading]="isEquipmentCreating" icon="mdi-add"
+                      styleClass="p-button-success"></p-button>
+        </div>
     </div>
 </p-dialog>

@@ -69,8 +69,7 @@
                 <section *ngIf="templateLoadingState==='READY'" class="flex gap-4 p-4 terminator-bottom">
                     <app-employee-sum-distribution class="w-full" [formControl]="employeeRatioForm"
                                                    [employees]="installersReportForm.value.installers"
-                                                   [actionsTaken]="worksPickerForm.value?.actionsTaken"
-                                                   [factorsActions]="worksPickerForm.value?.factorsActions"
+                                                   [actionPicker]="worksPickerForm.valueChanges"
                     (onRemoveFactorAction)="removeFactorActionHandler($event)"></app-employee-sum-distribution>
                 </section>
                 <p-button (onClick)="createTaskAndCalculate()" class="align-self-end my-3"

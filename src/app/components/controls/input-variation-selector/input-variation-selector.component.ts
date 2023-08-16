@@ -36,7 +36,6 @@ export class InputVariationSelectorComponent implements OnInit, OnChanges {
     }
 
     onChange(value: string) {
-        console.log("Change", value);
         this.value = value;
         this.valueChange.emit(value);
     }

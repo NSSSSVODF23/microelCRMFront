@@ -1,9 +1,9 @@
-<fieldset class="node flexed octet-wrapper" (blur)="onBlur.emit()">
-    <input #one (focus)="octetFocus($event)" (input)="octetChange(0, $event)" (keyup)="octetKeyUp(0, $event)" [disabled]="disable" class="octet-input">
+<fieldset class="node flexed octet-wrapper" [formGroup]="formGroup" (blur)="onBlur.emit()">
+    <input [formControl]="control1" (focus)="octetFocus($event)" (input)="focusNext($event, octTwo)" class="octet-input">
     <span>.</span>
-    <input #two (focus)="octetFocus($event)" (input)="octetChange(1, $event)" (keyup)="octetKeyUp(1, $event)" [disabled]="disable" class="octet-input">
+    <input #octTwo [formControl]="control2" (focus)="octetFocus($event)" (input)="focusNext($event, octThree)" class="octet-input">
     <span>.</span>
-    <input #three (focus)="octetFocus($event)" (input)="octetChange(2, $event)" (keyup)="octetKeyUp(2, $event)" [disabled]="disable" class="octet-input">
+    <input #octThree [formControl]="control3" (focus)="octetFocus($event)" (input)="focusNext($event, octFour)" class="octet-input">
     <span>.</span>
-    <input #four (focus)="octetFocus($event)" (input)="octetChange(3, $event)" (keyup)="octetKeyUp(3, $event)" [disabled]="disable" class="octet-input">
+    <input #octFour [formControl]="control4" (focus)="octetFocus($event)" class="octet-input">
 </fieldset>

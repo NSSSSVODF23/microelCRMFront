@@ -2,15 +2,31 @@ import {Injectable} from '@angular/core';
 import {StompClientService} from "./stomp-client.service";
 import {finalize, map, Observable, share} from "rxjs";
 import {
-    Chat, ChatUnreadCounter, City,
+    AcpConf,
+    BillingConf,
+    Chat,
+    ChatUnreadCounter,
+    City, ClientEquipment,
     Comment,
     Department,
-    Employee, House, INotification, PaidAction, PaidWork, PingMonitoring,
-    Position, Street,
+    Employee,
+    House,
+    INotification,
+    PaidAction,
+    PaidWork,
+    PingMonitoring,
+    Position, SalaryTable, SalaryTableCell,
+    Street,
     SuperMessage,
     Task,
     TaskEvent,
-    TaskTag, TreeElementPosition, TreeNodeMoveEvent, TreeNodeUpdateEvent, Wireframe, WorkLog
+    TaskTag,
+    TelegramConf,
+    TreeElementPosition,
+    TreeNodeMoveEvent,
+    TreeNodeUpdateEvent,
+    Wireframe,
+    WorkLog
 } from "../transport-interfaces";
 import {cyrb53} from "../util";
 import {OldTracker, SimpleMessage} from "../parsing-interfaces";
@@ -120,7 +136,7 @@ export class RealTimeUpdateService {
     }
 
     chatMessageCreated(chatId?: number) {
-        if(!chatId) return this.watch<SuperMessage>('chat', 'message', 'create')
+        if (!chatId) return this.watch<SuperMessage>('chat', 'message', 'create')
         return this.watch<SuperMessage>('chat', chatId.toString(), 'message', 'create')
     }
 
@@ -161,7 +177,7 @@ export class RealTimeUpdateService {
     }
 
     workLogUpdated(workLogId?: number) {
-        if(workLogId) return this.watch<WorkLog>('work-log', workLogId.toString(), 'update')
+        if (workLogId) return this.watch<WorkLog>('work-log', workLogId.toString(), 'update')
         return this.watch<WorkLog>('worklog', 'update')
     }
 
@@ -170,7 +186,7 @@ export class RealTimeUpdateService {
     }
 
     workLogDeleted(workLogId?: number) {
-        if(workLogId) return this.watch<WorkLog>('work-log', workLogId.toString(), 'delete')
+        if (workLogId) return this.watch<WorkLog>('work-log', workLogId.toString(), 'delete')
         return this.watch<WorkLog>('worklog', 'delete')
     }
 
@@ -179,12 +195,12 @@ export class RealTimeUpdateService {
     }
 
     wireframeUpdated(wireframeId?: number) {
-        if(wireframeId) return this.watch<Wireframe>('wireframe', wireframeId.toString(), 'update')
+        if (wireframeId) return this.watch<Wireframe>('wireframe', wireframeId.toString(), 'update')
         return this.watch<Wireframe>('wireframe', 'update');
     }
 
     wireframeDeleted(wireframeId?: number) {
-        if(wireframeId) return this.watch<Wireframe>('wireframe', wireframeId.toString(), 'delete')
+        if (wireframeId) return this.watch<Wireframe>('wireframe', wireframeId.toString(), 'delete')
         return this.watch<Wireframe>('wireframe', 'delete');
     }
 
@@ -193,12 +209,12 @@ export class RealTimeUpdateService {
     }
 
     paidActionUpdated(paidActionId?: number) {
-        if(paidActionId) return this.watch<PaidAction>('paid-action', paidActionId.toString(), 'update')
+        if (paidActionId) return this.watch<PaidAction>('paid-action', paidActionId.toString(), 'update')
         return this.watch<PaidAction>('paid-action', 'update')
     }
 
     paidActionDeleted(paidActionId?: number) {
-        if(paidActionId) return this.watch<PaidAction>('paid-action', paidActionId.toString(), 'delete')
+        if (paidActionId) return this.watch<PaidAction>('paid-action', paidActionId.toString(), 'delete')
         return this.watch<PaidAction>('paid-action', 'delete')
     }
 
@@ -206,11 +222,11 @@ export class RealTimeUpdateService {
         return this.watch<TreeNodeMoveEvent>('paid-works', 'tree', 'move')
     }
 
-    paidWorksTreeUpdated(){
+    paidWorksTreeUpdated() {
         return this.watch<TreeNodeUpdateEvent>('paid-works', 'tree', 'update')
     }
 
-    paidWorksTreeCreated(){
+    paidWorksTreeCreated() {
         return this.watch<TreeNodeUpdateEvent>('paid-works', 'tree', 'create')
     }
 
@@ -218,12 +234,12 @@ export class RealTimeUpdateService {
         return this.watch<TreeNodeUpdateEvent>('paid-works', 'tree', 'delete')
     }
 
-    worksTreeReposition(){
+    worksTreeReposition() {
         return this.watch<TreeElementPosition[]>('paid-works', 'tree', 'reposition')
     }
 
-    paidWorkUpdated(id?: number){
-        if(id) return this.watch<PaidWork>('paid-work', id.toString(), 'update')
+    paidWorkUpdated(id?: number) {
+        if (id) return this.watch<PaidWork>('paid-work', id.toString(), 'update')
         return this.watch<PaidWork>('paid-work', 'update')
     }
 
@@ -232,12 +248,12 @@ export class RealTimeUpdateService {
     }
 
     cityUpdated(id?: number) {
-        if(id) return this.watch<City>('city', id.toString(), 'update')
+        if (id) return this.watch<City>('city', id.toString(), 'update')
         return this.watch<City>('city', 'update')
     }
 
     cityDeleted(id?: number) {
-        if(id) return this.watch<City>('city', id.toString(), 'delete')
+        if (id) return this.watch<City>('city', id.toString(), 'delete')
         return this.watch<City>('city', 'delete')
     }
 
@@ -246,12 +262,12 @@ export class RealTimeUpdateService {
     }
 
     streetUpdated(id?: number) {
-        if(id) return this.watch<Street>('street', id.toString(), 'update')
+        if (id) return this.watch<Street>('street', id.toString(), 'update')
         return this.watch<Street>('street', 'update')
     }
 
     streetDeleted(id?: number) {
-        if(id) return this.watch<Street>('street', id.toString(), 'delete')
+        if (id) return this.watch<Street>('street', id.toString(), 'delete')
         return this.watch<Street>('street', 'delete')
     }
 
@@ -260,17 +276,45 @@ export class RealTimeUpdateService {
     }
 
     houseUpdated(id?: number) {
-        if(id) return this.watch<House>('house', id.toString(), 'update')
+        if (id) return this.watch<House>('house', id.toString(), 'update')
         return this.watch<House>('house', 'update')
     }
 
     houseDeleted(id?: number) {
-        if(id) return this.watch<House>('house', id.toString(), 'delete')
+        if (id) return this.watch<House>('house', id.toString(), 'delete')
         return this.watch<House>('house', 'delete')
     }
 
     pingMonitoring(ip: string) {
         return this.watch<PingMonitoring>('monitoring', 'ping', ip)
+    }
+
+    billingConfigChanged() {
+        return this.watch<BillingConf>('billing-config', 'change')
+    }
+
+    telegramConfigChanged() {
+        return this.watch<TelegramConf>('telegram-config', 'change')
+    }
+
+    acpConfigChanged() {
+        return this.watch<AcpConf>('acp-config', 'change')
+    }
+
+    salaryTableUpdated() {
+        return this.watch<SalaryTable>('salary-table', 'update')
+    }
+
+    clientEquipmentsCreated() {
+        return this.watch<ClientEquipment>('client-equipment', 'create')
+    }
+
+    clientEquipmentsUpdated() {
+        return this.watch<ClientEquipment>('client-equipment', 'update')
+    }
+
+    clientEquipmentsDeleted() {
+        return this.watch<ClientEquipment>('client-equipment', 'delete')
     }
 
     private watchUnicast<T>(...path: string[]): Observable<T> {
@@ -280,6 +324,8 @@ export class RealTimeUpdateService {
     private watch<T>(...path: string[]): Observable<T> {
         return this.getObservable<T>('api', ...path);
     }
+
+    // Генерируем хэш наблюдателя по месту назначения
 
     private getObservable<T>(prefix: string, ...path: string[]): Observable<T> {
         const destination = `/${prefix}/${path.join('/')}`;
@@ -303,13 +349,11 @@ export class RealTimeUpdateService {
         return observable;
     }
 
-    // Генерируем хэш наблюдателя по месту назначения
+    // Удаляет observable из кэша
 
     private generateHash(destination: string) {
         return cyrb53(destination, 0);
     }
-
-    // Удаляет observable из кэша
 
     private deleteFromCache(hash: string) {
         delete this.watchCacheMap[hash];

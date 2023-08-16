@@ -1,0 +1,53 @@
+<div class="flex flex-column border-1 border-round-md border-bluegray-100 overflow-x-auto bg-white w-fit" (blur)="onBlur.emit()">
+    <div class="flex flex-column flex-grow-1">
+        <div *ngFor="let realization of equipmentsList.controls; let i = index" [formGroup]="realization" class="flex align-items-center gap-2 p-3 split-line">
+            <span class="flex-grow-1">{{realization.value.equipment?.name}}</span>
+            <app-count-input formControlName="count" (onZero)="equipmentsList.removeAt(i); onTouch()"></app-count-input>
+        </div>
+    </div>
+    <div class="flex p-3">
+        <p-button (onClick)="overlayPanel.show($event); onTouch()" label="Добавить оборудование" icon="mdi-add" [disabled]="isDisabled"></p-button>
+    </div>
+</div>
+
+<p-overlayPanel #overlayPanel
+                (onHide)="closeAvailableEquipmentsView$.next(null)"
+                (onShow)="openAvailableEquipmentsView.next(queryFilterControl.value)">
+    <ng-template pTemplate="content">
+        <div class="flex flex-column gap-3">
+            <span class="p-input-icon-left">
+                <i class="mdi-search"></i>
+                <input [formControl]="queryFilterControl" pInputText placeholder="Поиск...">
+            </span>
+            <div [style.max-height]="'20rem'"
+                 class="flex flex-column border-1 border-bluegray-50 border-round-md overflow-y-auto overflow-x-hidden">
+                <div class="flex flex-column py-8 align-items-center text-bluegray-600" [hidden]="availableEquipmentsLoadingState !== 'EMPTY'">
+                    <span class="mds-router"></span>
+                    <span>Пусто</span>
+                </div>
+                <div class="flex flex-column py-8 align-items-center text-red-600" [hidden]="availableEquipmentsLoadingState !== 'ERROR'">
+                    <span class="mds-error"></span>
+                    <span>Ошибка</span>
+                </div>
+                <div class="flex py-8 justify-content-center" [hidden]="availableEquipmentsLoadingState !== 'LOADING'">
+                    <p-progressSpinner class="custom-spinner custom-spinner-gray custom-spinner-6xl" strokeWidth="1"></p-progressSpinner>
+                </div>
+                <div (mouseenter)="selectedAvailableEquipmentsIndex.next(i)"
+                     (mouseleave)="selectedAvailableEquipmentsIndex.next(-1)"
+                     (click)="selectAvailableEquipment.next(i)"
+                     [hidden]="availableEquipmentsLoadingState !== 'READY'"
+                     *ngFor="let equipment of equipments$ | async; let i = index"
+                     [ngClass]="{'bg-primary-50':(selectedAvailableEquipments$ | async) === i}"
+                     class="flex align-items-baseline gap-2 p-2 split-line cursor-pointer user-select-none">
+                    <span [ngClass]="(selectedAvailableEquipments$ | async) === i ? 'text-primary-400' : 'text-bluegray-600'">
+                        {{equipment.name}}
+                    </span>
+                    <span [ngClass]="(selectedAvailableEquipments$ | async) === i ? 'text-primary-400' : 'text-bluegray-400'"
+                          class="text-xs font-bold">
+                        {{equipment.price}} руб.
+                    </span>
+                </div>
+            </div>
+        </div>
+    </ng-template>
+</p-overlayPanel>

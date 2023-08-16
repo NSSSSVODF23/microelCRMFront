@@ -233,6 +233,7 @@ export interface ModelItem {
     timestampData?: string;
     phoneData?: { [id: string]: string };
     connectionServicesData?: { connectionService: string }[];
+    equipmentRealizationsData?: ClientEquipmentRealization[];
     textRepresentation?: string;
 }
 
@@ -800,6 +801,24 @@ export interface BillingUserItemData {
     fio: string;
 }
 
+export interface ClientEquipment{
+    clientEquipmentId: number;
+    name: string;
+    description: string;
+    price: number;
+    created: string;
+    creator: Employee;
+    editedBy: Employee[];
+    deleted: boolean;
+    lastEdit: EmployeeIntervention;
+}
+
+export interface ClientEquipmentRealization{
+    clientEquipmentRealizationId: number;
+    equipment: ClientEquipment;
+    count: number;
+}
+
 // @Getter
 // @Setter
 // public static class UserMainInfo {
@@ -1060,6 +1079,24 @@ export interface PingMonitoring{
     delayAvg: number;
     isReachable: boolean;
     chartData: any;
+}
+
+export interface BillingConf{
+    host: string;
+    port: number;
+    login: string;
+    password: string;
+    selfIp: string;
+}
+
+export interface TelegramConf{
+    botToken: string;
+    botName: string;
+    dhcpNotificationChatId: string;
+}
+
+export interface AcpConf{
+    acpFlexConnectorEndpoint: string;
 }
 
 export class CacheUnit<T> {

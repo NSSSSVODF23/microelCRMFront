@@ -24,6 +24,9 @@ import {BillingSearchUserPageComponent} from "../../pages/billing-search-user-pa
 import {BillingUserPageComponent} from "../../pages/billing-user-page/billing-user-page.component";
 import {AddressesListPageComponent} from "../../pages/addresses-list-page/addresses-list-page.component";
 import {BypassWorkCalculationComponent} from "../../pages/bypass-work-calculation/bypass-work-calculation.component";
+import {BillingSettingsPageComponent} from "../../pages/billing-settings-page/billing-settings-page.component";
+import {TelegramSettingsPageComponent} from "../../pages/telegram-settings-page/telegram-settings-page.component";
+import {AcpSettingsPageComponent} from "../../pages/acp-settings-page/acp-settings-page.component";
 
 const routes: Routes = [
     {
@@ -52,6 +55,9 @@ const routes: Routes = [
             {path: 'billing/search', component: BillingSearchUserPageComponent},
             {path: 'billing/user/:login', component: BillingUserPageComponent},
             {path: 'addresses/list', component: AddressesListPageComponent},
+            {path: 'system/billing', component: BillingSettingsPageComponent},
+            {path: 'system/telegram', component: TelegramSettingsPageComponent},
+            {path: 'system/acp', component: AcpSettingsPageComponent},
         ]
     },
     // {breadcrumb: '**', redirectTo: 'tasks/status/all', pathMatch: 'full'},

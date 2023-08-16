@@ -12,7 +12,7 @@
             </div>
             <ng-container *ngIf="selectedWorkLog">
                 <div class="flexed column gap15 stretched panel p20">
-                    <ng-container *ngIf="worksPickerForm.valueChanges | async as pickerValue">
+                    <ng-container *ngIf="worksPickerForm$ | async as pickerValue">
                         <div class="flexed gap10 hcenter spbtw">
                             <span class="caption size-huge">
                                 Распределение по сотрудникам
@@ -21,9 +21,8 @@
                                       styleClass="p-button-text p-button-secondary"></p-button>
                         </div>
                         <app-employee-sum-distribution #sumDistr (onRemoveFactorAction)="onRemoveFactorAction($event)"
-                                                       [actionsTaken]="pickerValue.actionsTaken"
+                                                       [actionPicker]="worksPickerForm$"
                                                        [employees]="selectedWorkLog?.employees"
-                                                       [factorsActions]="pickerValue.factorsActions"
                                                        [formControl]="employeeRatioForm"></app-employee-sum-distribution>
                     </ng-container>
                     <ng-container *ngIf="recalculate$ | async as recalculate">

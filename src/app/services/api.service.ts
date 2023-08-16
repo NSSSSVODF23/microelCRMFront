@@ -2,13 +2,14 @@ import {Injectable} from '@angular/core';
 import {HttpClient} from "@angular/common/http";
 import {catchError, map, Observable, share, tap, zip} from "rxjs";
 import {
+    AcpConf,
     Address,
-    Attachment,
+    Attachment, BillingConf,
     BillingTotalUserInfo,
     BillingUserItemData,
     Chat,
     ChatMessage,
-    City,
+    City, ClientEquipment,
     Comment,
     DefaultObservers,
     Department,
@@ -35,7 +36,7 @@ import {
     TaskEvent,
     TaskFieldsSnapshot,
     TaskFiltrationConditions,
-    TaskTag,
+    TaskTag, TelegramConf,
     TokenChain,
     TreeDragDropEvent,
     TreeElementPosition,
@@ -84,7 +85,6 @@ export class ApiService {
     }
 
     updateWireframe(wireframe: Wireframe): Observable<Wireframe> {
-        console.log(wireframe)
         return this.sendPatch('api/private/wireframe', wireframe);
     }
 
@@ -738,8 +738,54 @@ export class ApiService {
         return this.sendGet<{label: string, value: string}[]>('api/private/types/connection-type');
     }
 
+    getBillingConfiguration(){
+        return this.sendGet<BillingConf>('api/private/configuration/billing');
+    }
+
+    getTelegramConfiguration(){
+        return this.sendGet<TelegramConf>('api/private/configuration/telegram');
+    }
+
+    getAcpConfiguration(){
+        return this.sendGet<AcpConf>('api/private/configuration/acp');
+    }
+
+    setBillingConfiguration(billingConf: BillingConf){
+        return this.sendPost('api/private/configuration/billing', billingConf);
+    }
+
+    setTelegramConfiguration(telegramConf: TelegramConf){
+        return this.sendPost('api/private/configuration/telegram', telegramConf);
+    }
+
+    setAcpConfiguration(acpConf: AcpConf){
+        return this.sendPost('api/private/configuration/acp', acpConf);
+    }
+
+    getClientEquipments(query?: string | null, isDeleted?: boolean | null) {
+        return this.sendGet<ClientEquipment[]>('api/private/client-equipments', {query, isDeleted});
+    }
+
+    createClientEquipment(clientEquipmentForm: any) {
+        return this.sendPost('api/private/client-equipment', clientEquipmentForm);
+    }
+
+    editClientEquipment(clientEquipmentId: number, clientEquipmentForm: any) {
+        return this.sendPatch(`api/private/client-equipment/${clientEquipmentId}`, clientEquipmentForm);
+    }
+
+    deleteClientEquipment(clientEquipmentId: number) {
+        return this.sendDelete(`api/private/client-equipment/${clientEquipmentId}`);
+    }
+
     // Результаты запросов на сервер кэшируются по таймауту, чтобы не было доп нагрузки на сервер
+
     private sendGet<T>(uri: string, query?: any) {
+        for(let q in query){
+            if(query[q] === undefined || query[q] === null){
+                delete query[q];
+            }
+        }
         // Генерируем хэш запроса на основе конечной точки и параметров запроса
         const requestHash = this.generateHash(uri, query);
         // Объявляем результирующий observable
@@ -762,10 +808,14 @@ export class ApiService {
         }
         return observable;
     }
-
     // Генерируем хэш запроса по URI и параметрам запроса
 
     private sendGetSilent<T>(uri: string, query?: any) {
+        for(let q in query){
+            if(query[q] === undefined || query[q] === null){
+                delete query[q];
+            }
+        }
         const requestHash = this.generateHash(uri, query);
         let observable: Observable<T> | null = null;
         if (!this.requestCacheMap[requestHash]) {
@@ -792,7 +842,6 @@ export class ApiService {
     private sendPatch<T>(uri: string, body: any) {
         return this.client.patch<T>(uri, body)
             .pipe(catchError((err, caught) => {
-                console.log(err)
                 this.toast.add({severity: 'error', summary: "Ошибка запроса", detail: err.error.message})
                 throw err;
             }));

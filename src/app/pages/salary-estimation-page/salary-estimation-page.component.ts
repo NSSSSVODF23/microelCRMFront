@@ -5,7 +5,7 @@ import {ConfirmationService, TreeDragDropService} from "primeng/api";
 import {FormControl} from "@angular/forms";
 import {SubscriptionsHolder} from "../../util";
 import {RealTimeUpdateService} from "../../services/real-time-update.service";
-import {filter, map, Observable, of, switchMap} from "rxjs";
+import {filter, map, Observable, of, shareReplay, switchMap} from "rxjs";
 import {TFactorAction, WorksPickerValue} from "../../components/controls/works-picker/works-picker.component";
 import {ActivatedRoute, Router} from "@angular/router";
 
@@ -63,7 +63,11 @@ export class SalaryEstimationPageComponent implements OnInit, OnDestroy {
             this.isSendingCalculation = false;
         }
     }
+
     worksPickerForm = new FormControl<WorksPickerValue | null>(null);
+    worksPickerForm$ = this.worksPickerForm.valueChanges.pipe(
+        shareReplay(1)
+    )
 
     workLogId$: Observable<number | undefined> = <Observable<number | undefined>>this.route.queryParams.pipe(map(params => params['workLogId']));
 

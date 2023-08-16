@@ -1,12 +1,19 @@
 import {Component, forwardRef, Input, OnDestroy, OnInit} from '@angular/core';
 import {ControlValueAccessor, NG_VALUE_ACCESSOR} from "@angular/forms";
-import {Employee, PaidAction, PaidWork, WorkLog} from "../../../transport-interfaces";
-import {ConfirmationService, TreeDragDropService, TreeNode} from "primeng/api";
+import {
+    Employee,
+    PaidAction,
+    PaidWork, PaidWorkGroup,
+    TreeNodeMoveEvent,
+    TreeNodeUpdateEvent,
+    WorkLog
+} from "../../../transport-interfaces";
+import {TreeDragDropService, TreeNode} from "primeng/api";
 import {SubscriptionsHolder} from "../../../util";
 import {v4} from "uuid";
 import {ApiService} from "../../../services/api.service";
-import {RealTimeUpdateService} from "../../../services/real-time-update.service";
 import {Table} from "primeng/table";
+import {RealTimeUpdateService} from "../../../services/real-time-update.service";
 
 export type WorksPickerValue = {
     actionsTaken: any[],
@@ -56,7 +63,7 @@ export class WorksPickerComponent implements OnInit, OnDestroy, ControlValueAcce
     subscriptions: SubscriptionsHolder = new SubscriptionsHolder();
     isDisabled = false;
 
-    constructor(private api: ApiService) {
+    constructor(private api: ApiService, private rt: RealTimeUpdateService) {
     }
 
     private _employees: Employee[] = [];
@@ -75,6 +82,7 @@ export class WorksPickerComponent implements OnInit, OnDestroy, ControlValueAcce
             return {
                 label: employee.fullName,
                 items: [
+                    {label: "x0", command: () => this.addActionRatio(0.0001, employee.login)},
                     {label: "x0.1", command: () => this.addActionRatio(0.1, employee.login)},
                     {label: "x0.25", command: () => this.addActionRatio(0.2, employee.login)},
                     {label: "x0.5", command: () => this.addActionRatio(0.5, employee.login)},
@@ -96,6 +104,10 @@ export class WorksPickerComponent implements OnInit, OnDestroy, ControlValueAcce
     };
 
     onTouched = () => {
+    };
+
+    trackByActionItems(index: number, action: PaidAction) {
+        return action.paidActionId + action.cost + action.name + action.description + action.unit + action.deleted;
     };
 
     registerOnChange(fn: any): void {
@@ -157,6 +169,50 @@ export class WorksPickerComponent implements OnInit, OnDestroy, ControlValueAcce
                 this.actionsTableLoading = false;
             }
         })
+
+        this.subscriptions.addSubscription('actUpdate', this.rt.paidActionUpdated().subscribe(
+            update => {
+                const findIndex = this.tableMenuActionsItems.findIndex(paidAction=> paidAction.identifier === update.identifier);
+                if (findIndex > -1) {
+                    this.tableMenuActionsItems[findIndex] = update
+                }
+            }
+        ));
+
+        this.subscriptions.addSubscription('actDelete', this.rt.paidActionDeleted().subscribe(
+            del=>{
+                const findIndex = this.tableMenuActionsItems.findIndex(paidAction=> paidAction.identifier === del.identifier);
+                if (findIndex > -1) {
+                    this.tableMenuActionsItems.splice(findIndex, 1)
+                }
+            }
+        ))
+
+        this.subscriptions.addSubscription('actAdd', this.rt.paidActionCreated().subscribe(
+            create=>{
+                this.tableMenuActionsItems.unshift(create)
+            }
+        ))
+    }
+
+    foundNodeByPath(path: number[]) {
+        if (!path || path.length === 0) {
+            return null;
+        }
+        let node: TreeNode<PaidWorkGroup> | null = null;
+        let nodes: TreeNode<PaidWorkGroup>[] | undefined = this.treeMenuWorksItems;
+        for (let id of path) {
+            if (!nodes) {
+                return null;
+            }
+            node = nodes.find(node => node.key === ("g" + id)) ?? null;
+            if (node) {
+                nodes = node.children
+            } else {
+                return null;
+            }
+        }
+        return node;
     }
 
     loadWorks() {
@@ -167,6 +223,89 @@ export class WorksPickerComponent implements OnInit, OnDestroy, ControlValueAcce
                 this.worksTableLoading = false;
             },
         })
+        this.subscriptions.addSubscription('trMove', this.rt.paidWorksTreeMoved().subscribe(
+            (event: TreeNodeMoveEvent) => {
+                const sourceNode = this.foundNodeByPath(event.sourcePath);
+                const targetNode = this.foundNodeByPath(event.targetPath);
+                if (!sourceNode) {
+                    const remainingNode = this.treeMenuWorksItems.findIndex(node => (node.key === event.object.key && node.type === event.object.type));
+                    if (remainingNode > -1) {
+                        this.treeMenuWorksItems.splice(remainingNode, 1);
+                    }
+                } else if (sourceNode.children) {
+                    const remainingNode = sourceNode.children.findIndex(node => (node.key === event.object.key && node.type === event.object.type));
+                    if (remainingNode > -1) {
+                        sourceNode.children.splice(remainingNode, 1);
+                    }
+                    if (sourceNode.children.length === 0) {
+                        sourceNode.leaf = true;
+                    }
+                }
+
+                if (!targetNode) {
+                    const remainingNode = this.treeMenuWorksItems.findIndex(node => (node.key === event.object.key && node.type === event.object.type));
+                    if (remainingNode === -1) {
+                        this.treeMenuWorksItems.push(event.object);
+                    }
+                } else {
+                    if (!targetNode.children) {
+                        targetNode.children = [];
+                        targetNode.children.push(event.object);
+                    } else {
+                        const remainingNode = targetNode.children.findIndex(node => (node.key === event.object.key && node.type === event.object.type));
+                        if (remainingNode === -1) {
+                            targetNode.children.push(event.object);
+                        }
+                    }
+                    targetNode.leaf = false;
+                }
+            }
+        ))
+        this.subscriptions.addSubscription('trUpd', this.rt.paidWorksTreeUpdated().subscribe(
+            (event: TreeNodeUpdateEvent) => {
+                const node = this.foundNodeByPath(event.path);
+                if (node && node.children) {
+                    const index = node.children?.findIndex(n => (n.key === event.object.key && n.type === event.object.type));
+                    if (index > -1) {
+                        node.children[index] = event.object;
+                    }
+                } else if (!node) {
+                    const index = this.treeMenuWorksItems.findIndex(n => (n.key === event.object.key && n.type === event.object.type));
+                    if (index > -1) {
+                        this.treeMenuWorksItems[index] = event.object;
+                    }
+                }
+            }
+        ))
+        this.subscriptions.addSubscription('trCr', this.rt.paidWorksTreeCreated().subscribe(
+            (event: TreeNodeUpdateEvent) => {
+                const node = this.foundNodeByPath(event.path);
+                if (node) {
+                    if (!node.children) {
+                        node.children = [];
+                    }
+                    node.children.push(event.object);
+                    node.children.sort((a: any, b: any) => a.position - b.position);
+                    node.leaf = false;
+                } else {
+                    this.treeMenuWorksItems.push(event.object);
+                    this.treeMenuWorksItems.sort((a: any, b: any) => a.position - b.position);
+                }
+            }
+        ))
+        this.subscriptions.addSubscription('trDel', this.rt.paidWorksTreeDeleted().subscribe((event: TreeNodeUpdateEvent) => {
+            const node = this.foundNodeByPath(event.path);
+            if (node && node.children) {
+                const index = node.children.findIndex(n => (n.key === event.object.key));
+                if(index > -1) {
+                    node.children?.splice(index, 1);
+                }
+            }else if(!node){
+                const rootIndex = this.treeMenuWorksItems.findIndex(n => (n.key === event.object.key));
+                if(rootIndex > -1)
+                    this.treeMenuWorksItems.splice(rootIndex, 1);
+            }
+        }))
     }
 
     loadWorksByGroup(key: any) {
@@ -285,6 +424,9 @@ export class WorksPickerComponent implements OnInit, OnDestroy, ControlValueAcce
 
     updateActionCount(event: any, node: any) {
         node.cost = event * node.price;
+        setTimeout(() => {
+            this.onChange({actionsTaken: this.actionsTaken, factorsActions: this.factorsActions})
+        })
     }
 
     dragEnter() {
@@ -333,7 +475,7 @@ export class WorksPickerComponent implements OnInit, OnDestroy, ControlValueAcce
     }
 
     filterTable(event: Event, actionTableRef: Table) {
-        const target: HTMLInputElement = <HTMLInputElement> event.target;
+        const target: HTMLInputElement = <HTMLInputElement>event.target;
         actionTableRef.filterGlobal(target.value, 'contains')
     }
 }

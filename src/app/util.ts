@@ -150,6 +150,8 @@ export class Utils {
                 return modelItem.stringData;
             case WireframeFieldType.CONNECTION_SERVICES:
                 return modelItem.connectionServicesData;
+            case WireframeFieldType.EQUIPMENTS:
+                return modelItem.equipmentRealizationsData;
             default:
                 return null;
         }
@@ -181,6 +183,9 @@ export class Utils {
                 break;
             case WireframeFieldType.CONNECTION_SERVICES:
                 fieldItem.connectionServicesData = formValue;
+                break;
+            case WireframeFieldType.EQUIPMENTS:
+                fieldItem.equipmentRealizationsData = formValue;
                 break;
             default:
                 break;
@@ -249,6 +254,8 @@ export class FormToModelItemConverter {
                 case WireframeFieldType.CONNECTION_SERVICES:
                     modelItem.connectionServicesData = formValue;
                     break;
+                case WireframeFieldType.EQUIPMENTS:
+                    modelItem.equipmentRealizationsData = formValue;
             }
 
             return modelItem;
