@@ -15,7 +15,7 @@ import {
     switchMap,
     tap
 } from "rxjs";
-import {City, House, LoadingState, Place, Street} from "../../transport-interfaces";
+import {AcpHouse, City, House, LoadingState, Place, Street} from "../../transport-interfaces";
 import {ConfirmationService, MessageService} from "primeng/api";
 import {FormControl, FormGroup, Validators} from "@angular/forms";
 import {SubscriptionsHolder} from "../../util";
@@ -63,6 +63,7 @@ export class AddressesListPageComponent implements OnInit, OnDestroy {
         fraction: new FormControl<number | null>(null),
         build: new FormControl<number | null>(null),
         isApartmentHouse: new FormControl<boolean>(false),
+        acpHouseBind: new FormControl<AcpHouse|null>(null),
     });
     subscriptions = new SubscriptionsHolder();
     cityLoad$ = of(null).pipe(
@@ -381,7 +382,8 @@ export class AddressesListPageComponent implements OnInit, OnDestroy {
             letter: house.letter ?? null,
             fraction: house.fraction ?? null,
             build: house.build ?? null,
-            isApartmentHouse: house.isApartmentHouse
+            isApartmentHouse: house.isApartmentHouse,
+            acpHouseBind: house.acpHouseBind
         })
     }
 

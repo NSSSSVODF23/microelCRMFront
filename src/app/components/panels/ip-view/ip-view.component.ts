@@ -1,7 +1,7 @@
 import {Component, Input, OnInit} from '@angular/core';
 import {ApiService} from "../../../services/api.service";
 import {RealTimeUpdateService} from "../../../services/real-time-update.service";
-import {BehaviorSubject, debounceTime, delay, map, merge, Observable, of, share} from "rxjs";
+import {BehaviorSubject, debounceTime, delay, filter, map, merge, Observable, of, share} from "rxjs";
 import {PingMonitoring} from "../../../transport-interfaces";
 import "chartjs-adapter-moment";
 import {MessageService} from "primeng/api";
@@ -92,7 +92,17 @@ export class IpViewComponent implements OnInit {
         );
     }
 
-    openWeb(ip: string, webPort: number) {
-        window.open(`http://${ip}:${webPort}`, '_blank');
+    openWeb(ip: string) {
+        this.api.checkRemoteControl(ip).subscribe(
+            {
+                next: (ra) => {
+                    if(ra.hasAccess && ra.webPort){
+                        window.open(`http://${ip}:${ra.webPort}`, '_blank');
+                    }else {
+                        this.toast.add({detail: 'Нет удаленного доступа', severity: 'dark', key: 'darktoast', icon: 'mdi-web', closable: false});
+                    }
+                }
+            }
+        )
     }
 }

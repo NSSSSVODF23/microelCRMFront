@@ -8,7 +8,7 @@ import {
     ChatUnreadCounter,
     City, ClientEquipment,
     Comment,
-    Department,
+    Department, DhcpBinding,
     Employee,
     House,
     INotification,
@@ -315,6 +315,14 @@ export class RealTimeUpdateService {
 
     clientEquipmentsDeleted() {
         return this.watch<ClientEquipment>('client-equipment', 'delete')
+    }
+
+    acpDhcpBindingUpdated() {
+        return this.watch<DhcpBinding>('acp', 'dhcp-binding', 'update')
+    }
+
+    acpDhcpBindingHousePageUpdateSignal(){
+        return this.watch<{ vlan: number }>('acp', 'dhcp-binding', 'house-page', 'update')
     }
 
     private watchUnicast<T>(...path: string[]): Observable<T> {

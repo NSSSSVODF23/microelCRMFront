@@ -2,7 +2,7 @@ import {Injectable} from '@angular/core';
 import {HttpClient} from "@angular/common/http";
 import {catchError, map, Observable, share, tap, zip} from "rxjs";
 import {
-    AcpConf,
+    AcpConf, AcpHouse,
     Address,
     Attachment, BillingConf,
     BillingTotalUserInfo,
@@ -12,7 +12,7 @@ import {
     City, ClientEquipment,
     Comment,
     DefaultObservers,
-    Department,
+    Department, DhcpBinding,
     Employee,
     EmployeeStatus,
     FieldItem,
@@ -20,7 +20,7 @@ import {
     House,
     INotification,
     MessageData,
-    ModelItem,
+    ModelItem, NetworkRemoteControl,
     Page,
     PaidAction,
     PaidActionFilter,
@@ -30,7 +30,7 @@ import {
     PaidWorkGroupForm,
     Position,
     SalaryTable,
-    SuperMessage,
+    SuperMessage, Switch,
     Task,
     TaskCreationBody,
     TaskEvent,
@@ -102,6 +102,10 @@ export class ApiService {
             return this.sendGetSilent<Task>(url);
         }
         return this.sendGet<Task>(url);
+    }
+
+    getTasksByLogin(login: string, page: number): Observable<Page<Task>> {
+        return this.sendGet<Page<Task>>(`api/private/tasks/by-login/${login}`, {page});
     }
 
     getWorkLogsByTaskId(taskId: number): Observable<WorkLog[]> {
@@ -715,11 +719,27 @@ export class ApiService {
     }
 
     getDhcpBindingsByLogin(login: string) {
-        return this.sendGet<any[]>('api/private/acp/dhcp/bindings', {login});
+        return this.sendGet<DhcpBinding[]>('api/private/acp/dhcp/bindings', {login});
+    }
+
+    getDhcpBindingsByVlan(page: number, vlan: number, excludeLogin?: string) {
+        return this.sendGet<Page<DhcpBinding>>('api/private/acp/vlan/' + vlan + '/dhcp/bindings/' + page, {excludeLogin});
+    }
+
+    authDhcpBinding(login: string, macaddr: string) {
+        return this.sendPost('api/private/acp/dhcp/binding/auth', {login, macaddr});
+    }
+
+    getBuildings(query?: string) {
+        return this.sendGet<AcpHouse[]>('api/private/acp/buildings', {query});
+    }
+
+    getSwitchesByVlan(vlan: number) {
+        return this.sendGet<Switch[]>(`api/private/acp/vlan/${vlan}/switches`);
     }
 
     checkRemoteControl(ipaddr: any) {
-        return this.sendGet<any>(`api/private/remote-control/${ipaddr}/check-access`);
+        return this.sendGet<NetworkRemoteControl>(`api/private/remote-control/${ipaddr}/check-access`);
     }
 
     getWireframeFieldTypesList(){

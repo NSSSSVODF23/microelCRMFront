@@ -1,12 +1,14 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
 import {ApiService} from "../../services/api.service";
 import {ActivatedRoute} from "@angular/router";
-import {BillingTotalUserInfo, LoadingState} from "../../transport-interfaces";
-import {SubscriptionsHolder} from "../../util";
+import {BillingTotalUserInfo, DhcpBinding, LoadingState} from "../../transport-interfaces";
+import {DynamicValueFactory, SubscriptionsHolder} from "../../util";
 import {CustomNavigationService} from "../../services/custom-navigation.service";
-import {map, merge, Subject, switchMap, tap} from "rxjs";
+import {BehaviorSubject, combineLatest, filter, first, map, merge, shareReplay, Subject, switchMap, tap} from "rxjs";
 import {TaskCreatorService} from "../../services/task-creator.service";
-import {MessageService} from "primeng/api";
+import {MenuItem, MessageService} from "primeng/api";
+import {Menu} from "primeng/menu";
+import {RealTimeUpdateService} from "../../services/real-time-update.service";
 
 @Component({
     templateUrl: './billing-user-page.component.html',
@@ -43,9 +45,55 @@ export class BillingUserPageComponent implements OnInit, OnDestroy {
 
     wireframes: any[] = [];
 
-    dhcpBindings$ = this.loadUser$.pipe(switchMap(login => this.api.getDhcpBindingsByLogin(login)));
+    dhcpBindingsLoad$ = this.loadUser$.pipe(
+        switchMap(login => this.api.getDhcpBindingsByLogin(login)),
+        shareReplay(1)
+    );
 
-    constructor(private api: ApiService, private route: ActivatedRoute, readonly customNav: CustomNavigationService, readonly taskCreation: TaskCreatorService, readonly toast: MessageService) {
+    dhcpBindings$ = DynamicValueFactory.of(this.dhcpBindingsLoad$, 'id', this.rt.acpDhcpBindingUpdated(), this.rt.acpDhcpBindingUpdated());
+
+    firstVlanOfBindings$ = this.dhcpBindingsLoad$.pipe(
+        map(binds => binds[0].vlanid),
+        shareReplay(1)
+    )
+
+    houseBindingsPage = new BehaviorSubject(0);
+    houseBindingsPage$ = this.houseBindingsPage.pipe(
+        shareReplay(1)
+    )
+    houseBindingsLoadingState = LoadingState.LOADING;
+    changeHouseVlan$ = this.firstVlanOfBindings$.pipe(
+        switchMap(vlan => this.houseBindingsPage$.pipe(first(), map(page => ({vlan, page}))))
+    )
+    changeHousePage$ = this.houseBindingsPage$.pipe(
+        switchMap(page => this.firstVlanOfBindings$.pipe(first(), map(vlan => ({vlan, page}))))
+    )
+    changeHouseVlanPage$ = merge(this.changeHouseVlan$, this.changeHousePage$).pipe(shareReplay(1));
+    updateHousePage$ = this.rt.acpDhcpBindingHousePageUpdateSignal().pipe(
+        switchMap(({vlan}) => this.changeHouseVlanPage$.pipe(first(), filter(page => page.vlan === vlan))),
+    )
+    dhcpBindingsByVlan$ = merge(this.changeHouseVlanPage$, this.updateHousePage$).pipe(
+        tap(() => this.houseBindingsLoadingState = LoadingState.LOADING),
+        switchMap(({vlan, page}) => this.api.getDhcpBindingsByVlan(page, vlan, this.currentLogin)),
+        tap({
+            next: (page) => this.houseBindingsLoadingState = page.empty ? LoadingState.EMPTY : LoadingState.READY,
+            error: () => this.houseBindingsLoadingState = LoadingState.ERROR
+        }),
+        shareReplay(1)
+    );
+    changeTaskHistoryPage = new BehaviorSubject(0);
+    bindingContextMenuItems = [] as MenuItem[];
+    tasks$ = DynamicValueFactory.ofPage(
+        combineLatest([this.pathChange$, this.changeTaskHistoryPage]),
+        this.api.getTasksByLogin.bind(this.api),
+        'taskId',
+        this.rt.taskCreated().pipe(filter(task=>task?.fields?.some(field=>field.stringData === this.currentLogin) ?? false)),
+        this.rt.taskUpdated(),
+        this.rt.taskDeleted(),
+    );
+
+    constructor(private api: ApiService, private rt: RealTimeUpdateService, private route: ActivatedRoute, readonly customNav: CustomNavigationService,
+                readonly taskCreation: TaskCreatorService, readonly toast: MessageService) {
     }
 
     get isEndTariffDateAfter() {
@@ -92,8 +140,8 @@ export class BillingUserPageComponent implements OnInit, OnDestroy {
         return this.userInfo?.ibase?.money ?? 0;
     }
 
-    trackByDhcpBinding(index: number, item: any) {
-        return index;
+    trackByDhcpBinding(index: number, item: DhcpBinding) {
+        return item.vlanid + item.ipaddr + item.state + item.id + item.isAuth + item.authName + item.authExpire;
     };
 
     ngOnInit(): void {
@@ -143,5 +191,19 @@ export class BillingUserPageComponent implements OnInit, OnDestroy {
                 console.log("Error ", err);
             }
         })
+    }
+
+    openBindingContextMenu(event: MouseEvent, binding: DhcpBinding, menu: Menu) {
+        event.preventDefault();
+        event.stopPropagation();
+        this.bindingContextMenuItems = [
+            {
+                label: 'Авторизовать (текущий логин)', command: () => {
+                    if (!this.currentLogin) return;
+                    this.api.authDhcpBinding(this.currentLogin, binding.macaddr).subscribe();
+                }
+            }
+        ]
+        menu.show(event);
     }
 }

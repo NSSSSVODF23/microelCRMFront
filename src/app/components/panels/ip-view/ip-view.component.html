@@ -7,10 +7,8 @@
             {{ip}}
         </span>
         <span (click)="copyMessage(ip)" class="mdi-copy text-sm p-2 cursor-pointer text-primary-400 hover:text-primary" pTooltip="Скопировать"></span>
-        <ng-container *ngIf="remoteAccess$ | async as remoteAccess">
-            <span *ngIf="remoteAccess.webPort" (click)="openWeb(ip, remoteAccess.webPort)" pTooltip="Удаленное управление"
-                  class="mdi-public text-sm p-2 cursor-pointer text-primary-400 hover:text-primary"></span>
-        </ng-container>
+        <span (click)="openWeb(ip)" pTooltip="Удаленное управление"
+              class="mdi-public text-sm p-2 cursor-pointer text-primary-400 hover:text-primary"></span>
     </div>
     <p-overlay [visible]="(chartVisible$ | async)??false" appendTo="body"
                contentStyleClass="overlay pointer-events-none">

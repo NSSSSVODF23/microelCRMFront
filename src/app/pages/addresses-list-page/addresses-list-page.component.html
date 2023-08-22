@@ -204,6 +204,10 @@
                 <p-checkbox formControlName="isApartmentHouse" [binary]="true"></p-checkbox>
                 <label class="caption size-small wt-bold f-color-500">Многоквартирный дом?</label>
             </div>
+            <div class="flex gap-1 flex-column">
+                <label class="caption size-small wt-bold f-color-500">Привязка к ACP</label>
+                <app-acp-house-input formControlName="acpHouseBind"></app-acp-house-input>
+            </div>
             <p-button label="Сохранить" class="align-self-end" (onClick)="saveHouse()" [loading]="(beginRequest$|async) ?? false"
                       styleClass="p-button-success" icon="mdi-save" [disabled]="!houseEditingForm.valid || houseEditingForm.pristine"></p-button>
             <ya-map (yaclick)="onMapClick($event)" [center]="centerOfMap" [zoom]="zoom" [options]="mapOptions" class="flex-grow-1">

@@ -15,6 +15,7 @@ export class BillingSettingsPageComponent implements OnInit, OnDestroy {
         port: new FormControl(80, [Validators.required]),
         login: new FormControl('', [Validators.required]),
         password: new FormControl('', [Validators.required]),
+        daemonName: new FormControl('', [Validators.required]),
         selfIp: new FormControl('', [Validators.required]),
     });
 

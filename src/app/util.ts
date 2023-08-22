@@ -1,5 +1,13 @@
-import {DateRange, FieldItem, ModelItem, Wireframe, WireframeFieldType} from "./transport-interfaces";
-import {of, Subscription, switchMap, timer} from "rxjs";
+import {
+    DateRange,
+    FieldItem,
+    LoadingState,
+    ModelItem,
+    Page,
+    Wireframe,
+    WireframeFieldType
+} from "./transport-interfaces";
+import {map, merge, Observable, of, startWith, Subject, Subscription, switchMap, tap, timer} from "rxjs";
 import {ContentChange, QuillModules} from "ngx-quill";
 import {createCustomElement} from "@angular/elements";
 import {EmployeeLabelComponent} from "./components/controls/employee-label/employee-label.component";
@@ -198,9 +206,9 @@ export class Utils {
             for (let key in obj) {
                 if (!Array.isArray(obj[key]) && typeof obj[key] !== 'string' && typeof obj[key] !== 'number' && typeof obj[key] !== 'boolean') {
                     obj[key] = JSON.stringify(obj[key]);
-                }else if(Array.isArray(obj[key])){
-                    obj[key] = obj[key].map((item:any) => {
-                        if(typeof item === 'object'){
+                } else if (Array.isArray(obj[key])) {
+                    obj[key] = obj[key].map((item: any) => {
+                        if (typeof item === 'object') {
                             return JSON.stringify(item);
                         }
                         return item;
@@ -507,3 +515,153 @@ export class Storage {
         return JSON.parse(item) as T;
     }
 }
+
+export class DynamicContent<T> {
+    value: T;
+    loadingState: LoadingState = LoadingState.LOADING;
+
+    constructor(init: T) {
+        this.value = init;
+    }
+}
+
+export class DynamicPageContent<T> {
+    value: T;
+    loadingState: LoadingState = LoadingState.LOADING;
+    pageNumber: number = 0;
+    totalElements: number = 0;
+
+    constructor(init: T) {
+        this.value = init;
+    }
+}
+
+export class DynamicValueFactory {
+
+    static of<T>(loadingObservable: Observable<T[]>, id: keyof T, appendObservable?: Observable<T> | null,
+                 updateObservable?: Observable<T> | null,
+                 deleteObservable?: Observable<T> | null): Observable<DynamicContent<T[]>> {
+        const content = new DynamicContent([] as T[]);
+
+        const obsrvrs = [loadingObservable.pipe(
+            map(loading => {
+                content.loadingState = loading == null || loading.length === 0 ? LoadingState.EMPTY : LoadingState.READY;
+                content.value = loading || [];
+                return content;
+            })
+        )]
+
+        if (appendObservable) obsrvrs.push(appendObservable.pipe(
+            map(value => {
+                if (!content.value.some(exists => exists[id] === value[id]))
+                    content.value.unshift(value);
+                return content;
+            })
+        ));
+        if (updateObservable) obsrvrs.push(updateObservable.pipe(
+            map(value => {
+                const idx = content.value.findIndex(v => v[id] === value[id]);
+                if (idx !== -1) {
+                    content.value[idx] = value;
+                }
+                return content;
+            })
+        ));
+        if (deleteObservable) obsrvrs.push(deleteObservable.pipe(
+            map(value => {
+                const idx = content.value.findIndex(v => v[id] === value[id]);
+                if (idx !== -1) {
+                    content.value.splice(idx, 1);
+                }
+                return content;
+            })
+        ));
+
+        return merge(...obsrvrs).pipe(
+            startWith(content),
+            tap({
+                next: () => {
+                    console.log('NEXT');
+                },
+                error: () => {
+                    console.log('ERROR');
+                },
+                complete: () => {
+                    console.log('COMPLETE');
+                }
+            })
+        );
+    }
+
+    static ofPage<T>(filterObservable: Observable<any[]>, loadingObservable: (..._: any) => Observable<Page<T>>, id: keyof T,
+                     appendObservable?: Observable<T> | null, updateObservable?: Observable<T> | null,
+                     deleteObservable?: Observable<T> | null): Observable<DynamicPageContent<T[]>> {
+        const content = new DynamicPageContent<T[]>([]);
+
+        const loadingStateChange = new Subject<LoadingState>();
+        const loadingStateChange$ = loadingStateChange.pipe(map(state => {
+            content.loadingState = state;
+            return content;
+        }));
+
+        const obsrvrs = [filterObservable.pipe(
+            tap({
+                next: () => loadingStateChange.next(LoadingState.LOADING)
+            }),
+            switchMap(filter => {
+                return loadingObservable(...filter).pipe(
+                    map(page => {
+                        content.loadingState = page == null || page.content.length === 0 ? LoadingState.EMPTY : LoadingState.READY;
+                        content.value = page.content || [];
+                        content.pageNumber = page.number;
+                        content.totalElements = page.totalElements;
+                        return content;
+                    })
+                )
+            })
+        )]
+
+        if (appendObservable) obsrvrs.push(appendObservable.pipe(
+            map(value => {
+                if (content.pageNumber === 0) content.value.unshift(value);
+                return content;
+            })
+        ))
+
+        if (updateObservable) obsrvrs.push(updateObservable.pipe(
+            map(value => {
+                const idx = content.value.findIndex(v => v[id] === value[id]);
+                if (idx !== -1) {
+                    content.value[idx] = value;
+                }
+                return content;
+            })
+        ));
+
+        if (deleteObservable) obsrvrs.push(deleteObservable.pipe(
+            map(value => {
+                const idx = content.value.findIndex(v => v[id] === value[id]);
+                if (idx !== -1) {
+                    content.value.splice(idx, 1);
+                }
+                return content;
+            })
+        ));
+
+        return merge(...obsrvrs, loadingStateChange$).pipe(
+            startWith(content),
+            tap({
+                next: () => {
+                    console.log('NEXT');
+                },
+                error: () => {
+                    console.log('ERROR');
+                },
+                complete: () => {
+                    console.log('COMPLETE');
+                }
+            })
+        );
+    }
+}
+

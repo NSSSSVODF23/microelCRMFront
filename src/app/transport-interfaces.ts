@@ -287,6 +287,7 @@ export interface House {
     addressName: string;
     streetId: number;
     isApartmentHouse: boolean;
+    acpHouseBind: AcpHouse;
     place?: Place;
 }
 
@@ -1097,6 +1098,224 @@ export interface TelegramConf{
 
 export interface AcpConf{
     acpFlexConnectorEndpoint: string;
+}
+
+export interface Area {
+    id: number;
+    name: string;
+}
+
+export interface Building {
+    id: number;
+    streetId: number;
+    houseNum: string;
+    areaId: number;
+    entrances: number;
+    storeys: number;
+    flats: number;
+    uplinkId: number;
+    hofficeId: number;
+    hcommitee: string;
+    description: string;
+    status: number;
+}
+
+export interface DhcpBinding {
+    id: number;
+    state: number;
+    bindtype: number;
+    macaddr: string;
+    vlanid: number;
+    nid: number;
+    nidSlot: string;
+    ipaddr: string;
+    netmask: number;
+    gw: string;
+    dhcpRelayid: string;
+    dhcpPortid: number;
+    dhcpClient: string;
+    dhcpHostname: string;
+    dhcpFlags: number;
+    dhcpRoutesid: number;
+    authName: string;
+    authDate: number;
+    authExpire: number;
+    hashdata: string;
+    natRuleid: number;
+    description: string;
+    scriptname: string;
+    bindGroup: string;
+    creationTime: number;
+    leaseStart: number;
+    leaseExpire: number;
+    sessionTime: number;
+    isAuth: boolean;
+    onlineStatus: string;
+}
+
+export interface DhcpSetting {
+    id: string;
+    authLeaseTime: number;
+    leaseTime: number;
+    enableNewBind: number;
+    primaryDns: string;
+    secondaryDns: string;
+    firstFreeslot: number;
+    lastFreeslot: number;
+    randomFreeslot: number;
+    filterDbLog: string;
+    voidAuthName: string;
+    voidAuthExpire: number;
+    defaultHostname: string;
+    defaultClient: string;
+    defaultSessionTime: number;
+    defaultRemoteId: string;
+    authExpire: number;
+}
+
+export interface Hoffice {
+    id: number;
+    name: string;
+    addr: string;
+    dispatcher: string;
+}
+
+export interface LogBuilding {
+    id: number;
+    buildingsId: number;
+    logDate: Date;
+    logType: number;
+    memo: string;
+    author: string;
+    status: number;
+}
+
+export interface MacService {
+    id: number;
+    type: number;
+    macaddr: string;
+    device: string;
+    owner: string;
+}
+
+export interface NatLog {
+    id: number;
+    login: string;
+    natUptime: Date;
+    natDowntime: Date;
+    natSestime: Date;
+    natInternalip: string;
+    natExternalip: string;
+}
+
+export interface NatRule {
+    id: number;
+    internalip: string;
+    externalip: string;
+    serverid: number;
+    natPort: number;
+    shapeClassid: number;
+    shapePrio: number;
+    shapeIn: number;
+    shapeOut: number;
+}
+
+export interface Network {
+    id: number;
+    vid: number;
+    network: string;
+    nettype: number;
+    dhcpSubnets: number;
+    dhcpCustomMask: number;
+    dhcpCustomGw: string;
+    dhcpOpt82Autodetect: number;
+    dhcpRelayIp: string;
+    description: string;
+    status: number;
+    dhcpRoute: string;
+    dhcpValDefaults: number;
+}
+
+export interface Operator {
+    id: number;
+    login: string;
+    passw: string;
+    privilage: number;
+    email: string;
+    lastIp: string;
+    lastLog: Date;
+}
+
+export interface OpLog {
+    id: number;
+    opId: number;
+    opLogin: string;
+    opIp: string;
+    opUa: string;
+    action: string;
+    url: string;
+    postData: string;
+    headers: string;
+    dateof: Date;
+    actionObject: string;
+}
+
+export interface StreetAcp {
+    id: number;
+    name: string;
+    status: number;
+}
+
+export interface Switch {
+    id: number;
+    name: string;
+    swtype: number;
+    swmodelId: number;
+    ipaddr: string;
+    protocol: number;
+    login: string;
+    passw: string;
+    buildId: number;
+    entrance: number;
+    storey: number;
+    phyUplinkId: number;
+    description: string;
+    status: number;
+    enableMonitor: number;
+    enableSms: number;
+    enableBackup: number;
+}
+
+export interface SwitchModel {
+    id: number;
+    name: string;
+    portsCount: number;
+    status: number;
+}
+
+export interface Switchport {
+    id: number;
+    swid: number;
+    port: number;
+    ptype: number;
+    isuplink: number;
+    description: string;
+}
+
+export interface AcpHouse{
+    streetId: number;
+    streetName: string;
+    buildingId: number;
+    houseNum: string;
+    fullName: string;
+}
+
+export interface NetworkRemoteControl {
+    ip: string;
+    webPort: number;
+    telnetPort: number;
+    sshPort: number;
+    hasAccess: boolean;
 }
 
 export class CacheUnit<T> {

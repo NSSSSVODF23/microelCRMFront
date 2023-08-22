@@ -31,7 +31,7 @@ export class CustomValidators {
             case WireframeFieldType.EQUIPMENTS:
                 return (control: AbstractControl): ValidationErrors | null => {
                     if (CustomValidators.isValueEmpty(control.value)) return {'required': true};
-                    if (!Array.isArray( control.value) || control.value.length === 0) return {'required': true};
+                    // if (!Array.isArray(control.value) || control.value.length === 0) return {'required': true};
                     return null;
                 }
             case WireframeFieldType.PHONE_ARRAY:

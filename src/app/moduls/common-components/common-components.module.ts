@@ -171,6 +171,7 @@ import {
     ClientEquipmentListInputComponent
 } from "../../components/controls/client-equipment-list-input/client-equipment-list-input.component";
 import {CountInputComponent} from "../../components/controls/count-input/count-input.component";
+import {AcpHouseInputComponent} from "../../components/controls/acp-house-input/acp-house-input.component";
 
 
 @NgModule({
@@ -260,7 +261,8 @@ import {CountInputComponent} from "../../components/controls/count-input/count-i
         CopyClipboardDirective,
         ConnectionServicesInputComponent,
         ClientEquipmentListInputComponent,
-        CountInputComponent
+        CountInputComponent,
+        AcpHouseInputComponent
     ],
     exports: [
         AccountPanelComponent,
@@ -348,7 +350,8 @@ import {CountInputComponent} from "../../components/controls/count-input/count-i
         CopyClipboardDirective,
         ConnectionServicesInputComponent,
         ClientEquipmentListInputComponent,
-        CountInputComponent
+        CountInputComponent,
+        AcpHouseInputComponent
     ],
     imports: [
         CommonPipesModule,

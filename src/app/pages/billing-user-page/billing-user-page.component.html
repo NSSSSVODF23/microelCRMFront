@@ -1,9 +1,10 @@
 <div appExtendPageHeight class="flexed vcenter">
-    <div [style]="{marginBottom: '1rem'}" class="responsive-wrapper flexed gap10">
+    <div class="responsive-wrapper flex flex-column gap-3 mb-3">
         <ng-container [ngSwitch]="loadingState">
             <ng-container *ngSwitchCase="'LOADING'">
                 <div class="flexed hcenter vcenter stretched panel">
-                    <p-progressSpinner class="custom-spinner custom-spinner-8xl custom-spinner-primary" strokeWidth="1"></p-progressSpinner>
+                    <p-progressSpinner class="custom-spinner custom-spinner-8xl custom-spinner-primary"
+                                       strokeWidth="1"></p-progressSpinner>
                 </div>
             </ng-container>
             <ng-container *ngSwitchCase="'ERROR'">
@@ -22,7 +23,7 @@
 </div>
 
 <ng-template #infoViewTemp>
-    <div class="flexed column stretched h-min panel">
+    <div class="flex flex-column flex-grow-1 h-min panel">
         <div class="flexed gap10 p10 hcenter terminator-bottom">
             <p-button (onClick)="customNav.backOrDefault(['/billing','search'])" icon="mdi-arrow_back"
                       styleClass="p-button-secondary p-button-text p-button-icon"></p-button>
@@ -36,7 +37,8 @@
             <div class="stretched"></div>
             <span class="caption size-tiny wt-black f-color-300">Обновлено <app-time-elapsed
                     [startTime]="loadingTimestamp"></app-time-elapsed> назад</span>
-            <p-button *ngIf="currentLogin" (onClick)="update$.next(currentLogin)" icon="mdi-refresh" styleClass="p-button-text p-button-icon"></p-button>
+            <p-button (onClick)="update$.next(currentLogin)" *ngIf="currentLogin" icon="mdi-refresh"
+                      styleClass="p-button-text p-button-icon"></p-button>
         </div>
         <div class="flex gap-3 p-6 terminator-bottom flex-grow-1">
             <div class="flex flex-column gap-3">
@@ -63,6 +65,29 @@
             </span>
         </div>
     </div>
+    <ng-container *ngIf="tasks$ | async as tasks">
+        <div class="flex flex-column flex-grow-1 h-min panel">
+            <div class="flex align-items-center p-4 gap-2 border-bluegray-50 border-bottom-1 text-lg font-light text-bluegray-400">
+                <span class="mdi-history"></span>
+                <span>История задач</span>
+            </div>
+            <ng-container [ngSwitch]="tasks.loadingState">
+                <div class="flex flex-column p-3" *ngSwitchCase="'READY'">
+                    <div [style.max-height]="'30rem'" class="overflow-y-auto">
+                        <app-task-list-element *ngFor="let task of tasks.value" [inlined]="true"
+                                               [item]="task"></app-task-list-element>
+                    </div>
+                </div>
+                <div class="flex justify-content-center align-items-center p-3" [style.height]="'30rem'" *ngSwitchCase="'LOADING'">
+                    <p-progressSpinner class="custom-spinner custom-spinner-8xl custom-spinner-primary" strokeWidth="1"></p-progressSpinner>
+                </div>
+            </ng-container>
+            <p-paginator (onPageChange)="changeTaskHistoryPage.next($event.page)" [rows]="5"
+                         [showCurrentPageReport]="true"
+                         [totalRecords]="tasks.totalElements" class="p-2"
+                         currentPageReportTemplate="{totalRecords} задач"></p-paginator>
+        </div>
+    </ng-container>
 </ng-template>
 
 <ng-template #titleTagsTemp>
@@ -283,32 +308,91 @@
 
 <ng-template #acpInfo>
     <div class="flex flex-column overflow-hidden border-round-md border-bluegray-100 border-1">
-        <div class="p-3 text-sm text-bluegray-400 bg-bluegray-50 border-bottom-1 border-bluegray-100">
-            Оборудование абонента
-        </div>
-        <div class="flex flex-column p-3 gap-2 overflow-auto" [style.max-height]="'15rem'">
-            <div *ngFor="let binding of (dhcpBindings$ | async); trackBy: trackByDhcpBinding"
-                 class="flex border-round-md border-bluegray-100 border-1 p-2 text-sm">
-                <div class="flex flex-column gap-2 flex-grow-1">
-                    <div class="flex gap-2 align-items-center">
-                        <span [style]="{backgroundColor:binding.onlineStatus === 'ONLINE' ? 'var(--green-400)' : 'var(--red-400)'}"
-                              class="border-circle w-1rem h-1rem"></span>
-                        <span class="font-bold text-bluegray-600">{{binding.macaddr}}</span>
-                        <span class="text-primary-400">{{binding.dhcpHostname}}</span>
-                        <span *ngIf="binding.isAuth" class="text-green-400 font-bold">Авторизован</span>
-                    </div>
-                    <div class="flex gap-2 align-items-center">
-                        <app-ip-view *ngIf="binding.ipaddr" [ip]="binding.ipaddr"></app-ip-view>
-                        <span>VLAN: {{binding.vlanid}}</span>
-                        <span>Смена состояния: <app-time-elapsed [startTime]="binding.sessionTime" type="short"></app-time-elapsed> назад</span>
-                    </div>
+        <p-tabView>
+            <p-tabPanel header="Оборудование абонента">
+                <div [style.max-height]="'30rem'" class="flex flex-column gap-2 overflow-auto">
+                    <ng-container *ngIf="dhcpBindings$ | async as bindings">
+                        <ng-container *ngFor="let binding of bindings.value; trackBy: trackByDhcpBinding"
+                                      [ngTemplateOutletContext]="{binding:binding}"
+                                      [ngTemplateOutlet]="dhcpBinding"></ng-container>
+                    </ng-container>
                 </div>
-                <div class="flex align-items-center">
-                    <p-button icon="mdi-more_vert" styleClass="p-button-rounded p-button-icon p-button-text p-button-secondary"></p-button>
+            </p-tabPanel>
+            <p-tabPanel header="Оборудование в доме">
+                <div [style.max-height]="'30rem'" class="flex flex-column gap-2 overflow-auto">
+                    <ng-container *ngIf="dhcpBindingsByVlan$ | async as bindings">
+                        <ng-container [ngSwitch]="houseBindingsLoadingState">
+                            <div *ngSwitchCase="'LOADING'"
+                                 [style.height]="'30rem'"
+                                 class="flex align-items-center justify-content-center flex-grow-1">
+                                <p-progressSpinner
+                                        class="custom-spinner custom-spinner-gray custom-spinner-8xl"></p-progressSpinner>
+                            </div>
+                            <div *ngSwitchCase="'EMPTY'"
+                                 [style.height]="'30rem'"
+                                 class="flex align-items-center justify-content-center flex-grow-1">
+                                <div class="flex flex-column align-items-center font-bold text-lg text-bluegray-300">
+                                    <span class="mds-apartment"></span>
+                                    <span>Оборудование в доме не найдено</span>
+                                </div>
+                            </div>
+                            <div *ngSwitchCase="'ERROR'"
+                                 [style.height]="'30rem'"
+                                 class="flex align-items-center justify-content-center flex-grow-1">
+                                <div class="flex flex-column align-items-center font-bold text-lg text-red-400">
+                                    <span class="mds-error"></span>
+                                    <span>Ошибка загрузки</span>
+                                </div>
+                            </div>
+                            <ng-container *ngSwitchCase="'READY'">
+                                <ng-container *ngFor="let binding of bindings.content; trackBy: trackByDhcpBinding"
+                                              [ngTemplateOutletContext]="{binding:binding, isLogin:true}"
+                                              [ngTemplateOutlet]="dhcpBinding"></ng-container>
+                            </ng-container>
+                        </ng-container>
+                        <p-paginator (onPageChange)="houseBindingsPage.next($event.page)" [rows]="10"
+                                     [totalRecords]="bindings.totalElements"
+                                     class="position-sticky bottom-0"></p-paginator>
+                    </ng-container>
+
                 </div>
-            </div>
-        </div>
+            </p-tabPanel>
+        </p-tabView>
     </div>
 </ng-template>
 
 <p-menu #createTaskMenu [model]="wireframes" [popup]="true" appendTo="body"></p-menu>
+
+<ng-template #dhcpBinding let-binding="binding" let-isLogin="isLogin">
+    <div class="flex border-round-md border-bluegray-100 border-1 p-2 text-sm">
+        <div class="flex flex-column gap-2 flex-grow-1">
+            <div class="flex gap-2 align-items-center">
+                        <span [style]="{backgroundColor:binding.onlineStatus === 'ONLINE' ? 'var(--green-400)' : 'var(--red-400)'}"
+                              class="border-circle w-1rem h-1rem"></span>
+                <span class="font-bold text-bluegray-600">{{binding.macaddr}}</span>
+                <span *ngIf="isLogin" class="font-bold text-bluegray-600">{{binding.authName}}</span>
+                <span class="flex gap-1 text-primary-400">
+                                    <span *ngIf="binding.dhcpClient">
+                                        {{binding.dhcpClient}}
+                                    </span>
+                                    <span *ngIf="binding.dhcpHostname">
+                                        {{binding.dhcpHostname}}
+                                    </span>
+                                </span>
+                <span *ngIf="binding.isAuth" class="text-green-400 font-bold">Авторизован</span>
+            </div>
+            <div class="flex gap-2 align-items-center">
+                <app-ip-view *ngIf="binding.ipaddr" [ip]="binding.ipaddr"></app-ip-view>
+                <span>VLAN: {{binding.vlanid}}</span>
+                <span>Смена состояния: <app-time-elapsed [startTime]="binding.sessionTime"
+                                                         type="short"></app-time-elapsed> назад</span>
+            </div>
+        </div>
+        <div class="flex align-items-center">
+            <p-button (onClick)="openBindingContextMenu($event, binding, bindingContextMenu)" icon="mdi-more_vert"
+                      styleClass="p-button-rounded p-button-icon p-button-text p-button-secondary"></p-button>
+        </div>
+    </div>
+</ng-template>
+
+<p-menu #bindingContextMenu [model]="bindingContextMenuItems" [popup]="true" appendTo="body"></p-menu>
