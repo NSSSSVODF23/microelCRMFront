@@ -384,7 +384,7 @@
             <div class="flex gap-2 align-items-center">
                 <app-ip-view *ngIf="binding.ipaddr" [ip]="binding.ipaddr"></app-ip-view>
                 <span>VLAN: {{binding.vlanid}}</span>
-                <span>Смена состояния: <app-time-elapsed [startTime]="binding.sessionTime"
+                <span>Смена состояния: <app-time-elapsed [startTime]="binding.leaseStart"
                                                          type="short"></app-time-elapsed> назад</span>
             </div>
         </div>

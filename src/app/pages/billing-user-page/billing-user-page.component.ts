@@ -4,7 +4,19 @@ import {ActivatedRoute} from "@angular/router";
 import {BillingTotalUserInfo, DhcpBinding, LoadingState} from "../../transport-interfaces";
 import {DynamicValueFactory, SubscriptionsHolder} from "../../util";
 import {CustomNavigationService} from "../../services/custom-navigation.service";
-import {BehaviorSubject, combineLatest, filter, first, map, merge, shareReplay, Subject, switchMap, tap} from "rxjs";
+import {
+    BehaviorSubject,
+    combineLatest,
+    debounceTime,
+    filter,
+    first,
+    map,
+    merge,
+    shareReplay,
+    Subject,
+    switchMap,
+    tap
+} from "rxjs";
 import {TaskCreatorService} from "../../services/task-creator.service";
 import {MenuItem, MessageService} from "primeng/api";
 import {Menu} from "primeng/menu";
@@ -73,6 +85,7 @@ export class BillingUserPageComponent implements OnInit, OnDestroy {
         switchMap(({vlan}) => this.changeHouseVlanPage$.pipe(first(), filter(page => page.vlan === vlan))),
     )
     dhcpBindingsByVlan$ = merge(this.changeHouseVlanPage$, this.updateHousePage$).pipe(
+        debounceTime(100),
         tap(() => this.houseBindingsLoadingState = LoadingState.LOADING),
         switchMap(({vlan, page}) => this.api.getDhcpBindingsByVlan(page, vlan, this.currentLogin)),
         tap({
