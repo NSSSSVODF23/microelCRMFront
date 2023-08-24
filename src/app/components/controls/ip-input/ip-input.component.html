@@ -1,4 +1,4 @@
-<fieldset class="node flexed octet-wrapper" [formGroup]="formGroup" (blur)="onBlur.emit()">
+<fieldset class="node flexed octet-wrapper bg-white" [formGroup]="formGroup" (blur)="onBlur.emit()">
     <input [formControl]="control1" (focus)="octetFocus($event)" (input)="focusNext($event, octTwo)" class="octet-input">
     <span>.</span>
     <input #octTwo [formControl]="control2" (focus)="octetFocus($event)" (input)="focusNext($event, octThree)" class="octet-input">

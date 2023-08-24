@@ -12,15 +12,16 @@ import {
     first,
     map,
     merge,
-    shareReplay,
+    shareReplay, startWith,
     Subject,
     switchMap,
     tap
 } from "rxjs";
 import {TaskCreatorService} from "../../services/task-creator.service";
-import {MenuItem, MessageService} from "primeng/api";
+import {ConfirmationService, MenuItem, MessageService} from "primeng/api";
 import {Menu} from "primeng/menu";
 import {RealTimeUpdateService} from "../../services/real-time-update.service";
+import {FormControl, FormGroup} from "@angular/forms";
 
 @Component({
     templateUrl: './billing-user-page.component.html',
@@ -65,6 +66,7 @@ export class BillingUserPageComponent implements OnInit, OnDestroy {
     dhcpBindings$ = DynamicValueFactory.of(this.dhcpBindingsLoad$, 'id', this.rt.acpDhcpBindingUpdated(), this.rt.acpDhcpBindingUpdated());
 
     firstVlanOfBindings$ = this.dhcpBindingsLoad$.pipe(
+        filter(bindings => bindings && bindings.length > 0),
         map(binds => binds[0].vlanid),
         shareReplay(1)
     )
@@ -100,13 +102,57 @@ export class BillingUserPageComponent implements OnInit, OnDestroy {
         combineLatest([this.pathChange$, this.changeTaskHistoryPage]),
         this.api.getTasksByLogin.bind(this.api),
         'taskId',
-        this.rt.taskCreated().pipe(filter(task=>task?.fields?.some(field=>field.stringData === this.currentLogin) ?? false)),
+        this.rt.taskCreated().pipe(filter(task => task?.fields?.some(field => field.stringData === this.currentLogin) ?? false)),
         this.rt.taskUpdated(),
         this.rt.taskDeleted(),
     );
 
+    isLoadingLastBindings = true;
+    isAuthDialogVisible = false;
+
+    openAuthDialog = new Subject<null>();
+    changeLastBindingsPage = new BehaviorSubject(0);
+    changeLastBindingsPage$ = this.changeLastBindingsPage.pipe(
+        tap(() => this.isLoadingLastBindings = true),
+        shareReplay(1)
+    )
+    openAuthDialog$ = this.openAuthDialog.pipe(
+        tap(() => {
+            this.isAuthDialogVisible = true
+            this.isLoadingLastBindings = true
+        }),
+    )
+    lastBindingsFilterForm = new FormGroup({
+        state: new FormControl(true),
+        macaddr: new FormControl(null),
+        login: new FormControl(null),
+        ip: new FormControl(null),
+        vlan: new FormControl(null),
+        buildingId: new FormControl(null),
+    });
+    lastBindingsFilter$ = this.lastBindingsFilterForm.valueChanges.pipe(
+        startWith(this.lastBindingsFilterForm.value),
+        debounceTime(1000),
+        tap(() => this.isLoadingLastBindings = true),
+        map(filters=>{
+            return {state: filters.state ? 1 : 0, macaddr: filters.macaddr, login: filters.login, ip: filters.ip,
+                vlan: filters.vlan, buildingId: filters.buildingId && filters.buildingId['buildingId']}
+        }),
+        shareReplay(1)
+    );
+    lastBindingsPage$ = combineLatest([
+        this.openAuthDialog$,
+        this.changeLastBindingsPage$,
+        this.lastBindingsFilter$
+    ]).pipe(
+        switchMap(([_,page, {state, macaddr, vlan, login, ip, buildingId}]) => this.api.getLastBindings(page, state, macaddr, login, ip, vlan, buildingId)),
+        tap(() => this.isLoadingLastBindings = false),
+        shareReplay(1)
+    )
+
+
     constructor(private api: ApiService, private rt: RealTimeUpdateService, private route: ActivatedRoute, readonly customNav: CustomNavigationService,
-                readonly taskCreation: TaskCreatorService, readonly toast: MessageService) {
+                readonly taskCreation: TaskCreatorService, readonly toast: MessageService, private confirm: ConfirmationService) {
     }
 
     get isEndTariffDateAfter() {
@@ -207,16 +253,37 @@ export class BillingUserPageComponent implements OnInit, OnDestroy {
     }
 
     openBindingContextMenu(event: MouseEvent, binding: DhcpBinding, menu: Menu) {
-        event.preventDefault();
-        event.stopPropagation();
         this.bindingContextMenuItems = [
             {
-                label: 'Авторизовать (текущий логин)', command: () => {
-                    if (!this.currentLogin) return;
-                    this.api.authDhcpBinding(this.currentLogin, binding.macaddr).subscribe();
-                }
+                label: 'Авторизовать (текущий логин)', command: () => this.authCurrentLogin(binding.macaddr)
             }
         ]
-        menu.show(event);
+        menu.toggle(event);
+    }
+
+    authCurrentLogin(macaddr: string) {
+        if (!this.currentLogin) {
+            this.toast.add({
+                severity: 'error',
+                summary: "Ошибка запроса",
+                detail: "Не найден логин для авторизации"
+            })
+            return;
+        }
+        this.api.authDhcpBinding(this.currentLogin, macaddr).subscribe(()=>{
+            this.toast.add({
+                detail: 'Логин успешно авторизован', severity: 'dark', key: 'darktoast', icon: 'mdi-verified', closable: false
+            })
+        });
+    }
+
+    authConfirm(binding: DhcpBinding) {
+        this.confirm.confirm({
+            header: 'Подтверждение',
+            message: 'Авторизовать ' + binding.macaddr + ' под логином ' + this.currentLogin+'?',
+            accept: () => {
+                this.authCurrentLogin(binding.macaddr);
+            }
+        })
     }
 }

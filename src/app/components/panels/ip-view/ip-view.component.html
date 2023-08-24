@@ -7,8 +7,11 @@
             {{ip}}
         </span>
         <span (click)="copyMessage(ip)" class="mdi-copy text-sm p-2 cursor-pointer text-primary-400 hover:text-primary" pTooltip="Скопировать"></span>
-        <span (click)="openWeb(ip)" pTooltip="Удаленное управление"
-              class="mdi-public text-sm p-2 cursor-pointer text-primary-400 hover:text-primary"></span>
+        <ng-container [ngSwitch]="isDisabledRemoteAccessButton">
+            <span (click)="openWeb(ip)" pTooltip="Удаленное управление" *ngSwitchCase="false"
+                  class="mdi-public text-sm p-2 cursor-pointer text-primary-400 hover:text-primary"></span>
+            <p-progressSpinner *ngSwitchCase="true" class="custom-spinner custom-spinner-primary custom-spinner-sm m-2" strokeWidth="2"></p-progressSpinner>
+        </ng-container>
     </div>
     <p-overlay [visible]="(chartVisible$ | async)??false" appendTo="body"
                contentStyleClass="overlay pointer-events-none">

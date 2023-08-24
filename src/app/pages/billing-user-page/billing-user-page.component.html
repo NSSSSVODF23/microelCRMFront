@@ -69,23 +69,41 @@
         <div class="flex flex-column flex-grow-1 h-min panel">
             <div class="flex align-items-center p-4 gap-2 border-bluegray-50 border-bottom-1 text-lg font-light text-bluegray-400">
                 <span class="mdi-history"></span>
-                <span>История задач</span>
+                <span class="flex-grow-1">История задач</span>
+                <span *ngIf="tasks.totalElements > 0" class="text-sm text-primary-400 font-bold">
+                    Найдено: {{tasks.totalElements}} {{tasks.totalElements | decline:'задача':'задачи':'задач'}}
+                </span>
             </div>
             <ng-container [ngSwitch]="tasks.loadingState">
-                <div class="flex flex-column p-3" *ngSwitchCase="'READY'">
+                <div *ngSwitchCase="'READY'" class="flex flex-column p-3">
                     <div [style.max-height]="'30rem'" class="overflow-y-auto">
                         <app-task-list-element *ngFor="let task of tasks.value" [inlined]="true"
                                                [item]="task"></app-task-list-element>
                     </div>
                 </div>
-                <div class="flex justify-content-center align-items-center p-3" [style.height]="'30rem'" *ngSwitchCase="'LOADING'">
-                    <p-progressSpinner class="custom-spinner custom-spinner-8xl custom-spinner-primary" strokeWidth="1"></p-progressSpinner>
+                <div *ngSwitchCase="'LOADING'" [style.height]="'30rem'"
+                     class="flex justify-content-center align-items-center p-3">
+                    <p-progressSpinner class="custom-spinner custom-spinner-8xl custom-spinner-primary"
+                                       strokeWidth="1"></p-progressSpinner>
+                </div>
+                <div *ngSwitchCase="'EMPTY'"
+                     class="flex align-items-center justify-content-center flex-grow-1 py-5">
+                    <div class="flex flex-column align-items-center text-lg text-bluegray-400">
+                        <span class="mds-task_alt"></span>
+                        <span>Не найденно задач</span>
+                    </div>
+                </div>
+                <div *ngSwitchCase="'ERROR'"
+                     class="flex align-items-center justify-content-center flex-grow-1 py-5">
+                    <div class="flex flex-column align-items-center text-lg text-red-400">
+                        <span class="mds-error"></span>
+                        <span>Ошибка загрузки</span>
+                    </div>
                 </div>
             </ng-container>
-            <p-paginator (onPageChange)="changeTaskHistoryPage.next($event.page)" [rows]="5"
-                         [showCurrentPageReport]="true"
-                         [totalRecords]="tasks.totalElements" class="p-2"
-                         currentPageReportTemplate="{totalRecords} задач"></p-paginator>
+            <p-paginator (onPageChange)="changeTaskHistoryPage.next($event.page)" *ngIf="tasks.loadingState === 'READY'"
+                         [first]="tasks.pageNumber * 5"
+                         [rows]="5" [totalRecords]="tasks.totalElements" class="p-2"></p-paginator>
         </div>
     </ng-container>
 </ng-template>
@@ -312,15 +330,44 @@
             <p-tabPanel header="Оборудование абонента">
                 <div [style.max-height]="'30rem'" class="flex flex-column gap-2 overflow-auto">
                     <ng-container *ngIf="dhcpBindings$ | async as bindings">
-                        <ng-container *ngFor="let binding of bindings.value; trackBy: trackByDhcpBinding"
-                                      [ngTemplateOutletContext]="{binding:binding}"
-                                      [ngTemplateOutlet]="dhcpBinding"></ng-container>
+                        <ng-container [ngSwitch]="bindings.loadingState">
+                            <ng-container *ngSwitchCase="'READY'">
+                                <ng-container *ngFor="let binding of bindings.value; trackBy: trackByDhcpBinding"
+                                              [ngTemplateOutletContext]="{binding:binding}"
+                                              [ngTemplateOutlet]="dhcpBinding"></ng-container>
+                                <p-button (onClick)="isAuthDialogVisible = true"
+                                          icon="mdi-check" class="align-self-center"
+                                          label="Найти и авторизовать" styleClass="p-button-warning p-button-outlined"></p-button>
+                            </ng-container>
+                            <div *ngSwitchCase="'EMPTY'"
+                                 class="flex align-items-center justify-content-center flex-grow-1 py-5">
+                                <div class="flex flex-column align-items-center text-lg text-bluegray-400">
+                                    <span class="mds-router"></span>
+                                    <span>Нет авторизованного оборудования</span>
+                                    <p-button (onClick)="isAuthDialogVisible = true" class="mt-3"
+                                              icon="mdi-check"
+                                              label="Авторизовать" styleClass="p-button-success p-button-outlined"></p-button>
+                                </div>
+                            </div>
+                            <div *ngSwitchCase="'ERROR'"
+                                 class="flex align-items-center justify-content-center flex-grow-1 py-5">
+                                <div class="flex flex-column align-items-center text-lg text-red-400">
+                                    <span class="mds-error"></span>
+                                    <span>Ошибка загрузки оборудования</span>
+                                </div>
+                            </div>
+                            <div *ngSwitchCase="'LOADING'"
+                                 class="flex align-items-center justify-content-center flex-grow-1 py-5">
+                                <p-progressSpinner class="custom-spinner custom-spinner-gray custom-spinner-8xl"
+                                                   strokeWidth="1"></p-progressSpinner>
+                            </div>
+                        </ng-container>
                     </ng-container>
                 </div>
             </p-tabPanel>
-            <p-tabPanel header="Оборудование в доме">
-                <div [style.max-height]="'30rem'" class="flex flex-column gap-2 overflow-auto">
-                    <ng-container *ngIf="dhcpBindingsByVlan$ | async as bindings">
+            <ng-container *ngIf="dhcpBindingsByVlan$ | async as bindings">
+                <p-tabPanel header="Оборудование в доме">
+                    <div [style.max-height]="'30rem'" class="flex flex-column gap-2 overflow-auto">
                         <ng-container [ngSwitch]="houseBindingsLoadingState">
                             <div *ngSwitchCase="'LOADING'"
                                  [style.height]="'30rem'"
@@ -353,10 +400,9 @@
                         <p-paginator (onPageChange)="houseBindingsPage.next($event.page)" [rows]="10"
                                      [totalRecords]="bindings.totalElements"
                                      class="position-sticky bottom-0"></p-paginator>
-                    </ng-container>
-
-                </div>
-            </p-tabPanel>
+                    </div>
+                </p-tabPanel>
+            </ng-container>
         </p-tabView>
     </div>
 </ng-template>
@@ -367,18 +413,18 @@
     <div class="flex border-round-md border-bluegray-100 border-1 p-2 text-sm">
         <div class="flex flex-column gap-2 flex-grow-1">
             <div class="flex gap-2 align-items-center">
-                        <span [style]="{backgroundColor:binding.onlineStatus === 'ONLINE' ? 'var(--green-400)' : 'var(--red-400)'}"
-                              class="border-circle w-1rem h-1rem"></span>
+                <span [style]="{backgroundColor:binding.onlineStatus === 'ONLINE' ? 'var(--green-400)' : 'var(--red-400)'}"
+                      class="border-circle w-1rem h-1rem"></span>
                 <span class="font-bold text-bluegray-600">{{binding.macaddr}}</span>
                 <span *ngIf="isLogin" class="font-bold text-bluegray-600">{{binding.authName}}</span>
                 <span class="flex gap-1 text-primary-400">
-                                    <span *ngIf="binding.dhcpClient">
-                                        {{binding.dhcpClient}}
-                                    </span>
-                                    <span *ngIf="binding.dhcpHostname">
-                                        {{binding.dhcpHostname}}
-                                    </span>
-                                </span>
+                    <span *ngIf="binding.dhcpClient">
+                        {{binding.dhcpClient}}
+                    </span>
+                    <span *ngIf="binding.dhcpHostname">
+                        {{binding.dhcpHostname}}
+                    </span>
+                </span>
                 <span *ngIf="binding.isAuth" class="text-green-400 font-bold">Авторизован</span>
             </div>
             <div class="flex gap-2 align-items-center">
@@ -389,10 +435,102 @@
             </div>
         </div>
         <div class="flex align-items-center">
-            <p-button (onClick)="openBindingContextMenu($event, binding, bindingContextMenu)" icon="mdi-more_vert"
+            <p-button (onClick)="openBindingContextMenu($event, binding, bindingContextMenu)" [disabled]="binding.isAuth && binding.authName === currentLogin"
+                      icon="mdi-more_vert"
                       styleClass="p-button-rounded p-button-icon p-button-text p-button-secondary"></p-button>
         </div>
     </div>
 </ng-template>
 
 <p-menu #bindingContextMenu [model]="bindingContextMenuItems" [popup]="true" appendTo="body"></p-menu>
+
+<p-dialog (onShow)="openAuthDialog.next(null)" [(visible)]="isAuthDialogVisible"
+          appendTo="body" header="Авторизация оборудования" [resizable]="false">
+    <ng-template pTemplate="content">
+        <ng-container *ngIf="lastBindingsPage$ | async as lastBindingsPage; else loading">
+            <div class="flex py-3 gap-3 align-items-end justify-content-end" [formGroup]="lastBindingsFilterForm">
+                <div class="text-primary-400 font-bold">
+                    Найдено: {{lastBindingsPage.totalElements}} {{lastBindingsPage.totalElements | decline:'сессия':'сессии':'сессий'}}
+                </div>
+                <p-toggleButton formControlName="state" [disabled]="isLoadingLastBindings" onLabel="В сети"
+                                onIcon="mdi-check_circle" offLabel="Не в сети" offIcon="mdi-cancel"></p-toggleButton>
+                <p-button label="Сбросить фильтр" styleClass="p-button-secondary p-button-text"
+                          (onClick)="lastBindingsFilterForm.reset({state:true})" icon="mdi-filter_alt_off"></p-button>
+            </div>
+            <p-table [loading]="isLoadingLastBindings" [scrollable]="true" [value]="lastBindingsPage.content" dataKey="id"
+                     scrollHeight="500px">
+                <ng-template pTemplate="header">
+                    <tr>
+                        <th>MAC-адрес</th>
+                        <th>Логин</th>
+                        <th>Оборудование</th>
+                        <th>Состояние</th>
+                        <th>Адрес</th>
+                        <th>IP-адрес</th>
+                        <th>VLAN</th>
+                        <th>Смена состояния</th>
+                    </tr>
+                    <tr [formGroup]="lastBindingsFilterForm">
+                        <th>
+                            <input pInputText type="text" formControlName="macaddr" [size]="14"/>
+                        </th>
+                        <th>
+                            <input pInputText type="text" formControlName="login" [size]="8"/>
+                        </th>
+                        <th></th>
+                        <th></th>
+                        <th>
+                            <app-acp-house-input formControlName="buildingId"></app-acp-house-input>
+                        </th>
+                        <th>
+                            <app-ip-input formControlName="ip"></app-ip-input>
+                        </th>
+                        <th>
+                            <p-inputNumber [size]="4" [max]="4096" formControlName="vlan"></p-inputNumber>
+                        </th>
+                        <th></th>
+                    </tr>
+                </ng-template>
+                <ng-template let-binding pTemplate="body">
+                    <tr (click)="authConfirm(binding)" class="cursor-pointer hover:bg-primary-50 hover:text-primary-400">
+                        <td>{{binding.macaddr}}</td>
+                        <td>{{binding.authName}}</td>
+                        <td>
+                            <div [style.max-width]="'7rem'" appTicker class="white-space-nowrap overflow-hidden">
+                                <ng-container *ngIf="binding.dhcpClient">
+                                    {{binding.dhcpClient}}
+                                </ng-container>
+                                <ng-container *ngIf="binding.dhcpHostname">
+                                    {{binding.dhcpHostname}}
+                                </ng-container>
+                            </div>
+                        </td>
+                        <td>
+                            <ng-container [ngSwitch]="binding.isAuth">
+                                <span *ngSwitchCase="false" class="text-bluegray-300">Не авторизован</span>
+                                <span *ngSwitchCase="true" class="text-green-400">Авторизован</span>
+                            </ng-container>
+                        </td>
+                        <td>{{binding.streetName}} {{binding.houseNum}}</td>
+                        <td>{{binding.ipaddr}}</td>
+                        <td>{{binding.vlanid}}</td>
+                        <td>
+                            <app-time-elapsed [startTime]="binding.leaseStart"
+                                              type="short"></app-time-elapsed>
+                        </td>
+                    </tr>
+                </ng-template>
+            </p-table>
+            <p-paginator (onPageChange)="changeLastBindingsPage.next($event.page)" [first]="lastBindingsPage.number * 15"
+                         [rows]="15"
+                         [totalRecords]="lastBindingsPage.totalElements"></p-paginator>
+        </ng-container>
+    </ng-template>
+</p-dialog>
+
+<ng-template #loading>
+    <div class="flex align-items-center justify-content-center flex-grow-1 py-5">
+        <p-progressSpinner class="custom-spinner custom-spinner-gray custom-spinner-8xl"
+                           strokeWidth="1"></p-progressSpinner>
+    </div>
+</ng-template>

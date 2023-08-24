@@ -1151,6 +1151,10 @@ export interface DhcpBinding {
     sessionTime: number;
     isAuth: boolean;
     onlineStatus: string;
+    buildingId?: number;
+    houseNum?: string;
+    streetId?: number;
+    streetName?: string;
 }
 
 export interface DhcpSetting {

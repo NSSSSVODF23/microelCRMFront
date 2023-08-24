@@ -2,17 +2,21 @@ import {Injectable} from '@angular/core';
 import {HttpClient} from "@angular/common/http";
 import {catchError, map, Observable, share, tap, zip} from "rxjs";
 import {
-    AcpConf, AcpHouse,
+    AcpConf,
+    AcpHouse,
     Address,
-    Attachment, BillingConf,
+    Attachment,
+    BillingConf,
     BillingTotalUserInfo,
     BillingUserItemData,
     Chat,
     ChatMessage,
-    City, ClientEquipment,
+    City,
+    ClientEquipment,
     Comment,
     DefaultObservers,
-    Department, DhcpBinding,
+    Department,
+    DhcpBinding,
     Employee,
     EmployeeStatus,
     FieldItem,
@@ -20,7 +24,8 @@ import {
     House,
     INotification,
     MessageData,
-    ModelItem, NetworkRemoteControl,
+    ModelItem,
+    NetworkRemoteControl,
     Page,
     PaidAction,
     PaidActionFilter,
@@ -30,13 +35,15 @@ import {
     PaidWorkGroupForm,
     Position,
     SalaryTable,
-    SuperMessage, Switch,
+    SuperMessage,
+    Switch,
     Task,
     TaskCreationBody,
     TaskEvent,
     TaskFieldsSnapshot,
     TaskFiltrationConditions,
-    TaskTag, TelegramConf,
+    TaskTag,
+    TelegramConf,
     TokenChain,
     TreeDragDropEvent,
     TreeElementPosition,
@@ -722,6 +729,17 @@ export class ApiService {
         return this.sendGet<DhcpBinding[]>('api/private/acp/dhcp/bindings', {login});
     }
 
+    getLastBindings(page: number, state?: number, macaddr?: string | null, login?: string | null, ip?: string | null, vlan?: number | null, buildingId?: number | null) {
+        return this.sendGet<Page<DhcpBinding>>('api/private/acp/dhcp/bindings/' + page + '/last', {
+            state,
+            macaddr,
+            login,
+            ip,
+            vlan,
+            buildingId
+        });
+    }
+
     getDhcpBindingsByVlan(page: number, vlan: number, excludeLogin?: string) {
         return this.sendGet<Page<DhcpBinding>>('api/private/acp/vlan/' + vlan + '/dhcp/bindings/' + page, {excludeLogin});
     }
@@ -742,43 +760,43 @@ export class ApiService {
         return this.sendGet<NetworkRemoteControl>(`api/private/remote-control/${ipaddr}/check-access`);
     }
 
-    getWireframeFieldTypesList(){
-        return this.sendGet<{label: string, value: string}[]>('api/private/types/wireframe-field');
+    getWireframeFieldTypesList() {
+        return this.sendGet<{ label: string, value: string }[]>('api/private/types/wireframe-field');
     }
 
-    getConnectionServicesList(){
-        return this.sendGet<{label: string, value: string}[]>('api/private/types/connection-service');
+    getConnectionServicesList() {
+        return this.sendGet<{ label: string, value: string }[]>('api/private/types/connection-service');
     }
 
-    getConnectionServicesSuggestionsList(query: string){
-        return this.sendGet<{label: string, value: string}[]>('api/private/types/connection-service/suggestions', {query});
+    getConnectionServicesSuggestionsList(query: string) {
+        return this.sendGet<{ label: string, value: string }[]>('api/private/types/connection-service/suggestions', {query});
     }
 
-    getConnectionTypesList(){
-        return this.sendGet<{label: string, value: string}[]>('api/private/types/connection-type');
+    getConnectionTypesList() {
+        return this.sendGet<{ label: string, value: string }[]>('api/private/types/connection-type');
     }
 
-    getBillingConfiguration(){
+    getBillingConfiguration() {
         return this.sendGet<BillingConf>('api/private/configuration/billing');
     }
 
-    getTelegramConfiguration(){
+    getTelegramConfiguration() {
         return this.sendGet<TelegramConf>('api/private/configuration/telegram');
     }
 
-    getAcpConfiguration(){
+    getAcpConfiguration() {
         return this.sendGet<AcpConf>('api/private/configuration/acp');
     }
 
-    setBillingConfiguration(billingConf: BillingConf){
+    setBillingConfiguration(billingConf: BillingConf) {
         return this.sendPost('api/private/configuration/billing', billingConf);
     }
 
-    setTelegramConfiguration(telegramConf: TelegramConf){
+    setTelegramConfiguration(telegramConf: TelegramConf) {
         return this.sendPost('api/private/configuration/telegram', telegramConf);
     }
 
-    setAcpConfiguration(acpConf: AcpConf){
+    setAcpConfiguration(acpConf: AcpConf) {
         return this.sendPost('api/private/configuration/acp', acpConf);
     }
 
@@ -801,8 +819,8 @@ export class ApiService {
     // Результаты запросов на сервер кэшируются по таймауту, чтобы не было доп нагрузки на сервер
 
     private sendGet<T>(uri: string, query?: any) {
-        for(let q in query){
-            if(query[q] === undefined || query[q] === null){
+        for (let q in query) {
+            if (query[q] === undefined || query[q] === null) {
                 delete query[q];
             }
         }
@@ -828,11 +846,12 @@ export class ApiService {
         }
         return observable;
     }
+
     // Генерируем хэш запроса по URI и параметрам запроса
 
     private sendGetSilent<T>(uri: string, query?: any) {
-        for(let q in query){
-            if(query[q] === undefined || query[q] === null){
+        for (let q in query) {
+            if (query[q] === undefined || query[q] === null) {
                 delete query[q];
             }
         }

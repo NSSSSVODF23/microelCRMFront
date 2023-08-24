@@ -52,6 +52,7 @@ export class IpViewComponent implements OnInit {
         debounceTime(200)
     );
     breath$ = this.breathInit();
+    isDisabledRemoteAccessButton = false;
 
     constructor(private api: ApiService, private rt: RealTimeUpdateService, private toast: MessageService) {
     }
@@ -93,6 +94,7 @@ export class IpViewComponent implements OnInit {
     }
 
     openWeb(ip: string) {
+        this.isDisabledRemoteAccessButton = true
         this.api.checkRemoteControl(ip).subscribe(
             {
                 next: (ra) => {
@@ -101,6 +103,10 @@ export class IpViewComponent implements OnInit {
                     }else {
                         this.toast.add({detail: 'Нет удаленного доступа', severity: 'dark', key: 'darktoast', icon: 'mdi-web', closable: false});
                     }
+                    this.isDisabledRemoteAccessButton = false
+                },
+                error: () => {
+                    this.isDisabledRemoteAccessButton = false
                 }
             }
         )
