@@ -27,6 +27,8 @@ import {BypassWorkCalculationComponent} from "../../pages/bypass-work-calculatio
 import {BillingSettingsPageComponent} from "../../pages/billing-settings-page/billing-settings-page.component";
 import {TelegramSettingsPageComponent} from "../../pages/telegram-settings-page/telegram-settings-page.component";
 import {AcpSettingsPageComponent} from "../../pages/acp-settings-page/acp-settings-page.component";
+import {AcpSessionsPageComponent} from "../../pages/acp-sessions-page/acp-sessions-page.component";
+import {CommutatorListPageComponent} from "../../pages/commutator-list-page/commutator-list-page.component";
 
 const routes: Routes = [
     {
@@ -52,12 +54,14 @@ const routes: Routes = [
             {path: 'salary/works', component: WorksPageComponent},
             {path: 'salary/estimation', component: SalaryEstimationPageComponent},
             {path: 'salary/estimation/bypass', component: BypassWorkCalculationComponent},
-            {path: 'billing/search', component: BillingSearchUserPageComponent},
-            {path: 'billing/user/:login', component: BillingUserPageComponent},
+            {path: 'clients/billing/search', component: BillingSearchUserPageComponent},
+            {path: 'clients/billing/user/:login', component: BillingUserPageComponent},
+            {path: 'clients/sessions', component: AcpSessionsPageComponent},
             {path: 'addresses/list', component: AddressesListPageComponent},
             {path: 'system/billing', component: BillingSettingsPageComponent},
             {path: 'system/telegram', component: TelegramSettingsPageComponent},
             {path: 'system/acp', component: AcpSettingsPageComponent},
+            {path: 'commutators/list', component: CommutatorListPageComponent},
         ]
     },
     // {breadcrumb: '**', redirectTo: 'tasks/status/all', pathMatch: 'full'},

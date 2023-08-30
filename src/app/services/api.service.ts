@@ -36,7 +36,7 @@ import {
     Position,
     SalaryTable,
     SuperMessage,
-    Switch,
+    Switch, SwitchModel, SwitchWithAddress,
     Task,
     TaskCreationBody,
     TaskEvent,
@@ -573,8 +573,8 @@ export class ApiService {
         return this.sendPost("api/private/parser/addresses/start", {});
     }
 
-    getAddressSuggestions(query: string) {
-        return this.sendGet<Address[]>("api/private/suggestions/address", {query});
+    getAddressSuggestions(query: string, isAcpConnected: boolean|null, isHouseOnly: boolean) {
+        return this.sendGet<Address[]>("api/private/suggestions/address", {query, isAcpConnected, isHouseOnly});
     }
 
     getCountOfUnreadMessages(chatId: number) {
@@ -752,8 +752,36 @@ export class ApiService {
         return this.sendGet<AcpHouse[]>('api/private/acp/buildings', {query});
     }
 
-    getSwitchesByVlan(vlan: number) {
-        return this.sendGet<Switch[]>(`api/private/acp/vlan/${vlan}/switches`);
+    getCommutators(page: number, name?: string | null, ip?: string | null, buildingId?: number | null) {
+        return this.sendGet<Page<Switch>>('api/private/acp/commutators/' + page+'/page', {name, ip, buildingId});
+    }
+
+    getCommutator(swId: number) {
+        return this.sendGet<SwitchWithAddress>('api/private/acp/commutator/' + swId);
+    }
+
+    searchCommutators(query?: string|null) {
+        return this.sendGet<SwitchWithAddress[]>('api/private/acp/commutators/search', {query});
+    }
+
+    getCommutatorModels(query?: string|null) {
+        return this.sendGet<SwitchModel[]>('api/private/acp/commutator/models', {query});
+    }
+
+    getCommutatorModel(swmodelId: number) {
+        return this.sendGet<SwitchModel>(`api/private/acp/commutator/model/${swmodelId}`);
+    }
+
+    getBuildingAddress(buildingId: number) {
+        return this.sendGet<Address>(`api/private/acp/building/${buildingId}/address`);
+    }
+
+    checkCommutatorNameExist(name: string) {
+        return this.sendGet<boolean>('api/private/acp/commutator/check-exist/name', {name});
+    }
+
+    checkCommutatorIpExist(ip: string) {
+        return this.sendGet<boolean>('api/private/acp/commutator/check-exist/ip', {ip});
     }
 
     checkRemoteControl(ipaddr: any) {
@@ -896,5 +924,17 @@ export class ApiService {
 
     private generateHash(uri: string, query: any) {
         return cyrb53(uri + JSON.stringify(query), 0);
+    }
+
+    createCommutator(form: any) {
+        return this.sendPost('api/private/acp/commutator', form);
+    }
+
+    editCommutator(commutatorId: number, form: any) {
+        return this.sendPatch(`api/private/acp/commutator/${commutatorId}`, form);
+    }
+
+    deleteCommutator(id: number) {
+        return this.sendDelete(`api/private/acp/commutator/${id}`);
     }
 }

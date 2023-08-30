@@ -94,6 +94,10 @@ import {BypassWorkCalculationComponent} from "../../pages/bypass-work-calculatio
 import {BillingSettingsPageComponent} from "../../pages/billing-settings-page/billing-settings-page.component";
 import {TelegramSettingsPageComponent} from "../../pages/telegram-settings-page/telegram-settings-page.component";
 import {AcpSettingsPageComponent} from "../../pages/acp-settings-page/acp-settings-page.component";
+import {AcpSessionsPageComponent} from "../../pages/acp-sessions-page/acp-sessions-page.component";
+import {CommutatorListPageComponent} from "../../pages/commutator-list-page/commutator-list-page.component";
+import {AutoCompleteModule} from "primeng/autocomplete";
+import {KeyFilterModule} from "primeng/keyfilter";
 
 const mapConfig: YaConfig = {
     apikey: '008574e5-f34b-4270-b3d5-91aaabd036e8',
@@ -124,7 +128,9 @@ const mapConfig: YaConfig = {
         BypassWorkCalculationComponent,
         BillingSettingsPageComponent,
         TelegramSettingsPageComponent,
-        AcpSettingsPageComponent
+        AcpSettingsPageComponent,
+        AcpSessionsPageComponent,
+        CommutatorListPageComponent
     ],
     imports: [
         CommonComponentsModule,
@@ -199,7 +205,9 @@ const mapConfig: YaConfig = {
         SplitButtonModule,
         ChipsModule,
         InputMaskModule,
-        AngularYandexMapsModule.forRoot(mapConfig)
+        AngularYandexMapsModule.forRoot(mapConfig),
+        AutoCompleteModule,
+        KeyFilterModule
     ],
     providers: [MessageService, {provide: LOCALE_ID, useValue: 'ru'}, ConfirmationService]
 })

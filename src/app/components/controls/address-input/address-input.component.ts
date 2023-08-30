@@ -1,5 +1,15 @@
-import {AfterViewInit, Component, ElementRef, EventEmitter, OnDestroy, OnInit, Output, ViewChild} from '@angular/core';
-import {ControlValueAccessor, NG_VALUE_ACCESSOR} from "@angular/forms";
+import {
+    AfterViewInit,
+    Component,
+    ElementRef,
+    EventEmitter, Inject, Injector, INJECTOR,
+    Input,
+    OnDestroy,
+    OnInit,
+    Output,
+    ViewChild
+} from '@angular/core';
+import {ControlValueAccessor, NG_VALUE_ACCESSOR, NgControl} from "@angular/forms";
 import {SubscriptionsHolder} from "../../../util";
 import {debounceTime, distinctUntilChanged, fromEvent, map, of, switchMap, tap} from "rxjs";
 import {ApiService} from "../../../services/api.service";
@@ -22,6 +32,8 @@ export class AddressInputComponent implements OnInit, ControlValueAccessor, Afte
     @ViewChild('inputEl') inputEl?: ElementRef<HTMLInputElement>;
     @ViewChild('overlay') overlay?: Overlay;
     @ViewChild('list') list?: ElementRef<HTMLDivElement>;
+    @Input() isAcpConnected: boolean|null = null;
+    @Input() isHouseOnly = false;
     @Output() onBlur = new EventEmitter<void>();
     value?: Address | null = null;
     subscriptions: SubscriptionsHolder = new SubscriptionsHolder();
@@ -32,9 +44,9 @@ export class AddressInputComponent implements OnInit, ControlValueAccessor, Afte
     selectedSuggestion = -1;
     inputedValue = '';
     disabled = false;
-    placeholder = 'Маркса 33 35 п1 э9';
+    _ngControl!: NgControl;
 
-    constructor(readonly api: ApiService) {
+    constructor(readonly api: ApiService, @Inject(INJECTOR) private injector: Injector) {
     }
 
     onChange = (value: Address | null) => {
@@ -44,6 +56,11 @@ export class AddressInputComponent implements OnInit, ControlValueAccessor, Afte
     };
 
     ngOnInit(): void {
+        this._ngControl = this.injector.get(NgControl);
+    }
+
+    get isInvalid(){
+        return this._ngControl.status === "INVALID" && this._ngControl.dirty;
     }
 
     scrollToActiveSuggestion() {
@@ -74,7 +91,7 @@ export class AddressInputComponent implements OnInit, ControlValueAccessor, Afte
                     }),
                     switchMap(query => {
                         if (query.length < 2) return of([])
-                        return this.api.getAddressSuggestions(query)
+                        return this.api.getAddressSuggestions(query, this.isAcpConnected, this.isHouseOnly)
                     })
                 )
                 .subscribe(this.applySuggestion.bind(this));

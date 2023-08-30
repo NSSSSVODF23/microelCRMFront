@@ -1,17 +1,21 @@
-.octet-wrapper {
-  width: max-content;
-  padding: .7rem !important;
-  transition: border-color .15s ease-in-out;
-
-  &:focus-within{
-    border: 1px solid var(--primary-color) !important;
-    box-shadow: var(--focus-ring);
-  }
-
-  &:hover{
-    border: 1px solid var(--primary-color) !important;
-  }
-}
+//.octet-wrapper {
+//  width: max-content;
+//  padding: .7rem !important;
+//  transition: border-color .15s ease-in-out;
+//
+//  &:focus-within{
+//    border: 1px solid var(--primary-color) !important;
+//    box-shadow: var(--focus-ring);
+//  }
+//
+//  &:hover{
+//    border: 1px solid var(--primary-color) !important;
+//  }
+//}
+//
+//.octet-wrapper.ng-invalid {
+//  border: 1px solid var(--red-400) !important;
+//}
 
 .octet-input {
   padding: 0;

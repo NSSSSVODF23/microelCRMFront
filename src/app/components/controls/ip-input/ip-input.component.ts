@@ -1,5 +1,24 @@
-import {Component, EventEmitter, forwardRef, OnDestroy, OnInit, Output} from '@angular/core';
-import {ControlValueAccessor, FormArray, FormControl, FormGroup, NG_VALUE_ACCESSOR} from '@angular/forms';
+import {
+    Component,
+    EventEmitter,
+    forwardRef,
+    Inject, Injector,
+    INJECTOR,
+    OnDestroy,
+    OnInit,
+    Optional,
+    Output,
+    Self
+} from '@angular/core';
+import {
+    AbstractControl, AsyncValidator, AsyncValidatorFn,
+    ControlValueAccessor,
+    FormArray,
+    FormControl,
+    FormGroup, NG_ASYNC_VALIDATORS,
+    NG_VALIDATORS,
+    NG_VALUE_ACCESSOR, NgControl, ValidationErrors, Validator, ValidatorFn
+} from '@angular/forms';
 import {map, Subscription} from "rxjs";
 
 @Component({
@@ -23,6 +42,15 @@ export class IpInputComponent implements ControlValueAccessor, OnInit, OnDestroy
     control4 = new FormControl(0);
     formGroup = new FormGroup({octets:new FormArray([this.control1, this.control2, this.control3, this.control4])});
     subscription?: Subscription;
+    updateValue = "";
+    _ngControl!: NgControl;
+
+    constructor( @Inject(INJECTOR) private injector: Injector) {
+    }
+
+    get isInvalid(){
+        return this._ngControl.status === "INVALID" && this._ngControl.dirty;
+    }
 
     setDisabledState(isDisabled: boolean) {
         if (isDisabled) {
@@ -66,6 +94,7 @@ export class IpInputComponent implements ControlValueAccessor, OnInit, OnDestroy
                 obj = [0, 0, 0, 0];
             }
             this.formGroup.patchValue({octets:this.mapOctets(obj)});
+            this.updateValue = obj.join(".");
         }
     }
 
@@ -83,6 +112,7 @@ export class IpInputComponent implements ControlValueAccessor, OnInit, OnDestroy
     }
 
     ngOnInit(): void {
+        this._ngControl = this.injector.get(NgControl);
         this.subscription = this.formGroup.valueChanges.pipe(map(value => {
             let octets = value.octets;
             if(octets === undefined) {
@@ -93,7 +123,7 @@ export class IpInputComponent implements ControlValueAccessor, OnInit, OnDestroy
             this.formGroup.patchValue({octets}, {emitEvent: false, onlySelf: true});
             return octets.join(".")
         })).subscribe(value => {
-            this.onChange(value);
+            this.onChange(value === "0.0.0.0" ? null : value);
             this.onTouch();
         })
     }

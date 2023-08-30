@@ -15,6 +15,9 @@
         <ng-container *ngSwitchCase="'system'">
             <ng-container *ngTemplateOutlet="system"></ng-container>
         </ng-container>
+        <ng-container *ngSwitchCase="'clients'">
+            <ng-container *ngTemplateOutlet="clients"></ng-container>
+        </ng-container>
         <ng-container *ngSwitchDefault>
             <ng-container *ngTemplateOutlet="main"></ng-container>
         </ng-container>
@@ -23,9 +26,9 @@
 
 <ng-template #main>
     <app-extended-menu-item [link]="['/tasks','incoming']" caption="Задачи" icon="mdi-task"></app-extended-menu-item>
-    <app-extended-menu-item [link]="['/billing','search']" caption="Абоненты" icon="mdi-group"></app-extended-menu-item>
+    <app-extended-menu-item [link]="['/clients','billing','search']" caption="Абоненты" icon="mdi-group"></app-extended-menu-item>
     <app-extended-menu-item [link]="['/addresses','list']" caption="Адреса" icon="mdi-home_work"></app-extended-menu-item>
-    <app-extended-menu-item caption="Коммутаторы" icon="mdi-dns"></app-extended-menu-item>
+    <app-extended-menu-item [link]="['/commutators','list']" caption="Коммутаторы" icon="mdi-dns"></app-extended-menu-item>
     <app-extended-menu-item caption="Склад" icon="mdi-warehouse"></app-extended-menu-item>
     <app-extended-menu-item [link]="['/employees']" caption="Сотрудники" icon="mdi-account_circle"></app-extended-menu-item>
     <app-extended-menu-item [link]="['/salary','table']" caption="Зарплата" icon="mdi-currency_ruble"></app-extended-menu-item>
@@ -50,6 +53,12 @@
     <app-extended-menu-item [link]="['/salary','estimation','bypass']" caption="Подсчет работ (альт.)" icon="mdi-auto_awesome"></app-extended-menu-item>
     <app-extended-menu-item [link]="['/salary','works']" caption="Список работ" icon="mdi-construction"></app-extended-menu-item>
     <app-extended-menu-item [link]="['/salary','paid-actions']" caption="Платные действия" icon="mdi-toc"></app-extended-menu-item>
+</ng-template>
+
+<ng-template #clients>
+    <ng-container *ngTemplateOutlet="backButton; context:{name:'Абоненты'}"></ng-container>
+    <app-extended-menu-item [link]="['/clients','billing','search']" caption="Биллинг" icon="mdi-manage_accounts"></app-extended-menu-item>
+    <app-extended-menu-item [link]="['/clients','sessions']" caption="Сессии" icon="mdi-stream"></app-extended-menu-item>
 </ng-template>
 
 <ng-template #addresses>

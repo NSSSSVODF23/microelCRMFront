@@ -2,6 +2,7 @@ import {Injectable} from '@angular/core';
 import {StompClientService} from "./stomp-client.service";
 import {finalize, map, Observable, share} from "rxjs";
 import {
+    AcpCommutator,
     AcpConf,
     BillingConf,
     Chat,
@@ -17,7 +18,7 @@ import {
     PingMonitoring,
     Position, SalaryTable, SalaryTableCell,
     Street,
-    SuperMessage,
+    SuperMessage, Switch,
     Task,
     TaskEvent,
     TaskTag,
@@ -323,6 +324,22 @@ export class RealTimeUpdateService {
 
     acpDhcpBindingHousePageUpdateSignal(){
         return this.watch<{ vlan: number }>('acp', 'dhcp-binding', 'house-page', 'update')
+    }
+
+    acpCommutatorStatusUpdated() {
+        return this.watch<AcpCommutator>('acp', "commutator", "status", "update")
+    }
+
+    acpCommutatorCreated() {
+        return this.watch<Switch>('acp', "commutator", "create")
+    }
+
+    acpCommutatorUpdated() {
+        return this.watch<Switch>('acp', "commutator", "update")
+    }
+
+    acpCommutatorDeleted() {
+        return this.watch<Switch>('acp', "commutator", "delete");
     }
 
     private watchUnicast<T>(...path: string[]): Observable<T> {

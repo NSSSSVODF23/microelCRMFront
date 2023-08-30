@@ -7,6 +7,10 @@ export class AdjustInputWidthDirective implements OnInit, OnDestroy, OnChanges {
 
     @Input() dfPlaceholder: string = '';
 
+    @Input() set update(value: string) {
+        this.adjust(this.el.nativeElement);
+    }
+
     itemToMeasure = document.createElement('span');
 
     constructor(readonly el: ElementRef<HTMLInputElement>) {

@@ -7,7 +7,7 @@ import {
     Wireframe,
     WireframeFieldType
 } from "./transport-interfaces";
-import {map, merge, Observable, of, startWith, Subject, Subscription, switchMap, tap, timer} from "rxjs";
+import {combineLatest, map, merge, Observable, of, startWith, Subject, Subscription, switchMap, tap, timer} from "rxjs";
 import {ContentChange, QuillModules} from "ngx-quill";
 import {createCustomElement} from "@angular/elements";
 import {EmployeeLabelComponent} from "./components/controls/employee-label/employee-label.component";
@@ -16,6 +16,7 @@ import {DepartmentLabelComponent} from "./components/controls/department-label/d
 import {Injector} from "@angular/core";
 import {PrimeNGConfig} from "primeng/api";
 import {AppointedInstallersComponent} from "./components/controls/appointed-installers/appointed-installers.component";
+
 
 export class Utils {
     static convertModelItemToString(model: ModelItem) {
@@ -579,17 +580,6 @@ export class DynamicValueFactory {
 
         return merge(...obsrvrs).pipe(
             startWith(content),
-            tap({
-                next: () => {
-                    console.log('NEXT');
-                },
-                error: () => {
-                    console.log('ERROR');
-                },
-                complete: () => {
-                    console.log('COMPLETE');
-                }
-            })
         );
     }
 
@@ -650,17 +640,81 @@ export class DynamicValueFactory {
 
         return merge(...obsrvrs, loadingStateChange$).pipe(
             startWith(content),
-            tap({
-                next: () => {
-                    console.log('NEXT');
-                },
-                error: () => {
-                    console.log('ERROR');
-                },
-                complete: () => {
-                    console.log('COMPLETE');
+        );
+    }
+
+    static ofPageAlt<T>(filterObservable: Observable<any[]>, loadingObservable: (..._: any) => Observable<Page<T>>, id: keyof T,
+                        appendObservable?: Observable<any> | null, updateObservable?: Observable<T> | null,
+                        deleteObservable?: Observable<T> | null): Observable<DynamicPageContent<T[]>> {
+        const content = new DynamicPageContent<T[]>([]);
+
+        const loadingStateChange = new Subject<LoadingState>();
+        const loadingStateChange$ = loadingStateChange.pipe(map(state => {
+            content.loadingState = state;
+            return content;
+        }));
+
+        const obsrvrs =
+            appendObservable ?
+                [combineLatest([appendObservable.pipe(startWith(null)), filterObservable]).pipe(
+                    tap({
+                        next: (f: any) => loadingStateChange.next(LoadingState.LOADING)
+                    }),
+                    switchMap(([_, filter]: [null, any[]]) => {
+                        return loadingObservable(...filter).pipe(
+                            map(page => {
+                                content.loadingState = page == null || page.content.length === 0 ? LoadingState.EMPTY : LoadingState.READY;
+                                content.value = page.content || [];
+                                content.pageNumber = page.number;
+                                content.totalElements = page.totalElements;
+                                return content;
+                            })
+                        )
+                    })
+                )] : [filterObservable.pipe(
+                    tap({
+                        next: (f: any) => loadingStateChange.next(LoadingState.LOADING)
+                    }),
+                    switchMap(([_, filter]: [null, any[]]) => {
+                        return loadingObservable(...filter).pipe(
+                            map(page => {
+                                content.loadingState = page == null || page.content.length === 0 ? LoadingState.EMPTY : LoadingState.READY;
+                                content.value = page.content || [];
+                                content.pageNumber = page.number;
+                                content.totalElements = page.totalElements;
+                                return content;
+                            })
+                        )
+                    })
+                )]
+
+        if (updateObservable) obsrvrs.push(updateObservable.pipe(
+            map(value => {
+                const idx = content.value.findIndex(v => v[id] === value[id]);
+                if (idx !== -1) {
+                    const existsValue = content.value[idx];
+                    for (let valueKey in existsValue) {
+                        if (value[valueKey] != undefined)
+                            existsValue[valueKey] = value[valueKey];
+                    }
+                    // content.value[idx] = existsValue;
                 }
+                return content;
             })
+        ));
+
+        if (deleteObservable) obsrvrs.push(deleteObservable.pipe(
+            map(value => {
+                const idx = content.value.findIndex(v => v[id] === value[id]);
+                if (idx !== -1) {
+                    content.value.splice(idx, 1);
+                }
+                return content;
+            })
+        ));
+
+        return merge(...obsrvrs, loadingStateChange$).pipe(
+            startWith(content),
         );
     }
 }

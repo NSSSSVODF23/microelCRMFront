@@ -251,6 +251,7 @@ export interface Address {
     apartmentNum?: number;
     apartmentMod?: string;
     addressName?: string;
+    acpHouseBind?: AcpHouse;
 }
 
 export interface City {
@@ -1288,6 +1289,23 @@ export interface Switch {
     enableMonitor: number;
     enableSms: number;
     enableBackup: number;
+    address?: Address;
+    additionalInfo?: AcpCommutator;
+}
+
+export interface AcpCommutator{
+    acpCommutatorId: number;
+    externalId: number;
+    available: boolean;
+    lastUpdate: Date;
+    deleted: boolean;
+}
+
+export interface SwitchWithAddress {
+    commutator: Switch;
+    address: AcpHouse;
+    label: string;
+    value: number;
 }
 
 export interface SwitchModel {

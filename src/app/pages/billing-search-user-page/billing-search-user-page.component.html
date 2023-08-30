@@ -12,8 +12,11 @@
                     </div>
                     <div class="input-label-wrapper stretched">
                         <label>Запрос</label>
-                        <input *ngIf="!busService.isAddressMode" [appPreventInput]="busService.userLoadingState === 'LOADING'" formControlName="query"
-                               pInputText type="text"/>
+                        <div class="p-inputgroup" *ngIf="!busService.isAddressMode">
+                            <input  [appPreventInput]="busService.userLoadingState === 'LOADING'" formControlName="query"
+                                   pInputText type="text" (keydown.enter)="busService.enterSearch.next(null)"/>
+                            <button type="button" pButton pRipple icon="mdi-search" (click)="busService.enterSearch.next(null)"></button>
+                        </div>
                         <app-address-input *ngIf="busService.isAddressMode" formControlName="query"></app-address-input>
                     </div>
                 </div>
@@ -43,7 +46,7 @@
                 <ng-container *ngSwitchCase="'READY'">
                     <div class="flexed column gap5 stretched panel p10">
                         <div @flowInChild class="flexed column stretched">
-                            <div *ngFor="let user of busService.page" [routerLink]="['/billing','user',user.uname]" class="subscriber-item split-line">
+                            <div *ngFor="let user of busService.page" [routerLink]="['/clients','billing','user',user.uname]" class="subscriber-item split-line">
                                 <span class="flexed gap5 hcenter">
                                     <span class="caption wt-bold f-color-600">{{user.uname}}</span>
                                     <span class="caption f-color-600">{{user.addr}}</span>

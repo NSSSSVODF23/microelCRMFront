@@ -1,0 +1,176 @@
+<div appExtendPageHeight class="flex justify-content-center">
+    <div class="responsive-wrapper flex gap-3 mb-3">
+        <app-main-menu-panel></app-main-menu-panel>
+        <ng-container *ngIf="commutatorPage$ | async as commutatorPage; else loading">
+            <div class="flex flex-column flex-grow-1 panel">
+                <div class="flex align-items-center gap-2 border-bluegray-100 border-bottom-1
+                 text-bluegray-400 text-lg font-bold px-3 py-2">
+                    <span class="mdi-dns"></span>
+                    <div class="flex flex-grow-1 align-items-center gap-2">
+                        <span>Коммутаторы</span>
+                        <p-button (onClick)="openCreateCommutatorDialog()" icon="mdi-add"
+                                  label="Создать" styleClass="p-button-text p-button-success"></p-button>
+                    </div>
+                    <span *ngIf="commutatorPage.totalElements"
+                          class="text-sm text-primary-400">Найдено: {{commutatorPage.totalElements}} {{commutatorPage.totalElements | decline:'коммутатор':'коммутатора':'коммутаторов'}}</span>
+                </div>
+                <ng-container [ngSwitch]="commutatorPage.loadingState">
+                    <ng-container *ngSwitchCase="'LOADING'">
+                        <ng-container *ngTemplateOutlet="loading"></ng-container>
+                    </ng-container>
+                    <ng-container *ngSwitchCase="'READY'">
+                        <div class="flex flex-column flex-grow-1">
+                            <ng-container *ngFor="let commutator of commutatorPage.value; trackBy: trackByCommutator"
+                                          [ngTemplateOutletContext]="{commutator: commutator}"
+                                          [ngTemplateOutlet]="commutatorItem"></ng-container>
+                        </div>
+                        <p-paginator (onPageChange)="changeCommutatorPage.next($event.page)"
+                                     [first]="commutatorPage.pageNumber * 15"
+                                     [rows]="15"
+                                     [totalRecords]="commutatorPage.totalElements"></p-paginator>
+                    </ng-container>
+                    <ng-container *ngSwitchCase="'ERROR'">
+                        <div class="flex flex-column flex-grow-1 text-red-400 font-bold text-lg align-items-center justify-content-center">
+                            <span class="mds-error"></span>
+                            <span>Ошибка загрузки</span>
+                        </div>
+                    </ng-container>
+                    <ng-container *ngSwitchCase="'EMPTY'">
+                        <div class="flex flex-column flex-grow-1 text-bluegray-400 font-bold text-lg align-items-center justify-content-center">
+                            <span class="mds-dns"></span>
+                            <span>Коммутаторов не найденно</span>
+                        </div>
+                    </ng-container>
+                </ng-container>
+            </div>
+            <div [formGroup]="commutatorFilterForm"
+                 [style.top]="'calc(var(--top-panel-height) + 1.5rem)'"
+                 class="flex flex-column p-3 gap-3 align-items-end h-min panel sticky">
+            <span class="text-bluegray-400 text-lg font-bold flex align-items-center align-self-start"><span
+                    class="mdi-filter_alt"></span> Фильтры</span>
+                <div [formGroup]="commutatorFilterForm" class="flex flex-column gap-3">
+                    <input [appPreventInput]="commutatorPage.loadingState === 'LOADING'" formControlName="name" pInputText
+                           placeholder="Имя" type="text"/>
+                    <input [appPreventInput]="commutatorPage.loadingState === 'LOADING'" formControlName="ip" pInputText
+                           placeholder="IP-адрес" type="text"/>
+                    <app-address-input [appPreventInput]="commutatorPage.loadingState === 'LOADING'"
+                                       [isAcpConnected]="true" [isHouseOnly]="true"
+                                       formControlName="address"></app-address-input>
+                </div>
+                <p-button (onClick)="commutatorFilterForm.reset()" icon="mdi-filter_alt_off"
+                          label="Сбросить"
+                          styleClass="p-button-secondary p-button-text"></p-button>
+            </div>
+        </ng-container>
+    </div>
+</div>
+
+<ng-template #loading>
+    <div class="flex flex-grow-1 align-items-center justify-content-center">
+        <p-progressSpinner class="custom-spinner custom-spinner-gray custom-spinner-8xl"
+                           strokeWidth="1"></p-progressSpinner>
+    </div>
+</ng-template>
+
+<ng-template #commutatorItem let-commutator="commutator">
+    <div class="flex gap-2 split-line p-3 align-items-center">
+        <div class="flex flex-column gap-2 flex-grow-1">
+            <div class="flex align-items-center gap-2">
+                <span [ngClass]="commutator.additionalInfo?.available ? 'bg-green-400' : 'bg-red-400'"
+                      class="border-circle w-1rem h-1rem"></span>
+                <span class="font-bold text-sm">{{commutator.name}}</span>
+                <span class="text-xs font-bold" [ngClass]="{'text-bluegray-300': commutator.swtype===1, 'text-primary-400': commutator.swtype===2}">{{commutator.swtype === 1 ? 'L2' : 'L3'}}</span>
+            </div>
+            <div class="flex gap-2">
+                <span>{{commutator.ipaddr}}</span>
+                <span *ngIf="commutator.address; else noAddress">{{commutator.address?.addressName}}</span>
+            </div>
+        </div>
+        <p-button (onClick)="openContextMenu(commutator); contextMenu.toggle($event)" icon="mdi-more_vert"
+                  styleClass="p-button-text p-button-secondary p-button-icon"></p-button>
+    </div>
+</ng-template>
+<p-menu #contextMenu [model]="contextMenuItems" [popup]="true" appendTo="body"></p-menu>
+
+<ng-template #noAddress>
+    <span class="text-bluegray-300">Адрес не синхронизирован</span>
+</ng-template>
+
+<p-dialog [(visible)]="commutatorDialogVisible"
+          [header]="editableSwitch ? 'Редактирование коммутатора' : 'Создание коммутатора'"
+          [modal]="true" [resizable]="false">
+    <ng-template pTemplate="content">
+        <div class="flex flex-column">
+            <div [formGroup]="commutatorForm" class="flex flex-column gap-3">
+                <div class="flex gap-4 align-items-end">
+                    <p-selectButton [options]="[{label: 'L2', value: 1}, {label: 'L3', value: 2}]"
+                                    formControlName="type"></p-selectButton>
+                    <div class="input-label-wrapper">
+                        <label>Модель</label>
+                        <p-autoComplete (completeMethod)="commutatorModelQueryChange.next($event.query)"
+                                        (onClear)="commutatorForm.controls.model.setValue(null)" [showClear]="true"
+                                        [suggestions]="(commutatorModels$ | async) ?? []" appendTo="body" field="name"
+                                        formControlName="model"
+                                        placeholder="Huawei"></p-autoComplete>
+                    </div>
+                </div>
+                <div class="flex gap-4 align-items-end">
+                    <div class="input-label-wrapper">
+                        <label>Имя</label>
+                        <input [pKeyFilter]="commutatorNameKeyFilter" [size]="35" formControlName="name" pInputText placeholder="KM44.DES16.3.2"
+                               type="text">
+                    </div>
+                    <div class="input-label-wrapper">
+                        <label>IP-адрес</label>
+                        <app-ip-input formControlName="ipaddr"></app-ip-input>
+                    </div>
+                </div>
+                <div class="flex gap-4 align-items-end">
+                    <div class="input-label-wrapper">
+                        <label>Адрес</label>
+                        <app-address-input [isAcpConnected]="true" [isHouseOnly]="true"
+                                           formControlName="address"></app-address-input>
+                    </div>
+                    <div class="input-label-wrapper">
+                        <label>Подъезд</label>
+                        <p-inputNumber [max]="99" [min]="0" [size]="2" formControlName="entrance"></p-inputNumber>
+                    </div>
+                    <div class="input-label-wrapper">
+                        <label>Этаж</label>
+                        <p-inputNumber [max]="99" [min]="0" [size]="2" formControlName="floor"></p-inputNumber>
+                    </div>
+                </div>
+                <div class="flex gap-4 align-items-end">
+                    <div class="input-label-wrapper">
+                        <label>Uplink</label>
+                        <p-autoComplete (completeMethod)="commutatorUplinkQuerySearch.next($event.query)" (onClear)="commutatorForm.controls.uplink.setValue(null)" [showClear]="true" [size]="40"
+                                        [suggestions]="(commutatorUplinks$ | async) ?? []"
+                                        appendTo="body" field="label"
+                                        formControlName="uplink"
+                                        placeholder="Имя, IP-адрес, Адрес"></p-autoComplete>
+                    </div>
+                    <div class="input-label-wrapper">
+                        <label>Nagios</label>
+                        <p-inputSwitch formControlName="nagios"></p-inputSwitch>
+                    </div>
+                    <div class="input-label-wrapper">
+                        <label>SMS</label>
+                        <p-inputSwitch formControlName="sms"></p-inputSwitch>
+                    </div>
+                </div>
+            </div>
+            <div class="flex flex-column gap-1 py-2 text-xs font-bold text-red-400">
+                <span *ngFor="let commutatorFormError of commutatorFormErrors">{{commutatorFormError}}</span>
+            </div>
+            <p-button (onClick)="editCommutator()" *ngIf="editableSwitch; else createButton"
+                      [disabled]="commutatorFormErrors.length > 0 || !commutatorForm.dirty"
+                      [loading]="beginCommutatorsEditing" class="align-self-end" icon="mdi-save"
+                      label="Сохранить"></p-button>
+            <ng-template #createButton>
+                <p-button (onClick)="createCommutator()" [disabled]="!commutatorForm.valid"
+                          [loading]="beginCommutatorsEditing"
+                          class="align-self-end" icon="mdi-add" label="Создать"></p-button>
+            </ng-template>
+        </div>
+    </ng-template>
+</p-dialog>

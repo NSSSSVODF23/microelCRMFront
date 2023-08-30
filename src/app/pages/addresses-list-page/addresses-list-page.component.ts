@@ -10,7 +10,7 @@ import {
     map,
     merge,
     mergeMap,
-    of,
+    of, retry,
     Subject,
     switchMap,
     tap
@@ -281,9 +281,15 @@ export class AddressesListPageComponent implements OnInit, OnDestroy {
                     this._houseViewAnimation.next([num, 0]);
                 }),
                 delayWhen(() => this.animationEnd$),
+                retry()
             )
-            .subscribe((direction) => {
-                this.houseBeginningNavigate = false
+            .subscribe({
+                next: (direction) => {
+                    this.houseBeginningNavigate = false
+                },
+                error: () => {
+                    this.houseBeginningNavigate = false
+                },
             })
         );
 

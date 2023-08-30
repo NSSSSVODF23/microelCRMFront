@@ -1,7 +1,8 @@
 <span class="p-input-icon-left wrapper">
     <i [class]="(value?'mdi-domain active':'mdi-domain_disabled unactive')+' icon'"></i>
-    <input #inputEl [disabled]="disabled" [ngClass]="{unconfirmed:!value, confirmed:value}" [placeholder]="placeholder" [spellcheck]="false" autocomplete="off" class="address-input"
-           pInputText type="text" (blur)="onTouched(); onBlur.emit()"/>
+    <input #inputEl (blur)="onTouched(); onBlur.emit()" [disabled]="disabled"
+           [ngClass]="{unconfirmed:!value, confirmed:value, 'ng-dirty ng-invalid': isInvalid}" [placeholder]="isHouseOnly ? 'Маркса 33':'Маркса 33 35 п1 э9'" [spellcheck]="false"
+           autocomplete="off" pInputText type="text"/>
 </span>
 <p-overlay #overlay [(visible)]="showSuggestions" [responsive]="{ breakpoint: '640px', contentStyleClass: 'h-20rem' }"
            appendTo="body"
@@ -13,8 +14,9 @@
         <i class="mdi-domain_disabled"></i><span>Нет подходящего адреса</span>
     </div>
     <div #list *ngIf="!isLoading && !isEmpty" class="overlay-list">
-        <div *ngFor="let suggestion of suggestions; let i=index" [ngClass]="{selected:i===selectedSuggestion}"
-             class="overlay-list-item" (mousemove)="selectedSuggestion = i" (mouseleave)="selectedSuggestion=-1" (click)="$event.preventDefault(); selectSuggestion()">
+        <div (click)="$event.preventDefault(); selectSuggestion()" (mouseleave)="selectedSuggestion=-1"
+             (mousemove)="selectedSuggestion = i" *ngFor="let suggestion of suggestions; let i=index" [ngClass]="{selected:i===selectedSuggestion}"
+             class="overlay-list-item">
             <span class="address-label">{{suggestion.addressName}}</span>
         </div>
     </div>
