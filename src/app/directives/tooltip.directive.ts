@@ -26,8 +26,18 @@ export class TooltipDirective {
         this.tooltip.className = 'p-3 panel absolute pointer-events-none';
         document.body.appendChild(this.tooltip);
         this.tooltip.style.left = `${elBbox.left - 13}px`;
-        this.tooltip.style.top = `${elBbox.top+window.scrollY - 13}px`;
         this.tooltip.style.width = `${elBbox.width + 26}px`;
+        const topPos = elBbox.top + window.scrollY - 13;
+        this.tooltip.style.top = `${topPos}px`;
+        setTimeout(() => {
+            const bottomLine = this.tooltip.getBoundingClientRect().bottom + document.documentElement.scrollTop;
+            const bottomScroll = document.documentElement.scrollTop + window.innerHeight;
+            let diff = bottomLine - bottomScroll;
+            if (diff < 0) {
+                diff = 0;
+            }
+            this.tooltip.style.top = `${topPos - diff}px`;
+        })
     }
 
     @HostListener('mouseleave') onmouseleave() {
