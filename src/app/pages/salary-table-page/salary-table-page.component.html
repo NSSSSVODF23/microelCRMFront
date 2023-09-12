@@ -63,7 +63,7 @@
                     </div>
                 </ng-container>
             </div>
-            <div *ngIf="cache.selectedDay$|async as selectedDay" class="flex flex-column panel p-3 gap-3" [style.height]="'100rem'">
+            <div *ngIf="cache.selectedDay$|async as selectedDay" class="flex flex-column panel p-3 gap-3">
                 <div class="flex align-items-center gap-3">
                     <app-employee-label [employee]="selectedDay.employee"></app-employee-label>
                     <span class="caption text-sm text-bluegray-400">{{selectedDay.date | date: 'EEEE, dd MMMM yyyy' | titlecase}}</span>
