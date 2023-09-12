@@ -87,7 +87,8 @@ export class CommutatorListPageComponent implements OnInit {
                     header: 'Подтверждение',
                     message: 'Вы хотите удалить '+commutator.name+' коммутатор?',
                     accept: () => this.deleteCommutator(commutator)
-                })}
+                })},
+            {label: 'Обновить', icon: 'mdi-sync', command: ()=> this.commutatorRemoteUpdate(commutator)}
         ]
     }
 
@@ -262,5 +263,9 @@ export class CommutatorListPageComponent implements OnInit {
 
     deleteCommutator(commutator: Switch) {
         this.api.deleteCommutator(commutator.id).subscribe();
+    }
+
+    commutatorRemoteUpdate(commutator: Switch) {
+        return this.api.commutatorRemoteUpdate(commutator.id).subscribe();
     }
 }

@@ -1299,6 +1299,59 @@ export interface AcpCommutator{
     available: boolean;
     lastUpdate: Date;
     deleted: boolean;
+    systemInfo?: SystemInfo;
+    ports?: PortInfo[];
+}
+
+export interface SystemInfo{
+    systemInfoId: number;
+    device: string;
+    mac: string;
+    hwVersion: string;
+    fwVersion: string;
+    uptime?: number;
+    lastUpdate: Date;
+}
+
+export interface PortInfo{
+    portInfoId: number;
+    status: PortStatus;
+    name: string;
+    speed?: PortSpeed;
+    force: boolean;
+    type: InterfaceType;
+    portType: PortType;
+    uptime?: number;
+    description?: string;
+    portId?: number;
+}
+
+export enum PortStatus {
+    UP = "UP",
+    DOWN = "DOWN",
+    ADMIN_DOWN = "ADMIN_DOWN",
+    PREPARE = "PREPARE"
+}
+
+export enum PortSpeed {
+    HALF10 = "HALF10",
+    FULL10 = "FULL10",
+    HALF100 = "HALF100",
+    FULL100 = "FULL100",
+    HALF1000 = "HALF1000",
+    FULL1000 = "FULL1000"
+}
+
+export enum InterfaceType {
+    ETHERNET = "ETHERNET",
+    GIGABIT = "GIGABIT",
+    TENGIGABIT = "TENGIGABIT"
+}
+
+export enum PortType {
+    COPPER = "COPPER",
+    FIBER = "FIBER",
+    PON = "PON"
 }
 
 export interface SwitchWithAddress {

@@ -39,9 +39,9 @@
                                     </td>
                                     <td (click)="cache.selectDay(cell, i, colI)"
                                         *ngFor="let cell of rowData; let colI = index; trackBy: cache.trackByCell"
-                                        [ngClass]="{ 'text-primary-400 bg-blue-50': cache.isSelected(i, colI) }"
+                                        [ngClass]="{'text-bluegray-200': cell.sumWithNDFL === 0, 'text-primary-400 bg-blue-50': cache.isSelected(i, colI) }"
                                         class="caption size-tiny f-inline cursor-pointer hover:text-primary-400">
-                                        {{(cache.ndflValue$|async) ? cell.sumWithNDFL : cell.sumWithoutNDFL}}
+                                        {{((cache.ndflValue$|async) ? cell.sumWithNDFL : cell.sumWithoutNDFL) | number: '1.0-2'}}
                                     </td>
                                     <td class="caption size-tiny">
                                         {{(cache.ndflValue$|async) ? salaryTable.totalSum[i].sumWithNDFL : salaryTable.totalSum[i].sumWithoutNDFL}}
@@ -132,10 +132,10 @@
                                                 [employee]="rowData.lastEdit ? rowData.lastEdit.employee : rowData.creator"></app-employee-label>
                                     </td>
                                     <td>
-                                        {{rowData.sum}}руб.
+                                        {{rowData.sum | number: '1.0-2'}}руб.
                                     </td>
                                     <td>
-                                        {{rowData.sumWithoutNDFL}}руб.
+                                        {{rowData.sumWithoutNDFL | number: '1.0-2'}}руб.
                                     </td>
                                     <td>
                                         <p-button [queryParams]="{'workLogId': rowData.workLog.workLogId}"

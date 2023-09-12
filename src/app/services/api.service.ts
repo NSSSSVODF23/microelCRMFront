@@ -937,4 +937,8 @@ export class ApiService {
     deleteCommutator(id: number) {
         return this.sendDelete(`api/private/acp/commutator/${id}`);
     }
+
+    commutatorRemoteUpdate(id: number) {
+        return this.sendPost(`api/private/acp/commutator/${id}/get-remote-update`, {});
+    }
 }
