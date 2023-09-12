@@ -26,7 +26,7 @@ export class TooltipDirective {
         this.tooltip.className = 'p-3 panel absolute pointer-events-none';
         document.body.appendChild(this.tooltip);
         this.tooltip.style.left = `${elBbox.left - 13}px`;
-        this.tooltip.style.top = `${elBbox.top - 13}px`;
+        this.tooltip.style.top = `${elBbox.top+window.scrollY - 13}px`;
         this.tooltip.style.width = `${elBbox.width + 26}px`;
     }
 
