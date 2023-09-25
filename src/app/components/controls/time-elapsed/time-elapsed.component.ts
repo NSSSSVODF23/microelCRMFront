@@ -10,6 +10,14 @@ import {interval} from "rxjs";
 export class TimeElapsedComponent implements OnInit, OnDestroy {
     @Input() type: 'short' | 'long' = 'long';
     @Input() startTime?: number | string | Date;
+    @Input() set timePeriod(seconds: number){
+        if(!seconds){
+            this.startTime = undefined;
+            return;
+        }
+        this.startTime = Date.now() - seconds * 1000;
+    }
+
     value: string = '-- секунд';
     subscriptions: SubscriptionsHolder = new SubscriptionsHolder();
 

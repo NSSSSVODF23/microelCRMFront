@@ -49,7 +49,8 @@
             <span class="text-bluegray-400 text-lg font-bold flex align-items-center align-self-start"><span
                     class="mdi-filter_alt"></span> Фильтры</span>
                 <div [formGroup]="commutatorFilterForm" class="flex flex-column gap-3">
-                    <input [appPreventInput]="commutatorPage.loadingState === 'LOADING'" formControlName="name" pInputText
+                    <input [appPreventInput]="commutatorPage.loadingState === 'LOADING'" formControlName="name"
+                           pInputText
                            placeholder="Имя" type="text"/>
                     <input [appPreventInput]="commutatorPage.loadingState === 'LOADING'" formControlName="ip" pInputText
                            placeholder="IP-адрес" type="text"/>
@@ -79,17 +80,27 @@
                 <span [ngClass]="commutator.additionalInfo?.available ? 'bg-green-400' : 'bg-red-400'"
                       class="border-circle w-1rem h-1rem"></span>
                 <span class="font-bold text-sm">{{commutator.name}}</span>
-                <span class="text-xs font-bold" [ngClass]="{'text-bluegray-300': commutator.swtype===1, 'text-primary-400': commutator.swtype===2}">{{commutator.swtype === 1 ? 'L2' : 'L3'}}</span>
+                <span [ngClass]="{'text-bluegray-300': commutator.swtype===1, 'text-primary-400': commutator.swtype===2}"
+                      class="text-xs font-bold">{{commutator.swtype === 1 ? 'L2' : 'L3'}}</span>
+                <span class="text-bluegray-400">{{commutator.additionalInfo?.systemInfo?.device}}</span>
             </div>
             <div class="flex gap-2">
                 <span>{{commutator.ipaddr}}</span>
                 <span *ngIf="commutator.address; else noAddress">{{commutator.address?.addressName}}</span>
             </div>
         </div>
+        <p-button (onClick)="openCommutatorViewDialog(commutator)" icon="mdi-visibility"
+                  styleClass="p-button-text p-button-secondary p-button-icon"></p-button>
         <p-button (onClick)="openContextMenu(commutator); contextMenu.toggle($event)" icon="mdi-more_vert"
                   styleClass="p-button-text p-button-secondary p-button-icon"></p-button>
     </div>
 </ng-template>
+<p-dialog [(visible)]="commutatorViewDialogVisible"
+          header="Коммутатор" [resizable]="false">
+    <ng-template pTemplate="content">
+        <app-commutator-view [commutator]="selectedToViewCommutator"></app-commutator-view>
+    </ng-template>
+</p-dialog>
 <p-menu #contextMenu [model]="contextMenuItems" [popup]="true" appendTo="body"></p-menu>
 
 <ng-template #noAddress>
@@ -117,7 +128,8 @@
                 <div class="flex gap-4 align-items-end">
                     <div class="input-label-wrapper">
                         <label>Имя</label>
-                        <input [pKeyFilter]="commutatorNameKeyFilter" [size]="35" formControlName="name" pInputText placeholder="KM44.DES16.3.2"
+                        <input [pKeyFilter]="commutatorNameKeyFilter" [size]="35" formControlName="name" pInputText
+                               placeholder="KM44.DES16.3.2"
                                type="text">
                     </div>
                     <div class="input-label-wrapper">
@@ -143,7 +155,9 @@
                 <div class="flex gap-4 align-items-end">
                     <div class="input-label-wrapper">
                         <label>Uplink</label>
-                        <p-autoComplete (completeMethod)="commutatorUplinkQuerySearch.next($event.query)" (onClear)="commutatorForm.controls.uplink.setValue(null)" [showClear]="true" [size]="40"
+                        <p-autoComplete (completeMethod)="commutatorUplinkQuerySearch.next($event.query)"
+                                        (onClear)="commutatorForm.controls.uplink.setValue(null)" [showClear]="true"
+                                        [size]="40"
                                         [suggestions]="(commutatorUplinks$ | async) ?? []"
                                         appendTo="body" field="label"
                                         formControlName="uplink"

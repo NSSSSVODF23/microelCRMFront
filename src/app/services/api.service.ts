@@ -18,7 +18,7 @@ import {
     Department,
     DhcpBinding,
     Employee,
-    EmployeeStatus,
+    EmployeeStatus, FdbItem,
     FieldItem,
     FileData,
     House,
@@ -46,7 +46,7 @@ import {
     TelegramConf,
     TokenChain,
     TreeDragDropEvent,
-    TreeElementPosition,
+    TreeElementPosition, UserEvents,
     Wireframe,
     WorkingDay,
     WorkLog
@@ -677,6 +677,26 @@ export class ApiService {
         return this.sendGet<BillingTotalUserInfo>(`api/private/billing/user/${encodeURIComponent(login)}`);
     }
 
+    getBillingUserEvents(login: string) {
+        return this.sendGet<UserEvents>(`api/private/billing/user/${encodeURIComponent(login)}/events`);
+    }
+
+    makePayment(login: string, paymentForm: any) {
+        return this.sendPost(`api/private/billing/user/${encodeURIComponent(login)}/make-payment`, paymentForm);
+    }
+
+    setDeferredPayment(login: string) {
+        return this.sendPost(`api/private/billing/user/${encodeURIComponent(login)}/deferred-payment`,{});
+    }
+
+    startUserService(login: string) {
+        return this.sendPost(`api/private/billing/user/${encodeURIComponent(login)}/start-service`,{});
+    }
+
+    stopUserService(login: string) {
+        return this.sendPost(`api/private/billing/user/${encodeURIComponent(login)}/stop-service`,{});
+    }
+
     convertBillingAddress(addressString: string | undefined) {
         return this.sendGet<Address | null>('api/private/convert/billing-address-string', {addressString});
     }
@@ -798,6 +818,10 @@ export class ApiService {
 
     getConnectionServicesSuggestionsList(query: string) {
         return this.sendGet<{ label: string, value: string }[]>('api/private/types/connection-service/suggestions', {query});
+    }
+
+    getBillingPaymentTypesList() {
+        return this.sendGet<{ label: string, value: string }[]>('api/private/types/billing-payment-type');
     }
 
     getConnectionTypesList() {
@@ -940,5 +964,9 @@ export class ApiService {
 
     commutatorRemoteUpdate(id: number) {
         return this.sendPost(`api/private/acp/commutator/${id}/get-remote-update`, {});
+    }
+
+    fdbTableByPort(id: number) {
+        return this.sendGet<FdbItem[]>(`api/private/acp/commutator/port/${id}/fdb`);
     }
 }

@@ -78,7 +78,10 @@ export class CommutatorListPageComponent implements OnInit {
     )
     beginCommutatorsEditing = false;
 
-    contextMenuItems: MenuItem[] = []
+    contextMenuItems: MenuItem[] = [];
+
+    commutatorViewDialogVisible = false;
+    selectedToViewCommutator?: Switch;
 
     openContextMenu(commutator: Switch){
         this.contextMenuItems = [
@@ -267,5 +270,10 @@ export class CommutatorListPageComponent implements OnInit {
 
     commutatorRemoteUpdate(commutator: Switch) {
         return this.api.commutatorRemoteUpdate(commutator.id).subscribe();
+    }
+
+    openCommutatorViewDialog(commutator: any) {
+        this.selectedToViewCommutator = commutator;
+        this.commutatorViewDialogVisible = true;
     }
 }

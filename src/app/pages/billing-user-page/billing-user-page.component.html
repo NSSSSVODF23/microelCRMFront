@@ -25,7 +25,7 @@
 <ng-template #infoViewTemp>
     <div class="flex flex-column flex-grow-1 h-min panel">
         <div class="flexed gap10 p10 hcenter terminator-bottom">
-            <p-button (onClick)="customNav.backOrDefault(['/billing','search'])" icon="mdi-arrow_back"
+            <p-button (onClick)="customNav.backOrDefault(['/clients','billing','search'])" icon="mdi-arrow_back"
                       styleClass="p-button-secondary p-button-text p-button-icon"></p-button>
             <span class="caption size-huge wt-tiny f-color-600 with-icon">
                 <span class="mds-person caption size-xlarge"></span>
@@ -53,6 +53,9 @@
         <div class="flexed gap10 p10 hcenter">
             <p-button (onClick)="createTaskMenu.toggle($event)" icon="mdi-add" label="Создать задачу"
                       styleClass="p-button-success p-button-text"></p-button>
+            <p-button (onClick)="controlMenu.toggle($event)" icon="mdi-menu" label="Управление"
+                      styleClass="p-button-info p-button-text"></p-button>
+            <p-menu #controlMenu [popup]="true" appendTo="body" [model]="controlMenuItems"></p-menu>
             <div class="stretched"></div>
             <span *ngIf="creditAmount" class="caption wt-tiny size-huge f-color-danger">
                 Кредит:
@@ -110,29 +113,7 @@
 
 <ng-template #titleTagsTemp>
     <div class="flexed gap5 hcenter">
-        <ng-container [ngSwitch]="userInfo?.newTarif?.state">
-            <ng-container *ngSwitchCase="1">
-                <app-colored-tag caption="Активный" color="var(--mc-500)"></app-colored-tag>
-            </ng-container>
-            <ng-container *ngSwitchCase="100">
-                <app-colored-tag caption="Неактивный" color="var(--danger-600)"></app-colored-tag>
-            </ng-container>
-            <ng-container *ngSwitchCase="7">
-                <app-colored-tag caption="Нет денег" color="var(--warm-500)"></app-colored-tag>
-            </ng-container>
-            <ng-container *ngSwitchCase="10">
-                <app-colored-tag caption="Древний" color="var(--danger-600)"></app-colored-tag>
-            </ng-container>
-            <ng-container *ngSwitchCase="9">
-                <app-colored-tag caption="Нет тарифа" color="var(--danger-600)"></app-colored-tag>
-            </ng-container>
-            <ng-container *ngSwitchCase="11">
-                <app-colored-tag caption="Отключен" color="var(--danger-600)"></app-colored-tag>
-            </ng-container>
-            <ng-container *ngSwitchDefault>
-                <app-colored-tag caption="Неактивный" color="var(--danger-600)"></app-colored-tag>
-            </ng-container>
-        </ng-container>
+        <app-colored-tag [caption]="userInfo?.newTarif?.userStatusName" [color]="userInfo?.newTarif?.userStatusColor"></app-colored-tag>
         <app-colored-tag [caption]="isOnline ? 'Онлайн' : 'Офлайн'"
                          [color]="isOnline ? 'var(--scs-500)' : 'var(--danger-500)'"></app-colored-tag>
         <app-colored-tag *ngIf="hasCredit" caption="Кредит" color="var(--warm-500)"></app-colored-tag>
@@ -336,8 +317,9 @@
                                               [ngTemplateOutletContext]="{binding:binding}"
                                               [ngTemplateOutlet]="dhcpBinding"></ng-container>
                                 <p-button (onClick)="isAuthDialogVisible = true"
-                                          icon="mdi-check" class="align-self-center mb-2"
-                                          label="Найти и авторизовать" styleClass="p-button-warning p-button-outlined"></p-button>
+                                          class="align-self-center mb-2" icon="mdi-check"
+                                          label="Найти и авторизовать"
+                                          styleClass="p-button-warning p-button-outlined"></p-button>
                             </ng-container>
                             <div *ngSwitchCase="'EMPTY'"
                                  class="flex align-items-center justify-content-center flex-grow-1 py-5">
@@ -346,7 +328,8 @@
                                     <span>Нет авторизованного оборудования</span>
                                     <p-button (onClick)="isAuthDialogVisible = true" class="mt-3"
                                               icon="mdi-check"
-                                              label="Авторизовать" styleClass="p-button-success p-button-outlined"></p-button>
+                                              label="Авторизовать"
+                                              styleClass="p-button-success p-button-outlined"></p-button>
                                 </div>
                             </div>
                             <div *ngSwitchCase="'ERROR'"
@@ -435,7 +418,8 @@
             </div>
         </div>
         <div class="flex align-items-center">
-            <p-button (onClick)="openBindingContextMenu($event, binding, bindingContextMenu)" [disabled]="binding.isAuth && binding.authName === currentLogin"
+            <p-button (onClick)="openBindingContextMenu($event, binding, bindingContextMenu)"
+                      [disabled]="binding.isAuth && binding.authName === currentLogin"
                       icon="mdi-more_vert"
                       styleClass="p-button-rounded p-button-icon p-button-text p-button-secondary"></p-button>
         </div>
@@ -445,19 +429,20 @@
 <p-menu #bindingContextMenu [model]="bindingContextMenuItems" [popup]="true" appendTo="body"></p-menu>
 
 <p-dialog (onShow)="openAuthDialog.next(null)" [(visible)]="isAuthDialogVisible"
-          appendTo="body" header="Авторизация оборудования" [resizable]="false">
+          [resizable]="false" appendTo="body" header="Авторизация оборудования">
     <ng-template pTemplate="content">
         <ng-container *ngIf="lastBindingsPage$ | async as lastBindingsPage; else loading">
-            <div class="flex py-3 gap-3 align-items-end justify-content-end" [formGroup]="lastBindingsFilterForm">
+            <div [formGroup]="lastBindingsFilterForm" class="flex py-3 gap-3 align-items-end justify-content-end">
                 <div class="text-primary-400 font-bold">
                     Найдено: {{lastBindingsPage.totalElements}} {{lastBindingsPage.totalElements | decline:'сессия':'сессии':'сессий'}}
                 </div>
-                <p-toggleButton formControlName="state" [disabled]="isLoadingLastBindings" onLabel="В сети"
-                                onIcon="mdi-check_circle" offLabel="Не в сети" offIcon="mdi-cancel"></p-toggleButton>
-                <p-button label="Сбросить фильтр" styleClass="p-button-secondary p-button-text"
-                          (onClick)="lastBindingsFilterForm.reset({state:true})" icon="mdi-filter_alt_off"></p-button>
+                <p-toggleButton [disabled]="isLoadingLastBindings" formControlName="state" offIcon="mdi-cancel"
+                                offLabel="Не в сети" onIcon="mdi-check_circle" onLabel="В сети"></p-toggleButton>
+                <p-button (onClick)="lastBindingsFilterForm.reset({state:true})" icon="mdi-filter_alt_off"
+                          label="Сбросить фильтр" styleClass="p-button-secondary p-button-text"></p-button>
             </div>
-            <p-table [loading]="isLoadingLastBindings" [scrollable]="true" [value]="lastBindingsPage.content" dataKey="id"
+            <p-table [loading]="isLoadingLastBindings" [scrollable]="true" [value]="lastBindingsPage.content"
+                     dataKey="id"
                      scrollHeight="500px">
                 <ng-template pTemplate="header">
                     <tr>
@@ -472,10 +457,10 @@
                     </tr>
                     <tr [formGroup]="lastBindingsFilterForm">
                         <th>
-                            <input pInputText type="text" formControlName="macaddr" [size]="14"/>
+                            <input [size]="14" formControlName="macaddr" pInputText type="text"/>
                         </th>
                         <th>
-                            <input pInputText type="text" formControlName="login" [size]="8"/>
+                            <input [size]="8" formControlName="login" pInputText type="text"/>
                         </th>
                         <th></th>
                         <th></th>
@@ -486,13 +471,14 @@
                             <app-ip-input formControlName="ip"></app-ip-input>
                         </th>
                         <th>
-                            <p-inputNumber [size]="4" [max]="4096" formControlName="vlan"></p-inputNumber>
+                            <p-inputNumber [max]="4096" [size]="4" formControlName="vlan"></p-inputNumber>
                         </th>
                         <th></th>
                     </tr>
                 </ng-template>
                 <ng-template let-binding pTemplate="body">
-                    <tr (click)="authConfirm(binding)" class="cursor-pointer hover:bg-primary-50 hover:text-primary-400">
+                    <tr (click)="authConfirm(binding)"
+                        class="cursor-pointer hover:bg-primary-50 hover:text-primary-400">
                         <td>{{binding.macaddr}}</td>
                         <td>{{binding.authName}}</td>
                         <td>
@@ -521,10 +507,132 @@
                     </tr>
                 </ng-template>
             </p-table>
-            <p-paginator (onPageChange)="changeLastBindingsPage.next($event.page)" [first]="lastBindingsPage.number * 15"
+            <p-paginator (onPageChange)="changeLastBindingsPage.next($event.page)"
+                         [first]="lastBindingsPage.number * 15"
                          [rows]="15"
                          [totalRecords]="lastBindingsPage.totalElements"></p-paginator>
         </ng-container>
+    </ng-template>
+</p-dialog>
+
+<p-dialog (onHide)="closeHistoryDialog()" (onShow)="getHistory()" [(visible)]="isHistoryDialogVisible"
+          [modal]="true" [resizable]="false" appendTo="body" header="История операций за полгода">
+    <ng-template pTemplate="content">
+        <div *ngIf="userEventsLoadingState === 'LOADING'" [style]="{width: '20rem', height: '20rem'}"
+             class="flex align-items-center justify-content-center">
+            <p-progressSpinner class="custom-spinner custom-spinner-gray custom-spinner-8xl"></p-progressSpinner>
+        </div>
+        <p-tabView *ngIf="userEventsLoadingState === 'READY'">
+            <p-tabPanel header="Платежи">
+                <p-table [scrollable]="true"
+                         [value]="userEvents?.pays ?? []" scrollHeight="30rem"
+                         styleClass="p-datatable-sm border-round-lg border-1 border-bluegray-100 overflow-hidden">
+                    <ng-template pTemplate="header">
+                        <tr>
+                            <th>Тип платежа</th>
+                            <th>Сумма</th>
+                            <th>Дата</th>
+                            <th>Исполнитель</th>
+                            <th>Комментарий</th>
+                        </tr>
+                    </ng-template>
+                    <ng-template pTemplate="emptymessage">
+                        <tr>
+                            <td [attr.colspan]="5">
+                                Платежей не найдено
+                            </td>
+                        </tr>
+                    </ng-template>
+                    <ng-template let-rowData pTemplate="body">
+                        <tr>
+                            <td [style.color]="rowData.ptypeColor">{{rowData.ptypeName}}</td>
+                            <td>{{rowData.bmoney | currency:'RUB'}}</td>
+                            <td>{{rowData.pdate | date:'EEEE, dd MMMM yyyy HH:mm' | titlecase}}</td>
+                            <td>{{rowData.who}}</td>
+                            <td>{{rowData.cmt}}</td>
+                        </tr>
+                    </ng-template>
+                </p-table>
+            </p-tabPanel>
+            <p-tabPanel header="События">
+                <p-table [scrollable]="true"
+                         [value]="userEvents?.events ?? []" scrollHeight="30rem"
+                         styleClass="p-datatable-sm border-round-lg border-1 border-bluegray-100 overflow-hidden">
+                    <ng-template pTemplate="header">
+                        <tr>
+                            <th>Событие</th>
+                            <th>Дата</th>
+                            <th>Средства</th>
+                            <th>Информация</th>
+                            <th>Комментарий</th>
+                        </tr>
+                    </ng-template>
+                    <ng-template pTemplate="emptymessage">
+                        <tr>
+                            <td [attr.colspan]="5">
+                                Событий не найдено
+                            </td>
+                        </tr>
+                    </ng-template>
+                    <ng-template let-rowData pTemplate="body">
+                        <tr>
+                            <td [style.color]="rowData.eventColor">{{rowData.eventName}}</td>
+                            <td>{{rowData.evTimeStamp | date:'EEEE, dd MMMM yyyy HH:mm' | titlecase}}</td>
+                            <td [ngClass]="{'text-green-400':rowData.moneyDirection > 0, 'text-red-400':rowData.moneyDirection < 0}">{{rowData.money | currency:'RUB'}}</td>
+                            <td>{{rowData.info}}</td>
+                            <td>{{rowData.coment}}</td>
+                        </tr>
+                    </ng-template>
+                </p-table>
+            </p-tabPanel>
+            <p-tabPanel header="Тарифы">
+                <p-table [scrollable]="true"
+                         [value]="userEvents?.tarifs ?? []" scrollHeight="30rem"
+                         styleClass="p-datatable-sm border-round-lg border-1 border-bluegray-100 overflow-hidden">
+                    <ng-template pTemplate="header">
+                        <tr>
+                            <th>Тариф</th>
+                            <th>Стоимость</th>
+                            <th>Начало</th>
+                            <th>Окончание</th>
+                        </tr>
+                    </ng-template>
+                    <ng-template pTemplate="emptymessage">
+                        <tr>
+                            <td [attr.colspan]="4">
+                                Тарифов не найдено
+                            </td>
+                        </tr>
+                    </ng-template>
+                    <ng-template let-rowData pTemplate="body">
+                        <tr>
+                            <td>{{rowData.service}}</td>
+                            <td>{{rowData.price | currency:'RUB'}}</td>
+                            <td>{{rowData.hdate | date:'dd MMMM yyyy HH:mm' | titlecase}}</td>
+                            <td>{{rowData.edate | date:'dd MMMM yyyy HH:mm' | titlecase}}</td>
+                        </tr>
+                    </ng-template>
+                </p-table>
+            </p-tabPanel>
+        </p-tabView>
+    </ng-template>
+</p-dialog>
+
+<p-dialog [(visible)]="isPaymentDialogVisible"
+          [modal]="true" [resizable]="false" appendTo="body" header="Менеджер баланса">
+    <ng-template pTemplate="content">
+        <div class="flex flex-column gap-4 mt-1">
+            <form class="flex flex-column gap-2" [formGroup]="paymentForm">
+                <p-dropdown [options]="(billingPaymentTypes$ | async) ?? []" appendTo="body"
+                            placeholder="Тип платежа" formControlName="payType"></p-dropdown>
+<!--                <p-inputNumber placeholder="Сумма" mode="currency" currency="RUB" formControlName="sum"></p-inputNumber>-->
+                <p-inputNumber placeholder="Сумма" formControlName="sum"></p-inputNumber>
+                <textarea [autoResize]="true" pInputTextarea placeholder="Комментарий"
+                          formControlName="comment" [rows]="3" [cols]="40"></textarea>
+            </form>
+            <p-button label="Оплата" icon="mdi-attach_money" (onClick)="sendPayment()" [disabled]="!paymentForm.valid"
+                      styleClass="p-button-primary" class="align-self-end"></p-button>
+        </div>
     </ng-template>
 </p-dialog>
 

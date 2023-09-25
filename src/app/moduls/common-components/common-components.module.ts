@@ -172,6 +172,7 @@ import {
 } from "../../components/controls/client-equipment-list-input/client-equipment-list-input.component";
 import {CountInputComponent} from "../../components/controls/count-input/count-input.component";
 import {AcpHouseInputComponent} from "../../components/controls/acp-house-input/acp-house-input.component";
+import {CommutatorViewComponent} from "../../components/panels/commutator-view/commutator-view.component";
 
 
 @NgModule({
@@ -262,7 +263,8 @@ import {AcpHouseInputComponent} from "../../components/controls/acp-house-input/
         ConnectionServicesInputComponent,
         ClientEquipmentListInputComponent,
         CountInputComponent,
-        AcpHouseInputComponent
+        AcpHouseInputComponent,
+        CommutatorViewComponent
     ],
     exports: [
         AccountPanelComponent,
@@ -351,7 +353,8 @@ import {AcpHouseInputComponent} from "../../components/controls/acp-house-input/
         ConnectionServicesInputComponent,
         ClientEquipmentListInputComponent,
         CountInputComponent,
-        AcpHouseInputComponent
+        AcpHouseInputComponent,
+        CommutatorViewComponent
     ],
     imports: [
         CommonPipesModule,

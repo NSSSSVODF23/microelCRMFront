@@ -4,7 +4,7 @@ import {finalize, map, Observable, share} from "rxjs";
 import {
     AcpCommutator,
     AcpConf,
-    BillingConf,
+    BillingConf, BillingTotalUserInfo,
     Chat,
     ChatUnreadCounter,
     City, ClientEquipment,
@@ -284,6 +284,11 @@ export class RealTimeUpdateService {
     houseDeleted(id?: number) {
         if (id) return this.watch<House>('house', id.toString(), 'delete')
         return this.watch<House>('house', 'delete')
+    }
+
+    billingUserUpdated(login?: string) {
+        if (login) return this.watch<BillingTotalUserInfo>('billing', 'user', login, 'update')
+        return this.watch<BillingTotalUserInfo>('billing', 'user', 'update')
     }
 
     pingMonitoring(ip: string) {

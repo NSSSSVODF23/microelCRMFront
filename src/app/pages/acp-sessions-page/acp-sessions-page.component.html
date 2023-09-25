@@ -71,7 +71,7 @@
             </span>
             <span>{{binding.streetName}} {{binding.houseNum}}</span>
             <span>{{binding.ipaddr}}</span>
-            <span>VID: {{binding.vlanid}}</span>
+            <span *ngIf="binding.lastConnectionLocation">{{binding.lastConnectionLocation.commutatorName}} {{binding.lastConnectionLocation.portName}} порт</span>
         </div>
     </div>
 </ng-template>

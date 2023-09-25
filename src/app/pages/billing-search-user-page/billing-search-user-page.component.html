@@ -51,8 +51,8 @@
                                     <span class="caption wt-bold f-color-600">{{user.uname}}</span>
                                     <span class="caption f-color-600">{{user.addr}}</span>
                                     <app-colored-tag
-                                            [caption]="user.state === '1' ? 'Активный' : 'Неактивный'"
-                                            [color]="user.state === '1' ? 'var(--mc-500)' : 'var(--danger-600)'"></app-colored-tag>
+                                            [caption]="user.stateName"
+                                            [color]="user.stateColor"></app-colored-tag>
                                     <app-colored-tag *ngIf="user.utype === '11'"
                                             caption="Бизнес" color="var(--warm-600)"></app-colored-tag>
                                     <div class="stretched"></div>

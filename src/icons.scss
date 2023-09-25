@@ -8852,39 +8852,47 @@
 
 .mds {
 
-  &-task_alt{
+  &-visibility {
+    @include mds("visibility");
+  }
+
+  &-visibility_off {
+    @include mds("visibility_off");
+  }
+
+  &-task_alt {
     @include mds("task_alt");
   }
 
-  &-router{
+  &-router {
     @include mds("router");
   }
 
-  &-sync{
+  &-sync {
     @include mds("sync");
   }
 
-  &-person{
+  &-person {
     @include mds("person");
   }
 
-  &-person_search{
+  &-person_search {
     @include mds("person_search");
   }
 
-  &-sync_alt{
+  &-sync_alt {
     @include mds("sync_alt");
   }
 
-  &-release_alert{
+  &-release_alert {
     @include mds("release_alert");
   }
 
-  &-folder{
+  &-folder {
     @include mds("folder");
   }
 
-  &-construction{
+  &-construction {
     @include mds("construction");
   }
 
@@ -11556,11 +11564,11 @@
     @include mds("content_paste_search");
   }
 
-  &-list{
+  &-list {
     @include mds("list");
   }
 
-  &-receipt_long{
+  &-receipt_long {
     @include mds("receipt_long");
   }
 

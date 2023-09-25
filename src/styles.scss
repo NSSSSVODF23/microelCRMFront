@@ -1631,3 +1631,11 @@ markdown > p:last-child {
 .danger-menu-button > a span{
   color: var(--red-400) !important;
 }
+
+.warning-menu-button > a span{
+  color: var(--orange-400) !important;
+}
+
+.success-menu-button > a span{
+  color: var(--green-400) !important;
+}
