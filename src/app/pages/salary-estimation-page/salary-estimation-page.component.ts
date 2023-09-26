@@ -8,6 +8,7 @@ import {RealTimeUpdateService} from "../../services/real-time-update.service";
 import {filter, map, Observable, of, shareReplay, switchMap} from "rxjs";
 import {TFactorAction, WorksPickerValue} from "../../components/controls/works-picker/works-picker.component";
 import {ActivatedRoute, Router} from "@angular/router";
+import {CustomNavigationService} from "../../services/custom-navigation.service";
 
 @Component({
     templateUrl: './salary-estimation-page.component.html',
@@ -92,7 +93,7 @@ export class SalaryEstimationPageComponent implements OnInit, OnDestroy {
     )
 
     constructor(readonly api: ApiService, private confirmation: ConfirmationService, private rt: RealTimeUpdateService,
-                private router: Router, private route: ActivatedRoute) {
+                private router: Router, private route: ActivatedRoute, private nav: CustomNavigationService) {
     }
 
     get totalCostOfWork() {
@@ -161,8 +162,9 @@ export class SalaryEstimationPageComponent implements OnInit, OnDestroy {
     }
 
     unselectWork() {
-        // this.selectedWorkLog = undefined;
-        this.router.navigate(['.'], {relativeTo: this.route}).then();
+        // // this.selectedWorkLog = undefined;
+        // this.router.navigate(['.'], {relativeTo: this.route}).then();
+        this.nav.backOrDefault(["/salary","estimation"]);
         this.resetCalculation();
     }
 

@@ -87,6 +87,9 @@ export class SalaryTableCacheService {
                 return this.api.getWorkingDay(day[0], day[1])
             } else return of(null)
         }),
+        tap(()=>{
+            setTimeout(()=> window.scrollTo({top:document.body.scrollHeight}))
+        }),
         tap({
             next: (workingDay) => this.calculatedLoadingState = workingDay === null ? LoadingState.EMPTY : LoadingState.READY,
             error: () => this.calculatedLoadingState = LoadingState.ERROR

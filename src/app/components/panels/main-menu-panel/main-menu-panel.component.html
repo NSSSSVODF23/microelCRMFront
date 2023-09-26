@@ -41,7 +41,7 @@
     <app-extended-menu-item [link]="['/tasks','calendar']" caption="Календарь" icon="mdi-calendar_month"></app-extended-menu-item>
     <app-extended-menu-item [link]="['/tasks','list']" caption="Список"
                             icon="mdi-format_list_bulleted"></app-extended-menu-item>
-    <app-extended-menu-item [elements]="stagesMenuItems" [isExtended]="stageMenuExtended" caption="Доска"
+    <app-extended-menu-item [elements]="stagesMenuItems" [isExtended]="stageMenuExtended" [extendable]="true" caption="Доска"
                             icon="mdi-checklist"></app-extended-menu-item>
     <app-extended-menu-item [link]="['/tasks','templates']" caption="Теги/Шаблоны" icon="mdi-ballot"></app-extended-menu-item>
 </ng-template>

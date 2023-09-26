@@ -1,6 +1,5 @@
 import {AfterViewInit, Component, ContentChild, ElementRef, Input, OnInit, ViewChild} from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
-import {map} from "rxjs";
 
 export type ExtendedMenuModel = { label: string, link: string[], children?: ExtendedMenuModel[], nestingLevel?: number, extended: boolean };
 
@@ -14,25 +13,30 @@ export class ExtendedMenuItemComponent implements OnInit, AfterViewInit {
     @ViewChild('titleElem') titleElem!: ElementRef<HTMLDivElement>;
     @ViewChild('wrapperElem') wrapperElem!: ElementRef<HTMLDivElement>;
     @ViewChild('childElem') childElem?: ContentChild;
-    _isExtended = false;
-    @Input() set isExtended(value: boolean) {
-        this._isExtended = value;
-        this.extending();
-    }
+    @Input() extendable = false;
     @Input() icon = '';
     @Input() caption: string = '';
     @Input() elements: ExtendedMenuModel[] = [];
     @Input() link?: string[];
     @Input() badge?: string;
     @Input() exact = false;
-
     animationTimer?: any;
 
     constructor(readonly route: ActivatedRoute) {
     }
 
+    _isExtended = false;
+
+    @Input() set isExtended(value: boolean) {
+        if (this.extendable) {
+            this._isExtended = value;
+            this.extending();
+        }
+    }
+
     ngAfterViewInit(): void {
-        this.extending();
+        if (this.extendable)
+            this.extending();
     }
 
     ngOnInit(): void {

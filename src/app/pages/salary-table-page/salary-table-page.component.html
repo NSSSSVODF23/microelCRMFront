@@ -1,7 +1,7 @@
-<div appExtendPageHeight class="flexed vcenter">
-    <div class="flexed gap10">
-        <app-main-menu-panel></app-main-menu-panel>
-        <div class="flex flex-column gap-3 flex-grow-1 m-3">
+<div appExtendPageHeight class="flex justify-content-center">
+    <div class="responsive-wrapper" [style]="{display: 'grid', grid:'1fr / min-content 1fr'}">
+        <app-main-menu-panel class="pt-1"></app-main-menu-panel>
+        <div class="flex flex-column gap-3 flex-grow-1 p-3 pt-1 overflow-hidden">
             <div class="flex flex-column panel overflow-hidden">
                 <div [formGroup]="cache.filtrationForm" class="flex gap-3 p-2">
                     <div class="p-inputgroup w-max">
@@ -23,18 +23,18 @@
                 </div>
                 <ng-container *ngIf="cache.salaryTable$|async as salaryTable">
                     <ng-container *ngIf="cache.tableLoadingState==='READY'">
-                        <p-table [columns]="salaryTable.headers" [value]="salaryTable.payload"
+                        <p-table [columns]="salaryTable.headers" [value]="salaryTable.payload" [scrollable]="true" scrollHeight="50rem" scrollDirection="horizontal"
                                  styleClass="p-datatable-sm">
                             <ng-template let-columns pTemplate="header">
                                 <tr>
-                                    <th *ngFor="let name of columns" class="caption size-tiny">
+                                    <th *ngFor="let name of columns; let i = index" class="caption size-tiny" pFrozenColumn [frozen]="i === 0 || i === columns.length-1" [alignFrozen]="i === columns.length-1 ? 'right' : ''">
                                         {{name}}
                                     </th>
                                 </tr>
                             </ng-template>
                             <ng-template let-columns="columns" let-i="rowIndex" let-rowData pTemplate="body">
                                 <tr>
-                                    <td>
+                                    <td pFrozenColumn>
                                         <app-employee-label [employee]="salaryTable.employees[i]"></app-employee-label>
                                     </td>
                                     <td (click)="cache.selectDay(cell, i, colI)"
@@ -43,7 +43,7 @@
                                         class="caption size-tiny f-inline cursor-pointer hover:text-primary-400">
                                         {{((cache.ndflValue$|async) ? cell.sumWithNDFL : cell.sumWithoutNDFL) | number: '1.0-2'}}
                                     </td>
-                                    <td class="caption size-tiny">
+                                    <td class="caption size-tiny" pFrozenColumn alignFrozen="right">
                                         {{(cache.ndflValue$|async) ? salaryTable.totalSum[i].sumWithNDFL : salaryTable.totalSum[i].sumWithoutNDFL}}
                                     </td>
                                 </tr>
