@@ -94,6 +94,9 @@
                                         Считал
                                     </th>
                                     <th>
+                                        Платная?
+                                    </th>
+                                    <th>
                                         Сумма
                                     </th>
                                     <th>
@@ -132,9 +135,17 @@
                                                 [employee]="rowData.lastEdit ? rowData.lastEdit.employee : rowData.creator"></app-employee-label>
                                     </td>
                                     <td>
-                                        {{rowData.sum | number: '1.0-2'}}руб.
+                                        {{rowData.isPaidWork ? 'Да' : 'Нет'}}
                                     </td>
-                                    <td>
+                                    <td [colSpan]="rowData.isPaidWork ? 2 : 1" [style.text-align]="rowData.isPaidWork ? 'center' : ''">
+                                        <ng-container *ngIf="rowData.isPaidWork">
+                                            {{rowData.amountOfMoneyTaken | number: '1.0-2'}}руб.
+                                        </ng-container>
+                                        <ng-container *ngIf="!rowData.isPaidWork">
+                                            {{rowData.sum | number: '1.0-2'}}руб.
+                                        </ng-container>
+                                    </td>
+                                    <td *ngIf="!rowData.isPaidWork">
                                         {{rowData.sumWithoutNDFL | number: '1.0-2'}}руб.
                                     </td>
                                     <td>

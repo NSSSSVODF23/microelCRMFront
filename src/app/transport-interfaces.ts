@@ -761,6 +761,8 @@ export interface WorkCalculation {
     sum: number;
     sumWithoutNDFL: number;
     lastEdit?: EmployeeIntervention;
+    isPaidWork: boolean;
+    amountOfMoneyTaken: number;
 }
 
 export interface WorkingDay {
@@ -1048,6 +1050,9 @@ export interface NetworkConnectionLocation{
     isLast: boolean;
     createdAt: Date;
     checkedAt: Date;
+    isHasLink: boolean;
+    portSpeed?: PortSpeed;
+    lastPortCheck?: Date;
 }
 
 export interface DhcpSetting {
@@ -1198,7 +1203,7 @@ export interface AcpCommutator{
 export interface SystemInfo{
     systemInfoId: number;
     device: string;
-    mac: string;
+    mac?: string;
     hwVersion: string;
     fwVersion: string;
     uptime?: number;

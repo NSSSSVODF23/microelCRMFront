@@ -221,8 +221,8 @@ html:not(.whited), body:not(.whited) {
   pointer-events: none;
 }
 
-.relative {
-  position: relative;
+.line-height-0{
+  line-height: 0 !important;
 }
 
 .flexed {
@@ -1453,9 +1453,9 @@ markdown > p:last-child {
   0px 0px 17px rgba(0, 0, 0, 0.07);
 }
 
-.p-overlay {
-  width: 20rem;
-}
+//.p-overlay {
+//  width: 20rem;
+//}
 
 .p-overlaypanel {
   display: grid !important;

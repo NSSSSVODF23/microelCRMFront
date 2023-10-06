@@ -28,6 +28,7 @@ import {ConfirmationService, MenuItem} from "primeng/api";
     animations: [flowInChild]
 })
 export class CommutatorListPageComponent implements OnInit {
+    pageNum = 0;
     commutatorFilterForm = new FormGroup({
         name: new FormControl(null),
         ip: new FormControl(null),
@@ -36,13 +37,16 @@ export class CommutatorListPageComponent implements OnInit {
     changeFilterForm$ = this.commutatorFilterForm.valueChanges.pipe(
         startWith(this.commutatorFilterForm.value),
         debounceTime(1000),
-        shareReplay(1)
+        tap(()=>this.pageNum = 0)
     )
     changeCommutatorPage = new BehaviorSubject(0);
+    page$ = this.changeCommutatorPage.pipe(
+        tap(page=>this.pageNum=page)
+    );
     loadingState = LoadingState.LOADING;
-    changePageOrFilters$ = combineLatest([this.changeCommutatorPage, this.changeFilterForm$]).pipe(
+    changePageOrFilters$ = combineLatest([this.page$, this.changeFilterForm$]).pipe(
         map(([page, filter]) => {
-            return [page, filter.name, filter.ip, filter.address?.acpHouseBind?.buildingId]
+            return [this.pageNum, filter.name, filter.ip, filter.address?.acpHouseBind?.buildingId]
         })
     )
     updateCommutators$ = merge(this.rt.acpCommutatorUpdated(), this.rt.acpCommutatorStatusUpdated().pipe(

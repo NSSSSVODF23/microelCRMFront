@@ -1,6 +1,6 @@
 <span class="relative flexed">
     <p-button (onClick)="overlayPanelVisible = true; overlayPanelEl.toggle($event)" icon="mdi-chat"
-              styleClass="p-button-text p-button-icon p-button-rounded p-button-secondary"></p-button>
+              styleClass="p-button-outlined p-button-icon p-button-rounded p-button-secondary"></p-button>
     <p-badge *ngIf="chatService.isHasUnreadMessages && chatService.allUnreadCount" [value]="chatService.allUnreadCount.toString()" class="ur-badge" severity="warning"></p-badge>
 </span>
 <p-overlayPanel #overlayPanelEl appendTo="body" [baseZIndex]="2000">

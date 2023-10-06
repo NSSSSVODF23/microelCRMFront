@@ -347,6 +347,10 @@ export class RealTimeUpdateService {
         return this.watch<Switch>('acp', "commutator", "delete");
     }
 
+    acpCommutatorsRemoteUpdatePool(){
+        return this.watch<Switch[]>('acp', "commutator", "remote-update-pool")
+    }
+
     private watchUnicast<T>(...path: string[]): Observable<T> {
         return this.getObservable<T>('user', ...path);
     }

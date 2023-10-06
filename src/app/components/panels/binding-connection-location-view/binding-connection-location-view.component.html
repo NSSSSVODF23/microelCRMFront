@@ -1,0 +1,50 @@
+<div (mouseenter)="overlayVisibleChange.next(true)"
+     (mouseleave)="overlayVisibleChange.next(false)"
+     class="flex align-items-center font-bold text-bluegray-400 border-1 border-bluegray-100 bg-white border-round-md" [style.cursor]="'default'">
+    <span *ngIf="binding && binding.lastConnectionLocation; else notFinded"
+          [ngClass]="binding.lastConnectionLocation.isHasLink ? 'text-green-400' : 'text-red-400'"
+          class="mdi-dns text-sm p-2 terminator-right"></span>
+    <span class="px-2 border-right-1 border-bluegray-100 text-sm">
+        {{binding?.macaddr}}
+    </span>
+    <ng-container [ngSwitch]="isLocationRefreshing">
+        <span (click)="refreshConnectionLocation(binding?.id)" *ngSwitchCase="false" class="mdi-refresh text-sm p-2 cursor-pointer text-primary-400 hover:text-primary"
+              pTooltip="Обновить"></span>
+        <p-progressSpinner *ngSwitchCase="true" class="custom-spinner custom-spinner-primary custom-spinner-sm m-2"
+                           strokeWidth="2"></p-progressSpinner>
+    </ng-container>
+</div>
+
+<p-overlay [visible]="(overlayVisible | async) ?? false" appendTo="body" contentStyleClass="overlay">
+        <div *ngIf="binding && binding.lastConnectionLocation; else notFindedOverlay" class="p-3 flex flex-column gap-2 text-sm text-bluegray-400 fit-content">
+            <div class="flex align-items-center gap-2">
+                <span class="font-bold">{{binding?.lastConnectionLocation?.commutatorName}}</span>
+                <span class="font-bold">{{binding?.lastConnectionLocation?.portName}} порт</span>
+                <span [ngClass]="binding?.lastConnectionLocation?.isHasLink ? 'text-green-400' : 'text-red-400'"
+                      class="font-bold">{{binding?.lastConnectionLocation?.isHasLink ? 'Есть линк' : 'Нет линка'}}</span>
+            </div>
+            <div class="flex align-items-center gap-2">
+                <span>IP: {{binding?.lastConnectionLocation?.commutatorIp}}</span>
+                <span>Скорость: {{binding?.lastConnectionLocation?.portSpeed ?? '-'}}</span>
+            </div>
+            <div class="flex align-items-center gap-1 justify-content-end text-xs text-bluegray-300">
+                <span>Обновлен:</span>
+                <app-time-elapsed [startTime]="binding?.lastConnectionLocation?.lastPortCheck"
+                                  type="short"></app-time-elapsed>
+                <span>назад</span>
+            </div>
+        </div>
+</p-overlay>
+
+<ng-template #notFinded>
+    <span class="mdi-check_box_outline_blank text-sm p-2 terminator-right"></span>
+</ng-template>
+
+<ng-template #notFindedOverlay>
+    <div class="text-sm text-bluegray-300 font-bold flex flex-column align-items-center justify-content-center p-3">
+        <span class="mds-dns" [style.font-size]="'3rem'"></span>
+        <span class="text-center max-w-20rem">
+            Нет информации о месте подключения, попробуйте обновить
+        </span>
+    </div>
+</ng-template>

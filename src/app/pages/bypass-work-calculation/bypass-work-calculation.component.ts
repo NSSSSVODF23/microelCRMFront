@@ -6,6 +6,7 @@ import {AbstractControl, FormControl, FormGroup, ValidationErrors, Validators} f
 import {FormToModelItemConverter, SubscriptionsHolder} from "../../util";
 import {TFactorAction, WorksPickerValue} from "../../components/controls/works-picker/works-picker.component";
 import {CustomValidators} from "../../custom-validators";
+import {InputSwitchOnChangeEvent} from "primeng/inputswitch";
 
 @Component({
     templateUrl: './bypass-work-calculation.component.html',
@@ -60,6 +61,10 @@ export class BypassWorkCalculationComponent implements OnInit, OnDestroy {
     worksPickerForm = new FormControl<WorksPickerValue | null>(null, [this.worksPickerValidator]);
     isSendingCalculation = false;
     employeeRatioForm = new FormControl<{ [key: string]: { ratio: number, sum: number } }>({});
+    paidWorkForm = new FormGroup({
+        isPaidWork: new FormControl(false),
+        amountOfMoneyTaken: new FormControl(null)
+    })
     private _selectTemplateSubject = new Subject<number>();
     selectWireframe$ = this._selectTemplateSubject.pipe(
         tap(() => {
@@ -120,13 +125,15 @@ export class BypassWorkCalculationComponent implements OnInit, OnDestroy {
         const employees: Employee[] = <Employee[]>this.installersReportForm.value.installers;
         if (!employees
             || !this.worksPickerForm.value?.actionsTaken
-            || !this.selectedWireframe) return;
+            || !this.selectedWireframe ||
+            (this.paidWorkForm.value.isPaidWork && (!this.paidWorkForm.value.amountOfMoneyTaken || this.paidWorkForm.value.amountOfMoneyTaken < 1))) return;
 
         this.isSendingCalculation = true;
         this.worksPickerForm.disable()
         this.employeeRatioForm.disable()
         this.installersReportForm.disable()
         this.taskInformationForm.disable()
+        this.paidWorkForm.disable()
 
         this.api.sendBypassWorkCalculation({
             taskInfo: {
@@ -150,7 +157,9 @@ export class BypassWorkCalculationComponent implements OnInit, OnDestroy {
                         actionUuids: war.actionUuids,
                     })),
                 }
-            })
+            }),
+            isPaidWork: this.paidWorkForm.value.isPaidWork,
+            amountOfMoneyTaken: this.paidWorkForm.value.amountOfMoneyTaken
         }).subscribe(this.sendingCalculationHandler)
     }
 
@@ -161,8 +170,10 @@ export class BypassWorkCalculationComponent implements OnInit, OnDestroy {
             this.employeeRatioForm.enable()
             this.installersReportForm.enable()
             this.taskInformationForm.enable()
+            this.paidWorkForm.enable()
             this.worksPickerForm.reset()
             this.employeeRatioForm.reset()
+            this.paidWorkForm.reset()
             this.installersReportForm.reset({
                 installers: [],
                 report: '',
@@ -177,6 +188,7 @@ export class BypassWorkCalculationComponent implements OnInit, OnDestroy {
             this.employeeRatioForm.enable()
             this.installersReportForm.enable()
             this.taskInformationForm.enable()
+            this.paidWorkForm.enable()
         }
     }
 

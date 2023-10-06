@@ -1,10 +1,15 @@
 <div class="top-panel">
     <div class="responsive-wrapper top-panel-content">
-        <img [style.height]="'3rem'" src="assets/logo-dark.svg" alt="" class="cursor-pointer" [routerLink]="['/']">
-        <app-button *ngIf="!isTaskCreationPage" label="Создать задачу" icon="add_task" model="p-button-success" (onClick)="taskCreator.standard()"></app-button>
+        <img [routerLink]="['/']" [style.height]="'3rem'" alt="" class="cursor-pointer" src="assets/logo-dark.svg">
+        <app-button (onClick)="taskCreator.standard()" *ngIf="!isTaskCreationPage" icon="add_task"
+                    label="Создать задачу"
+                    model="p-button-success"></app-button>
         <div class="stretched"></div>
-        <app-active-work-logs-panel></app-active-work-logs-panel>
-        <app-my-active-chats></app-my-active-chats>
+        <div class="flex gap-3">
+            <ng-container *ngTemplateOutlet="commutatorPullRemoteUpdates"></ng-container>
+            <app-active-work-logs-panel></app-active-work-logs-panel>
+            <app-my-active-chats></app-my-active-chats>
+        </div>
         <app-account-panel></app-account-panel>
     </div>
 </div>
@@ -12,22 +17,51 @@
 
 <app-notifications-popup-panel></app-notifications-popup-panel>
 
-<p-sidebar appScrollToBottomEmitter [showCloseIcon]="false" [blockScroll]="true" [(visible)]="notifyService.displaySideBar"
-           [position]="'right'" (onShow)="notifyService.load()" (onHide)="notifyService.readAllNotifications()"
-           [style]="{width:'max-content', maxWidth: '30vw'}">
+<ng-template #commutatorPullRemoteUpdates>
+    <ng-container *ngIf="commutatorRemoteUpdatePool$ | async as commutatorRemoteUpdatePool">
+        <span *ngIf="commutatorRemoteUpdatePool && commutatorRemoteUpdatePool.length > 0" class="flex relative">
+            <p-button (onClick)="commutatorRemoteUpdatePoolVisible = true" icon="mdi-upgrade"
+                      styleClass="p-button-outlined p-button-icon p-button-rounded p-button-secondary"></p-button>
+            <p-overlay [(visible)]="commutatorRemoteUpdatePoolVisible" [baseZIndex]="2000"
+                       appendTo="body" contentStyleClass="overlay flex flex-column">
+                <span class="text-bluegray-400 font-bold p-2">
+                    Обновляемые коммутаторы
+                </span>
+                <div class="flex flex-column max-h-20rem overflow-y-auto">
+                    <div *ngFor="let cuItem of commutatorRemoteUpdatePool" class="flex align-items-center p-3">
+                        {{cuItem.name}}
+                    </div>
+                </div>
+            </p-overlay>
+            <p-badge [value]="commutatorRemoteUpdatePool.length.toString()" class="ur-badge"></p-badge>
+        </span>
+    </ng-container>
+</ng-template>
+
+<p-sidebar (onHide)="notifyService.readAllNotifications()" (onShow)="notifyService.load()"
+           [(visible)]="notifyService.displaySideBar"
+           [blockScroll]="true"
+           [position]="'right'" [showCloseIcon]="false" [style]="{width:'max-content', maxWidth: '30vw'}"
+           appScrollToBottomEmitter>
     <ng-template pTemplate="header">
-        <span class="caption size-big flexed inline hcenter gap3"><i class="mdi-circle_notifications"></i> Уведомления</span>
+        <span class="caption size-big flexed inline hcenter gap3"><i
+                class="mdi-circle_notifications"></i> Уведомления</span>
         <div class="stretched"></div>
-        <p-button styleClass="p-button-text" icon="mdi-clear_all" label="Отчистить"
-                  [disabled]="!notifyService.isHasUnread" (onClick)="notifyService.readAllNotifications()"></p-button>
+        <p-button (onClick)="notifyService.readAllNotifications()" [disabled]="!notifyService.isHasUnread"
+                  icon="mdi-clear_all"
+                  label="Отчистить" styleClass="p-button-text"></p-button>
     </ng-template>
     <ng-template pTemplate="content">
-        <div class="list-view flexed v-scroll" appScrollToBottomEmitter *ngIf="!notifyService.isEmpty" (onScrollToBottom)="!notifyService.isLast && notifyService.load()">
-            <app-notification-item [notification]="notify" *ngFor="let notify of notifyService.list"></app-notification-item>
+        <div (onScrollToBottom)="!notifyService.isLast && notifyService.load()" *ngIf="!notifyService.isEmpty"
+             appScrollToBottomEmitter
+             class="list-view flexed v-scroll">
+            <app-notification-item *ngFor="let notify of notifyService.list"
+                                   [notification]="notify"></app-notification-item>
         </div>
-        <div class="flexed hcenter vcenter column p10" [style.padding-top]="'10rem'" *ngIf="notifyService.isEmpty">
+        <div *ngIf="notifyService.isEmpty" [style.padding-top]="'10rem'" class="flexed hcenter vcenter column p10">
             <span class="flexed hcenter gap5 caption size-big wt-bold f-color-500"><i class="mdi-inventory"></i> Новых уведомлений пока нет</span>
-            <p-button label="Показать предыдущие" styleClass="p-button-text one-line" (onClick)="notifyService.changeNotificationViewMode('ALL')"></p-button>
+            <p-button (onClick)="notifyService.changeNotificationViewMode('ALL')" label="Показать предыдущие"
+                      styleClass="p-button-text one-line"></p-button>
         </div>
     </ng-template>
 </p-sidebar>
@@ -35,10 +69,10 @@
 <p-confirmDialog></p-confirmDialog>
 <app-media-viewer></app-media-viewer>
 <app-chat-panel #chatPanelEl></app-chat-panel>
-<p-toast position="bottom-center" key="darktoast">
+<p-toast key="darktoast" position="bottom-center">
     <ng-template let-message pTemplate="message">
         <div class="flex gap-3 flex-grow-1 h-full align-items-center">
-            <span [class]="message.icon+' text-xl'" *ngIf="message.icon"></span>
+            <span *ngIf="message.icon" [class]="message.icon+' text-xl'"></span>
             <span class="font-bold">
                 {{message.detail}}
             </span>

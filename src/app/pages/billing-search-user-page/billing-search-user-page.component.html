@@ -4,7 +4,7 @@
         <div class="flexed column gap10 stretched">
             <div class="flexed column gap10 panel p10">
                 <span class="caption size-big f-color-500">Поиск абонентов</span>
-                <div [formGroup]="busService.filtrationForm" class="flexed gap10">
+                <div [formGroup]="busService.filtrationForm" class="flex gap-3 align-items-end">
                     <div class="input-label-wrapper">
                         <label>Режим поиска</label>
                         <p-selectButton [disabled]="busService.userLoadingState==='LOADING'" [options]="filterModeItems"
@@ -12,13 +12,14 @@
                     </div>
                     <div class="input-label-wrapper stretched">
                         <label>Запрос</label>
-                        <div class="p-inputgroup" *ngIf="!busService.isAddressMode">
+                        <div class="p-inputgroup">
                             <input  [appPreventInput]="busService.userLoadingState === 'LOADING'" formControlName="query"
                                    pInputText type="text" (keydown.enter)="busService.enterSearch.next(null)"/>
                             <button type="button" pButton pRipple icon="mdi-search" (click)="busService.enterSearch.next(null)"></button>
                         </div>
-                        <app-address-input *ngIf="busService.isAddressMode" formControlName="query"></app-address-input>
                     </div>
+                    <p-button [disabled]="busService.userLoadingState==='LOADING'" icon="mdi-cancel" (onClick)="clearSearchQuery()"
+                              styleClass="p-button-outlined p-button-secondary" label="Очистить"></p-button>
                 </div>
             </div>
             <ng-container [ngSwitch]="busService.userLoadingState">

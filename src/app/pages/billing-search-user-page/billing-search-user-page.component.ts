@@ -26,4 +26,8 @@ export class BillingSearchUserPageComponent implements OnInit {
         this.busService.first = event.first;
         this.busService.page = this.busService.users.slice(event.first, event.first + event.rows);
     }
+
+    clearSearchQuery() {
+        this.busService.filtrationForm.patchValue({query: ''})
+    }
 }

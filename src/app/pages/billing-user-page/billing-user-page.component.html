@@ -162,9 +162,9 @@
                 <span class="caption wt-black size-small f-color-500">
                     Комментарий:
                 </span>
-                <span class="caption">
+                <div class="caption ml-2" [style]="{maxWidth:'30rem'}">
                     {{userInfo?.ibase?.coment}}
-                </span>
+                </div>
             </span>
         </div>
     </div>
@@ -398,7 +398,6 @@
             <div class="flex gap-2 align-items-center">
                 <span [style]="{backgroundColor:binding.onlineStatus === 'ONLINE' ? 'var(--green-400)' : 'var(--red-400)'}"
                       class="border-circle w-1rem h-1rem"></span>
-                <span class="font-bold text-bluegray-600">{{binding.macaddr}}</span>
                 <span *ngIf="isLogin" class="font-bold text-bluegray-600">{{binding.authName}}</span>
                 <span class="flex gap-1 text-primary-400">
                     <span *ngIf="binding.dhcpClient">
@@ -412,8 +411,11 @@
             </div>
             <div class="flex gap-2 align-items-center">
                 <app-ip-view *ngIf="binding.ipaddr" [ip]="binding.ipaddr"></app-ip-view>
-                <span>VLAN: {{binding.vlanid}}</span>
-                <span>Смена состояния: <app-time-elapsed [startTime]="binding.leaseStart"
+                <app-binding-connection-location-view [binding]="binding"></app-binding-connection-location-view>
+            </div>
+            <div class="flex gap-2 align-items-center">
+                <span class="text-xs font-bold text-bluegray-300">VLAN: {{binding.vlanid}}</span>
+                <span class="text-xs font-bold text-bluegray-300">Смена состояния: <app-time-elapsed [startTime]="binding.leaseStart"
                                                          type="short"></app-time-elapsed> назад</span>
             </div>
         </div>

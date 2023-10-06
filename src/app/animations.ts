@@ -3,9 +3,9 @@ import {animate, query, stagger, state, style, transition, trigger} from "@angul
 export const flowInChild = trigger("flowInChild", [
     transition('* => *', [
         query(':enter', [
-                style({opacity: 0, transform: "translateY(-1.5rem)"}),
-                stagger(101,
-                    animate(".4s", style({opacity: 1, transform: "translateY(0)"}))
+                style({opacity: 0, transform: "translateY(-2rem)"}),
+                stagger(30,
+                    animate(".3s", style({opacity: 1, transform: "translateY(0)"}))
                 )
             ],
             {

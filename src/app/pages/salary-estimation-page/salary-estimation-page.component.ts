@@ -2,7 +2,7 @@ import {Component, OnDestroy, OnInit} from '@angular/core';
 import {ApiService} from "../../services/api.service";
 import {LoadingState, WorkLog} from "../../transport-interfaces";
 import {ConfirmationService, TreeDragDropService} from "primeng/api";
-import {FormControl} from "@angular/forms";
+import {FormControl, FormGroup} from "@angular/forms";
 import {SubscriptionsHolder} from "../../util";
 import {RealTimeUpdateService} from "../../services/real-time-update.service";
 import {filter, map, Observable, of, shareReplay, switchMap} from "rxjs";
@@ -92,6 +92,11 @@ export class SalaryEstimationPageComponent implements OnInit, OnDestroy {
         map(workLog=>workLog?"RECALCULATE":"CALCULATE"),
     )
 
+    paidWorkForm = new FormGroup({
+        isPaidWork: new FormControl(false),
+        amountOfMoneyTaken: new FormControl(null)
+    })
+
     constructor(readonly api: ApiService, private confirmation: ConfirmationService, private rt: RealTimeUpdateService,
                 private router: Router, private route: ActivatedRoute, private nav: CustomNavigationService) {
     }
@@ -127,9 +132,14 @@ export class SalaryEstimationPageComponent implements OnInit, OnDestroy {
                     factorsActions: value.factorsActions
                 });
                 this.employeeRatioForm.setValue(value.employeesRatio);
+                this.paidWorkForm.setValue({
+                    isPaidWork: value.isPaidWork ?? false,
+                    amountOfMoneyTaken: value.amountOfMoneyTaken ?? null
+                })
             }else{
                 this.worksPickerForm.reset();
                 this.employeeRatioForm.reset();
+                this.paidWorkForm.reset();
             }
         }))
     }
@@ -174,6 +184,9 @@ export class SalaryEstimationPageComponent implements OnInit, OnDestroy {
     }
 
     sendCalculation() {
+        if(this.paidWorkForm.value.isPaidWork && (!this.paidWorkForm.value.amountOfMoneyTaken || this.paidWorkForm.value.amountOfMoneyTaken < 1)){
+            return;
+        }
         if (this.actionsTaken.length === 0) {
             this.emptyCalculationConformationDialogVisible = true;
             return;
@@ -202,7 +215,9 @@ export class SalaryEstimationPageComponent implements OnInit, OnDestroy {
                                 actionUuids: war.actionUuids,
                             })),
                         }
-                    })
+                    }),
+                    isPaidWork: this.paidWorkForm.value.isPaidWork,
+                    amountOfMoneyTaken: this.paidWorkForm.value.amountOfMoneyTaken
                 }).subscribe(this.sendingCalculationHandlers)
             }
         })
@@ -213,6 +228,9 @@ export class SalaryEstimationPageComponent implements OnInit, OnDestroy {
     }
 
     sendRecalculation() {
+        if(this.paidWorkForm.value.isPaidWork && (!this.paidWorkForm.value.amountOfMoneyTaken || this.paidWorkForm.value.amountOfMoneyTaken < 1)){
+            return;
+        }
         if (!this.selectedWorkLog) return;
         this.isSendingCalculation = true;
         this.api.sendWorkCalculation({
@@ -235,11 +253,16 @@ export class SalaryEstimationPageComponent implements OnInit, OnDestroy {
                         actionUuids: war.actionUuids,
                     })),
                 }
-            })
+            }),
+            isPaidWork: this.paidWorkForm.value.isPaidWork,
+            amountOfMoneyTaken: this.paidWorkForm.value.amountOfMoneyTaken
         }).subscribe(this.sendingCalculationHandlers)
     }
 
     sendEmptyCalculation() {
+        if(this.paidWorkForm.value.isPaidWork && (!this.paidWorkForm.value.amountOfMoneyTaken || this.paidWorkForm.value.amountOfMoneyTaken < 1)){
+            return;
+        }
         if (!this.selectedWorkLog) return;
         this.isSendingCalculation = true;
         this.api.sendWorkCalculation({
@@ -261,7 +284,9 @@ export class SalaryEstimationPageComponent implements OnInit, OnDestroy {
                         actionUuids: war.actionUuids,
                     })),
                 }
-            })
+            }),
+            isPaidWork: this.paidWorkForm.value.isPaidWork,
+            amountOfMoneyTaken: this.paidWorkForm.value.amountOfMoneyTaken
         }).subscribe(this.sendingCalculationHandlers)
     }
 

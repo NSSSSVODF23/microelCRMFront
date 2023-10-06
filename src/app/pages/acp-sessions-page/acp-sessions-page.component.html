@@ -6,13 +6,26 @@
                 <div class="flex align-items-center gap-2 text-bluegray-400 text-lg font-bold">
                     <span class="mdi-router"></span><span>Сессии абон. оборудования</span>
                 </div>
-                <div class="flex flex-column flex-grow-1" @flowInChild>
-                    <ng-container *ngFor="let binding of lastBindingsPage.content; trackBy: trackByDhcpBinding"
-                                  [ngTemplateOutletContext]="{binding: binding}"
-                                  [ngTemplateOutlet]="sessionItem"></ng-container>
-                </div>
-                <p-paginator (onPageChange)="changeLastBindingsPage.next($event.page)"
-                             [first]="lastBindingsPage.number * 15"
+                <ng-container [ngSwitch]="lastBindingsPage.loadingState">
+                    <div class="flex flex-column flex-grow-1" @flowInChild *ngSwitchCase="'READY'">
+                        <ng-container *ngFor="let binding of lastBindingsPage.value; trackBy: trackByDhcpBinding"
+                                      [ngTemplateOutletContext]="{binding: binding}"
+                                      [ngTemplateOutlet]="sessionItem"></ng-container>
+                    </div>
+                    <div *ngSwitchCase="'LOADING'" class="flex justify-content-center align-items-center full-height">
+                        <p-progressSpinner strokeWidth="2" class="custom-spinner custom-spinner-primary custom-spinner-8xl"></p-progressSpinner>
+                    </div>
+                    <div *ngSwitchCase="'ERROR'" class="flex flex-column justify-content-center align-items-center full-height text-red-400 text-lg font-bold">
+                        <span class="mds-error"></span>
+                        <span>Ошибка загрузки</span>
+                    </div>
+                    <div *ngSwitchCase="'EMPTY'" class="flex flex-column justify-content-center align-items-center full-height text-bluegray-400 text-lg font-bold">
+                        <span class="mds-stream"></span>
+                        <span>Сессий абон. оборудования не найдено</span>
+                    </div>
+                </ng-container>
+                <p-paginator (onPageChange)="changeLastBindingsPage.next($event.page)" *ngIf="lastBindingsPage.loadingState === 'READY'"
+                             [first]="pageNum * 15"
                              [rows]="15"
                              [totalRecords]="lastBindingsPage.totalElements"></p-paginator>
             </div>
@@ -23,7 +36,7 @@
                     <input [size]="14" formControlName="macaddr" pInputText placeholder="MAC-адрес" type="text"/>
                     <input [size]="8" formControlName="login" pInputText placeholder="Логин" type="text"/>
                     <app-acp-house-input formControlName="buildingId"></app-acp-house-input>
-                    <app-ip-input formControlName="ip"></app-ip-input>
+                    <input formControlName="ip" pInputText placeholder="IP-адрес" type="text" [pKeyFilter]="ipKeyFilter"/>
                     <p-inputNumber [max]="4096" [size]="4" formControlName="vlan"
                                    placeholder="VLAN"></p-inputNumber>
                 </div>
@@ -42,11 +55,10 @@
 </div>
 
 <ng-template #sessionItem let-binding="binding">
-    <div
-         class="flex flex-column p-3 gap-1 cursor-pointer hover:bg-primary-50
+    <div class="flex flex-column p-3 gap-1 cursor-pointer hover:bg-primary-50
           hover:text-primary-400 split-line transition-ease-in-out transition-duration-150">
-        <div class="flex gap-2">
-            <span class="font-bold">{{binding.macaddr}}</span>
+        <div class="flex gap-2 align-items-center">
+            <app-binding-connection-location-view [binding]="binding"></app-binding-connection-location-view>
             <span *ngIf="binding.authName">{{binding.authName}}</span>
             <div [style.max-width]="'15rem'" appTicker class="white-space-nowrap overflow-hidden">
                 <ng-container *ngIf="binding.dhcpClient">
@@ -71,7 +83,6 @@
             </span>
             <span>{{binding.streetName}} {{binding.houseNum}}</span>
             <span>{{binding.ipaddr}}</span>
-            <span *ngIf="binding.lastConnectionLocation">{{binding.lastConnectionLocation.commutatorName}} {{binding.lastConnectionLocation.portName}} порт</span>
         </div>
     </div>
 </ng-template>

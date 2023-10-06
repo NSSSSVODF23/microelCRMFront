@@ -8852,6 +8852,10 @@
 
 .mds {
 
+  &-stream{
+    @include mds("stream");
+  }
+
   &-visibility {
     @include mds("visibility");
   }

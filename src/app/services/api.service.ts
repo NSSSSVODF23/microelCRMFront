@@ -670,7 +670,7 @@ export class ApiService {
     }
 
     getBillingUsersByAddress(address: Address) {
-        return this.sendGet<BillingUserItemData[]>(`api/private/billing/users/by-address`, {address: JSON.stringify(address, (k, v) => v ?? undefined)});
+        return this.sendGet<BillingUserItemData[]>(`api/private/billing/users/by-address`, {address});
     }
 
     getBillingUserInfo(login: string) {

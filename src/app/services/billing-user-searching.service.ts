@@ -1,7 +1,21 @@
 import {Injectable} from '@angular/core';
 import {BillingUserItemData, LoadingState} from "../transport-interfaces";
 import {FormControl, FormGroup} from "@angular/forms";
-import {catchError, filter, merge, of, repeat, shareReplay, startWith, Subject, switchMap, tap, first, map} from "rxjs";
+import {
+    catchError,
+    filter,
+    merge,
+    of,
+    repeat,
+    shareReplay,
+    startWith,
+    Subject,
+    switchMap,
+    tap,
+    first,
+    map,
+    mergeMap
+} from "rxjs";
 import {ApiService} from "./api.service";
 
 @Injectable({
@@ -20,11 +34,10 @@ export class BillingUserSearchingService {
     changeUsersSubject = new Subject<BillingUserItemData[]>();
     changeUsers$ = this.changeUsersSubject.asObservable();
     enterSearch = new Subject<null>();
-    filterChange$ = this.filtrationForm.valueChanges.pipe(shareReplay(1));
-    enterSearch$ = this.enterSearch.pipe(switchMap(()=>this.filterChange$.pipe(first())));
+    enterSearch$ = this.enterSearch.pipe(map(()=>this.filtrationForm.value));
     modeChange$ = this.filtrationForm.controls.mode.valueChanges.pipe(map(value => ({mode: value, query: null})));
 
-    users$ = merge(this.enterSearch$, this.modeChange$, this.filterChange$.pipe(filter(value => value.mode === 'address'))).pipe(
+    users$ = merge(this.enterSearch$, this.modeChange$).pipe(
             tap(() => {
                 this.userLoadingState = LoadingState.LOADING
             }),

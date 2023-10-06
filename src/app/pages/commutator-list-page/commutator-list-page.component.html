@@ -25,7 +25,7 @@
                                           [ngTemplateOutlet]="commutatorItem"></ng-container>
                         </div>
                         <p-paginator (onPageChange)="changeCommutatorPage.next($event.page)"
-                                     [first]="commutatorPage.pageNumber * 15"
+                                     [first]="pageNum * 15"
                                      [rows]="15"
                                      [totalRecords]="commutatorPage.totalElements"></p-paginator>
                     </ng-container>
@@ -96,7 +96,7 @@
     </div>
 </ng-template>
 <p-dialog [(visible)]="commutatorViewDialogVisible"
-          header="Коммутатор" [resizable]="false">
+          [header]="'Коммутатор '+selectedToViewCommutator?.name" [resizable]="false">
     <ng-template pTemplate="content">
         <app-commutator-view [commutator]="selectedToViewCommutator"></app-commutator-view>
     </ng-template>

@@ -25,14 +25,20 @@
                                                        [employees]="selectedWorkLog?.employees"
                                                        [formControl]="employeeRatioForm"></app-employee-sum-distribution>
                     </ng-container>
-                    <ng-container *ngIf="recalculate$ | async as recalculate">
-                        <p-button (onClick)="sendCalculation()" *ngIf="recalculate === 'CALCULATE'" [loading]="isSendingCalculation"
-                                  class="align-self-end"
-                                  icon="mdi-currency_exchange" label="Рассчитать"></p-button>
-                        <p-button (onClick)="openRecalculationConformationDialog()" *ngIf="recalculate === 'RECALCULATE'" [loading]="isSendingCalculation"
-                                  class="align-self-end"
-                                  icon="mdi-currency_exchange" label="Пересчитать"></p-button>
-                    </ng-container>
+                    <div class="flex gap-3 align-items-center align-self-end">
+                        <div class="flex gap-2 align-items-center" [formGroup]="paidWorkForm">
+                            <span class="text-sm text-bluegray-400 font-bold white-space-nowrap">Платная работа</span>
+                            <p-inputSwitch class="line-height-0" formControlName="isPaidWork"></p-inputSwitch>
+                            <p-inputNumber formControlName="amountOfMoneyTaken" *ngIf="paidWorkForm.value.isPaidWork"
+                                           placeholder="Сумма" mode="currency" currency="RUB"></p-inputNumber>
+                        </div>
+                        <ng-container *ngIf="recalculate$ | async as recalculate">
+                            <p-button (onClick)="sendCalculation()" *ngIf="recalculate === 'CALCULATE'" [loading]="isSendingCalculation"
+                                      icon="mdi-currency_exchange" label="Рассчитать"></p-button>
+                            <p-button (onClick)="openRecalculationConformationDialog()" *ngIf="recalculate === 'RECALCULATE'" [loading]="isSendingCalculation"
+                                      icon="mdi-currency_exchange" label="Пересчитать"></p-button>
+                        </ng-container>
+                    </div>
                 </div>
             </ng-container>
         </div>
