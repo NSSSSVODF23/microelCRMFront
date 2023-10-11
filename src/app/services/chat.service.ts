@@ -25,23 +25,23 @@ export class ChatService {
         personality.onGettingUserData.subscribe(emp => {
             if (!emp.login) return;
             this.rt.chatCreated(emp.login).subscribe(this.createChat.bind(this))
+            this.rt.chatMessageCreated(emp.login).subscribe(message=>{
+                if(message.parentChatId !== this.currentOpenChat){
+                    if(this.notificationAudios.loud.paused) this.notificationAudios.loud.play().then();
+                    this.messageService.add({
+                        key: 'chatMessage',
+                        severity: 'chatmsg',
+                        data: message,
+                        life: 30000,
+                    });
+                }else {
+                    if(this.notificationAudios.quiet.paused) this.notificationAudios.quiet.play().then();
+                }
+            })
             this.rt.updateCountUnreadMessages(emp.login).subscribe(c => this.unreadMessagesCount[c.chatId] = c.count)
         })
         this.rt.chatUpdated().subscribe(this.updateChat.bind(this));
         this.rt.chatClosed().subscribe(this.closeChat.bind(this));
-        this.rt.chatMessageCreated().subscribe(message=>{
-            if(message.parentChatId !== this.currentOpenChat){
-                if(this.notificationAudios.loud.paused) this.notificationAudios.loud.play().then();
-                this.messageService.add({
-                    key: 'chatMessage',
-                    severity: 'chatmsg',
-                    data: message,
-                    life: 30000,
-                });
-            }else {
-                if(this.notificationAudios.quiet.paused) this.notificationAudios.quiet.play().then();
-            }
-        })
         this.open.subscribe(()=>this.messageService.clear("chatMessage"));
     }
 

@@ -22,8 +22,8 @@
         <span *ngIf="commutatorRemoteUpdatePool && commutatorRemoteUpdatePool.length > 0" class="flex relative">
             <p-button (onClick)="commutatorRemoteUpdatePoolVisible = true" icon="mdi-upgrade"
                       styleClass="p-button-outlined p-button-icon p-button-rounded p-button-secondary"></p-button>
-            <p-overlay [(visible)]="commutatorRemoteUpdatePoolVisible" [baseZIndex]="2000"
-                       appendTo="body" contentStyleClass="overlay flex flex-column">
+            <p-overlay #commOver [(visible)]="commutatorRemoteUpdatePoolVisible" [baseZIndex]="2000"
+                       appendTo="body" contentStyleClass="overlay flex flex-column" appCloseIfScroll [isVisible]="commOver.visible" [alignFn]="commOver.alignOverlay.bind(commOver)">
                 <span class="text-bluegray-400 font-bold p-2">
                     Обновляемые коммутаторы
                 </span>

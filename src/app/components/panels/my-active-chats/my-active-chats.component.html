@@ -3,7 +3,7 @@
               styleClass="p-button-outlined p-button-icon p-button-rounded p-button-secondary"></p-button>
     <p-badge *ngIf="chatService.isHasUnreadMessages && chatService.allUnreadCount" [value]="chatService.allUnreadCount.toString()" class="ur-badge" severity="warning"></p-badge>
 </span>
-<p-overlayPanel #overlayPanelEl appendTo="body" [baseZIndex]="2000">
+<p-overlayPanel #overlayPanelEl appendTo="body" [baseZIndex]="2000" appCloseIfScroll [isVisible]="overlayPanelEl.overlayVisible" [alignFn]="overlayPanelEl.align.bind(overlayPanelEl)">
     <ng-template pTemplate="content">
         <ng-container *ngIf="chatService.chats.length>0">
             <div class="caption size-big title">Активные чаты</div>

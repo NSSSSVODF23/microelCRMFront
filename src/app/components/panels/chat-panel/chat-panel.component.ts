@@ -202,7 +202,7 @@ export class ChatPanelComponent implements OnInit, OnDestroy, AfterViewInit {
     whenOpenPanel() {
         this.loadChat();
         this.loadMessages();
-        this.subscriptions.addSubscription('msgCr', this.rt.chatMessageCreated(this.chatId).subscribe(this.createMessage.bind(this)));
+        this.subscriptions.addSubscription('msgCr', this.rt.chatMessageCreatedByChat(this.chatId).subscribe(this.createMessage.bind(this)));
         this.subscriptions.addSubscription('msgUpd', this.rt.chatMessageUpdated(this.chatId).subscribe(this.updateMessage.bind(this)));
         this.subscriptions.addSubscription('msgDel', this.rt.chatMessageDeleted(this.chatId).subscribe(this.deleteMessage.bind(this)));
         this.subscriptions.addSubscription('unreadCount', this.rt.updateCountUnreadMessages(this.personality.me?.login ?? '')

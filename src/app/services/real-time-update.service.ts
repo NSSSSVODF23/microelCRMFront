@@ -136,8 +136,11 @@ export class RealTimeUpdateService {
         return this.watchUnicast<INotification>(login, 'notification', 'update')
     }
 
-    chatMessageCreated(chatId?: number) {
-        if (!chatId) return this.watch<SuperMessage>('chat', 'message', 'create')
+    chatMessageCreated(login: string) {
+        return this.watchUnicast<SuperMessage>(login, 'chat', 'message', 'create')
+    }
+
+    chatMessageCreatedByChat(chatId: number) {
         return this.watch<SuperMessage>('chat', chatId.toString(), 'message', 'create')
     }
 

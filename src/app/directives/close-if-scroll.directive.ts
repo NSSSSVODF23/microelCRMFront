@@ -1,18 +1,21 @@
-import {Directive, HostListener} from '@angular/core';
+import {Directive, HostListener, Input} from '@angular/core';
 import {OverlayPanel} from "primeng/overlaypanel";
+import {Overlay} from "primeng/overlay";
 
 @Directive({
-    selector: 'p-overlay-panel [appCloseIfScroll]',
+    selector: '[appCloseIfScroll]',
 })
 export class CloseIfScrollDirective {
 
-    constructor(readonly element: OverlayPanel) {
+    @Input() isVisible: boolean = false;
+    @Input() alignFn?: ()=>void;
+
+    constructor() {
     }
 
     @HostListener('window:scroll', ['$event']) onScrollEvent(event: any) {
-        if (this.element.overlayVisible) {
-            // this.element.hide();
-            this.element.align();
+        if (this.isVisible && this.alignFn) {
+            this.alignFn();
         }
     }
 
