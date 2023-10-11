@@ -86,11 +86,31 @@ export class IpViewComponent implements OnInit {
     }
 
     copyMessage(ip: string) {
-        navigator.clipboard.writeText(ip).then(
-            () => {
+        if(navigator.clipboard?.writeText){
+            navigator.clipboard.writeText(ip).then(
+                () => {
+                    this.toast.add({detail: 'IP адрес скопирован', severity: 'dark', key: 'darktoast', icon: 'mdi-copy', closable: false});
+                }
+            );
+        }else {
+            const textArea = document.createElement("textarea");
+            textArea.style.display = "fixed";
+            textArea.style.top = "-100";
+            textArea.style.left = "-100";
+            textArea.style.opacity = "0";
+            textArea.style.userSelect = "none";
+            textArea.style.pointerEvents = "none";
+            textArea.value = ip;
+            document.body.appendChild(textArea);
+            textArea.select();
+            try {
+                document.execCommand('copy');
                 this.toast.add({detail: 'IP адрес скопирован', severity: 'dark', key: 'darktoast', icon: 'mdi-copy', closable: false});
+            } catch (err) {
+                this.toast.add({detail: 'IP адрес не удалось скопировать', severity: 'dark', key: 'darktoast', icon: 'mdi-copy', closable: false});
             }
-        );
+            document.body.removeChild(textArea);
+        }
     }
 
     openWeb(ip: string) {

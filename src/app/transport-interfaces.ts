@@ -1198,6 +1198,16 @@ export interface AcpCommutator{
     deleted: boolean;
     systemInfo?: SystemInfo;
     ports?: PortInfo[];
+    remoteUpdateLogs?: RemoteUpdateLog[];
+    isLastUpdateError: boolean;
+    lastErrorMessage: string;
+}
+
+export interface RemoteUpdateLog{
+    remoteUpdateLogId: number;
+    isError: boolean;
+    message: string;
+    timestamp: string;
 }
 
 export interface SystemInfo{

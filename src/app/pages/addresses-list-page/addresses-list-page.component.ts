@@ -166,6 +166,8 @@ export class AddressesListPageComponent implements OnInit, OnDestroy {
         letter: new FormControl<string | null>(null, [Validators.maxLength(1)]),
         fraction: new FormControl<number | null>(null, [Validators.min(1), Validators.max(999)]),
         build: new FormControl<number | null>(null, [Validators.min(1), Validators.max(99)]),
+        isApartmentHouse: new FormControl<boolean>(false),
+        acpHouseBind: new FormControl<AcpHouse|null>(null),
     })
 
     beginRequest$ = new BehaviorSubject(false);
@@ -554,7 +556,9 @@ export class AddressesListPageComponent implements OnInit, OnDestroy {
     }
 
     openDialogCreateHouse() {
-        this.createHouseForm.reset();
+        this.createHouseForm.reset({
+            isApartmentHouse: false
+        });
         this.createHouseVisible = true;
     }
 

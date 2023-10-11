@@ -32,16 +32,17 @@ export class CommutatorViewComponent implements OnInit {
         }),
         retry()
     )
+    trackByLog = (index: number, item: any) => item.remoteUpdateLogId;
 
     constructor(private api: ApiService) {
     }
 
-    get uptime(){
-        if(!this.commutator
+    get uptime() {
+        if (!this.commutator
             || !this.commutator.additionalInfo
             || !this.commutator.additionalInfo.systemInfo
             || !this.commutator.additionalInfo.systemInfo.uptime) return 0;
-        return new Date(this.commutator.additionalInfo.systemInfo.lastUpdate).getTime() - (this.commutator.additionalInfo.systemInfo.uptime*1000);
+        return new Date(this.commutator.additionalInfo.systemInfo.lastUpdate).getTime() - (this.commutator.additionalInfo.systemInfo.uptime * 1000);
     }
 
     ngOnInit(): void {
@@ -83,7 +84,10 @@ export class CommutatorViewComponent implements OnInit {
     refresh() {
         if (!this.commutator) return;
         this.isUpdating = true;
-        this.api.commutatorRemoteUpdate(this.commutator.id).subscribe(() => this.isUpdating = false);
+        this.api.commutatorRemoteUpdate(this.commutator.id).subscribe({
+            next: () => this.isUpdating = false,
+            error: () => this.isUpdating = false
+        });
     }
 
     selectPort(port: PortInfo) {

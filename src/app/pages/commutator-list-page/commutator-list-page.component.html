@@ -89,6 +89,8 @@
                 <span *ngIf="commutator.address; else noAddress">{{commutator.address?.addressName}}</span>
             </div>
         </div>
+        <span *ngIf="commutator.additionalInfo?.isLastUpdateError" [pTooltip]="commutator.additionalInfo?.lastErrorMessage"
+              class="mdi-warning text-red-400"></span>
         <p-button (onClick)="openCommutatorViewDialog(commutator)" icon="mdi-visibility"
                   styleClass="p-button-text p-button-secondary p-button-icon"></p-button>
         <p-button (onClick)="openContextMenu(commutator); contextMenu.toggle($event)" icon="mdi-more_vert"

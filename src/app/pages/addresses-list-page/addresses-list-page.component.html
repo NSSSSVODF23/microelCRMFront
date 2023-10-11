@@ -283,6 +283,17 @@
             <label class="caption size-small wt-bold f-color-500">Строение (если есть)</label>
             <p-inputNumber formControlName="build" [min]="1" [max]="99"></p-inputNumber>
         </div>
+        <div class="input-label-wrapper">
+            <label class="caption size-small wt-bold f-color-500">Многоквартирный дом?</label>
+            <p-inputSwitch formControlName="isApartmentHouse"></p-inputSwitch>
+        </div>
+        <div class="flex gap-1 flex-column">
+            <label class="caption size-small wt-bold f-color-500">Привязка к ACP</label>
+            <app-acp-house-input formControlName="acpHouseBind"></app-acp-house-input>
+        </div>
+<!--        <ya-map (yaclick)="onMapClick($event)" [center]="centerOfMap" [zoom]="zoom" [options]="mapOptions" class="flex-grow-1">-->
+<!--            <ya-placemark *ngIf="housePlace" [geometry]="[housePlace.latitude,housePlace.longitude]"></ya-placemark>-->
+<!--        </ya-map>-->
         <p-button label="Создать" (onClick)="createHouse()" class="align-self-end" styleClass="p-button-success" icon="mdi-add" [disabled]="!createHouseForm.valid"></p-button>
     </div>
 </p-dialog>
