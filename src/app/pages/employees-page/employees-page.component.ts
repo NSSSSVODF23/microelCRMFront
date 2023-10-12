@@ -86,7 +86,7 @@ export class EmployeesPageComponent implements OnInit, OnDestroy {
         secondName: new FormControl(''),
         internalPhoneNumber: new FormControl(),
         access: new FormControl([]),
-        login: new FormControl('', Validators.required),
+        login: new FormControl('', [Validators.required, Validators.minLength(4)]),
         password: new FormControl('', Validators.required),
         telegramUserId: new FormControl(''),
         department: new FormControl(undefined, Validators.required),
