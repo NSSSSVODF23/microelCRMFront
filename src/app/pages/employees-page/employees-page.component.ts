@@ -326,6 +326,19 @@ export class EmployeesPageComponent implements OnInit, OnDestroy {
 
     openEmployeeCreator() {
         this.showCreateEmployeeDialog = true;
+        this.employeeForm.reset({
+            login: "",
+            password: "",
+            access: 0,
+            department: null,
+            position: null,
+            secondName: "",
+            firstName: "",
+            lastName: "",
+            internalPhoneNumber: "",
+            telegramUserId: "",
+            offsite: false
+        })
     }
 
     accessOverrideChange(value: boolean) {
