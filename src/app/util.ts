@@ -583,6 +583,66 @@ export class DynamicValueFactory {
         );
     }
 
+    static ofWithFilter<T>(filterObservable: Observable<any[]>, loadingObservable: (..._: any) => Observable<T[]>, id: keyof T,
+                     appendObservable?: Observable<T> | null, updateObservable?: Observable<T> | null,
+                     deleteObservable?: Observable<T> | null): Observable<DynamicPageContent<T[]>> {
+        const content = new DynamicPageContent<T[]>([]);
+
+        const loadingStateChange = new Subject<LoadingState>();
+        const loadingStateChange$ = loadingStateChange.pipe(map(state => {
+            content.loadingState = state;
+            return content;
+        }));
+
+        const obsrvrs = [filterObservable.pipe(
+            tap({
+                next: () => loadingStateChange.next(LoadingState.LOADING)
+            }),
+            switchMap(filter => {
+                return loadingObservable(...filter).pipe(
+                    map(page => {
+                        content.loadingState = page == null || page.length === 0 ? LoadingState.EMPTY : LoadingState.READY;
+                        content.value = page || [];
+                        content.pageNumber = 0;
+                        content.totalElements = page?.length ?? 0
+                        return content;
+                    })
+                )
+            })
+        )]
+
+        if (appendObservable) obsrvrs.push(appendObservable.pipe(
+            map(value => {
+                if (content.pageNumber === 0) content.value.unshift(value);
+                return content;
+            })
+        ))
+
+        if (updateObservable) obsrvrs.push(updateObservable.pipe(
+            map(value => {
+                const idx = content.value.findIndex(v => v[id] === value[id]);
+                if (idx !== -1) {
+                    content.value[idx] = value;
+                }
+                return content;
+            })
+        ));
+
+        if (deleteObservable) obsrvrs.push(deleteObservable.pipe(
+            map(value => {
+                const idx = content.value.findIndex(v => v[id] === value[id]);
+                if (idx !== -1) {
+                    content.value.splice(idx, 1);
+                }
+                return content;
+            })
+        ));
+
+        return merge(...obsrvrs, loadingStateChange$).pipe(
+            startWith(content),
+        );
+    }
+
     static ofPage<T>(filterObservable: Observable<any[]>, loadingObservable: (..._: any) => Observable<Page<T>>, id: keyof T,
                      appendObservable?: Observable<T> | null, updateObservable?: Observable<T> | null,
                      deleteObservable?: Observable<T> | null): Observable<DynamicPageContent<T[]>> {

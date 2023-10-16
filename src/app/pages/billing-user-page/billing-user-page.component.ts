@@ -57,6 +57,7 @@ export class BillingUserPageComponent implements OnInit, OnDestroy {
 
     houseBindingsPage = new BehaviorSubject(0);
     houseBindingsPage$ = this.houseBindingsPage.pipe(
+        startWith(0),
         shareReplay(1)
     )
     houseBindingsLoadingState = LoadingState.LOADING;
@@ -142,32 +143,56 @@ export class BillingUserPageComponent implements OnInit, OnDestroy {
         switchMap(login => this.api.getDhcpBindingsByLogin(login)),
         shareReplay(1)
     );
-    dhcpBindings$ = DynamicValueFactory.of(this.dhcpBindingsLoad$, 'id', this.rt.acpDhcpBindingUpdated(), this.rt.acpDhcpBindingUpdated());
+    dhcpBindings$ = DynamicValueFactory.of(this.dhcpBindingsLoad$, 'id', null, this.rt.acpDhcpBindingUpdated());
     firstVlanOfBindings$ = this.dhcpBindingsLoad$.pipe(
         filter(bindings => bindings && bindings.length > 0),
-        map(binds => binds[0].vlanid),
-        shareReplay(1)
-    )
-    changeHouseVlan$ = this.firstVlanOfBindings$.pipe(
-        switchMap(vlan => this.houseBindingsPage$.pipe(first(), map(page => ({vlan, page}))))
-    )
-    changeHousePage$ = this.houseBindingsPage$.pipe(
-        switchMap(page => this.firstVlanOfBindings$.pipe(first(), map(vlan => ({vlan, page}))))
-    )
-    changeHouseVlanPage$ = merge(this.changeHouseVlan$, this.changeHousePage$).pipe(shareReplay(1));
-    updateHousePage$ = this.rt.acpDhcpBindingHousePageUpdateSignal().pipe(
-        switchMap(({vlan}) => this.changeHouseVlanPage$.pipe(first(), filter(page => page.vlan === vlan))),
-    )
-    dhcpBindingsByVlan$ = merge(this.changeHouseVlanPage$, this.updateHousePage$).pipe(
-        debounceTime(100),
-        tap(() => this.houseBindingsLoadingState = LoadingState.LOADING),
-        switchMap(({vlan, page}) => this.api.getDhcpBindingsByVlan(page, vlan, this.currentLogin)),
-        tap({
-            next: (page) => this.houseBindingsLoadingState = page.empty ? LoadingState.EMPTY : LoadingState.READY,
-            error: () => this.houseBindingsLoadingState = LoadingState.ERROR
+        map(binds => {
+            const authBind = binds.find(bind => bind.isAuth);
+            if(authBind){
+                return authBind.vlanid;
+            }else{
+                return binds[0].vlanid;
+            }
         }),
+        tap(vlan=>this.lastBindingVlan=vlan),
         shareReplay(1)
-    );
+    )
+
+    changeHouseVlanPage$ = combineLatest([this.firstVlanOfBindings$, this.houseBindingsPage$]).pipe(tap(console.log),shareReplay(1));
+    updateHousePage$ = this.rt.acpDhcpBindingHousePageUpdateSignal().pipe(
+        switchMap((resp) => this.changeHouseVlanPage$.pipe(first(), filter(([vlan, page]) => vlan === resp.vlan))),
+    )
+    dhcpBindingsByVlan$$= DynamicValueFactory.ofPage(
+        merge(this.changeHouseVlanPage$, this.updateHousePage$),
+        (vlan,page)=>this.api.getDhcpBindingsByVlan(page, vlan, this.currentLogin),
+        'id',
+        null,
+        this.rt.acpDhcpBindingUpdated(),
+        null
+    )
+    // dhcpBindingsByVlan$ = merge(this.changeHouseVlanPage$, this.updateHousePage$).pipe(
+    //     debounceTime(100),
+    //     tap(() => this.houseBindingsLoadingState = LoadingState.LOADING),
+    //     switchMap(({vlan, page}) => this.api.getDhcpBindingsByVlan(page, vlan, this.currentLogin)),
+    //     tap({
+    //         next: (page) => this.houseBindingsLoadingState = page.empty ? LoadingState.EMPTY : LoadingState.READY,
+    //         error: () => this.houseBindingsLoadingState = LoadingState.ERROR
+    //     }),
+    //     shareReplay(1)
+    // );
+    commutatorsByVlan$ = DynamicValueFactory.ofWithFilter(
+        this.firstVlanOfBindings$.pipe(
+            filter(vlan=>vlan != undefined && vlan > 0 && vlan<4097),
+            map(vlan=>[vlan]),
+        ),
+        (vlan) => this.api.getCommutatorsByVlan(vlan),
+        'id',
+        this.rt.acpCommutatorCreated(),
+        this.rt.acpCommutatorUpdated(),
+        this.rt.acpCommutatorDeleted()
+    )
+    isCommutatorRefreshing = false;
+    lastBindingVlan: null  | number = null;
 
     constructor(private api: ApiService, private rt: RealTimeUpdateService, private route: ActivatedRoute, readonly customNav: CustomNavigationService,
                 readonly taskCreation: TaskCreatorService, readonly toast: MessageService, private confirm: ConfirmationService) {
@@ -276,10 +301,11 @@ export class BillingUserPageComponent implements OnInit, OnDestroy {
     }
 
     trackByDhcpBinding(index: number, item: DhcpBinding) {
-        return item.vlanid + item.ipaddr + item.state + item.id + item.isAuth + item.authName + item.authExpire;
+        return item.vlanid + item.ipaddr + item.state + item.id + item.isAuth + item.authName + item.authExpire + item.lastConnectionLocation?.checkedAt;
     };
 
     ngOnInit(): void {
+        this.rt.acpDhcpBindingUpdated().subscribe(console.log)
         this.subscriptions.addSubscription('pch',
             this.loadUser$.subscribe(this.load.bind(this))
         )
@@ -400,5 +426,15 @@ export class BillingUserPageComponent implements OnInit, OnDestroy {
     sendPayment() {
         if (!this.currentLogin) return;
         this.api.makePayment(this.currentLogin, this.paymentForm.value).subscribe();
+    }
+
+    refreshCommutators() {
+        if(this.lastBindingVlan)
+            this.api.commutatorRemoteUpdateByVlan(this.lastBindingVlan).pipe(
+                tap(()=>this.isCommutatorRefreshing = true)
+            ).subscribe({
+                next: ()=>this.isCommutatorRefreshing = false,
+                error: ()=>this.isCommutatorRefreshing = false
+            })
     }
 }

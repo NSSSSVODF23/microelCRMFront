@@ -1,17 +1,18 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {Component, Input, OnDestroy, OnInit} from '@angular/core';
 import {ApiService} from "../../../services/api.service";
 import {RealTimeUpdateService} from "../../../services/real-time-update.service";
-import {BehaviorSubject, debounceTime, delay, filter, map, merge, Observable, of, share} from "rxjs";
+import {BehaviorSubject, debounceTime, delay, map, merge, Observable, of, share} from "rxjs";
 import {PingMonitoring} from "../../../transport-interfaces";
 import "chartjs-adapter-moment";
 import {MessageService} from "primeng/api";
+import {SubscriptionsHolder} from "../../../util";
 
 @Component({
     selector: 'app-ip-view',
     templateUrl: './ip-view.component.html',
     styleUrls: ['./ip-view.component.scss']
 })
-export class IpViewComponent implements OnInit {
+export class IpViewComponent implements OnInit, OnDestroy {
 
     ping$: Observable<PingMonitoring | null> = of(null);
     remoteAccess$: Observable<any | null> = of(null);
@@ -53,6 +54,8 @@ export class IpViewComponent implements OnInit {
     );
     breath$ = this.breathInit();
     isDisabledRemoteAccessButton = false;
+    pingMonitoring: PingMonitoring|null = null;
+    subscriptions = new SubscriptionsHolder()
 
     constructor(private api: ApiService, private rt: RealTimeUpdateService, private toast: MessageService) {
     }
@@ -66,6 +69,8 @@ export class IpViewComponent implements OnInit {
     @Input() set ip(value: string) {
         this._ip = value;
         this.ping$ = this.rt.pingMonitoring(value);
+        this.subscriptions.unsubscribe('ping');
+        this.subscriptions.addSubscription('ping', this.ping$.subscribe((p)=>this.pingMonitoring = p))
         this.remoteAccess$ = this.api.checkRemoteControl(value)
         this.breath$ = this.breathInit();
     }
@@ -73,9 +78,9 @@ export class IpViewComponent implements OnInit {
     breathInit() {
         return merge(
             this.ping$.pipe(map((ping) => {
-                if(!ping) return 'hsl(0 0% 50%)';
-                if(ping.reachablePercentage === 0) return 'hsl(0 0% 50%)';
-                const offset = Math.min(100, ((100-ping.reachablePercentage)**2));
+                if (!ping) return 'hsl(0 0% 50%)';
+                if (ping.reachablePercentage === 0) return 'hsl(0 0% 50%)';
+                const offset = Math.min(100, ((100 - ping.reachablePercentage) ** 2));
                 return `hsl(0 ${offset}% 60%)`
             })),
             this.ping$.pipe(delay(500), map(() => 'hsl(0 0% 50%)'))
@@ -85,14 +90,24 @@ export class IpViewComponent implements OnInit {
     ngOnInit(): void {
     }
 
+    ngOnDestroy() {
+        this.subscriptions.unsubscribeAll();
+    }
+
     copyMessage(ip: string) {
-        if(navigator.clipboard?.writeText){
+        if (navigator.clipboard?.writeText) {
             navigator.clipboard.writeText(ip).then(
                 () => {
-                    this.toast.add({detail: 'IP адрес скопирован', severity: 'dark', key: 'darktoast', icon: 'mdi-copy', closable: false});
+                    this.toast.add({
+                        detail: 'IP адрес скопирован',
+                        severity: 'dark',
+                        key: 'darktoast',
+                        icon: 'mdi-copy',
+                        closable: false
+                    });
                 }
             );
-        }else {
+        } else {
             const textArea = document.createElement("textarea");
             textArea.style.display = "fixed";
             textArea.style.top = "-100";
@@ -105,9 +120,21 @@ export class IpViewComponent implements OnInit {
             textArea.select();
             try {
                 document.execCommand('copy');
-                this.toast.add({detail: 'IP адрес скопирован', severity: 'dark', key: 'darktoast', icon: 'mdi-copy', closable: false});
+                this.toast.add({
+                    detail: 'IP адрес скопирован',
+                    severity: 'dark',
+                    key: 'darktoast',
+                    icon: 'mdi-copy',
+                    closable: false
+                });
             } catch (err) {
-                this.toast.add({detail: 'IP адрес не удалось скопировать', severity: 'dark', key: 'darktoast', icon: 'mdi-copy', closable: false});
+                this.toast.add({
+                    detail: 'IP адрес не удалось скопировать',
+                    severity: 'dark',
+                    key: 'darktoast',
+                    icon: 'mdi-copy',
+                    closable: false
+                });
             }
             document.body.removeChild(textArea);
         }
@@ -118,10 +145,16 @@ export class IpViewComponent implements OnInit {
         this.api.checkRemoteControl(ip).subscribe(
             {
                 next: (ra) => {
-                    if(ra.hasAccess && ra.webPort){
+                    if (ra.hasAccess && ra.webPort) {
                         window.open(`http://${ip}:${ra.webPort}`, '_blank');
-                    }else {
-                        this.toast.add({detail: 'Нет удаленного доступа', severity: 'dark', key: 'darktoast', icon: 'mdi-web', closable: false});
+                    } else {
+                        this.toast.add({
+                            detail: 'Нет удаленного доступа',
+                            severity: 'dark',
+                            key: 'darktoast',
+                            icon: 'mdi-web',
+                            closable: false
+                        });
                     }
                     this.isDisabledRemoteAccessButton = false
                 },

@@ -348,10 +348,10 @@
                     </ng-container>
                 </div>
             </p-tabPanel>
-            <ng-container *ngIf="dhcpBindingsByVlan$ | async as bindings">
+            <ng-container *ngIf="dhcpBindingsByVlan$$ | async as bindings">
                 <p-tabPanel header="Оборудование в доме">
-                    <div [style.max-height]="'30rem'" class="flex flex-column gap-2 overflow-auto">
-                        <ng-container [ngSwitch]="houseBindingsLoadingState">
+                    <div class="flex flex-column gap-2 overflow-auto max-h-30rem">
+                        <ng-container [ngSwitch]="bindings.loadingState">
                             <div *ngSwitchCase="'LOADING'"
                                  [style.height]="'30rem'"
                                  class="flex align-items-center justify-content-center flex-grow-1">
@@ -375,7 +375,7 @@
                                 </div>
                             </div>
                             <ng-container *ngSwitchCase="'READY'">
-                                <ng-container *ngFor="let binding of bindings.content; trackBy: trackByDhcpBinding"
+                                <ng-container *ngFor="let binding of bindings.value; trackBy: trackByDhcpBinding"
                                               [ngTemplateOutletContext]="{binding:binding, isLogin:true}"
                                               [ngTemplateOutlet]="dhcpBinding"></ng-container>
                             </ng-container>
@@ -383,6 +383,16 @@
                         <p-paginator (onPageChange)="houseBindingsPage.next($event.page)" [rows]="10"
                                      [totalRecords]="bindings.totalElements"
                                      class="position-sticky bottom-0"></p-paginator>
+                    </div>
+                </p-tabPanel>
+            </ng-container>
+            <ng-container *ngIf="commutatorsByVlan$ | async as commutators">
+                <p-tabPanel header="Коммутаторы">
+                    <div class="flex justify-content-end mb-3">
+                        <p-button icon="mdi-refresh" label="Обновить все" styleClass="p-button-outlined" (onClick)="refreshCommutators()" [loading]="isCommutatorRefreshing"></p-button>
+                    </div>
+                    <div class="flex flex-column gap-2 overflow-auto max-h-30rem">
+                        <app-commutator-view *ngFor="let commutator of commutators.value" [commutator]="commutator" [tiny]="true"></app-commutator-view>
                     </div>
                 </p-tabPanel>
             </ng-container>

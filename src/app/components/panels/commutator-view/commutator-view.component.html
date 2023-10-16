@@ -1,4 +1,4 @@
-<p-tabView styleClass="border-round-lg border-bluegray-100 border-1 overflow-hidden">
+<p-tabView *ngIf="!tiny" styleClass="border-round-lg border-bluegray-100 border-1 overflow-hidden">
     <p-tabPanel header="Информация">
         <div *ngIf="commutator && commutator.additionalInfo && commutator.additionalInfo.systemInfo; else noinfo"
              class="flex flex-column gap-2">
@@ -33,8 +33,11 @@
                     </div>
                 </div>
                 <div *ngIf="selectPortChange$|async as selectedPort">
-                    <p-table [value]="(fdbTable$|async) ?? []" [scrollable]="true" scrollHeight="30rem" [loading]="fdbTableLoadingState === 'LOADING'"
-                             styleClass="p-datatable-sm border-1 border-round-md border-bluegray-100 overflow-hidden" [hidden]="fdbTableLoadingState == 'EMPTY' || fdbTableLoadingState == 'ERROR'">
+                    <p-table [hidden]="fdbTableLoadingState == 'EMPTY' || fdbTableLoadingState == 'ERROR'"
+                             [loading]="fdbTableLoadingState === 'LOADING'" [scrollable]="true"
+                             [value]="(fdbTable$|async) ?? []"
+                             scrollHeight="30rem"
+                             styleClass="p-datatable-sm border-1 border-round-md border-bluegray-100 overflow-hidden">
                         <ng-template pTemplate="header">
                             <tr>
                                 <th>MAC-адрес</th>
@@ -44,7 +47,7 @@
                                 <th>Сессия</th>
                             </tr>
                         </ng-template>
-                        <ng-template pTemplate="body" let-item>
+                        <ng-template let-item pTemplate="body">
                             <tr>
                                 <td>{{item.mac}}</td>
                                 <td>{{item.vid}}</td>
@@ -55,11 +58,13 @@
                         </ng-template>
                     </p-table>
                     <ng-container [ngSwitch]="fdbTableLoadingState">
-                        <div class="flex flex-column align-items-center justify-content-center p-3 text-bluegray-300 font-bold" *ngSwitchCase="'EMPTY'">
+                        <div *ngSwitchCase="'EMPTY'"
+                             class="flex flex-column align-items-center justify-content-center p-3 text-bluegray-300 font-bold">
                             <span class="mds-dns"></span>
                             <span>Таблица MAC-адресов пуста</span>
                         </div>
-                        <div class="flex flex-column align-items-center justify-content-center p-3 text-red-400 font-bold" *ngSwitchCase="'ERROR'">
+                        <div *ngSwitchCase="'ERROR'"
+                             class="flex flex-column align-items-center justify-content-center p-3 text-red-400 font-bold">
                             <span class="mds-error"></span>
                             <span>Ошибка загрузки таблицы MAC-адресов</span>
                         </div>
@@ -69,8 +74,11 @@
         </div>
     </p-tabPanel>
     <p-tabPanel header="Логи">
-        <div class="flex flex-column-reverse overflow-y-auto max-h-20rem" [style.overscroll-behavior]="'contain'" *ngIf="commutator?.additionalInfo?.remoteUpdateLogs?.length; else notags">
-            <div *ngFor="let log of commutator?.additionalInfo?.remoteUpdateLogs; trackBy: trackByLog" class="flex flex-column p-2 text-xs split-line">
+        <div *ngIf="commutator?.additionalInfo?.remoteUpdateLogs?.length; else notags"
+             [style.overscroll-behavior]="'contain'"
+             class="flex flex-column-reverse overflow-y-auto max-h-20rem">
+            <div *ngFor="let log of commutator?.additionalInfo?.remoteUpdateLogs; trackBy: trackByLog"
+                 class="flex flex-column p-2 text-xs split-line">
                 <span [ngClass]="log.isError ? 'text-red-400' : 'text-green-400'" class="font-bold">
                     {{log.message}}
                 </span>
@@ -81,6 +89,75 @@
         </div>
     </p-tabPanel>
 </p-tabView>
+
+<div *ngIf="tiny" class="flex align-items-center gap-2 p-2 border-1 border-bluegray-100 border-round-md">
+    <div class="flex flex-column text-bluegray-400">
+        <span class="text-sm">
+            {{commutator?.name}}
+        </span>
+        <div class="flex align-items-center gap-1">
+            <span *ngIf="commutator?.additionalInfo?.available && commutator?.additionalInfo?.systemInfo?.uptime"
+                  [pTooltip]="uptime | elapsedTime:'':'':false:true"
+                  class="mdi-schedule text-green-400 text-sm"></span>
+            <span [ngClass]="commutator?.additionalInfo?.available ? 'text-green-400' : 'text-red-400'"
+                  class="text-xs font-bold">
+                {{commutator?.additionalInfo?.available ? 'В сети' : 'Не в сети'}}
+            </span>
+            <span class="text-xs font-bold text-bluegray-400">
+                {{commutator?.ipaddr}}
+            </span>
+        </div>
+    </div>
+    <div *ngIf="commutator?.additionalInfo" class="port-grille-tiny">
+        <div (click)="selectPortChange$.next(port); macPanel.show($event)" *ngFor="let port of commutator?.additionalInfo?.ports ?? []"
+             [class]="'w-2rem h-1rem border-round-lg cursor-pointer user-select-none flex flex-column align-items-center justify-content-center '+portStatusStyle(port)"
+             [ngClass]="{'border-2 border-primary-400': (selectPortChange$|async)?.portInfoId === port.portInfoId}">
+            <span [style]="{fontSize:'0.5rem'}" class="text-white font-bold">{{port.name}}</span>
+            <!--            <span class="text-white text-xs font-bold">{{portSpeedName(port)}}</span>-->
+        </div>
+    </div>
+    <div class="flex-grow-1"></div>
+    <span *ngIf="commutator?.additionalInfo?.isLastUpdateError"
+          [pTooltip]="commutator?.additionalInfo?.lastErrorMessage ?? ''"
+          class="mdi-warning text-red-400"></span>
+    <app-tiny-button (onClick)="refresh()" [disabled]="isUpdating" icon="refresh" [pTooltip]="(commutator?.additionalInfo?.systemInfo?.lastUpdate | date:'dd MMMM yyyy HH:mm' | titlecase) ?? ''"></app-tiny-button>
+</div>
+
+<p-overlayPanel #macPanel appendTo="body" (onHide)="selectPortChange$.next(null)">
+    <ng-template pTemplate="content">
+        <ng-container *ngIf="fdbTable$|async as fdbTable">
+            <p-table *ngIf="fdbTableLoadingState !== 'ERROR'"
+                    [loading]="fdbTableLoadingState === 'LOADING'" [scrollable]="true"
+                     [value]="fdbTable"
+                     scrollHeight="30rem"
+                     styleClass="p-datatable-sm border-1 border-round-md border-bluegray-100 overflow-hidden">
+                <ng-template pTemplate="header">
+                    <tr>
+                        <th>MAC-адрес</th>
+                        <th>VID</th>
+                        <th>Имя vlan</th>
+                        <th>Динамический</th>
+                        <th>Сессия</th>
+                    </tr>
+                </ng-template>
+                <ng-template let-item pTemplate="body">
+                    <tr>
+                        <td>{{item.mac}}</td>
+                        <td>{{item.vid}}</td>
+                        <td>{{item.vlanName}}</td>
+                        <td>{{item.dynamic}}</td>
+                        <td>{{item.dhcpBinding?.authName}}</td>
+                    </tr>
+                </ng-template>
+                <ng-template pTemplate="emptymessage">
+                    <tr>
+                        <td [attr.colspan]="5" class="text-center font-bold text-bluegray-300">Таблица MAC-адресов пуста</td>
+                    </tr>
+                </ng-template>
+            </p-table>
+        </ng-container>
+    </ng-template>
+</p-overlayPanel>
 
 <ng-template #notags>
     <div class="flex flex-column align-items-center justify-content-center text-bluegray-300 font-bold text-sm">
@@ -93,6 +170,7 @@
     <div class="flex flex-column align-items-center text-bluegray-300 font-bold text-sm">
         <span class="mds-visibility_off"></span>
         <span>Нет информации</span>
-        <p-button (onClick)="refresh()" [disabled]="isUpdating" icon="mdi-refresh" styleClass="p-button-outlined p-button-warning mt-3" label="Обновить"></p-button>
+        <p-button (onClick)="refresh()" [disabled]="isUpdating" icon="mdi-refresh"
+                  label="Обновить" styleClass="p-button-outlined p-button-warning mt-3"></p-button>
     </div>
 </ng-template>

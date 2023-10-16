@@ -1,17 +1,23 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {Component, Input, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {LoadingState, PortInfo, Switch} from "../../../transport-interfaces";
 import {ApiService} from "../../../services/api.service";
-import {BehaviorSubject, of, retry, switchMap, tap} from "rxjs";
+import {BehaviorSubject, debounceTime, mergeMap, of, retry, switchMap, tap} from "rxjs";
+import {SubscriptionsHolder} from "../../../util";
+import {OverlayPanel} from "primeng/overlaypanel";
 
 @Component({
     selector: 'app-commutator-view',
     templateUrl: './commutator-view.component.html',
     styleUrls: ['./commutator-view.component.scss']
 })
-export class CommutatorViewComponent implements OnInit {
+export class CommutatorViewComponent implements OnInit, OnDestroy {
 
     @Input() commutator?: Switch;
+    @Input() tiny = false;
+    @ViewChild('macPanel') macPanel?: OverlayPanel;
     isUpdating = false;
+
+    subscription = new SubscriptionsHolder();
 
     lastSelectedPortId: number | null = null;
     selectPortChange$ = new BehaviorSubject<PortInfo | null>(null);
@@ -24,15 +30,21 @@ export class CommutatorViewComponent implements OnInit {
         }),
         tap({
             next: (result) => {
-                this.fdbTableLoadingState = result && result.length > 0 ? LoadingState.READY : LoadingState.EMPTY
+                if(result && result.length > 0) {
+                    this.fdbTableLoadingState = LoadingState.READY;
+                }else{
+                    this.fdbTableLoadingState = LoadingState.EMPTY;
+                }
             },
             error: (err) => {
                 this.fdbTableLoadingState = LoadingState.ERROR
+                this.macPanel?.hide();
             }
         }),
         retry()
     )
-    trackByLog = (index: number, item: any) => item.remoteUpdateLogId;
+    changeMacPanelVisible$ = new BehaviorSubject<[Event | null, PortInfo | null]>([null, null]);
+    overlayPanelPort: null | PortInfo = null;
 
     constructor(private api: ApiService) {
     }
@@ -45,7 +57,20 @@ export class CommutatorViewComponent implements OnInit {
         return new Date(this.commutator.additionalInfo.systemInfo.lastUpdate).getTime() - (this.commutator.additionalInfo.systemInfo.uptime * 1000);
     }
 
+    trackByLog = (index: number, item: any) => item.remoteUpdateLogId;
+
     ngOnInit(): void {
+        this.fdbTable$.subscribe(()=>{
+            setTimeout(() => {
+                if(this.macPanel?.overlayVisible){
+                    this.macPanel.align();
+                }
+            }, 100);
+        })
+    }
+
+    ngOnDestroy() {
+        this.subscription.unsubscribeAll()
     }
 
     portSpeedName(port?: PortInfo): string {
@@ -100,4 +125,7 @@ export class CommutatorViewComponent implements OnInit {
         this.selectPortChange$.next(port);
     }
 
+    loadingFdbTable() {
+        this.selectPortChange$.next(this.overlayPanelPort)
+    }
 }

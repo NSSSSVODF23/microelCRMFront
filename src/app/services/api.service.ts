@@ -2,6 +2,7 @@ import {Injectable} from '@angular/core';
 import {HttpClient} from "@angular/common/http";
 import {catchError, map, Observable, share, tap, zip} from "rxjs";
 import {
+    AcpCommutator,
     AcpConf,
     AcpHouse,
     Address,
@@ -966,7 +967,15 @@ export class ApiService {
         return this.sendPost(`api/private/acp/commutator/${id}/get-remote-update`, {});
     }
 
+    commutatorRemoteUpdateByVlan(vlan: number) {
+        return this.sendPost(`api/private/acp/commutators/vlan/${vlan}/get-remote-update`, {});
+    }
+
     fdbTableByPort(id: number) {
         return this.sendGet<FdbItem[]>(`api/private/acp/commutator/port/${id}/fdb`);
+    }
+
+    getCommutatorsByVlan(vlan: number) {
+        return this.sendGet<Switch[]>(`api/private/acp/commutators/vlan/${vlan}`);
     }
 }
