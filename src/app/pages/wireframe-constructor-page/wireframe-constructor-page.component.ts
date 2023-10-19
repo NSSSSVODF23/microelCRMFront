@@ -4,17 +4,7 @@ import {MenuItem} from "primeng/api";
 import {Menu} from "primeng/menu";
 import {ApiService} from 'src/app/services/api.service';
 import {v4} from "uuid";
-import {
-    Address,
-    DefaultObserverTargetType,
-    ModelItem,
-    StepItem,
-    Task,
-    Wireframe,
-    WireframeFieldType,
-    WireframeType
-} from "../../transport-interfaces";
-import {map} from "rxjs";
+import {FieldItem, StepItem, Task, Wireframe, WireframeFieldType, WireframeType} from "../../transport-interfaces";
 import {CustomNavigationService} from "../../services/custom-navigation.service";
 
 const defaultStep: StepItem = {
@@ -33,7 +23,9 @@ export class WireframeConstructorPageComponent implements OnInit {
     activeStepIndex: number = 0;
 
     stepsArray: MenuItem[] = [{
-        label: 'Название этапа', command: () => this.selectStep(0)
+        label: 'Название этапа',
+        command: () => this.selectStep(0),
+
     }];
     wireframeFieldsList: any[] = [];
     stepsContextMenu: MenuItem[] = [];
@@ -46,7 +38,10 @@ export class WireframeConstructorPageComponent implements OnInit {
     listItemViewOptions: any = [{label: "Простой", value: "SIMPLE"}, {
         label: "Составной", value: "COMPOSITE"
     }, {label: "Подробный", value: "DETAILED"},];
+
     // stages = [{label: "Начальный", stageId: v4(), orderIndex: 0}]
+    draggedField?: FieldItem;
+    stageHoverTarget: number | null = null;
 
     constructor(readonly api: ApiService, readonly route: ActivatedRoute, readonly nav: CustomNavigationService) {
     }
@@ -108,18 +103,6 @@ export class WireframeConstructorPageComponent implements OnInit {
         }
     }
 
-    createStep() {
-        const lastStep = this.stepsArray.length;
-        this.stepsArray.push({
-            label: 'Название этапа', command: (event: any) => this.openStepContextMenu(lastStep, event.originalEvent)
-        })
-        this.stepsArray = [...this.stepsArray];
-        this.wireframe.steps.push({
-            name: 'Название этапа', fields: [], id: lastStep
-        })
-        this.selectStep(lastStep);
-    }
-
     //swap index fields in array
     // swapFields(currentIndex: number, targetIndex: number) {
     //     //get wireframe by activeStepIndex
@@ -127,19 +110,30 @@ export class WireframeConstructorPageComponent implements OnInit {
     //     //swap fields
     //     wireframe.fields.splice(targetIndex, 0, wireframe.fields.splice(currentIndex, 1));
 
+    createStep() {
+        const lastStep = this.stepsArray.length;
+        this.stepsArray.push({
+            label: 'Название этапа', command: (event: any) => this.openStepContextMenu(lastStep, event.originalEvent)
+        })
+        this.wireframe.steps.push({
+            name: 'Название этапа', fields: [], id: lastStep
+        })
+        this.selectStep(lastStep);
+    }
+
     selectStep(id: number) {
         this.activeStepIndex = id;
     }
 
     removeStep(id: number) {
-        if (this.activeStepIndex === id) this.selectStep(0);
+        if (this.activeStepIndex >= id) this.selectStep(this.activeStepIndex-1);
         this.stepsArray.splice(id, 1)
-        this.stepsArray = this.stepsArray.map((s, i) => {
-            return {
-                label: s.label,
-                command: (i === 0 ? (() => this.selectStep(i)) : ((event) => this.openStepContextMenu(i, event.originalEvent)))
-            }
-        })
+        // this.stepsArray = this.stepsArray.map((s, i) => {
+        //     return {
+        //         label: s.label,
+        //         command: (i === 0 ? (() => this.selectStep(i)) : ((event) => this.openStepContextMenu(i, event.originalEvent)))
+        //     }
+        // })
         this.wireframe.steps.splice(id, 1)
         this.wireframe.steps = this.wireframe.steps.map((s, i) => {
             s.id = i;
@@ -169,7 +163,7 @@ export class WireframeConstructorPageComponent implements OnInit {
     }
 
     createWireframe() {
-        this.api.createWireframe(this.wireframe).subscribe(()=>{
+        this.api.createWireframe(this.wireframe).subscribe(() => {
             this.nav.backOrDefault(["/"])
         });
     }
@@ -184,7 +178,7 @@ export class WireframeConstructorPageComponent implements OnInit {
     }
 
     updateWireframe() {
-        this.api.updateWireframe(this.wireframe).subscribe(()=>{
+        this.api.updateWireframe(this.wireframe).subscribe(() => {
             this.nav.backOrDefault(["/"])
         });
     }
@@ -240,7 +234,7 @@ export class WireframeConstructorPageComponent implements OnInit {
     }
 
     taskItemForView(): Task {
-        return {taskId: 0, modelWireframe: this.wireframe, listItemFields:[], allEmployeesObservers:[]};
+        return {taskId: 0, modelWireframe: this.wireframe, listItemFields: [], allEmployeesObservers: []};
     }
 
     createStage() {
@@ -269,50 +263,66 @@ export class WireframeConstructorPageComponent implements OnInit {
         });
     }
 
-    // private viewTestFieldsFromWireframe(wireframe: Wireframe) {
-    //     const phoneData = {'test': '8 (999) 123-45-67', 'test2': '8 (898) 555-35-35'};
-    //     const stringData = 'Принимая во внимание показатели успешности, экономическая повестка сегодняшнего дня выявляет срочную потребность приоретизации разума над эмоциями. Но глубокий уровень погружения предполагает независимые способы реализации укрепления моральных ценностей. Принимая во внимание показатели успешности, перспективное планирование не оставляет шанса для системы обучения кадров, соответствующей насущным потребностям. С другой стороны, консультация с широким активом способствует подготовке и реализации распределения внутренних резервов и ресурсов.';
-    //     const integerData = 23;
-    //     const floatData = 325.56;
-    //     const addressData: Address = {
-    //         city: {
-    //             cityId:0,
-    //             name: 'Волгодонск',
-    //         },
-    //         district: {
-    //             name: 'В-8',
-    //         },
-    //         street: {
-    //             name: 'К.Маркса',
-    //         },
-    //         houseNum: 44,
-    //         apartmentNum: 46,
-    //         entrance: 2,
-    //         floor: 5
-    //     }
-    //     const booleanData = true;
-    //     const timestampData = "1995-09-01T17:30:00";
-    //
-    //     const modelItems: ModelItem[] = [];
-    //     wireframe.steps.forEach((step => {
-    //         step.fields.forEach(field => {
-    //             if (typeof field.orderPosition === 'number') {
-    //                 modelItems.push({
-    //                     name: field.name,
-    //                     id: field.id,
-    //                     wireframeFieldType: field.type,
-    //                     modelItemId: 0,
-    //                     phoneData,
-    //                     stringData,
-    //                     integerData,
-    //                     floatData,
-    //                     addressData,
-    //                     booleanData,
-    //                     timestampData
-    //                 })
-    //             }
-    //         })
-    //     }))
-    //     return modelItems;
-    // }
+    trackByStep = (index: number, step: MenuItem) => (index + (step.label ?? ''));
+
+    dragStart(event: any, field: FieldItem) {
+        this.draggedField = field
+    }
+
+    drag(event: any, field: FieldItem) {
+    }
+
+    dragEnd(event: any, field: FieldItem) {
+        this.draggedField = undefined;
+    }
+
+    drop(event: any, targetIndex: number, pos: 'up' | 'down') {
+        const target: HTMLDivElement = event.target;
+        target.classList.remove('border-top-2', 'border-bottom-2', 'border-primary');
+        // Move dragged field to target index
+        if (this.draggedField) {
+            const fields = this.wireframe.steps[this.activeStepIndex].fields;
+            const targetFieldIndex = fields.findIndex(f => f === this.draggedField);
+            if (targetFieldIndex < targetIndex && pos === 'up') {
+                targetIndex--;
+            } else if (targetFieldIndex > targetIndex && pos === 'down') {
+                targetIndex++;
+            }
+            fields.splice(targetFieldIndex, 1);
+            fields.splice(targetIndex, 0, this.draggedField);
+        }
+    }
+
+    dragEnter(event: any, targetIndex: number, pos: 'top' | 'bottom') {
+        const target: HTMLDivElement = event.target;
+        target.classList.add('border-' + pos + '-2', 'border-primary');
+    }
+
+    dragLeave(event: any, targetIndex: number, pos: 'top' | 'bottom') {
+        const target: HTMLDivElement = event.target;
+        target.classList.remove('border-' + pos + '-2', 'border-primary');
+    }
+
+    dropToStage(event: any, stageIndex: number) {
+        this.stageHoverTarget = null;
+        if(stageIndex !== this.activeStepIndex){
+            const sourceStep: StepItem | undefined = this.wireframe.steps.find(s => s.id === this.activeStepIndex)
+            const targetStep: StepItem | undefined = this.wireframe.steps.find(s => s.id === stageIndex)
+
+            if (sourceStep && targetStep && this.draggedField) {
+                sourceStep.fields.splice(sourceStep.fields.findIndex(f=>f===this.draggedField),1);
+                targetStep.fields.unshift(this.draggedField);
+                this.draggedField = undefined;
+            }
+        }
+    }
+
+    dragEnterStage(event: any, stageIndex: number) {
+        if(stageIndex !== this.activeStepIndex)
+            this.stageHoverTarget = stageIndex;
+    }
+
+    dragLeaveStage(event: any, stageIndex: number) {
+        this.stageHoverTarget = null;
+    }
 }

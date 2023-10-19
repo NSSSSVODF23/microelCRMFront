@@ -431,7 +431,6 @@
         </div>
         <div class="flex align-items-center">
             <p-button (onClick)="openBindingContextMenu($event, binding, bindingContextMenu)"
-                      [disabled]="binding.isAuth && binding.authName === currentLogin"
                       icon="mdi-more_vert"
                       styleClass="p-button-rounded p-button-icon p-button-text p-button-secondary"></p-button>
         </div>
@@ -628,6 +627,49 @@
             </p-tabPanel>
         </p-tabView>
     </ng-template>
+</p-dialog>
+
+<p-dialog [(visible)]="isNCLHistoryDialogVisible" [style]="{width:'90rem'}"
+          [modal]="true" [resizable]="false" appendTo="body" header="История локаций подключений">
+        <div [style]="nclHistoryLoadingState === 'READY' ? (nclHistoryViewStyle$ | async) : {display:'grid', alignItems:'center'}" class="p-3 border-1 border-bluegray-100 border-round-lg">
+            <ng-container *ngIf="nclHistory$ | async as history">
+                <ng-container [ngSwitch]="nclHistoryLoadingState">
+                    <ng-container *ngSwitchCase="'READY'">
+                        <ng-container *ngFor="let location of (history.nclItems | keyvalue); let i = index">
+                            <div [style]="{'gridArea': (i+1) + '/1/'+(i+2)+'/2'}" class="text-bluegray-400 mr-2 pr-2 border-right-1 border-bluegray-100">{{location.key}}</div>
+                            <ng-container *ngFor="let item of (history.nclItems[location.key])">
+                                <div [style]="{'gridArea': (i+1) + '/'+(item.percentStart+2)+'/'+(i+2)+'/'+(item.percentEnd+2),
+                                 'backgroundColor': item.color, 'border': '1px solid '+item.borderColor}" class="h-50 mr-1 opacity-70"
+                                [pTooltip]="'Начало: ' + (item.timeStart|date:'EEEE dd MMMM yyyy HH:mm'|titlecase) + ' Конец: ' + (item.timeEnd|date:'EEEE dd MMMM yyyy HH:mm'|titlecase)"
+                                tooltipPosition="bottom"></div>
+                            </ng-container>
+                        </ng-container>
+                        <div [style]="{gridArea:'-1/2/-1/-1'}" class="flex align-items-center justify-content-between text-bluegray-400 text-sm font-bold">
+                            <span>{{history.from|date:'EEEE dd MMMM yyyy HH:mm'|titlecase}}</span>
+                            <span>{{history.to|date:'EEEE dd MMMM yyyy HH:mm'|titlecase}}</span>
+                        </div>
+                    </ng-container>
+                    <ng-container *ngSwitchCase="'LOADING'">
+                        <div class="flex flex-column align-items-center justify-content-center" [style]="{gridAreaColumn:'1/-1'}">
+                            <p-progressSpinner class="custom-spinner custom-spinner-gray custom-spinner-8xl"></p-progressSpinner>
+                            <span class="text-bluegray-400 font-bold text-lg">Загрузка</span>
+                        </div>
+                    </ng-container>
+                    <ng-container *ngSwitchCase="'ERROR'">
+                        <div class="flex flex-column align-items-center justify-content-center text-red-400 font-bold text-lg" [style]="{gridAreaColumn:'1/-1'}">
+                            <span class="mds-error"></span>
+                            <span>Не удалось загрузить данные</span>
+                        </div>
+                    </ng-container>
+                    <ng-container *ngSwitchCase="'EMPTY'">
+                        <div class="flex flex-column align-items-center justify-content-center text-bluegray-400 font-bold text-lg" [style]="{gridAreaColumn:'1/-1'}">
+                            <span class="mds-radar"></span>
+                            <span>Нет данных</span>
+                        </div>
+                    </ng-container>
+                </ng-container>
+            </ng-container>
+        </div>
 </p-dialog>
 
 <p-dialog [(visible)]="isPaymentDialogVisible"

@@ -12796,6 +12796,10 @@
     @include mds("equalizer");
   }
 
+  &-radar{
+    @include mds("radar");
+  }
+
   &-error {
     @include mds("error");
   }

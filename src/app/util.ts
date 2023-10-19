@@ -219,6 +219,21 @@ export class Utils {
         }
         return obj;
     }
+
+    static groupBy<T>(items: T[], key: keyof T) {
+        return items.reduce(
+            (result, item) => ({
+                ...result,
+                // @ts-ignore
+                [item[key]]: [
+                    // @ts-ignore
+                    ...(result[item[key]] || []),
+                    item,
+                ],
+            }),
+            {} as { [key: string]: T[] },
+        );
+    }
 }
 
 export class FormToModelItemConverter {

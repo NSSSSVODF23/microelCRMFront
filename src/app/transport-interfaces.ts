@@ -807,19 +807,19 @@ export interface BillingUserItemData {
     stateColor: string;
 }
 
-export interface BillingPaymentForm{
-    sum:number;
+export interface BillingPaymentForm {
+    sum: number;
     payType: BillingPayType;
     comment: string;
 }
 
-export enum BillingPayType{
+export enum BillingPayType {
     REFUND = 3,
     CREDIT = 4,
     SERVICE = 11
 }
 
-export interface UserEvents{
+export interface UserEvents {
     uname: string;
     fromDate: string;
     events: UserEventLog[];
@@ -827,7 +827,7 @@ export interface UserEvents{
     tarifs: UserTariffLog[];
 }
 
-export interface UserEventLog{
+export interface UserEventLog {
     evdate: string;
     evtime: string;
     evTimeStamp: string;
@@ -846,7 +846,7 @@ export interface UserEventLog{
     moneyDirection: number;
 }
 
-export interface UserPaysLog{
+export interface UserPaysLog {
     bmoney: number;
     uname: string;
     money: number;
@@ -856,7 +856,7 @@ export interface UserPaysLog{
     who: string;
 }
 
-export interface UserTariffLog{
+export interface UserTariffLog {
     lasttime: string;
     uname: string;
     mdate: string;
@@ -870,7 +870,7 @@ export interface UserTariffLog{
     iExt: string;
 }
 
-export interface ClientEquipment{
+export interface ClientEquipment {
     clientEquipmentId: number;
     name: string;
     description: string;
@@ -882,7 +882,7 @@ export interface ClientEquipment{
     lastEdit: EmployeeIntervention;
 }
 
-export interface ClientEquipmentRealization{
+export interface ClientEquipmentRealization {
     clientEquipmentRealizationId: number;
     equipment: ClientEquipment;
     count: number;
@@ -953,7 +953,7 @@ export interface BillingTotalUserInfo {
     uname: string;
 }
 
-export interface PingMonitoring{
+export interface PingMonitoring {
     ip: string;
     reachablePercentage: number;
     delayAvg: number;
@@ -961,7 +961,7 @@ export interface PingMonitoring{
     chartData: any;
 }
 
-export interface BillingConf{
+export interface BillingConf {
     host: string;
     port: number;
     login: string;
@@ -969,13 +969,13 @@ export interface BillingConf{
     selfIp: string;
 }
 
-export interface TelegramConf{
+export interface TelegramConf {
     botToken: string;
     botName: string;
     dhcpNotificationChatId: string;
 }
 
-export interface AcpConf{
+export interface AcpConf {
     acpFlexConnectorEndpoint: string;
 }
 
@@ -1037,7 +1037,7 @@ export interface DhcpBinding {
     lastConnectionLocation?: NetworkConnectionLocation;
 }
 
-export interface NetworkConnectionLocation{
+export interface NetworkConnectionLocation {
     id: number;
     commutatorName: string;
     commutatorIp: string;
@@ -1053,6 +1053,27 @@ export interface NetworkConnectionLocation{
     isHasLink: boolean;
     portSpeed?: PortSpeed;
     lastPortCheck?: Date;
+}
+
+export interface NCLHistoryWrapper{
+    from: string;
+    to: string;
+    nclItems: {
+        [nclId: string]: NCLHistoryItem[];
+    }
+}
+
+export interface NCLHistoryItem {
+    nclId: number;
+    color: string;
+    borderColor: string;
+    connectionName: string;
+    commutatorId: number;
+    bindingId: number;
+    timeStart: string;
+    timeEnd: string;
+    percentStart: number;
+    percentEnd: number;
 }
 
 export interface DhcpSetting {
@@ -1190,7 +1211,7 @@ export interface Switch {
     additionalInfo?: AcpCommutator;
 }
 
-export interface AcpCommutator{
+export interface AcpCommutator {
     acpCommutatorId: number;
     externalId: number;
     available: boolean;
@@ -1203,14 +1224,14 @@ export interface AcpCommutator{
     lastErrorMessage: string;
 }
 
-export interface RemoteUpdateLog{
+export interface RemoteUpdateLog {
     remoteUpdateLogId: number;
     isError: boolean;
     message: string;
     timestamp: string;
 }
 
-export interface SystemInfo{
+export interface SystemInfo {
     systemInfoId: number;
     device: string;
     mac?: string;
@@ -1220,7 +1241,7 @@ export interface SystemInfo{
     lastUpdate: Date;
 }
 
-export interface FdbItem{
+export interface FdbItem {
     fdbItemId: number;
     vid: number;
     vlanName: string;
@@ -1230,7 +1251,7 @@ export interface FdbItem{
     dhcpBinding?: DhcpBinding;
 }
 
-export interface PortInfo{
+export interface PortInfo {
     portInfoId: number;
     status: PortStatus;
     name: string;
@@ -1294,7 +1315,7 @@ export interface Switchport {
     description: string;
 }
 
-export interface AcpHouse{
+export interface AcpHouse {
     streetId: number;
     streetName: string;
     buildingId: number;

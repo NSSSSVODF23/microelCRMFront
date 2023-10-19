@@ -9,40 +9,6 @@
   min-width: 40rem;
 }
 
-.step-construct-view {
-  min-width: 40rem;
-  width: max-content;
-  //height: 30rem;
-
-  &-header {
-    display: flex;
-    padding: 1.7rem 2.1rem;
-    gap: .5rem;
-    align-items: center;
-
-    &-step-number {
-      font-size: 1.2rem;
-      font-weight: 500;
-      color: var(--tc-500);
-    }
-
-    &-caption {
-      font-size: 1.2rem;
-      font-weight: 500;
-      color: var(--tc-700)
-    }
-
-    &-edit-button {
-      font-size: 1.3rem;
-      color: var(--mc-500);
-      transform: translateY(.15rem);
-    }
-  }
-
-  &-content {
-    display: flex;
-  }
-}
 
 .stage-list-panel {
   min-width: 30rem;

@@ -72,8 +72,8 @@ export class CommutatorListPageComponent implements OnInit {
     )
     commutatorNameKeyFilter = /^[^А-я ]+$/;
 
-    commutatorUplinkQuerySearch = new Subject<string>();
     editableSwitch?: Switch;
+    commutatorUplinkQuerySearch = new Subject<string>();
     commutatorUplinks$ = this.commutatorUplinkQuerySearch.pipe(
         debounceTime(1000),
         switchMap(query => this.api.searchCommutators(query)),

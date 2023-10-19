@@ -4,28 +4,40 @@
         <div class="flexed column gap10 stretched">
             <div class="flexed column gap10 panel p10">
                 <span class="caption size-big f-color-500">Поиск абонентов</span>
-                <div [formGroup]="busService.filtrationForm" class="flex gap-3 align-items-end">
-                    <div class="input-label-wrapper">
-                        <label>Режим поиска</label>
-                        <p-selectButton [disabled]="busService.userLoadingState==='LOADING'" [options]="filterModeItems"
-                                        formControlName="mode"></p-selectButton>
-                    </div>
-                    <div class="input-label-wrapper stretched">
-                        <label>Запрос</label>
-                        <div class="p-inputgroup">
-                            <input  [appPreventInput]="busService.userLoadingState === 'LOADING'" formControlName="query"
-                                   pInputText type="text" (keydown.enter)="busService.enterSearch.next(null)"/>
-                            <button type="button" pButton pRipple icon="mdi-search" (click)="busService.enterSearch.next(null)"></button>
+                <div [formGroup]="busService.filtrationForm" class="flex flex-column gap-1">
+                    <div class="flex gap-3 align-items-end">
+                        <div class="input-label-wrapper">
+                            <label>Режим поиска</label>
+                            <p-selectButton [disabled]="busService.userLoadingState==='LOADING'"
+                                            [options]="filterModeItems"
+                                            formControlName="mode"></p-selectButton>
                         </div>
+                        <p-toggleButton [disabled]="busService.userLoadingState==='LOADING'" formControlName="isActive"
+                                        offLabel="Только активные" onLabel="Все"></p-toggleButton>
                     </div>
-                    <p-button [disabled]="busService.userLoadingState==='LOADING'" icon="mdi-cancel" (onClick)="clearSearchQuery()"
-                              styleClass="p-button-outlined p-button-secondary" label="Очистить"></p-button>
+                    <div class="flex gap-3 align-items-end">
+
+                        <div class="input-label-wrapper stretched">
+                            <label>Запрос</label>
+                            <div class="p-inputgroup">
+                                <input (keydown.enter)="busService.enterSearch.next(null)"
+                                       [appPreventInput]="busService.userLoadingState === 'LOADING'"
+                                       formControlName="query" pInputText type="text"/>
+                                <button (click)="busService.enterSearch.next(null)" icon="mdi-search" pButton pRipple
+                                        type="button"></button>
+                            </div>
+                        </div>
+                        <p-button (onClick)="clearSearchQuery()" [disabled]="busService.userLoadingState==='LOADING'"
+                                  icon="mdi-cancel"
+                                  label="Очистить" styleClass="p-button-outlined p-button-secondary"></p-button>
+                    </div>
                 </div>
             </div>
             <ng-container [ngSwitch]="busService.userLoadingState">
                 <ng-container *ngSwitchCase="'LOADING'">
                     <div class="flexed vcenter hcenter gap10 stretched panel p10">
-                        <p-progressSpinner class="custom-spinner custom-spinner-8xl custom-spinner-primary" strokeWidth="1"></p-progressSpinner>
+                        <p-progressSpinner class="custom-spinner custom-spinner-8xl custom-spinner-primary"
+                                           strokeWidth="1"></p-progressSpinner>
                     </div>
                 </ng-container>
                 <ng-container *ngSwitchCase="'EMPTY'">
@@ -47,7 +59,9 @@
                 <ng-container *ngSwitchCase="'READY'">
                     <div class="flexed column gap5 stretched panel p10">
                         <div @flowInChild class="flexed column stretched">
-                            <div *ngFor="let user of busService.page" [routerLink]="['/clients','billing','user',user.uname]" class="subscriber-item split-line">
+                            <div *ngFor="let user of busService.page"
+                                 [routerLink]="['/clients','billing','user',user.uname]"
+                                 class="subscriber-item split-line">
                                 <span class="flexed gap5 hcenter">
                                     <span class="caption wt-bold f-color-600">{{user.uname}}</span>
                                     <span class="caption f-color-600">{{user.addr}}</span>
@@ -55,7 +69,7 @@
                                             [caption]="user.stateName"
                                             [color]="user.stateColor"></app-colored-tag>
                                     <app-colored-tag *ngIf="user.utype === '11'"
-                                            caption="Бизнес" color="var(--warm-600)"></app-colored-tag>
+                                                     caption="Бизнес" color="var(--warm-600)"></app-colored-tag>
                                     <div class="stretched"></div>
                                     <span>
                                         <span class="caption wt-black size-small f-color-500">
@@ -79,7 +93,7 @@
                                         <span class="caption wt-black size-small f-color-500">
                                             Тариф:
                                         </span>
-                                        <span class="caption" [ngClass]="{'f-color-danger': !user.tarif}">
+                                        <span [ngClass]="{'f-color-danger': !user.tarif}" class="caption">
                                             {{user.tarif ? user.tarif : 'Не установлен'}}
                                         </span>
                                     </span>
@@ -94,7 +108,9 @@
                                 </span>
                             </div>
                         </div>
-                        <p-paginator [first]="busService.first" [rows]="busService.PAGE_SIZE" [totalRecords]="busService.users.length" (onPageChange)="pageChange($event)"></p-paginator>
+                        <p-paginator (onPageChange)="pageChange($event)" [first]="busService.first"
+                                     [rows]="busService.PAGE_SIZE"
+                                     [totalRecords]="busService.users.length"></p-paginator>
                     </div>
                 </ng-container>
             </ng-container>

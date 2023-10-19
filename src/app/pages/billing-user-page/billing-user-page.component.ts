@@ -1,7 +1,14 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
 import {ApiService} from "../../services/api.service";
 import {ActivatedRoute} from "@angular/router";
-import {BillingTotalUserInfo, DhcpBinding, LoadingState, UserEvents} from "../../transport-interfaces";
+import {
+    BillingTotalUserInfo,
+    DhcpBinding,
+    LoadingState,
+    NCLHistoryItem,
+    NCLHistoryWrapper,
+    UserEvents
+} from "../../transport-interfaces";
 import {DynamicValueFactory, SubscriptionsHolder} from "../../util";
 import {CustomNavigationService} from "../../services/custom-navigation.service";
 import {
@@ -116,6 +123,7 @@ export class BillingUserPageComponent implements OnInit, OnDestroy {
         shareReplay(1)
     )
     isHistoryDialogVisible = false;
+    isNCLHistoryDialogVisible = false
     userEvents?: UserEvents;
     userEventsLoadingState = LoadingState.LOADING;
     billingPaymentTypes$ = this.api.getBillingPaymentTypesList();
@@ -148,42 +156,34 @@ export class BillingUserPageComponent implements OnInit, OnDestroy {
         filter(bindings => bindings && bindings.length > 0),
         map(binds => {
             const authBind = binds.find(bind => bind.isAuth);
-            if(authBind){
+            if (authBind) {
                 return authBind.vlanid;
-            }else{
+            } else {
                 return binds[0].vlanid;
             }
         }),
-        tap(vlan=>this.lastBindingVlan=vlan),
+        tap(vlan => this.lastBindingVlan = vlan),
         shareReplay(1)
     )
+    changeHouseVlanPage$ = combineLatest([this.firstVlanOfBindings$, this.houseBindingsPage$]).pipe(shareReplay(1));
 
-    changeHouseVlanPage$ = combineLatest([this.firstVlanOfBindings$, this.houseBindingsPage$]).pipe(tap(console.log),shareReplay(1));
     updateHousePage$ = this.rt.acpDhcpBindingHousePageUpdateSignal().pipe(
         switchMap((resp) => this.changeHouseVlanPage$.pipe(first(), filter(([vlan, page]) => vlan === resp.vlan))),
     )
-    dhcpBindingsByVlan$$= DynamicValueFactory.ofPage(
+    dhcpBindingsByVlan$$ = DynamicValueFactory.ofPage(
         merge(this.changeHouseVlanPage$, this.updateHousePage$),
-        (vlan,page)=>this.api.getDhcpBindingsByVlan(page, vlan, this.currentLogin),
+        (vlan, page) => this.api.getDhcpBindingsByVlan(page, vlan, this.currentLogin),
         'id',
         null,
         this.rt.acpDhcpBindingUpdated(),
         null
     )
-    // dhcpBindingsByVlan$ = merge(this.changeHouseVlanPage$, this.updateHousePage$).pipe(
-    //     debounceTime(100),
-    //     tap(() => this.houseBindingsLoadingState = LoadingState.LOADING),
-    //     switchMap(({vlan, page}) => this.api.getDhcpBindingsByVlan(page, vlan, this.currentLogin)),
-    //     tap({
-    //         next: (page) => this.houseBindingsLoadingState = page.empty ? LoadingState.EMPTY : LoadingState.READY,
-    //         error: () => this.houseBindingsLoadingState = LoadingState.ERROR
-    //     }),
-    //     shareReplay(1)
-    // );
+    isCommutatorRefreshing = false;
+    lastBindingVlan: null | number = null;
     commutatorsByVlan$ = DynamicValueFactory.ofWithFilter(
         this.firstVlanOfBindings$.pipe(
-            filter(vlan=>vlan != undefined && vlan > 0 && vlan<4097),
-            map(vlan=>[vlan]),
+            filter(vlan => vlan != undefined && vlan > 0 && vlan < 4097),
+            map(vlan => [vlan]),
         ),
         (vlan) => this.api.getCommutatorsByVlan(vlan),
         'id',
@@ -191,8 +191,37 @@ export class BillingUserPageComponent implements OnInit, OnDestroy {
         this.rt.acpCommutatorUpdated(),
         this.rt.acpCommutatorDeleted()
     )
-    isCommutatorRefreshing = false;
-    lastBindingVlan: null  | number = null;
+    nclHistory$ = new BehaviorSubject<NCLHistoryWrapper|null>(null);
+    nclHistoryLoadingState = LoadingState.LOADING;
+    nclHistoryViewStyle$ = this.nclHistory$.pipe(
+        map(history => {
+            if(history){
+                try {
+                    const length = Object.entries(history.nclItems).length;
+                    if(length === 0){
+                        return {
+                            display: 'grid',
+                            alignItems: 'center',
+                        };
+                    }
+                    return {
+                        display: 'grid',
+                        grid: `repeat(${length}, 1.5rem)/max-content repeat(100,1fr)`,
+                        alignItems: 'center',
+                    }
+                } catch (e) {
+                    return {
+                        display: 'grid',
+                        alignItems: 'center',
+                    };
+                }
+            }
+            return {
+                display: 'grid',
+                alignItems: 'center',
+            };
+        })
+    )
 
     constructor(private api: ApiService, private rt: RealTimeUpdateService, private route: ActivatedRoute, readonly customNav: CustomNavigationService,
                 readonly taskCreation: TaskCreatorService, readonly toast: MessageService, private confirm: ConfirmationService) {
@@ -272,7 +301,7 @@ export class BillingUserPageComponent implements OnInit, OnDestroy {
     }
 
     confirmSuspendService() {
-        if(!this.userInfo?.newTarif) return;
+        if (!this.userInfo?.newTarif) return;
         if (this.userInfo?.newTarif?.isServiceSuspended) {
             this.confirm.confirm({
                 header: 'Подтверждение',
@@ -305,7 +334,7 @@ export class BillingUserPageComponent implements OnInit, OnDestroy {
     };
 
     ngOnInit(): void {
-        this.rt.acpDhcpBindingUpdated().subscribe(console.log)
+        this.rt.acpDhcpBindingUpdated().subscribe()
         this.subscriptions.addSubscription('pch',
             this.loadUser$.subscribe(this.load.bind(this))
         )
@@ -359,7 +388,10 @@ export class BillingUserPageComponent implements OnInit, OnDestroy {
     openBindingContextMenu(event: MouseEvent, binding: DhcpBinding, menu: Menu) {
         this.bindingContextMenuItems = [
             {
-                label: 'Авторизовать (текущий логин)', command: () => this.authCurrentLogin(binding.macaddr)
+                label: 'Авторизовать (текущий логин)', command: () => this.authCurrentLogin(binding.macaddr), disabled: binding.isAuth && binding.authName === this.currentLogin
+            },
+            {
+                label: 'История подключений', command: () => this.openNCLHistoryDialog(binding),
             }
         ]
         menu.toggle(event);
@@ -382,6 +414,8 @@ export class BillingUserPageComponent implements OnInit, OnDestroy {
                 icon: 'mdi-verified',
                 closable: false
             })
+            if (this.currentLogin)
+                this.update$.next(this.currentLogin)
         });
     }
 
@@ -429,12 +463,26 @@ export class BillingUserPageComponent implements OnInit, OnDestroy {
     }
 
     refreshCommutators() {
-        if(this.lastBindingVlan)
+        if (this.lastBindingVlan)
             this.api.commutatorRemoteUpdateByVlan(this.lastBindingVlan).pipe(
-                tap(()=>this.isCommutatorRefreshing = true)
+                tap(() => this.isCommutatorRefreshing = true)
             ).subscribe({
-                next: ()=>this.isCommutatorRefreshing = false,
-                error: ()=>this.isCommutatorRefreshing = false
+                next: () => this.isCommutatorRefreshing = false,
+                error: () => this.isCommutatorRefreshing = false
             })
+    }
+
+    openNCLHistoryDialog(binding: DhcpBinding) {
+        this.isNCLHistoryDialogVisible = true;
+        this.nclHistoryLoadingState = LoadingState.LOADING;
+        this.api.getNetworkConnectionLocationHistory(binding.id).subscribe(
+            {
+                next: (history) => {
+                    this.nclHistory$.next(history);
+                    this.nclHistoryLoadingState = Object.entries(history.nclItems).length ? LoadingState.READY : LoadingState.EMPTY
+                },
+                error: () => this.nclHistoryLoadingState = LoadingState.ERROR
+            }
+        );
     }
 }

@@ -1,5 +1,5 @@
-import {AbstractControl, ValidationErrors} from "@angular/forms";
-import {WireframeFieldType} from "./transport-interfaces";
+import {AbstractControl, ValidationErrors, ValidatorFn} from "@angular/forms";
+import {DhcpBinding, WireframeFieldType} from "./transport-interfaces";
 
 export class CustomValidators {
 
@@ -110,5 +110,13 @@ export class CustomValidators {
         if (typeof phone !== 'string') return false;
         const regexExp = /^8 \(\d{3}\) \d{3}-\d{2}-\d{2}$/;
         return regexExp.test(phone);
+    }
+
+    static typeIsSwitchWithAddress(): ValidatorFn {
+        return (control: AbstractControl): ValidationErrors | null => {
+            if(!control) return null;
+            if('commutator' in control.value && control.value.commutator) return null;
+            return {typized: true}
+        }
     }
 }

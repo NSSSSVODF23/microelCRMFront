@@ -29,13 +29,13 @@ export class BillingUserSearchingService {
     PAGE_SIZE: number = 10;
     userLoadingState: LoadingState = LoadingState.EMPTY;
     filtrationForm = new FormGroup({
-        mode: new FormControl('address'), query: new FormControl(''),
+        mode: new FormControl('address'), query: new FormControl(''), isActive: new FormControl(false)
     })
     changeUsersSubject = new Subject<BillingUserItemData[]>();
     changeUsers$ = this.changeUsersSubject.asObservable();
     enterSearch = new Subject<null>();
     enterSearch$ = this.enterSearch.pipe(map(()=>this.filtrationForm.value));
-    modeChange$ = this.filtrationForm.controls.mode.valueChanges.pipe(map(value => ({mode: value, query: null})));
+    modeChange$ = this.filtrationForm.controls.mode.valueChanges.pipe(map(value => ({mode: value, isActive: false, query: null})));
 
     users$ = merge(this.enterSearch$, this.modeChange$).pipe(
             tap(() => {
@@ -45,11 +45,11 @@ export class BillingUserSearchingService {
                 if (!value.query) return of([] as BillingUserItemData[]);
                 switch (value.mode) {
                     case 'login':
-                        return this.api.getBillingUsersByLogin(value.query);
+                        return this.api.getBillingUsersByLogin(value.query, !value.isActive); // todo вставить фильтр по активности
                     case 'fio':
-                        return this.api.getBillingUsersByFio(value.query);
+                        return this.api.getBillingUsersByFio(value.query, !value.isActive);
                     case 'address':
-                        return this.api.getBillingUsersByAddress(value.query);
+                        return this.api.getBillingUsersByAddress(value.query, !value.isActive);
                 }
                 return of([] as BillingUserItemData[]);
             }),
@@ -64,7 +64,15 @@ export class BillingUserSearchingService {
     usersHandler = {
         next: (users: BillingUserItemData[]) => {
             this.userLoadingState = !users || users.length === 0 ? LoadingState.EMPTY : LoadingState.READY;
-            this.users = !users || users.length === 0 ? [] : users;
+            this.users = !users || users.length === 0 ? [] : users.sort((a,b)=>{
+                if (a.addr < b.addr) {
+                    return -1;
+                }
+                if (a.addr > b.addr) {
+                    return 1;
+                }
+                return 0;
+            });
             this.first = 1;
             this.page = this.users.slice(0, this.PAGE_SIZE);
         }
@@ -76,9 +84,5 @@ export class BillingUserSearchingService {
             this.filtrationForm.patchValue({query: ''})
         })
         this.changeUsers$.subscribe(this.usersHandler)
-    }
-
-    get isAddressMode() {
-        return this.filtrationForm.controls.mode.value === 'address'
     }
 }

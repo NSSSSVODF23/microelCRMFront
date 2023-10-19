@@ -1,22 +1,12 @@
 import {Component, OnInit} from '@angular/core';
-import {
-    BehaviorSubject,
-    combineLatest,
-    debounceTime,
-    delay,
-    map,
-    shareReplay,
-    startWith,
-    Subject,
-    switchMap,
-    tap
-} from "rxjs";
+import {BehaviorSubject, combineLatest, debounceTime, map, shareReplay, startWith, Subject, switchMap, tap} from "rxjs";
 import {FormControl, FormGroup} from "@angular/forms";
 import {ApiService} from "../../services/api.service";
-import {DhcpBinding} from "../../transport-interfaces";
+import {DhcpBinding, SwitchWithAddress} from "../../transport-interfaces";
 import {ConfirmationService} from "primeng/api";
 import {flowInChild} from "../../animations";
 import {DynamicValueFactory} from "../../util";
+import {CustomValidators} from "../../custom-validators";
 
 @Component({
     templateUrl: './acp-sessions-page.component.html',
@@ -35,12 +25,14 @@ export class AcpSessionsPageComponent implements OnInit {
         shareReplay(1)
     )
     lastBindingsFilterForm = new FormGroup({
-        state: new FormControl(true),
+        state: new FormControl<number | null>(1),
         macaddr: new FormControl(null),
         login: new FormControl(null),
         ip: new FormControl(null),
         vlan: new FormControl(null),
         buildingId: new FormControl(null),
+        commutator: new FormControl<SwitchWithAddress | null>(null, CustomValidators.typeIsSwitchWithAddress),
+        port: new FormControl<number| null>(null)
     });
 
     lastBindingFilterForm$ = this.lastBindingsFilterForm.valueChanges
@@ -50,16 +42,18 @@ export class AcpSessionsPageComponent implements OnInit {
             map(filters => {
                 this.pageNum = 0;
                 return {
-                    state: filters.state ? 1 : 0, macaddr: filters.macaddr, login: filters.login, ip: filters.ip,
-                    vlan: filters.vlan, buildingId: filters.buildingId && filters.buildingId['buildingId']
+                    state: filters.state !== null ? filters.state : undefined, macaddr: filters.macaddr, login: filters.login, ip: filters.ip,
+                    vlan: filters.vlan, buildingId: filters.buildingId && filters.buildingId['buildingId'],
+                    commutator: filters.commutator && filters.commutator.commutator ? filters.commutator.commutator.id : undefined,
+                    port: filters.port
                 }
             })
         );
 
     lastBindingsFilter$ = combineLatest([this.page$, this.lastBindingFilterForm$])
         .pipe(
-            map(([page,filter]) => {
-                return [this.pageNum, filter.state, filter.macaddr, filter.login, filter.ip, filter.vlan, filter.buildingId];
+            map(([page, filter]) => {
+                return [this.pageNum, filter.state, filter.macaddr, filter.login, filter.ip, filter.vlan, filter.buildingId, filter.commutator, filter.port];
             })
         );
 
@@ -73,6 +67,25 @@ export class AcpSessionsPageComponent implements OnInit {
         null,
         null
     );
+
+    commutatorUplinkQuerySearch = new Subject<string>();
+    commutatorUplinks$ = this.commutatorUplinkQuerySearch.pipe(
+        debounceTime(1000),
+        switchMap(query => this.api.searchCommutators(query)),
+        // map(commutators => commutators.filter(com => com.value !== this.editableSwitch?.id)),
+        shareReplay(1)
+    )
+    statusOptions = [
+        {
+            label: 'В сети', value: 1
+        },
+        {
+            label: 'Не в сети', value: 0
+        },
+        {
+            label: 'Любые', value: null
+        }
+    ];
 
     constructor(private api: ApiService, private confirm: ConfirmationService) {
     }

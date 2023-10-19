@@ -1619,6 +1619,10 @@ markdown > p:last-child {
   }
 }
 
+.cursor-default {
+  cursor: default !important;
+}
+
 @keyframes flow {
   from {
     backdrop-filter: brightness(1);

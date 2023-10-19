@@ -46,11 +46,11 @@ export class TestingPageComponent implements OnInit {
         if (!value.query) return of([] as any[]);
         switch (value.mode) {
             case 'login':
-                return this.api.getBillingUsersByLogin(value.query);
+                return this.api.getBillingUsersByLogin(value.query,true);
             case 'fio':
-                return this.api.getBillingUsersByFio(value.query);
+                return this.api.getBillingUsersByFio(value.query,true);
             case 'address':
-                return this.api.getBillingUsersByAddress(value.query);
+                return this.api.getBillingUsersByAddress(value.query,true);
         }
         return of([] as any[]);
     }));

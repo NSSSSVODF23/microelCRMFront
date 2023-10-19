@@ -25,7 +25,7 @@ import {
     House,
     INotification,
     MessageData,
-    ModelItem,
+    ModelItem, NCLHistoryItem, NCLHistoryWrapper, NetworkConnectionLocation,
     NetworkRemoteControl,
     Page,
     PaidAction,
@@ -662,16 +662,16 @@ export class ApiService {
         return this.sendGet<SalaryTable>('api/private/salary/table', filter);
     }
 
-    getBillingUsersByLogin(login: string) {
-        return this.sendGet<BillingUserItemData[]>(`api/private/billing/users/by-login`, {login});
+    getBillingUsersByLogin(login: string, isActive: boolean) {
+        return this.sendGet<BillingUserItemData[]>(`api/private/billing/users/by-login`, {login, isActive});
     }
 
-    getBillingUsersByFio(query: string) {
-        return this.sendGet<BillingUserItemData[]>(`api/private/billing/users/by-fio`, {query});
+    getBillingUsersByFio(query: string, isActive: boolean) {
+        return this.sendGet<BillingUserItemData[]>(`api/private/billing/users/by-fio`, {query, isActive});
     }
 
-    getBillingUsersByAddress(address: Address) {
-        return this.sendGet<BillingUserItemData[]>(`api/private/billing/users/by-address`, {address});
+    getBillingUsersByAddress(address: Address, isActive: boolean) {
+        return this.sendGet<BillingUserItemData[]>(`api/private/billing/users/by-address`, {address, isActive});
     }
 
     getBillingUserInfo(login: string) {
@@ -750,14 +750,16 @@ export class ApiService {
         return this.sendGet<DhcpBinding[]>('api/private/acp/dhcp/bindings', {login});
     }
 
-    getLastBindings(page: number, state?: number, macaddr?: string | null, login?: string | null, ip?: string | null, vlan?: number | null, buildingId?: number | null) {
+    getLastBindings(page: number, state?: number, macaddr?: string | null, login?: string | null, ip?: string | null, vlan?: number | null, buildingId?: number | null, commutator?: number | null, port?: number|null) {
         return this.sendGet<Page<DhcpBinding>>('api/private/acp/dhcp/bindings/' + page + '/last', {
             state,
             macaddr,
             login,
             ip,
             vlan,
-            buildingId
+            buildingId,
+            commutator,
+            port
         });
     }
 
@@ -767,6 +769,10 @@ export class ApiService {
 
     authDhcpBinding(login: string, macaddr: string) {
         return this.sendPost('api/private/acp/dhcp/binding/auth', {login, macaddr});
+    }
+
+    getNetworkConnectionLocationHistory(bindingId: number) {
+        return this.sendGet<NCLHistoryWrapper>('api/private/acp/dhcp/binding/' + bindingId + '/ncl-history',{});
     }
 
     getBuildings(query?: string) {

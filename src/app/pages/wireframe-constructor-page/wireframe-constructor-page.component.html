@@ -12,7 +12,7 @@
                 </div>
             </div>
             <div class="input-label-wrapper">
-                <label>Ответственные по умолчанию</label>
+                <label>Наблюдатели по умолчанию</label>
                 <app-observer-selector-input [(ngModel)]="wireframe.defaultObservers"></app-observer-selector-input>
             </div>
             <div class="flexed">
@@ -23,31 +23,51 @@
             </div>
 
             <p-button label="Добавить этап" icon="mdi-add" (onClick)="createStep()" styleClass="p-button-success" class="self-center"></p-button>
-            <p-steps [activeIndex]="activeStepIndex" [model]="stepsArray" [readonly]="false"
-                     class="stretched"></p-steps>
-
+            <div class="flex justify-content-around align-items-center gap-3">
+                <div class="flex flex-column align-items-center justify-content-center gap-1 relative p-2 border-round-lg overflow-hidden" (click)="activeStepIndex!==i && (activeStepIndex=i)"
+                     *ngFor="let step of stepsArray; let i = index; trackBy:trackByStep"
+                     [ngClass]="{'cursor-pointer hover:text-primary-400':activeStepIndex!==i, 'cursor-default font-bold':activeStepIndex===i}">
+                    <div class="flex align-items-center justify-content-center border-circle border-1 border-bluegray-100 text-lg w-2rem h-2rem">{{i+1}}</div>
+                    <div class="flex align-items-center gap-1">
+                        <span>{{step.label}}</span>
+                        <span class="mdi-close text-red-400 hover:text-red-600 cursor-pointer text-lg z-1" (click)="removeStep(i)" *ngIf="i>0"></span>
+                    </div>
+                    <div class="opacity-25 absolute top-0 left-0 w-full h-full" [ngClass]="{'bg-primary':stageHoverTarget===i}"
+                         pDroppable="field" (onDragEnter)="dragEnterStage($event, i)" (onDragLeave)="dragLeaveStage($event, i)" (onDrop)="dropToStage($event, i)">
+                    </div>
+                </div>
+            </div>
         </div>
-        <div class="flexed hcenter column stretched">
-            <div class="step-construct-view panel">
-                <div class="step-construct-view-header">
-                    <span class="step-construct-view-header-step-number">Этап {{activeStepIndex + 1}}:</span>
+        <div class="flex flex-column align-items-center flex-grow-1 bg-white">
+            <div class="w-max border-round-lg shadow-5" [style.min-width]="'40rem'">
+                <div class="flex p-3 gap-2 align-items-center border-bottom-1 border-bluegray-100">
+                    <span class="font-bold text-bluegray-400">Этап {{activeStepIndex + 1}}:</span>
                     <app-editing-caption
                             (captionChange)="stepsPanelCaptionUpdate($event)"
                             (onStopEditing)="fillingEmptyStepName()"
                             [(caption)]="this.wireframe.steps[activeStepIndex].name"
-                            class="step-construct-view-header-caption">
+                            class="font-bold text-bluegray-400">
                     </app-editing-caption>
                 </div>
-                <div class="flexed column p20 gap5">
-                    <div *ngFor="let field of this.wireframe.steps[activeStepIndex].fields" class="flexed gap5 hcenter">
+                <div class="flex flex-column px-3 pt-1 pb-3">
+                    <div class="flex gap-2 align-items-center relative py-2" [ngClass]="{'opacity-50':draggedField === field}"
+                         *ngFor="let field of wireframe.steps[activeStepIndex].fields; let i = index"
+                         pDraggable="field" dragHandle=".dg" dragEffect="linkMove"
+                         (onDragStart)="dragStart($event, field)" (onDrag)="drag($event, field)" (onDragEnd)="dragEnd($event, field)">
+                        <div class="absolute w-full top-0 z-1" [ngClass]="{'pointer-events-none':!draggedField}" pDroppable="field"
+                             *ngIf="draggedField !== field"
+                             (onDrop)="drop($event, i, 'up')" (onDragEnter)="dragEnter($event, i, 'top')" (onDragLeave)="dragLeave($event, i, 'top')" [style.height]="'50%'"></div>
+                        <span class="mdi-drag_indicator text-4xl text-bluegray-400 mt-4 dg cursor-move"></span>
                         <app-task-template-input [field]="field" [isExample]="true"
                                                              class="stretched"></app-task-template-input>
-                        <app-icon-button (click)="deleteField(field.id)" [style.transform]="'translateY(.5rem)'"
-                                         icon="delete"
-                                         model="danger"></app-icon-button>
+                        <p-button (click)="deleteField(field.id)" styleClass="p-button-text p-button-danger mt-4"
+                                         icon="mdi-delete"></p-button>
+                        <div class="absolute w-full bottom-0 z-1" [ngClass]="{'pointer-events-none':!draggedField}" pDroppable="field"
+                             *ngIf="draggedField !== field"
+                             (onDrop)="drop($event, i, 'down')" (onDragEnter)="dragEnter($event, i, 'bottom')" (onDragLeave)="dragLeave($event, i, 'bottom')" [style.height]="'50%'"></div>
                     </div>
                     <app-button (onClick)="chooseFieldTypeDialogVisible = true" icon="add" label="Добавить поле"
-                                model="p-button-success"></app-button>
+                                model="p-button-success" class="pt-2"></app-button>
                 </div>
             </div>
         </div>
