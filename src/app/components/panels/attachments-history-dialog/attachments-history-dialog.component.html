@@ -1,4 +1,4 @@
-<p-dialog (visibleChange)="showChange.emit($event)" [draggable]="false"
+<p-dialog (visibleChange)="showChange.emit($event)" [draggable]="false" [dismissableMask]="true"
           [(visible)]="show" [modal]="true" [resizable]="false" header="Файлы в задаче">
     <p-tabView>
         <p-tabPanel header="Фото">

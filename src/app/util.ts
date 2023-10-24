@@ -139,6 +139,7 @@ export class Utils {
         return suffixArray[2];
     }
 
+    // todo Для добавления типа поля, нужно добавить сюда2
     static getValueFromModelItem(modelItem: ModelItem) {
         switch (modelItem.wireframeFieldType) {
             case WireframeFieldType.ADDRESS:
@@ -156,6 +157,9 @@ export class Utils {
             case WireframeFieldType.LOGIN:
             case WireframeFieldType.SMALL_TEXT:
             case WireframeFieldType.CONNECTION_TYPE:
+            case WireframeFieldType.AD_SOURCE:
+            case WireframeFieldType.REQUEST_INITIATOR:
+            case WireframeFieldType.COUNTING_LIVES:
                 return modelItem.stringData;
             case WireframeFieldType.CONNECTION_SERVICES:
                 return modelItem.connectionServicesData;
@@ -166,6 +170,7 @@ export class Utils {
         }
     }
 
+    // todo Для добавления типа поля, нужно добавить сюда3
     static setValueToModelItem(fieldItem: ModelItem, formValue: any) {
         switch (fieldItem.wireframeFieldType) {
             case WireframeFieldType.ADDRESS:
@@ -188,6 +193,9 @@ export class Utils {
             case WireframeFieldType.LOGIN:
             case WireframeFieldType.CONNECTION_TYPE:
             case WireframeFieldType.SMALL_TEXT:
+            case WireframeFieldType.AD_SOURCE:
+            case WireframeFieldType.REQUEST_INITIATOR:
+            case WireframeFieldType.COUNTING_LIVES:
                 fieldItem.stringData = formValue;
                 break;
             case WireframeFieldType.CONNECTION_SERVICES:
@@ -252,12 +260,16 @@ export class FormToModelItemConverter {
                 variation: fieldItem.variation
             }
 
+            // todo Для добавления типа поля, нужно добавить сюда4
             switch (fieldItem.type) {
                 case WireframeFieldType.SMALL_TEXT:
                 case WireframeFieldType.LARGE_TEXT:
                 case WireframeFieldType.LOGIN:
                 case WireframeFieldType.IP:
                 case WireframeFieldType.CONNECTION_TYPE:
+                case WireframeFieldType.AD_SOURCE:
+                case WireframeFieldType.REQUEST_INITIATOR:
+                case WireframeFieldType.COUNTING_LIVES:
                     modelItem.stringData = formValue;
                     break;
                 case WireframeFieldType.ADDRESS:

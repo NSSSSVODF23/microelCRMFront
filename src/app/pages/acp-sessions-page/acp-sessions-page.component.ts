@@ -7,6 +7,7 @@ import {ConfirmationService} from "primeng/api";
 import {flowInChild} from "../../animations";
 import {DynamicValueFactory} from "../../util";
 import {CustomValidators} from "../../custom-validators";
+import {RealTimeUpdateService} from "../../services/real-time-update.service";
 
 @Component({
     templateUrl: './acp-sessions-page.component.html',
@@ -64,7 +65,7 @@ export class AcpSessionsPageComponent implements OnInit {
         this.api.getLastBindings.bind(this.api),
         'id',
         null,
-        null,
+        this.rt.acpDhcpBindingUpdated(),
         null
     );
 
@@ -87,7 +88,9 @@ export class AcpSessionsPageComponent implements OnInit {
         }
     ];
 
-    constructor(private api: ApiService, private confirm: ConfirmationService) {
+    numberMask = /^\d{1,4}$/;
+
+    constructor(private api: ApiService, private rt: RealTimeUpdateService, private confirm: ConfirmationService) {
     }
 
     ngOnInit(): void {
@@ -96,7 +99,6 @@ export class AcpSessionsPageComponent implements OnInit {
     trackByDhcpBinding(index: number, binding: DhcpBinding) {
         return binding.macaddr + binding.ipaddr + binding.id + binding.onlineStatus + binding.authExpire + binding.authName;
     };
-
     // Добавить логин
 
     authConfirm(binding: DhcpBinding) {

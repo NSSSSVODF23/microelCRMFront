@@ -1,4 +1,4 @@
-import {AfterViewInit, Component, EventEmitter, forwardRef, OnInit, Output} from '@angular/core';
+import {AfterViewInit, Component, EventEmitter, forwardRef, Input, OnInit, Output} from '@angular/core';
 import {ControlValueAccessor, NG_VALUE_ACCESSOR} from "@angular/forms";
 import {v4} from "uuid";
 import {KeyValue} from "@angular/common";
@@ -19,6 +19,8 @@ export class PhoneListInputComponent implements OnInit, ControlValueAccessor, Af
 
     controlValue: { [key: string]: string; } = {};
     disable = false;
+
+    @Input() inputClasses: {[key:string]:boolean} = {};
 
     @Output() onBlur = new EventEmitter();
 

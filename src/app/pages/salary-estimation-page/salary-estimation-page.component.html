@@ -153,7 +153,8 @@
 </ng-template>
 
 <!--Диалог подтверждения пустого расчета работы-->
-<p-dialog [(visible)]="emptyCalculationConformationDialogVisible" [draggable]="false" [modal]="true" [resizable]="false"
+<p-dialog [(visible)]="emptyCalculationConformationDialogVisible"
+          [dismissableMask]="true" [draggable]="false" [modal]="true" [resizable]="false"
           [style]="{width: '50vw', minWidth: 'fit-content'}"
           header="Отправить пустой расчет?">
     <ng-template pTemplate="content">
@@ -179,7 +180,8 @@
 </p-dialog>
 
 <!--Диалог подтверждения перерасчета работы-->
-<p-dialog [(visible)]="recalculationConformationDialogVisible" [draggable]="false" [modal]="true" [resizable]="false"
+<p-dialog [(visible)]="recalculationConformationDialogVisible"
+          [dismissableMask]="true" [draggable]="false" [modal]="true" [resizable]="false"
           [style]="{width: '50vw', minWidth: 'fit-content'}"
           header="Причина пересчета работ?">
     <ng-template pTemplate="content">

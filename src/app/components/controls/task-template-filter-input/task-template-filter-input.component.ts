@@ -20,6 +20,9 @@ export class TaskTemplateFilterInputComponent implements OnInit, ControlValueAcc
     @Input() field?: FieldItem;
     controlValue: any;
 
+    connectionTypes$ = this.api.getConnectionTypesList();
+    adSources$ = this.api.getAdSourcesList();
+
     constructor(readonly api: ApiService) {
     }
 

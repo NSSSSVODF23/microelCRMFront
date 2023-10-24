@@ -1,4 +1,4 @@
-import {Component, forwardRef, Input, OnInit} from '@angular/core';
+import {Component, ElementRef, forwardRef, Input, OnInit} from '@angular/core';
 import {FieldItem, ModelItem, WireframeFieldType} from "../../../transport-interfaces";
 import {ApiService} from "../../../services/api.service";
 import {ControlValueAccessor, NG_VALUE_ACCESSOR} from "@angular/forms";
@@ -32,8 +32,17 @@ export class TaskTemplateInputComponent implements OnInit, ControlValueAccessor 
     @Input() isExample: boolean = false;
     disable = false;
     connectionTypes$ = this.api.getConnectionTypesList();
+    adSources$ = this.api.getAdSourcesList();
 
-    constructor(readonly api: ApiService) {
+    constructor(readonly api: ApiService, private el: ElementRef) {
+    }
+
+    get classes(){
+        const element: HTMLElement = this.el.nativeElement;
+        return {
+            "ng-dirty": element.classList.contains("ng-touched"),
+            "ng-invalid": element.classList.contains("ng-invalid")
+        }
     }
 
     get type() {
@@ -43,15 +52,31 @@ export class TaskTemplateInputComponent implements OnInit, ControlValueAccessor 
         return '';
     }
 
+    // todo Для добавления типа поля, нужно добавить сюда5
     get currentVariationsList(): VariationItem[] {
         if (!this.field) return [];
         if ('type' in this.field) {
             switch (this.field.type) {
+                case WireframeFieldType.SMALL_TEXT:
+                case WireframeFieldType.LARGE_TEXT:
+                case WireframeFieldType.BOOLEAN:
+                case WireframeFieldType.INTEGER:
+                case WireframeFieldType.FLOAT:
+                case WireframeFieldType.LOGIN:
+                case WireframeFieldType.IP:
+                case WireframeFieldType.CONNECTION_TYPE:
+                case WireframeFieldType.CONNECTION_SERVICES:
+                case WireframeFieldType.EQUIPMENTS:
+                case WireframeFieldType.PHONE_ARRAY:
+                case WireframeFieldType.AD_SOURCE:
+                case WireframeFieldType.REQUEST_INITIATOR:
+                case WireframeFieldType.COUNTING_LIVES:
+                    return [{id: "MANDATORY", name: "Обязательное поле"}, {id: "OPTIONAL", name: "Необязательное поле"}];
                 case WireframeFieldType.ADDRESS:
                     return [{id: "ALL", name: "Все данные"}, {
                         id: "APARTMENT_ONLY",
                         name: "Только номер квартиры"
-                    }, {id: "HOUSE_ONLY", name: "Только номер дома"}];
+                    }, {id: "HOUSE_ONLY", name: "Только номер дома"}, {id: "OPTIONAL", name: "Необязательное поле"}];
                 default:
                     return [];
             }

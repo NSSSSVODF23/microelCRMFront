@@ -37,8 +37,7 @@
                     <input [size]="8" formControlName="login" pInputText placeholder="Логин" type="text"/>
                     <app-acp-house-input formControlName="buildingId"></app-acp-house-input>
                     <input formControlName="ip" pInputText placeholder="IP-адрес" type="text" [pKeyFilter]="ipKeyFilter"/>
-                    <p-inputNumber [max]="4096" [size]="4" formControlName="vlan"
-                                   placeholder="VLAN"></p-inputNumber>
+                    <input pInputText pKeyFilter="pint" [size]="4" formControlName="vlan" placeholder="VLAN">
                     <p-dropdown formControlName="state" placeholder="Статус" [options]="statusOptions"></p-dropdown>
                     <p-autoComplete (completeMethod)="commutatorUplinkQuerySearch.next($event.query)"
                                     (onClear)="lastBindingsFilterForm.controls.commutator.setValue(null)" [showClear]="true"

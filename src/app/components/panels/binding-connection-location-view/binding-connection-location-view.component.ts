@@ -2,6 +2,7 @@ import {Component, Input, OnInit} from '@angular/core';
 import {DhcpBinding} from "../../../transport-interfaces";
 import {BehaviorSubject, debounceTime, tap} from "rxjs";
 import {ApiService} from "../../../services/api.service";
+import {RealTimeUpdateService} from "../../../services/real-time-update.service";
 
 @Component({
   selector: 'app-binding-connection-location-view',
@@ -22,7 +23,8 @@ export class BindingConnectionLocationViewComponent implements OnInit {
   ngOnInit(): void {
   }
 
-  refreshConnectionLocation(vlan?: number) {
+  refreshConnectionLocation(event: Event, vlan?: number) {
+    event.stopPropagation();
     if(vlan){
       this.isLocationRefreshing = true
       this.api.commutatorRemoteUpdateByVlan(vlan).subscribe({

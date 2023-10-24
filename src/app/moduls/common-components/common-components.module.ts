@@ -176,6 +176,13 @@ import {CommutatorViewComponent} from "../../components/panels/commutator-view/c
 import {
     BindingConnectionLocationViewComponent
 } from "../../components/panels/binding-connection-location-view/binding-connection-location-view.component";
+import {
+    EquipmentsFieldFilterComponent
+} from "../../components/controls/equipments-field-filter/equipments-field-filter.component";
+import {KeyFilterModule} from "primeng/keyfilter";
+import {
+    CountingLivesInputComponent
+} from "../../components/controls/counting-lives-input/counting-lives-input.component";
 
 
 @NgModule({
@@ -268,7 +275,9 @@ import {
         CountInputComponent,
         AcpHouseInputComponent,
         CommutatorViewComponent,
-        BindingConnectionLocationViewComponent
+        BindingConnectionLocationViewComponent,
+        EquipmentsFieldFilterComponent,
+        CountingLivesInputComponent
     ],
     exports: [
         AccountPanelComponent,
@@ -359,7 +368,9 @@ import {
         CountInputComponent,
         AcpHouseInputComponent,
         CommutatorViewComponent,
-        BindingConnectionLocationViewComponent
+        BindingConnectionLocationViewComponent,
+        EquipmentsFieldFilterComponent,
+        CountingLivesInputComponent
     ],
     imports: [
         CommonPipesModule,
@@ -408,6 +419,7 @@ import {
         SlideMenuModule,
         DragDropModule,
         ChartModule,
+        KeyFilterModule,
     ],
     providers: [
         {

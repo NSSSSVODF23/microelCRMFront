@@ -3,7 +3,7 @@ import {
     EventEmitter,
     forwardRef,
     Inject, Injector,
-    INJECTOR,
+    INJECTOR, Input,
     OnDestroy,
     OnInit,
     Optional,
@@ -35,6 +35,7 @@ import {map, Subscription} from "rxjs";
 })
 export class IpInputComponent implements ControlValueAccessor, OnInit, OnDestroy {
 
+    @Input() inputClasses: {[key:string]:boolean} = {};
     @Output() onBlur = new EventEmitter();
     control1 = new FormControl(0);
     control2 = new FormControl(0);
@@ -43,13 +44,8 @@ export class IpInputComponent implements ControlValueAccessor, OnInit, OnDestroy
     formGroup = new FormGroup({octets:new FormArray([this.control1, this.control2, this.control3, this.control4])});
     subscription?: Subscription;
     updateValue = "";
-    _ngControl!: NgControl;
 
-    constructor( @Inject(INJECTOR) private injector: Injector) {
-    }
-
-    get isInvalid(){
-        return this._ngControl.status === "INVALID" && this._ngControl.dirty;
+    constructor() {
     }
 
     setDisabledState(isDisabled: boolean) {
@@ -112,7 +108,6 @@ export class IpInputComponent implements ControlValueAccessor, OnInit, OnDestroy
     }
 
     ngOnInit(): void {
-        this._ngControl = this.injector.get(NgControl);
         this.subscription = this.formGroup.valueChanges.pipe(map(value => {
             let octets = value.octets;
             if(octets === undefined) {
@@ -124,7 +119,6 @@ export class IpInputComponent implements ControlValueAccessor, OnInit, OnDestroy
             return octets.join(".")
         })).subscribe(value => {
             this.onChange(value === "0.0.0.0" ? null : value);
-            this.onTouch();
         })
     }
 

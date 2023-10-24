@@ -134,7 +134,8 @@
     </div>
 </div>
 
-<p-dialog [(visible)]="showCreateDepartmentDialog" [modal]="true" [resizable]="false" header="Создание отдела">
+<p-dialog [(visible)]="showCreateDepartmentDialog" [modal]="true" [dismissableMask]="true"
+          [resizable]="false" header="Создание отдела">
     <ng-template pTemplate="content">
         <form [formGroup]="departmentForm" class="flexed column gap5">
             <span class="input-label-wrapper">
@@ -152,7 +153,8 @@
     </ng-template>
 </p-dialog>
 
-<p-dialog [(visible)]="showEditDepartmentDialog" [modal]="true" [resizable]="false" header="Редактирование отдела">
+<p-dialog [(visible)]="showEditDepartmentDialog" [modal]="true" [dismissableMask]="true"
+          [resizable]="false" header="Редактирование отдела">
     <ng-template pTemplate="content">
         <form [formGroup]="departmentForm" class="flexed column gap5">
             <span class="input-label-wrapper">
@@ -170,7 +172,8 @@
     </ng-template>
 </p-dialog>
 
-<p-dialog [(visible)]="showCreatePositionDialog" [modal]="true" [resizable]="false" header="Создание должности">
+<p-dialog [(visible)]="showCreatePositionDialog" [modal]="true" [dismissableMask]="true"
+          [resizable]="false" header="Создание должности">
     <ng-template pTemplate="content">
         <form [formGroup]="positionForm" class="flexed column gap5">
             <span class="input-label-wrapper">
@@ -194,7 +197,8 @@
     </ng-template>
 </p-dialog>
 
-<p-dialog [(visible)]="showEditPositionDialog" [modal]="true" [resizable]="false" header="Редактирование должности">
+<p-dialog [(visible)]="showEditPositionDialog" [modal]="true" [dismissableMask]="true"
+          [resizable]="false" header="Редактирование должности">
     <ng-template pTemplate="content">
         <form [formGroup]="positionForm" class="flexed column gap5">
             <span class="input-label-wrapper">
@@ -218,7 +222,8 @@
     </ng-template>
 </p-dialog>
 
-<p-dialog [(visible)]="showCreateEmployeeDialog" [modal]="true" [resizable]="false" header="Создание сотрудника">
+<p-dialog [(visible)]="showCreateEmployeeDialog" [modal]="true" [dismissableMask]="true"
+          [resizable]="false" header="Создание сотрудника">
     <ng-template pTemplate="content">
         <form [formGroup]="employeeForm" class="flexed column gap5">
             <div class="flexed gap10 hcenter">
@@ -326,7 +331,8 @@
     </ng-template>
 </p-dialog>
 
-<p-dialog [(visible)]="showEditEmployeeDialog" [modal]="true" [resizable]="false" header="Редактирование сотрудника">
+<p-dialog [(visible)]="showEditEmployeeDialog" [modal]="true" [dismissableMask]="true"
+          [resizable]="false" header="Редактирование сотрудника">
     <ng-template pTemplate="content">
         <form [formGroup]="employeeForm" class="flexed column gap5">
             <div class="flexed gap10 hcenter">

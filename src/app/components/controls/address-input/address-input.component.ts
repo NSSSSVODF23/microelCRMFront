@@ -34,6 +34,7 @@ export class AddressInputComponent implements OnInit, ControlValueAccessor, Afte
     @ViewChild('list') list?: ElementRef<HTMLDivElement>;
     @Input() isAcpConnected: boolean|null = null;
     @Input() isHouseOnly = false;
+    @Input() inputClasses: {[key:string]:boolean} = {};
     @Output() onBlur = new EventEmitter<void>();
     value?: Address | null = null;
     subscriptions: SubscriptionsHolder = new SubscriptionsHolder();
@@ -44,9 +45,12 @@ export class AddressInputComponent implements OnInit, ControlValueAccessor, Afte
     selectedSuggestion = -1;
     inputedValue = '';
     disabled = false;
-    _ngControl!: NgControl;
 
-    constructor(readonly api: ApiService, @Inject(INJECTOR) private injector: Injector) {
+    constructor(readonly api: ApiService) {
+    }
+
+    get borderClass(){
+        return {...this.inputClasses, unconfirmed:!this.value, confirmed:this.value}
     }
 
     onChange = (value: Address | null) => {
@@ -56,11 +60,6 @@ export class AddressInputComponent implements OnInit, ControlValueAccessor, Afte
     };
 
     ngOnInit(): void {
-        this._ngControl = this.injector.get(NgControl);
-    }
-
-    get isInvalid(){
-        return this._ngControl.status === "INVALID" && this._ngControl.dirty;
     }
 
     scrollToActiveSuggestion() {

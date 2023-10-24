@@ -78,7 +78,8 @@
     </div>
 </div>
 
-<p-dialog [(visible)]="createDialogVisible" [draggable]="false" [header]="createDialogHeader" [modal]="true"
+<p-dialog [(visible)]="createDialogVisible" [draggable]="false" [dismissableMask]="true"
+          [header]="createDialogHeader" [modal]="true"
           [resizable]="false" [style]="{width:'40rem'}" appendTo="body">
     <ng-template pTemplate="content">
         <div [formGroup]="createForm" [style.margin-top]="'.2rem'" class="grided gap10">

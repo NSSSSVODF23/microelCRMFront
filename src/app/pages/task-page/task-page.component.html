@@ -244,7 +244,7 @@
 <app-attachments-history-dialog [(show)]="showFilesHistory" [taskId]="taskId"></app-attachments-history-dialog>
 
 <!--Диалог назначения монтажников-->
-<p-dialog (onHide)="clearAppointInstallers()" [(visible)]="showAppointInstallersMenu"
+<p-dialog (onHide)="clearAppointInstallers()" [(visible)]="showAppointInstallersMenu" [dismissableMask]="true"
           [breakpoints]="{'960px': '75vw', '640px': '100vw'}" [draggable]="false" [modal]="true" [resizable]="false"
           [style]="{width: '50vw'}" header="Назначение монтажников">
     <div class="flexed column gap10">
@@ -277,7 +277,7 @@
 
 <!--Диалог назначения наблюдателей-->
 <p-dialog [(visible)]="showChangeObserversDialog" [breakpoints]="{'960px': '75vw', '640px': '100vw'}"
-          [draggable]="false" [modal]="true" [resizable]="false"
+          [draggable]="false" [modal]="true" [resizable]="false" [dismissableMask]="true"
           [style]="{width: '50vw'}" header="Изменить ответственных">
     <p-tabView>
         <p-tabPanel header="Отделы">
@@ -309,7 +309,7 @@
 
 <!--Диалог назначения ответственного-->
 <p-dialog [(visible)]="showChangeResponsibleDialog" [breakpoints]="{'960px': '50vw', '640px': '100vw'}"
-          [draggable]="false" [modal]="true" [resizable]="false"
+          [draggable]="false" [modal]="true" [resizable]="false" [dismissableMask]="true"
           [style]="{width: '35rem', height: '50vh'}" header="Изменить ответственного">
     <div class="flexed column gap10 full-height">
         <div class="list-view stretched p5 gap5">
@@ -339,7 +339,7 @@
 
 <!--Диалог просмотра цепочки задач-->
 <p-dialog [(visible)]="showTaskChainDialog" [breakpoints]="{'960px': '75vw', '640px': '100vw'}"
-          [draggable]="false" [maximizable]="true" [modal]="true" [resizable]="false"
+          [draggable]="false" [maximizable]="true" [modal]="true" [resizable]="false" [dismissableMask]="true"
           [style]="{width: '60vw'}" header="Цепочка задач">
     <div [style]="{overflow:'auto',minHeight:'100%'}" appDragScrolling>
         <p-organizationChart [value]="taskChain">
@@ -353,7 +353,7 @@
 
 <!--Диалог редактирования информации в задаче-->
 <p-dialog [(visible)]="isShowEditTaskDialog" [breakpoints]="{'960px': '75vw', '640px': '100vw'}"
-          [draggable]="false" [modal]="true" [resizable]="false"
+          [draggable]="false" [modal]="true" [resizable]="false" [dismissableMask]="true"
           [style]="{width: '50vw', maxHeight: '70vh'}" header="Редактирование информации в задаче">
     <div class="flexed column gap10">
         <div [formGroup]="editTaskForm" class="flexed gap7 column">
@@ -363,7 +363,7 @@
         </div>
         <div class="stretched"></div>
         <div class="flexed vend hcenter sticky bottom0">
-            <app-button (onClick)="doEditTask()" [disabled]="!editTaskForm.valid" [loading]="editBlocked" icon="save"
+            <app-button (onClick)="doEditTask()" [loading]="editBlocked" icon="save"
                         label="Сохранить" model="p-button-success"></app-button>
         </div>
     </div>
@@ -371,7 +371,7 @@
 
 <!--Диалог просмотра истории редактирования информации в задаче-->
 <p-dialog [(visible)]="isShowEditHistoryDialog" [breakpoints]="{'960px': '85vw', '640px': '100vw'}"
-          [draggable]="false" [modal]="true" [resizable]="false"
+          [draggable]="false" [modal]="true" [resizable]="false" [dismissableMask]="true"
           [style]="{width: '75vw', maxHeight: '70vh'}" header="История редактирования задачи">
     <div class="flexed column gap10">
         <div class="flexed hcenter vcenter gap20 p5">
@@ -442,7 +442,7 @@
 </p-dialog>
 
 <!--Диалог для установки даты и времени актуальности задачи-->
-<p-dialog [(visible)]="isShowSchedulingDialog"
+<p-dialog [(visible)]="isShowSchedulingDialog" [dismissableMask]="true"
           [draggable]="false" [modal]="true" [resizable]="false"
           [style]="{maxHeight: '70vh'}" header="Планирование задачи">
     <ng-template pTemplate="content">
@@ -457,7 +457,7 @@
 
 <!--Диалог принудительного закрытия журнала работ-->
 <p-dialog [(visible)]="forceCloseWorkLogDialogVisible" [draggable]="false" [modal]="true" [resizable]="false"
-          [style]="{width: '50vw', minWidth: 'fit-content'}"
+          [style]="{width: '50vw', minWidth: 'fit-content'}" [dismissableMask]="true"
           header="Принудительно закрыть журнал работ?">
     <ng-template pTemplate="content">
         <div class="flexed column gap10">

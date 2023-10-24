@@ -233,7 +233,7 @@
     </div>
 </ng-template>
 
-<p-dialog appendTo="body" header="Создать населенный пункт" [modal]="true" [resizable]="false" [draggable]="false" [(visible)]="createCityVisible">
+<p-dialog appendTo="body" header="Создать населенный пункт" [modal]="true" [resizable]="false" [dismissableMask]="true" [draggable]="false" [(visible)]="createCityVisible">
     <div class="flex flex-column gap-3" [formGroup]="createCityForm">
         <div class="input-label-wrapper">
             <label class="caption size-small wt-bold f-color-500">Название города</label>
@@ -243,7 +243,7 @@
     </div>
 </p-dialog>
 
-<p-dialog appendTo="body" header="Создать улицу" [modal]="true" [resizable]="false" [draggable]="false" [(visible)]="createStreetVisible">
+<p-dialog appendTo="body" header="Создать улицу" [modal]="true" [resizable]="false" [dismissableMask]="true" [draggable]="false" [(visible)]="createStreetVisible">
     <div class="flex flex-column gap-3" [formGroup]="createStreetForm">
         <div class="input-label-wrapper">
             <label class="caption size-small wt-bold f-color-500">Тип</label>
@@ -265,7 +265,7 @@
     </div>
 </p-dialog>
 
-<p-dialog appendTo="body" header="Создать дом" [modal]="true" [resizable]="false" [draggable]="false" [(visible)]="createHouseVisible">
+<p-dialog appendTo="body" header="Создать дом" [modal]="true" [resizable]="false" [draggable]="false" [dismissableMask]="true" [(visible)]="createHouseVisible">
     <div class="flex flex-column gap-3" [formGroup]="createHouseForm">
         <div class="input-label-wrapper">
             <label class="caption size-small wt-bold f-color-500">Номер дома</label>

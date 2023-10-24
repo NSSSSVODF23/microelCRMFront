@@ -649,6 +649,10 @@ export class TaskPageComponent implements OnInit, OnDestroy {
 
     doEditTask() {
         if (!this.currentTask?.modelWireframe) return;
+        if(!this.editTaskForm.valid) {
+            this.editTaskForm.markAllAsTouched();
+            return;
+        }
         this.editBlocked = true;
         this.api.editTask(this._taskId,
             FormToModelItemConverter

@@ -44,6 +44,7 @@ export class TaskCreationPageComponent implements OnInit, OnDestroy {
 
     subscriptions = new SubscriptionsHolder();
     defaultValues: any;
+    initialComment?: string;
 
     constructor(readonly api: ApiService, readonly route: ActivatedRoute, readonly personality: PersonalityService, readonly toast: MessageService, private taskCreation: TaskCreatorService) {
         document.body.classList.add("whited");
@@ -84,7 +85,8 @@ export class TaskCreationPageComponent implements OnInit, OnDestroy {
             wireframeId: this.selectedTemplate.wireframeId,
             childId: this.childId,
             parentId: this.parentId,
-            fields: FormToModelItemConverter.convert(rawValues, this.selectedTemplate)
+            fields: FormToModelItemConverter.convert(rawValues, this.selectedTemplate),
+            initialComment: this.initialComment
         };
     }
 
@@ -144,7 +146,7 @@ export class TaskCreationPageComponent implements OnInit, OnDestroy {
                                     case "адрес": defaultValue = this.defaultValues.address; break;
                                 }
                             }
-                            return {...prev, [field.id]: new FormControl(defaultValue, [CustomValidators.taskInput(field.type, field.variation)])};
+                            return {...prev, [field.id]: new FormControl(defaultValue, CustomValidators.taskInput(field.type, field.variation))};
                         }, {}
                     )
                 )
@@ -167,6 +169,10 @@ export class TaskCreationPageComponent implements OnInit, OnDestroy {
 
     // Изменение этапа создания задачи
     changeCreationStep(shift: number = 0) {
+        if(!this.isValidCurrentStep && shift > 0) {
+            this.currentStepForm.markAllAsTouched();
+            return;
+        }
         // Изменяем индекс этапа создания задачи
         this.currentStep += shift;
     }
@@ -206,6 +212,10 @@ export class TaskCreationPageComponent implements OnInit, OnDestroy {
         // Если this.taskCreationBody равно null, прерываем создание
         if (!this.taskCreationBody) {
             this.toast.add({severity: 'danger', summary: 'Ошибка', detail: 'Не выбран шаблон для создания задачи'});
+            return;
+        }
+        if(!this.taskCreationForm.valid){
+            this.taskCreationForm.markAllAsTouched();
             return;
         }
         // Устанавливаем статус создания задачи

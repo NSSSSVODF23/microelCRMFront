@@ -82,7 +82,7 @@ export class BypassWorkCalculationComponent implements OnInit, OnDestroy {
                     wf.allFields?.reduce((prev, curr) => {
                         return {
                             ...prev,
-                            [curr.id]: new FormControl(null, [CustomValidators.taskInput(curr.type, curr.variation)])
+                            [curr.id]: new FormControl(null, CustomValidators.taskInput(curr.type, curr.variation))
                         }
                     }, {}) ?? new FormGroup({}));
                 this.templateLoadingState = LoadingState.READY

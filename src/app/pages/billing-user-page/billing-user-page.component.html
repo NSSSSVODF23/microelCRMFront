@@ -439,7 +439,7 @@
 
 <p-menu #bindingContextMenu [model]="bindingContextMenuItems" [popup]="true" appendTo="body"></p-menu>
 
-<p-dialog (onShow)="openAuthDialog.next(null)" [(visible)]="isAuthDialogVisible"
+<p-dialog (onShow)="openAuthDialog.next(null)" [(visible)]="isAuthDialogVisible" [dismissableMask]="true"
           [resizable]="false" appendTo="body" header="Авторизация оборудования">
     <ng-template pTemplate="content">
         <ng-container *ngIf="lastBindingsPage$ | async as lastBindingsPage; else loading">
@@ -526,7 +526,7 @@
     </ng-template>
 </p-dialog>
 
-<p-dialog (onHide)="closeHistoryDialog()" (onShow)="getHistory()" [(visible)]="isHistoryDialogVisible"
+<p-dialog (onHide)="closeHistoryDialog()" (onShow)="getHistory()" [(visible)]="isHistoryDialogVisible" [dismissableMask]="true"
           [modal]="true" [resizable]="false" appendTo="body" header="История операций за полгода">
     <ng-template pTemplate="content">
         <div *ngIf="userEventsLoadingState === 'LOADING'" [style]="{width: '20rem', height: '20rem'}"
@@ -629,7 +629,7 @@
     </ng-template>
 </p-dialog>
 
-<p-dialog [(visible)]="isNCLHistoryDialogVisible" [style]="{width:'90rem'}"
+<p-dialog [(visible)]="isNCLHistoryDialogVisible" [style]="{width:'90rem'}" [dismissableMask]="true"
           [modal]="true" [resizable]="false" appendTo="body" header="История локаций подключений">
         <div [style]="nclHistoryLoadingState === 'READY' ? (nclHistoryViewStyle$ | async) : {display:'grid', alignItems:'center'}" class="p-3 border-1 border-bluegray-100 border-round-lg">
             <ng-container *ngIf="nclHistory$ | async as history">
@@ -672,7 +672,7 @@
         </div>
 </p-dialog>
 
-<p-dialog [(visible)]="isPaymentDialogVisible"
+<p-dialog [(visible)]="isPaymentDialogVisible" [dismissableMask]="true"
           [modal]="true" [resizable]="false" appendTo="body" header="Менеджер баланса">
     <ng-template pTemplate="content">
         <div class="flex flex-column gap-4 mt-1">

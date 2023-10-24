@@ -1,6 +1,7 @@
 <div class="flexed gap5 column">
     <div *ngFor="let entry of (controlValue | keyvalue); trackBy: valuesTrack" class="p-inputgroup">
-        <p-inputMask [(ngModel)]="controlValue[entry.key]" (ngModelChange)="controlValue[entry.key]=$event; onChange(controlValue)" [style]="{width:'100%'}" (onBlur)="onBlur.emit()"
+        <p-inputMask [(ngModel)]="controlValue[entry.key]" (ngModelChange)="controlValue[entry.key]=$event; onChange(controlValue)"
+                     [style]="{width:'100%'}" (onBlur)="onBlur.emit()"
                      mask="8 (999) 999-99-99" [disabled]="disable"></p-inputMask>
         <button (click)="removePhone(entry.key)" [disabled]="count<2 || disable" class="p-button-danger"
                 icon="pi pi-trash"

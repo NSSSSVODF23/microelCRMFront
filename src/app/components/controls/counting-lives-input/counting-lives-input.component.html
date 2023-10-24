@@ -1,0 +1,12 @@
+<div class="flex flex-column gap-1" (keyup.enter)="!isLoading && getCalculation()">
+    <div class="flex gap-1" [formGroup]="addressCounterLivesForm">
+        <app-address-input formControlName="address"></app-address-input>
+        <p-inputNumber placeholder="С кв." formControlName="startApart" [useGrouping]="false" [min]="0" [max]="999" [size]="4"></p-inputNumber>
+        <p-inputNumber placeholder="По кв." formControlName="endApart" [useGrouping]="false" [min]="0" [max]="999" [size]="4"></p-inputNumber>
+        <p-button icon="mdi-people" styleClass="p-button-icon" [disabled]="isDisabled" [loading]="isLoading" (onClick)="getCalculation()"></p-button>
+    </div>
+    <textarea (blur)="onTouched(); onBlur.emit()" (ngModelChange)="onChange($event)"
+              [formControl]="control" [autoResize]="true"
+              [disabled]="isDisabled" [ngClass]="inputClasses"
+              [rows]="5" pInputTextarea></textarea>
+</div>

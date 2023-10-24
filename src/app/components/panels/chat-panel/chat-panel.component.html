@@ -1,5 +1,5 @@
 <p-dialog (onHide)="flushMessages()" (onShow)="whenOpenPanel()" [(visible)]="isShow" [contentStyle]="{display:'grid',
-          padding: '0', height: '100%', grid: '1fr min-content / 1fr'}"
+          padding: '0', height: '100%', grid: '1fr min-content / 1fr'}" [dismissableMask]="true"
           [style]="{width:'min-content', height:'50vh', minWidth: '27rem', minHeight: '15rem', maxWidth:'70vw', maxHeight: '90vh'}"
           appendTo="body"
           position="bottom-right">

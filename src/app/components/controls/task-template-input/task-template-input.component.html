@@ -6,6 +6,7 @@
                 (ngModelChange)="onChange($event)"
                 (onBlur)="onTouched()"
                 [(ngModel)]="controlValue"
+                [ngClass]="classes"
                 [options]="[
                     {label:'Да',value:true},
                     {label:'Нет',value:false},
@@ -20,6 +21,7 @@
         <input (blur)="onTouched()"
                (ngModelChange)="onChange($event)"
                [disabled]="disable"
+               [ngClass]="classes"
                [(ngModel)]="controlValue" pInputText>
     </div>
 
@@ -28,20 +30,27 @@
         <textarea (blur)="onTouched()" (ngModelChange)="onChange($event)"
                   [(ngModel)]="controlValue" [autoResize]="true"
                   [disabled]="disable"
+                  [ngClass]="classes"
                   [rows]="7" pInputTextarea></textarea>
+    </div>
+
+    <div *ngSwitchCase="'COUNTING_LIVES'" class="input-label-wrapper">
+        <ng-container *ngTemplateOutlet="label"></ng-container>
+        <app-counting-lives-input (onBlur)="onTouched()" (ngModelChange)="onChange($event)" [inputClasses]="classes"
+                                    [(ngModel)]="controlValue" [disabled]="disable"></app-counting-lives-input>
     </div>
 
     <div *ngSwitchCase="'INTEGER'" class="input-label-wrapper">
         <ng-container *ngTemplateOutlet="label"></ng-container>
         <p-inputNumber (ngModelChange)="onChange($event)" (onBlur)="onTouched()"
-                       [disabled]="disable"
+                       [disabled]="disable" [ngClass]="classes"
                        [(ngModel)]="controlValue"></p-inputNumber>
     </div>
 
     <div *ngSwitchCase="'FLOAT'" class="input-label-wrapper">
         <ng-container *ngTemplateOutlet="label"></ng-container>
         <p-inputNumber (ngModelChange)="onChange($event)" (onBlur)="onTouched()"
-                       [(ngModel)]="controlValue"
+                       [(ngModel)]="controlValue" [ngClass]="classes"
                        [disabled]="disable"
                        [minFractionDigits]="1"></p-inputNumber>
     </div>
@@ -49,58 +58,56 @@
     <div *ngSwitchCase="'ADDRESS'" class="input-label-wrapper">
         <ng-container *ngTemplateOutlet="label"></ng-container>
         <app-address-input (ngModelChange)="onChange($event)" (onBlur)="onTouched()"
-                           [disabled]="disable"
+                           [disabled]="disable" [inputClasses]="classes"
                            [(ngModel)]="controlValue"></app-address-input>
     </div>
 
     <div *ngSwitchCase="'LOGIN'" class="input-label-wrapper">
         <ng-container *ngTemplateOutlet="label"></ng-container>
         <input (blur)="onTouched()" (ngModelChange)="onChange($event)" [(ngModel)]="controlValue"
-               [disabled]="disable"
+               [disabled]="disable" [ngClass]="classes"
                appRegexPatternChecker pInputText patternRx="^[\dA-z_]+$">
     </div>
 
     <div *ngSwitchCase="'AD_SOURCE'" class="input-label-wrapper">
         <ng-container *ngTemplateOutlet="label"></ng-container>
-        <input (blur)="onTouched()" (ngModelChange)="onChange($event)" [(ngModel)]="controlValue"
-               [disabled]="disable"
-               appRegexPatternChecker pInputText patternRx="^[\dA-z_]+$">
+        <p-dropdown (onBlur)="onTouched()" (ngModelChange)="onChange($event)" placeholder="Рекламный источник" appendTo="body" [(ngModel)]="controlValue"
+                    [disabled]="disable" [options]="(adSources$ | async) ?? []" [ngClass]="classes"></p-dropdown>
     </div>
 
     <div *ngSwitchCase="'REQUEST_INITIATOR'" class="input-label-wrapper">
         <ng-container *ngTemplateOutlet="label"></ng-container>
         <input (blur)="onTouched()" (ngModelChange)="onChange($event)" [(ngModel)]="controlValue"
-               [disabled]="disable"
+               [disabled]="disable" [ngClass]="classes"
                appRegexPatternChecker pInputText patternRx="^[\dA-z_]+$">
     </div>
 
     <div *ngSwitchCase="'IP'" class="input-label-wrapper">
         <ng-container *ngTemplateOutlet="label"></ng-container>
-        <app-ip-input (ngModelChange)="onChange($event)" (onBlur)="onTouched()"
-                      [disabled]="disable"
-                      [(ngModel)]="controlValue"></app-ip-input>
+        <app-ip-input (ngModelChange)="onChange($event)" (onBlur)="onTouched()" [inputClasses]="classes"
+                      [disabled]="disable" [(ngModel)]="controlValue"></app-ip-input>
     </div>
 
     <div *ngSwitchCase="'EQUIPMENTS'" class="input-label-wrapper">
         <ng-container *ngTemplateOutlet="label"></ng-container>
         <app-client-equipment-list-input (ngModelChange)="onChange($event)" (onBlur)="onTouched()" [disabled]="disable"
-                                       [(ngModel)]="controlValue"></app-client-equipment-list-input>
+                                       [(ngModel)]="controlValue" [inputClasses]="classes"></app-client-equipment-list-input>
     </div>
 
     <div *ngSwitchCase="'CONNECTION_SERVICES'" class="input-label-wrapper">
         <ng-container *ngTemplateOutlet="label"></ng-container>
         <app-connection-services-input (onBlur)="onTouched()" [isDisabled]="disable" (ngModelChange)="onChange($event)"
-                                       [(ngModel)]="controlValue"></app-connection-services-input>
+                                       [(ngModel)]="controlValue" [inputClasses]="classes"></app-connection-services-input>
     </div>
 
     <div *ngSwitchCase="'CONNECTION_TYPE'" class="input-label-wrapper">
         <ng-container *ngTemplateOutlet="label"></ng-container>
-        <p-dropdown (onBlur)="onTouched()" (ngModelChange)="onChange($event)" placeholder="Выберите" appendTo="body" [(ngModel)]="controlValue"
-                    [disabled]="disable" [options]="(connectionTypes$ | async) ?? []"></p-dropdown>
+        <p-dropdown (onBlur)="onTouched()" (ngModelChange)="onChange($event)" placeholder="Тип подключения" appendTo="body" [(ngModel)]="controlValue"
+                    [disabled]="disable" [options]="(connectionTypes$ | async) ?? []" [ngClass]="classes"></p-dropdown>
     </div>
 
     <div *ngSwitchCase="'PHONE_ARRAY'" class="input-label-wrapper">
-        <fieldset class="node flexed gap5 column">
+        <fieldset class="node flexed gap5 column" [ngClass]="classes">
             <legend>
                 <ng-container *ngTemplateOutlet="label"></ng-container>
             </legend>

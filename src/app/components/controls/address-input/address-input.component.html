@@ -1,7 +1,7 @@
-<span class="p-input-icon-left wrapper">
+<span class="p-input-icon-left wrapper" >
     <i [class]="(value?'mdi-domain active':'mdi-domain_disabled unactive')+' icon'"></i>
     <input #inputEl (blur)="onTouched(); onBlur.emit()" [disabled]="disabled"
-           [ngClass]="{unconfirmed:!value, confirmed:value, 'ng-dirty ng-invalid': isInvalid}" [placeholder]="isHouseOnly ? 'Маркса 33':'Маркса 33 35 п1 э9'" [spellcheck]="false"
+           [ngClass]="borderClass" [placeholder]="isHouseOnly ? 'Маркса 33':'Маркса 33 35 п1 э9'" [spellcheck]="false"
            autocomplete="off" pInputText type="text"/>
 </span>
 <p-overlay #overlay [(visible)]="showSuggestions" [responsive]="{ breakpoint: '640px', contentStyleClass: 'h-20rem' }"

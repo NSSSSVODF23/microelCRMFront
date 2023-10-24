@@ -1,14 +1,14 @@
-<fieldset (blur)="onBlur.emit()" (click)="octOne.focus()" [formGroup]="formGroup"
-          [ngClass]="{'ng-dirty ng-invalid': isInvalid}" [style.cursor]="'text'" class="flex gap-1 p-component p-inputtext p-element">
-    <input #octOne (click)="$event.stopPropagation()" (focus)="octetFocus($event)" (input)="focusNext($event, octTwo)"
+<div  (click)="octOne.focus()" [ngClass]="inputClasses"
+     [formGroup]="formGroup" [style.cursor]="'text'" class="flex gap-1 p-component p-inputtext p-element error-border">
+    <input #octOne (click)="$event.stopPropagation()" (focus)="octetFocus($event)" (blur)="onBlur.emit(); onTouch()" (input)="focusNext($event, octTwo)"
            [formControl]="control1" appAdjustInputWidth [update]="updateValue" class="octet-input text-bluegray-600">
     <span>.</span>
-    <input #octTwo (click)="$event.stopPropagation()" (focus)="octetFocus($event)" (input)="focusNext($event, octThree)"
+    <input #octTwo (click)="$event.stopPropagation()" (focus)="octetFocus($event)" (blur)="onBlur.emit(); onTouch()" (input)="focusNext($event, octThree)"
            [formControl]="control2" appAdjustInputWidth [update]="updateValue" class="octet-input text-bluegray-600">
     <span>.</span>
-    <input #octThree (click)="$event.stopPropagation()" (focus)="octetFocus($event)" (input)="focusNext($event, octFour)"
+    <input #octThree (click)="$event.stopPropagation()" (focus)="octetFocus($event)" (blur)="onBlur.emit(); onTouch()" (input)="focusNext($event, octFour)"
            [formControl]="control3" appAdjustInputWidth [update]="updateValue" class="octet-input text-bluegray-600">
     <span>.</span>
-    <input #octFour (click)="$event.stopPropagation()" (focus)="octetFocus($event)" [formControl]="control4"
+    <input #octFour (click)="$event.stopPropagation()" (focus)="octetFocus($event)" (blur)="onBlur.emit(); onTouch()" [formControl]="control4"
            appAdjustInputWidth [update]="updateValue" class="octet-input text-bluegray-600">
-</fieldset>
+</div>

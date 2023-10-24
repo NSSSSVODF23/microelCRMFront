@@ -9,6 +9,11 @@
             <app-task-template-input *ngFor="let field of currentStepFields" [formControlName]="field.id" [field]="field"
                                      class="stretched"></app-task-template-input>
         </div>
+        <span class="font-semibold text-lg text-bluegray-400 mt-3">Начальный комментарий</span>
+        <div class="flex gap-2">
+            <app-avatar *ngIf="personality.me" [name]="personality.me?.fullName" [src]="personality.me?.avatar" [size]="3"></app-avatar>
+            <textarea pInputTextarea placeholder="Комментарий..." [autoResize]="true" [rows]="5" [(ngModel)]="initialComment" class="flex-grow-1"></textarea>
+        </div>
         <ng-container *ngTemplateOutlet="controls"></ng-container>
     </div>
 </div>
@@ -17,26 +22,26 @@
     <ng-container [ngSwitch]="controlsType()">
         <div *ngSwitchCase="'NEXT_ONLY'" class="flexed">
             <div class="stretched"></div>
-            <app-button (onClick)="changeCreationStep(1)" [disabled]="!isValidCurrentStep" icon="navigate_next"
+            <app-button (onClick)="changeCreationStep(1)" icon="navigate_next"
                         iconPos="right" label="Далее"></app-button>
         </div>
         <div *ngSwitchCase="'BOTH'" class="flexed">
             <app-button (onClick)="changeCreationStep(-1)" icon="navigate_before"
                         label="Назад" model="p-button-text p-button-secondary"></app-button>
             <div class="stretched"></div>
-            <app-button (onClick)="changeCreationStep(1)" [disabled]="!isValidCurrentStep" icon="navigate_next"
+            <app-button (onClick)="changeCreationStep(1)" icon="navigate_next"
                         iconPos="right" label="Далее"></app-button>
         </div>
         <div *ngSwitchCase="'PREV_FIN'" class="flexed">
             <app-button (onClick)="changeCreationStep(-1)" icon="navigate_before"
                         label="Назад" model="p-button-text p-button-secondary"></app-button>
             <div class="stretched"></div>
-            <app-button (onClick)="createTask()" [disabled]="!taskCreationForm.valid" icon="add_circle_outline"
+            <app-button (onClick)="createTask()" icon="add_circle_outline"
                         label="Создать"></app-button>
         </div>
         <div *ngSwitchCase="'FIN_ONLY'" class="flexed">
             <div class="stretched"></div>
-            <app-button (onClick)="createTask()" [disabled]="!taskCreationForm.valid" icon="add_circle_outline"
+            <app-button (onClick)="createTask()" icon="add_circle_outline"
                         label="Создать"></app-button>
         </div>
     </ng-container>

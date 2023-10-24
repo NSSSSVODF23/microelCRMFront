@@ -836,6 +836,18 @@ fieldset.node {
   }
 }
 
+.error-border.ng-dirty.ng-invalid {
+  border-color: #e24c4c !important;
+}
+
+//.error-border.ng-touched.ng-invalid {
+//  border-color: #e24c4c !important;
+//}
+
+fieldset.ng-dirty.ng-invalid {
+  border-color: #e24c4c;
+}
+
 .header {
 
   &300 {

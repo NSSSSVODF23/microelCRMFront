@@ -15,6 +15,7 @@ export enum WireframeFieldType {
     CONNECTION_SERVICES = "CONNECTION_SERVICES",
     CONNECTION_TYPE = "CONNECTION_TYPE",
     PHONE_ARRAY = "PHONE_ARRAY",
+    COUNTING_LIVES = "COUNTING_LIVES",
 }
 
 export interface TaskStage {
@@ -187,6 +188,7 @@ export interface TaskCreationBody {
     fields: ModelItem[];
     childId?: number;
     parentId?: number;
+    initialComment?: string;
 }
 
 export class TimestampItem {

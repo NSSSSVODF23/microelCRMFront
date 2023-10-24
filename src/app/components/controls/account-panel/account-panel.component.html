@@ -10,7 +10,7 @@
 </div>
 
 <p-dialog [(visible)]="avatarChangeDialogVisible" [draggable]="false" [modal]="true" [resizable]="false" appendTo="body"
-          header="Изменить аватар">
+          [dismissableMask]="true" header="Изменить аватар">
     <div class="avatar-change-content">
         <div class="flexed gap10 p5 hcenter vcenter">
             <div class="preview-wrapper">

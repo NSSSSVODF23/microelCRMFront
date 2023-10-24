@@ -835,6 +835,10 @@ export class ApiService {
         return this.sendGet<{ label: string, value: string }[]>('api/private/types/connection-type');
     }
 
+    getAdSourcesList() {
+        return this.sendGet<{ label: string, value: string }[]>('api/private/types/advertising-source');
+    }
+
     getBillingConfiguration() {
         return this.sendGet<BillingConf>('api/private/configuration/billing');
     }
@@ -861,6 +865,10 @@ export class ApiService {
 
     getClientEquipments(query?: string | null, isDeleted?: boolean | null) {
         return this.sendGet<ClientEquipment[]>('api/private/client-equipments', {query, isDeleted});
+    }
+
+    getClientEquipmentsSuggestions(query?: string | null){
+        return this.sendGet<{ label: string, value: string }[]>('api/private/client-equipments/suggestions', {query});
     }
 
     createClientEquipment(clientEquipmentForm: any) {
@@ -983,5 +991,9 @@ export class ApiService {
 
     getCommutatorsByVlan(vlan: number) {
         return this.sendGet<Switch[]>(`api/private/acp/commutators/vlan/${vlan}`);
+    }
+
+    getCountingLivesCalculation(form: {[key:string]: any})  {
+        return this.sendPost<{ result: string }>(`api/private/billing/counting-lives`, form)
     }
 }

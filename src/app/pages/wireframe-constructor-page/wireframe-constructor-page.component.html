@@ -151,7 +151,8 @@
 </div>
 
 <p-menu #stepsContextMenuElem [model]="stepsContextMenu" [popup]="true"></p-menu>
-<p-dialog [(visible)]="chooseFieldTypeDialogVisible" [modal]="true" [style]="{width:'30vw'}" header="Выбор типа данных">
+<p-dialog [(visible)]="chooseFieldTypeDialogVisible" [modal]="true"
+          [dismissableMask]="true" [style]="{width:'30vw'}" header="Выбор типа данных">
     <ng-template pTemplate="content">
         <div class="flexed column p10 gap10">
             <p-dropdown [(ngModel)]="createFieldType" [options]="(fieldTypeOptions | async) ?? []" appendTo="body"

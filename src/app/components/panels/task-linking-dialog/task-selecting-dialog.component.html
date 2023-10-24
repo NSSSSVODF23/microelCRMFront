@@ -1,4 +1,4 @@
-<p-dialog [(visible)]="isShow" [breakpoints]="{'960px': '90vw', '640px': '100vw'}"
+<p-dialog [(visible)]="isShow" [breakpoints]="{'960px': '90vw', '640px': '100vw'}" [dismissableMask]="true"
           [draggable]="false" [modal]="true" [resizable]="false" [contentStyle]="dialogContentStyle"
           [style]="{width: '80vw'}" (onHide)="closeHandler()" [header]="header">
     <ng-template pTemplate="content">

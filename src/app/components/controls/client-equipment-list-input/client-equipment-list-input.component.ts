@@ -1,4 +1,4 @@
-import {Component, EventEmitter, forwardRef, OnDestroy, OnInit, Output, ViewChild} from '@angular/core';
+import {Component, EventEmitter, forwardRef, Input, OnDestroy, OnInit, Output, ViewChild} from '@angular/core';
 import {
     AbstractControl,
     ControlValueAccessor,
@@ -119,6 +119,7 @@ export class ClientEquipmentListInputComponent implements OnInit, OnDestroy, Con
     onTouch = () => {
     }
     isDisabled = false;
+    @Input() inputClasses: {[key:string]:boolean} = {};
     @Output() onBlur = new EventEmitter();
 
     ngOnInit(): void {

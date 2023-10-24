@@ -1,12 +1,12 @@
-<div class="flex flex-column border-1 border-round-md border-bluegray-100 overflow-x-auto bg-white w-fit" (blur)="onBlur.emit()">
+<div class="flex flex-column border-1 border-round-md border-bluegray-100 overflow-x-auto bg-white w-fit error-border" (blur)="onBlur.emit()" [ngClass]="inputClasses">
     <div class="flex flex-column flex-grow-1">
         <div *ngFor="let realization of equipmentsList.controls; let i = index" [formGroup]="realization" class="flex align-items-center gap-2 p-3 split-line">
             <span class="flex-grow-1">{{realization.value.equipment?.name}}</span>
-            <app-count-input formControlName="count" (onZero)="equipmentsList.removeAt(i); onTouch()"></app-count-input>
+            <app-count-input formControlName="count" (onZero)="equipmentsList.removeAt(i); onTouch(); onBlur.emit()"></app-count-input>
         </div>
     </div>
     <div class="flex p-3">
-        <p-button (onClick)="overlayPanel.show($event); onTouch()" label="Добавить оборудование" icon="mdi-add" [disabled]="isDisabled"></p-button>
+        <p-button (onClick)="overlayPanel.show($event); onTouch(); onBlur.emit()" label="Добавить оборудование" icon="mdi-add" [disabled]="isDisabled"></p-button>
     </div>
 </div>
 

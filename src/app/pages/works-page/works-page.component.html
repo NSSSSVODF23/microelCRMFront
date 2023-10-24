@@ -121,7 +121,7 @@
 <p-menu #rootTreeMenu [model]="rootContextMenuItems" [popup]="true"></p-menu>
 <p-menu #inViewContextMenu [model]="inViewContextMenuItems" [popup]="true"></p-menu>
 
-<p-dialog [(visible)]="createGroupDialogVisible"
+<p-dialog [(visible)]="createGroupDialogVisible" [dismissableMask]="true"
           [header]="createGroupDialogMode==='create'? 'Создание группы': 'Изменение группы'" [resizable]="false"
           appendTo="body">
     <ng-template pTemplate="content">
@@ -139,7 +139,7 @@
     </ng-template>
 </p-dialog>
 
-<p-dialog [(visible)]="createWorkDialogVisible"
+<p-dialog [(visible)]="createWorkDialogVisible" [dismissableMask]="true"
           [autoZIndex]="false" [baseZIndex]="4400"
           [header]="createWorkDialogMode==='create'? 'Создание работы': 'Изменение работы'" [resizable]="false">
     <ng-template pTemplate="content">

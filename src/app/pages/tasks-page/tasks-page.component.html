@@ -59,7 +59,8 @@
 </div>
 <p-scrollTop></p-scrollTop>
 
-<p-dialog [(visible)]="filterDialogVisible" [breakpoints]="{'960px': '640px', '640px': '100vw'}" [draggable]="false" [modal]="true"
+<p-dialog [(visible)]="filterDialogVisible" [breakpoints]="{'960px': '640px', '640px': '100vw'}"
+          [dismissableMask]="true" [draggable]="false" [modal]="true"
           [resizable]="false" [style]="{width: '25rem'}" header="Фильтры задач">
     <ng-template pTemplate="content">
         <div class="flexed column gap15">

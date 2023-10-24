@@ -26,6 +26,7 @@ export class ConnectionServicesInputComponent implements OnInit, ControlValueAcc
         mergeMap(query => query ? this.api.getConnectionServicesSuggestionsList(query) : this.api.getConnectionServicesList())
     );
     @Input() isDisabled = false;
+    @Input() inputClasses: {[key:string]:boolean} = {};
     @Output() changeIsDisabled = new EventEmitter<boolean>();
 
     @Output() onBlur = new EventEmitter();

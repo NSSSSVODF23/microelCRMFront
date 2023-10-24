@@ -8,7 +8,7 @@
         {{binding?.macaddr}}
     </span>
     <ng-container [ngSwitch]="isLocationRefreshing">
-        <span (click)="refreshConnectionLocation(binding?.vlanid)" *ngSwitchCase="false" class="mdi-refresh text-sm p-2 cursor-pointer text-primary-400 hover:text-primary"
+        <span (click)="refreshConnectionLocation($event, binding?.vlanid)" *ngSwitchCase="false" class="mdi-refresh text-sm p-2 cursor-pointer text-primary-400 hover:text-primary"
               pTooltip="Обновить"></span>
         <p-progressSpinner *ngSwitchCase="true" class="custom-spinner custom-spinner-primary custom-spinner-sm m-2"
                            strokeWidth="2"></p-progressSpinner>

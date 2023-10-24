@@ -3,7 +3,9 @@ import {DhcpBinding, WireframeFieldType} from "./transport-interfaces";
 
 export class CustomValidators {
 
+    // todo Для добавления типа поля, нужно добавить сюда1
     static taskInput(type: WireframeFieldType, variation?: string) {
+        if(variation === 'OPTIONAL') return null;
         switch (type) {
             case WireframeFieldType.BOOLEAN:
                 return (control: AbstractControl): ValidationErrors | null => {
@@ -11,12 +13,20 @@ export class CustomValidators {
                     if (control.value === true || control.value === false) return null;
                     return {'required': true};
                 }
+            case WireframeFieldType.IP:
+                return (control: AbstractControl): ValidationErrors | null => {
+                    if (CustomValidators.isValueEmpty(control.value)) return {'required': true};
+                    if (control.value === '0.0.0.0') return {'required': true};
+                    return null;
+                }
+            case WireframeFieldType.AD_SOURCE:
             case WireframeFieldType.FLOAT:
             case WireframeFieldType.INTEGER:
-            case WireframeFieldType.IP:
             case WireframeFieldType.LOGIN:
             case WireframeFieldType.LARGE_TEXT:
             case WireframeFieldType.CONNECTION_TYPE:
+            case WireframeFieldType.COUNTING_LIVES:
+            case WireframeFieldType.REQUEST_INITIATOR:
             case WireframeFieldType.SMALL_TEXT:
                 return (control: AbstractControl): ValidationErrors | null => {
                     if (CustomValidators.isValueEmpty(control.value)) return {'required': true};
@@ -31,18 +41,23 @@ export class CustomValidators {
             case WireframeFieldType.EQUIPMENTS:
                 return (control: AbstractControl): ValidationErrors | null => {
                     if (CustomValidators.isValueEmpty(control.value)) return {'required': true};
-                    // if (!Array.isArray(control.value) || control.value.length === 0) return {'required': true};
+                    if (!Array.isArray(control.value) || control.value.length === 0) return {'required': true};
                     return null;
                 }
             case WireframeFieldType.PHONE_ARRAY:
                 return (control: AbstractControl): ValidationErrors | null => {
-                    if (CustomValidators.isValueEmpty(control.value)) return {'required': true};
+                    if (CustomValidators.isValueEmpty(control.value)) {
+                        return {'required': true};
+                    }
+                    if(Array.isArray(control.value) && control.value.length === 0) return {'required': true}
                     if (
                         Object.keys(control.value)
-                            .some(key => !CustomValidators.isValidUUID(key)) &&
+                            .some(key => !CustomValidators.isValidUUID(key)) ||
                         Object.values(control.value)
                             .some(phone => !CustomValidators.isValidPhone(phone))
-                    ) return {'required': true};
+                    ) {
+                        return {'required': true};
+                    }
                     return null;
                 }
             case WireframeFieldType.ADDRESS:
@@ -65,7 +80,7 @@ export class CustomValidators {
                                 CustomValidators.isValueEmpty(address.houseNum)
                             ) return {'required': true};
                             break;
-                        default:
+                        case 'ALL':
                             if (
                                 CustomValidators.isValueEmpty(address.city?.cityId) ||
                                 CustomValidators.isValueEmpty(address.street?.streetId) ||
@@ -74,6 +89,10 @@ export class CustomValidators {
                                 CustomValidators.isValueEmpty(address.floor) ||
                                 CustomValidators.isValueEmpty(address.apartmentNum)
                             ) return {'required': true};
+                            break;
+                        default:
+                            return null;
+
                     }
                     return null;
                 }

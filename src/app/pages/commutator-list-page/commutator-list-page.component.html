@@ -97,7 +97,7 @@
                   styleClass="p-button-text p-button-secondary p-button-icon"></p-button>
     </div>
 </ng-template>
-<p-dialog [(visible)]="commutatorViewDialogVisible"
+<p-dialog [(visible)]="commutatorViewDialogVisible" [dismissableMask]="true"
           [header]="'Коммутатор '+selectedToViewCommutator?.name" [resizable]="false">
     <ng-template pTemplate="content">
         <app-commutator-view [commutator]="selectedToViewCommutator"></app-commutator-view>
@@ -109,7 +109,7 @@
     <span class="text-bluegray-300">Адрес не синхронизирован</span>
 </ng-template>
 
-<p-dialog [(visible)]="commutatorDialogVisible"
+<p-dialog [(visible)]="commutatorDialogVisible" [dismissableMask]="true"
           [header]="editableSwitch ? 'Редактирование коммутатора' : 'Создание коммутатора'"
           [modal]="true" [resizable]="false">
     <ng-template pTemplate="content">
