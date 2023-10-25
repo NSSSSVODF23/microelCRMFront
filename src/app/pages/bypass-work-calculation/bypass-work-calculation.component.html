@@ -80,7 +80,6 @@
                                        placeholder="Сумма" mode="currency" currency="RUB"></p-inputNumber>
                     </div>
                     <p-button (onClick)="createTaskAndCalculate()" [loading]="isSendingCalculation"
-                              [disabled]="!taskInformationForm.valid || !worksPickerForm.valid || !installersReportForm.valid"
                               icon="mdi-currency_exchange" label="Рассчитать"></p-button>
                 </section>
             </div>

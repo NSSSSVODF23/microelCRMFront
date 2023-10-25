@@ -840,6 +840,68 @@ fieldset.node {
   border-color: #e24c4c !important;
 }
 
+p-autocomplete.ng-touched.touched-error.ng-invalid > .p-autocomplete > .p-inputtext {
+  border-color: #e24c4c;
+}
+p-calendar.ng-touched.touched-error.ng-invalid > .p-calendar > .p-inputtext {
+  border-color: #e24c4c;
+}
+p-cascadeselect.ng-touched.touched-error.ng-invalid > .p-cascadeselect {
+  border-color: #e24c4c;
+}
+p-checkbox.ng-touched.touched-error.ng-invalid > .p-checkbox > .p-checkbox-box {
+  border-color: #e24c4c;
+}
+p-chips.ng-touched.touched-error.ng-invalid > .p-chips > .p-inputtext {
+  border-color: #e24c4c;
+}
+p-dropdown.ng-touched.touched-error.ng-invalid > .p-dropdown {
+  border-color: #e24c4c;
+}
+p-inputmask.ng-touched.touched-error.ng-invalid > .p-inputtext {
+  border-color: #e24c4c;
+}
+p-inputnumber.ng-touched.touched-error.ng-invalid > .p-inputnumber > .p-inputtext {
+  border-color: #e24c4c;
+}
+p-inputswitch.ng-touched.touched-error.ng-invalid > .p-inputswitch {
+  border-color: #e24c4c;
+}
+.p-inputtext.ng-touched.touched-error.ng-invalid {
+  border-color: #e24c4c;
+}
+.p-float-label > .ng-invalid.ng-touched.touched-error + label {
+  color: #e24c4c;
+}
+p-listbox.ng-touched.touched-error.ng-invalid > .p-listbox {
+  border-color: #e24c4c;
+}
+p-multiselect.ng-touched.touched-error.ng-invalid > .p-multiselect {
+  border-color: #e24c4c;
+}
+p-password.ng-invalid.ng-touched.touched-error > .p-password > .p-inputtext {
+  border-color: #e24c4c;
+}
+p-radiobutton.ng-touched.touched-error.ng-invalid > .p-radiobutton > .p-radiobutton-box {
+  border-color: #e24c4c;
+}
+p-selectbutton.ng-touched.touched-error.ng-invalid > .p-selectbutton > .p-button {
+  border-color: #e24c4c;
+}
+p-togglebutton.ng-touched.touched-error.ng-invalid > .p-togglebutton.p-button {
+  border-color: #e24c4c;
+}
+p-treeselect.ng-invalid.ng-touched.touched-error > .p-treeselect {
+  border-color: #e24c4c;
+}
+
+p-listbox.ng-touched.ng-invalid > .p-listbox {
+  border-color: #e24c4c !important;
+}
+textarea.ng-touched.ng-invalid{
+  border-color: #e24c4c !important;
+}
+
 //.error-border.ng-touched.ng-invalid {
 //  border-color: #e24c4c !important;
 //}
@@ -1505,6 +1567,16 @@ markdown > p:last-child {
   background-color: var(--bluegray-700);
   color: var(--bluegray-50);
   border: solid 1px var(--bluegray-500);
+  border-radius: .75rem !important;
+  .p-toast-icon-close {
+    color: var(--bluegray-50);
+  }
+}
+
+.p-toast-message-red {
+  background-color: var(--red-500);
+  color: var(--bluegray-50);
+  border: solid 1px var(--red-700);
   border-radius: .75rem !important;
   .p-toast-icon-close {
     color: var(--bluegray-50);

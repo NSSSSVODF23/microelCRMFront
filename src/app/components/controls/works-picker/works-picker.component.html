@@ -11,8 +11,8 @@
         Выполненные работы
     </div>
 
-    <div class="table-wrapper" [ngClass]="{'cover-element': isDisabled}">
-        <p-tabView styleClass="tab-content-unpadding border-1 border-200 border-round-md overflow-hidden">
+    <div class="border-1 border-bluegray-100 border-round-md overflow-hidden" [ngClass]="{'cover-element': isDisabled}">
+        <p-tabView styleClass="tab-content-unpadding">
             <p-tabPanel header="Работы">
                 <p-table [loading]="worksTableLoading" [rowHover]="true" [value]="treeMenuWorksItems"
                          scrollHeight="200px"
@@ -85,8 +85,8 @@
 
     <div (onDragEnter)="dragEnter()" (onDragLeave)="dragLeave()" (onDrop)="dropped()"
          [ngClass]="{'drop-zone': isDragging, 'cover-element': isDisabled}" [pDroppableDisabled]="isDisabled"
-         class="stretched flexed column table-wrapper border-1 border-200 border-round-md overflow-hidden" pDroppable="dd">
-        <p-table [value]="actionsTaken" class="stretched" groupRowsBy="workId" rowGroupMode="rowspan"
+         class="flex-grow-1 flex flex-column border-1 border-bluegray-100 border-round-md overflow-hidden" pDroppable="dd">
+        <p-table [value]="actionsTaken" class="flex-grow-1" groupRowsBy="workId" rowGroupMode="rowspan"
                  sortField="workName" sortMode="single">
             <ng-template pTemplate="header">
                 <tr>

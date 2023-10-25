@@ -7,6 +7,7 @@ import {FormToModelItemConverter, SubscriptionsHolder} from "../../util";
 import {TFactorAction, WorksPickerValue} from "../../components/controls/works-picker/works-picker.component";
 import {CustomValidators} from "../../custom-validators";
 import {InputSwitchOnChangeEvent} from "primeng/inputswitch";
+import {MessageService} from "primeng/api";
 
 @Component({
     templateUrl: './bypass-work-calculation.component.html',
@@ -93,7 +94,7 @@ export class BypassWorkCalculationComponent implements OnInit, OnDestroy {
         })
     );
 
-    constructor(private api: ApiService) {
+    constructor(private api: ApiService, private toast: MessageService) {
     }
 
     worksPickerValidator(control: AbstractControl): ValidationErrors | null {
@@ -123,10 +124,48 @@ export class BypassWorkCalculationComponent implements OnInit, OnDestroy {
 
     createTaskAndCalculate() {
         const employees: Employee[] = <Employee[]>this.installersReportForm.value.installers;
+        this.taskInformationForm.markAllAsTouched();
+        this.worksPickerForm.markAllAsTouched();
+        this.installersReportForm.markAllAsTouched();
+
+        if(this.taskInformationForm.invalid) {
+            this.toast.add({
+                detail: 'Заполните информацию о задаче',
+                severity: 'red',
+                key: 'redtoast',
+                icon: 'mdi-cancel',
+                closable: false
+            });
+            return;
+        }
+
+        if(this.installersReportForm.invalid) {
+            this.toast.add({
+                detail: 'Выберите монтажника и заполните отчет',
+                severity: 'red',
+                key: 'redtoast',
+                icon: 'mdi-cancel',
+                closable: false
+            });
+            return;
+        }
+
+        if(this.worksPickerForm.invalid) {
+            this.toast.add({
+                detail: 'Выберите произведенные монтажниками работы',
+                severity: 'red',
+                key: 'redtoast',
+                icon: 'mdi-cancel',
+                closable: false
+            });
+            return;
+        }
+
         if (!employees
             || !this.worksPickerForm.value?.actionsTaken
             || !this.selectedWireframe ||
             (this.paidWorkForm.value.isPaidWork && (!this.paidWorkForm.value.amountOfMoneyTaken || this.paidWorkForm.value.amountOfMoneyTaken < 1))) return;
+
 
         this.isSendingCalculation = true;
         this.worksPickerForm.disable()

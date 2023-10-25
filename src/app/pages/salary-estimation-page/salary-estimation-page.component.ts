@@ -2,7 +2,7 @@ import {Component, OnDestroy, OnInit} from '@angular/core';
 import {ApiService} from "../../services/api.service";
 import {LoadingState, WorkLog} from "../../transport-interfaces";
 import {ConfirmationService, TreeDragDropService} from "primeng/api";
-import {FormControl, FormGroup} from "@angular/forms";
+import {FormControl, FormGroup, Validators} from "@angular/forms";
 import {SubscriptionsHolder} from "../../util";
 import {RealTimeUpdateService} from "../../services/real-time-update.service";
 import {filter, map, Observable, of, shareReplay, switchMap} from "rxjs";
@@ -94,7 +94,7 @@ export class SalaryEstimationPageComponent implements OnInit, OnDestroy {
 
     paidWorkForm = new FormGroup({
         isPaidWork: new FormControl(false),
-        amountOfMoneyTaken: new FormControl(null)
+        amountOfMoneyTaken: new FormControl(null, [Validators.min(0), Validators.required])
     })
 
     constructor(readonly api: ApiService, private confirmation: ConfirmationService, private rt: RealTimeUpdateService,
@@ -184,7 +184,8 @@ export class SalaryEstimationPageComponent implements OnInit, OnDestroy {
     }
 
     sendCalculation() {
-        if(this.paidWorkForm.value.isPaidWork && (!this.paidWorkForm.value.amountOfMoneyTaken || this.paidWorkForm.value.amountOfMoneyTaken < 1)){
+        this.paidWorkForm.markAllAsTouched();
+        if(this.paidWorkForm.value.isPaidWork && this.paidWorkForm.invalid){
             return;
         }
         if (this.actionsTaken.length === 0) {
@@ -228,7 +229,8 @@ export class SalaryEstimationPageComponent implements OnInit, OnDestroy {
     }
 
     sendRecalculation() {
-        if(this.paidWorkForm.value.isPaidWork && (!this.paidWorkForm.value.amountOfMoneyTaken || this.paidWorkForm.value.amountOfMoneyTaken < 1)){
+        this.paidWorkForm.markAllAsTouched();
+        if(this.paidWorkForm.value.isPaidWork  && this.paidWorkForm.invalid){
             return;
         }
         if (!this.selectedWorkLog) return;
@@ -260,7 +262,7 @@ export class SalaryEstimationPageComponent implements OnInit, OnDestroy {
     }
 
     sendEmptyCalculation() {
-        if(this.paidWorkForm.value.isPaidWork && (!this.paidWorkForm.value.amountOfMoneyTaken || this.paidWorkForm.value.amountOfMoneyTaken < 1)){
+        if(this.paidWorkForm.value.isPaidWork && this.paidWorkForm.invalid){
             return;
         }
         if (!this.selectedWorkLog) return;

@@ -131,6 +131,7 @@
 <ng-template #staticLabel>
     <label>
         {{field?.name}}
+        <span class="text-red-400 text-xs" *ngIf="currentVariation !== 'OPTIONAL'">*</span>
     </label>
 </ng-template>
 
