@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, OnDestroy, OnInit} from '@angular/core';
 import {AbstractControl, FormControl, FormGroup, ValidationErrors, Validators} from "@angular/forms";
 import {ApiService} from "../../services/api.service";
 import {RealTimeUpdateService} from "../../services/real-time-update.service";
@@ -7,8 +7,8 @@ import {
     combineLatest,
     debounceTime,
     delay,
-    distinctUntilChanged, filter,
-    map, merge,
+    map,
+    merge,
     Observable,
     of,
     shareReplay,
@@ -17,9 +17,16 @@ import {
     switchMap,
     tap
 } from "rxjs";
-import {Address, LoadingState, Switch, SwitchModel, SwitchWithAddress} from "../../transport-interfaces";
+import {
+    Address,
+    LoadingState,
+    Switch,
+    SwitchBaseInfo,
+    SwitchModel,
+    SwitchWithAddress
+} from "../../transport-interfaces";
 import {flowInChild} from "../../animations";
-import {DynamicPageContent, DynamicValueFactory} from "../../util";
+import {DynamicPageContent, DynamicValueFactory, SubscriptionsHolder} from "../../util";
 import {ConfirmationService, MenuItem} from "primeng/api";
 
 @Component({
@@ -27,7 +34,7 @@ import {ConfirmationService, MenuItem} from "primeng/api";
     styleUrls: ['./commutator-list-page.component.scss'],
     animations: [flowInChild]
 })
-export class CommutatorListPageComponent implements OnInit {
+export class CommutatorListPageComponent implements OnInit, OnDestroy {
     pageNum = 0;
     commutatorFilterForm = new FormGroup({
         name: new FormControl(null),
@@ -49,18 +56,13 @@ export class CommutatorListPageComponent implements OnInit {
             return [this.pageNum, filter.name, filter.ip, filter.address?.acpHouseBind?.buildingId]
         })
     )
-    updateCommutators$ = merge(this.rt.acpCommutatorUpdated(), this.rt.acpCommutatorStatusUpdated().pipe(
-        map(info=>{
-            return {id: info.externalId, additionalInfo: info} as Switch
-        })
-    ));
-    commutatorPage$:Observable<DynamicPageContent<Switch[]>> = DynamicValueFactory.ofPageAlt(
+    commutatorPage$:Observable<DynamicPageContent<SwitchBaseInfo[]>> = DynamicValueFactory.ofPageAlt(
         this.changePageOrFilters$,
         this.api.getCommutators.bind(this.api),
         'id',
-        this.rt.acpCommutatorCreated(),
-        this.updateCommutators$,
-        this.rt.acpCommutatorDeleted(),
+        this.rt.acpBaseCommutatorCreated(),
+        this.rt.acpBaseCommutatorUpdated(),
+        this.rt.acpBaseCommutatorDeleted(),
     );
 
     commutatorDialogVisible = false;
@@ -85,17 +87,19 @@ export class CommutatorListPageComponent implements OnInit {
     contextMenuItems: MenuItem[] = [];
 
     commutatorViewDialogVisible = false;
+    commutatorInfoLoadingState = LoadingState.LOADING;
     selectedToViewCommutator?: Switch;
+    private subscriptions = new SubscriptionsHolder();
 
-    openContextMenu(commutator: Switch){
+    openContextMenu(commutator: SwitchBaseInfo){
         this.contextMenuItems = [
-            {label: 'Изменить', icon: 'mdi-edit', command: () => this.openEditCommutatorDialog(commutator)},
+            {label: 'Изменить', icon: 'mdi-edit', command: () => this.openEditCommutatorDialog(commutator.id)},
             {label: 'Удалить', styleClass: 'danger-menu-button', icon: 'mdi-delete', command: () => this.confirm.confirm({
                     header: 'Подтверждение',
                     message: 'Вы хотите удалить '+commutator.name+' коммутатор?',
-                    accept: () => this.deleteCommutator(commutator)
+                    accept: () => this.deleteCommutator(commutator.id)
                 })},
-            {label: 'Обновить', icon: 'mdi-sync', command: ()=> this.commutatorRemoteUpdate(commutator)}
+            {label: 'Обновить', icon: 'mdi-sync', command: ()=> this.commutatorRemoteUpdate(commutator.id)}
         ]
     }
 
@@ -186,11 +190,18 @@ export class CommutatorListPageComponent implements OnInit {
         sms: new FormControl(false)
     });
 
-    trackByCommutator(index: number, commutator: Switch) {
-        return commutator.id + commutator.ipaddr + commutator.name + commutator.swtype;
+    trackByCommutator(index: number, commutator: SwitchBaseInfo) {
+        return commutator.id + commutator.ip + commutator.name + commutator.model + commutator.isOnline;
     };
 
     ngOnInit(): void {
+        this.subscriptions.addSubscription('updCom', this.rt.acpCommutatorUpdated().subscribe(commutator=>{
+            if(commutator.id === this.selectedToViewCommutator?.id) this.selectedToViewCommutator = commutator;
+        }));
+    }
+
+    ngOnDestroy() {
+        this.subscriptions.unsubscribeAll();
     }
 
     openCreateCommutatorDialog() {
@@ -210,29 +221,23 @@ export class CommutatorListPageComponent implements OnInit {
         });
     }
 
-    openEditCommutatorDialog(commutator: Switch) {
-        combineLatest(
-            [this.api.getCommutatorModel(commutator.swmodelId),
-                this.api.getBuildingAddress(commutator.buildId),
-                this.api.getCommutator(commutator.phyUplinkId)]
-        ).subscribe(
-            ([swmodel, address, uplink]) => {
-                this.commutatorForm = new FormGroup({
-                    type: new FormControl(commutator.swtype, [Validators.required]),
-                    model: new FormControl(swmodel, [Validators.required]),
-                    name: new FormControl(commutator.name, [Validators.required], [this.commutatorNameValidator]),
-                    ipaddr: new FormControl(commutator.ipaddr, [Validators.required], [this.commutatorIpValidator]),
-                    address: new FormControl(address, [Validators.required]),
-                    entrance: new FormControl(commutator.entrance, [Validators.required]),
-                    floor: new FormControl(commutator.storey, [Validators.required]),
-                    uplink: new FormControl(uplink, [Validators.required]),
-                    nagios: new FormControl(commutator.enableMonitor === 1),
-                    sms: new FormControl(commutator.enableSms === 1)
-                })
-                this.commutatorDialogVisible = true;
-                this.editableSwitch = commutator;
-            }
-        )
+    openEditCommutatorDialog(id:number) {
+        this.api.getCommutatorEditingPreset(id).subscribe((preset) => {
+            this.commutatorForm = new FormGroup({
+                type: new FormControl(preset.targetCommutator.swtype, [Validators.required]),
+                model: new FormControl(preset.model, [Validators.required]),
+                name: new FormControl(preset.targetCommutator.name, [Validators.required], [this.commutatorNameValidator]),
+                ipaddr: new FormControl(preset.targetCommutator.ipaddr, [Validators.required], [this.commutatorIpValidator]),
+                address: new FormControl(preset.address, [Validators.required]),
+                entrance: new FormControl(preset.targetCommutator.entrance, [Validators.required]),
+                floor: new FormControl(preset.targetCommutator.storey, [Validators.required]),
+                uplink: new FormControl(preset.uplinkCommutator, [Validators.required]),
+                nagios: new FormControl(preset.targetCommutator.enableMonitor === 1),
+                sms: new FormControl(preset.targetCommutator.enableSms === 1)
+            })
+            this.commutatorDialogVisible = true;
+            this.editableSwitch = preset.targetCommutator;
+        })
     }
 
     editCommutator() {
@@ -268,16 +273,31 @@ export class CommutatorListPageComponent implements OnInit {
         })
     }
 
-    deleteCommutator(commutator: Switch) {
-        this.api.deleteCommutator(commutator.id).subscribe();
+    deleteCommutator(id: number) {
+        this.api.deleteCommutator(id).subscribe();
     }
 
-    commutatorRemoteUpdate(commutator: Switch) {
-        return this.api.commutatorRemoteUpdate(commutator.id).subscribe();
+    commutatorRemoteUpdate(id: number) {
+        return this.api.commutatorRemoteUpdate(id).subscribe();
     }
 
-    openCommutatorViewDialog(commutator: any) {
-        this.selectedToViewCommutator = commutator;
+    openCommutatorViewDialog(commutator: SwitchBaseInfo) {
+        this.selectedToViewCommutator = undefined;
+        this.commutatorInfoLoadingState = LoadingState.LOADING;
         this.commutatorViewDialogVisible = true;
+        this.api.getCommutator(commutator.id).subscribe({
+            next:(commutator)=>{
+                if(commutator?.commutator?.additionalInfo) {
+                    this.commutatorInfoLoadingState = LoadingState.READY;
+                    this.selectedToViewCommutator = commutator.commutator;
+                }
+                else{
+                    this.commutatorInfoLoadingState = LoadingState.EMPTY;
+                }
+            },
+            error:()=>{
+                this.commutatorInfoLoadingState = LoadingState.ERROR;
+            }
+        })
     }
 }

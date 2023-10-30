@@ -45,7 +45,7 @@ export class BillingUserSearchingService {
                 if (!value.query) return of([] as BillingUserItemData[]);
                 switch (value.mode) {
                     case 'login':
-                        return this.api.getBillingUsersByLogin(value.query, !value.isActive); // todo вставить фильтр по активности
+                        return this.api.getBillingUsersByLogin(value.query, !value.isActive);
                     case 'fio':
                         return this.api.getBillingUsersByFio(value.query, !value.isActive);
                     case 'address':

@@ -77,19 +77,18 @@
     <div class="flex gap-2 split-line p-3 align-items-center">
         <div class="flex flex-column gap-2 flex-grow-1">
             <div class="flex align-items-center gap-2">
-                <span [ngClass]="commutator.additionalInfo?.available ? 'bg-green-400' : 'bg-red-400'"
+                <span [ngClass]="commutator.isOnline ? 'bg-green-400' : 'bg-red-400'"
                       class="border-circle w-1rem h-1rem"></span>
                 <span class="font-bold text-sm">{{commutator.name}}</span>
-                <span [ngClass]="{'text-bluegray-300': commutator.swtype===1, 'text-primary-400': commutator.swtype===2}"
-                      class="text-xs font-bold">{{commutator.swtype === 1 ? 'L2' : 'L3'}}</span>
-                <span class="text-bluegray-400">{{commutator.additionalInfo?.systemInfo?.device}}</span>
+                <span [ngClass]="{'text-bluegray-300': commutator.type===1, 'text-primary-400': commutator.type===2}"
+                      class="text-xs font-bold">{{commutator.type === 1 ? 'L2' : 'L3'}}</span>
             </div>
             <div class="flex gap-2">
-                <span>{{commutator.ipaddr}}</span>
-                <span *ngIf="commutator.address; else noAddress">{{commutator.address?.addressName}}</span>
+                <span>{{commutator.ip}}</span>
+                <span class="text-bluegray-400">{{commutator.model}}</span>
             </div>
         </div>
-        <span *ngIf="commutator.additionalInfo?.isLastUpdateError" [pTooltip]="commutator.additionalInfo?.lastErrorMessage"
+        <span *ngIf="commutator.isHasError" [pTooltip]="commutator.errorMessage"
               class="mdi-warning text-red-400"></span>
         <p-button (onClick)="openCommutatorViewDialog(commutator)" icon="mdi-visibility"
                   styleClass="p-button-text p-button-secondary p-button-icon"></p-button>
@@ -98,9 +97,29 @@
     </div>
 </ng-template>
 <p-dialog [(visible)]="commutatorViewDialogVisible" [dismissableMask]="true"
-          [header]="'Коммутатор '+selectedToViewCommutator?.name" [resizable]="false">
+          [header]="'Коммутатор ' + (selectedToViewCommutator?.name ?? 'загружается')" [resizable]="false">
     <ng-template pTemplate="content">
-        <app-commutator-view [commutator]="selectedToViewCommutator"></app-commutator-view>
+        <ng-container [ngSwitch]="commutatorInfoLoadingState">
+            <app-commutator-view [commutator]="selectedToViewCommutator" *ngSwitchCase="'READY'"></app-commutator-view>
+            <div *ngSwitchCase="'ERROR'">
+                <div class="flex flex-column flex-grow-1 text-red-400 font-bold text-lg align-items-center justify-content-center">
+                    <span class="mds-error"></span>
+                    <span>Ошибка загрузки</span>
+                </div>
+            </div>
+            <div *ngSwitchCase="'EMPTY'">
+                <div class="flex flex-column flex-grow-1 text-bluegray-400 font-bold text-lg align-items-center justify-content-center">
+                    <span class="mds-dns"></span>
+                    <span>Информации о коммутаторе не найденно</span>
+                </div>
+            </div>
+            <div *ngSwitchCase="'LOADING'">
+                <div class="flex flex-grow-1 align-items-center justify-content-center">
+                    <p-progressSpinner class="custom-spinner custom-spinner-gray custom-spinner-8xl"
+                                       strokeWidth="2"></p-progressSpinner>
+                </div>
+            </div>
+        </ng-container>
     </ng-template>
 </p-dialog>
 <p-menu #contextMenu [model]="contextMenuItems" [popup]="true" appendTo="body"></p-menu>

@@ -18,7 +18,7 @@ import {
     PingMonitoring,
     Position, SalaryTable, SalaryTableCell,
     Street,
-    SuperMessage, Switch,
+    SuperMessage, Switch, SwitchBaseInfo,
     Task,
     TaskEvent,
     TaskTag,
@@ -352,6 +352,18 @@ export class RealTimeUpdateService {
 
     acpCommutatorsRemoteUpdatePool(){
         return this.watch<Switch[]>('acp', "commutator", "remote-update-pool")
+    }
+
+    acpBaseCommutatorCreated() {
+        return this.watch<SwitchBaseInfo>('acp', "commutator", "base", "create")
+    }
+
+    acpBaseCommutatorUpdated() {
+        return this.watch<SwitchBaseInfo>('acp', "commutator", "base", "update")
+    }
+
+    acpBaseCommutatorDeleted() {
+        return this.watch<SwitchBaseInfo>('acp', "commutator", "base", "delete");
     }
 
     private watchUnicast<T>(...path: string[]): Observable<T> {

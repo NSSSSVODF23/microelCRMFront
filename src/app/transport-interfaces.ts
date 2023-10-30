@@ -1213,6 +1213,25 @@ export interface Switch {
     additionalInfo?: AcpCommutator;
 }
 
+export interface SwitchBaseInfo {
+    id: number;
+    name: string;
+    ip: string;
+    isOnline: boolean;
+    modelId: number;
+    model: string;
+    type: number;
+    isHasError: boolean;
+    errorMessage: string;
+}
+
+export interface SwitchEditingPreset {
+    targetCommutator: Switch;
+    address: Address;
+    model: SwitchModel;
+    uplinkCommutator: SwitchWithAddress;
+}
+
 export interface AcpCommutator {
     acpCommutatorId: number;
     externalId: number;

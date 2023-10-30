@@ -37,7 +37,7 @@ import {
     Position,
     SalaryTable,
     SuperMessage,
-    Switch, SwitchModel, SwitchWithAddress,
+    Switch, SwitchBaseInfo, SwitchEditingPreset, SwitchModel, SwitchWithAddress,
     Task,
     TaskCreationBody,
     TaskEvent,
@@ -780,11 +780,15 @@ export class ApiService {
     }
 
     getCommutators(page: number, name?: string | null, ip?: string | null, buildingId?: number | null) {
-        return this.sendGet<Page<Switch>>('api/private/acp/commutators/' + page+'/page', {name, ip, buildingId});
+        return this.sendGet<Page<SwitchBaseInfo>>('api/private/acp/commutators/' + page+'/page', {name, ip, buildingId});
     }
 
     getCommutator(swId: number) {
         return this.sendGet<SwitchWithAddress>('api/private/acp/commutator/' + swId);
+    }
+
+    getCommutatorEditingPreset(swId: number) {
+        return this.sendGet<SwitchEditingPreset>('api/private/acp/commutator/' + swId+'/editing-preset');
     }
 
     searchCommutators(query?: string|null) {
