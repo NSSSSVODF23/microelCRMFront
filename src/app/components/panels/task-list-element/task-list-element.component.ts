@@ -53,9 +53,9 @@ export class TaskListElementComponent implements OnInit, OnChanges {
 
     get statusColor() {
         return {
-            'active': this.item?.taskStatus === TaskStatus.ACTIVE,
-            'processing': this.item?.taskStatus === TaskStatus.PROCESSING,
-            'close': this.item?.taskStatus === TaskStatus.CLOSE
+            'text-primary': this.item?.taskStatus === TaskStatus.ACTIVE,
+            'text-orange-400': this.item?.taskStatus === TaskStatus.PROCESSING,
+            'text-bluegray-200': this.item?.taskStatus === TaskStatus.CLOSE
         }
     };
 

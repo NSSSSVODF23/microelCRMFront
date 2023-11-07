@@ -108,7 +108,7 @@ export class EmployeeSumDistributionComponent implements OnInit, OnDestroy, Cont
                 ...prev, [curr.login]: employeeGroup
             }
         }, {}))
-        this.onChange(this.employeeRatioForm.value);
+        setTimeout(()=> this.onChange(this.employeeRatioForm.value))
         this.formSub?.unsubscribe();
         this.formSub = this.employeeRatioForm.valueChanges.subscribe((value) => {
             this.onChange(value);
@@ -139,30 +139,12 @@ export class EmployeeSumDistributionComponent implements OnInit, OnDestroy, Cont
     get factorsActions(): TFactorAction[] {
         return this._factorsActions
     }
-    //
-    // @Input() set factorsActions(factorsActions: TFactorAction[] | null | undefined) {
-    //     if (factorsActions === null || factorsActions === undefined) {
-    //         this._factorsActions = [];
-    //         return;
-    //     }
-    //     this._factorsActions = factorsActions;
-    //     this.recalculateAmountsForEmployees();
-    // }
 
     private _actionsTaken: any[] = [];
 
     get actionsTaken(): any[] {
         return this._actionsTaken
     }
-    //
-    // @Input() set actionsTaken(actionsTaken: any[] | null | undefined) {
-    //     if (actionsTaken === null || actionsTaken === undefined) {
-    //         this._actionsTaken = [];
-    //         return;
-    //     }
-    //     this._actionsTaken = actionsTaken;
-    //     this.recalculateAmountsForEmployees();
-    // }
 
     get totalCostOfWork() {
         return this.actionsTaken.reduce((total, action) => total + action.cost, 0);
@@ -194,7 +176,6 @@ export class EmployeeSumDistributionComponent implements OnInit, OnDestroy, Cont
     };
 
     ngOnInit(): void {
-        // setTimeout(()=>this.onChange(this.employeeRatioForm.value));
         this.employeeRatioForm.valueChanges.subscribe(console.log)
     }
 

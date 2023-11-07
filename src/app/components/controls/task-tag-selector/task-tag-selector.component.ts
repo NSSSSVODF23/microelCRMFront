@@ -53,7 +53,7 @@ export class TaskTagSelectorComponent implements OnInit, OnDestroy, ControlValue
     }
 
     search(event: any) {
-        this.api.getTaskTagsBySearch(event.query).subscribe(tags => {
+        this.api.getTaskTags(event.query).subscribe(tags => {
             this.suggestions = tags.filter(t => !this.control.value?.some(ct => t.taskTagId === ct.taskTagId));
         })
     }

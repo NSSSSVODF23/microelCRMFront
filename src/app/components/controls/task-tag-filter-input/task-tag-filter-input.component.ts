@@ -49,7 +49,7 @@ export class TaskTagFilterInputComponent implements OnInit, OnDestroy, ControlVa
     }
 
     ngOnInit(): void {
-        this.api.getTaskTags(true).subscribe(tags => {
+        this.api.getTaskTags(null,true).subscribe(tags => {
             this.availableTags = tags;
         })
         this.subscription.addSubscription('change', this.control.valueChanges

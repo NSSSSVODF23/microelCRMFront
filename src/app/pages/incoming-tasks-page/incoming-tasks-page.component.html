@@ -1,38 +1,75 @@
 <div appExtendPageHeight class="flexed vcenter">
     <div class="responsive-wrapper flexed gap10">
-    <app-main-menu-panel></app-main-menu-panel>
+        <app-main-menu-panel></app-main-menu-panel>
         <div class="flexed gap10 stretched">
             <ng-container *ngTemplateOutlet="taskList"></ng-container>
-            <ng-container [formGroup]="filtersForm">
+            <div class="flex flex-column gap-3" [formGroup]="ic.filtersForm">
                 <app-task-template-multi-selector formControlName="template"></app-task-template-multi-selector>
-            </ng-container>
+                <div class="shadow-1 p-3 border-round-md flex flex-column bg-white gap-2">
+                    <ng-container *ngIf="ic.stageList$ | async as stages">
+                        <div class="input-label-wrapper" *ngIf="stages.length>1 && ic.isSelectOneTemplate">
+                            <label>Стадия</label>
+                            <p-listbox [options]="stages" formControlName="stage" listStyleClass="max-h-20rem">
+                                <ng-template let-option pTemplate="item">
+                                    <div class="flex align-items-center w-full justify-content-between gap-1">
+                                        <div class="max-w-10rem white-space-nowrap overflow-hidden" appTicker>
+                                            {{option.label}}
+                                        </div>
+                                        <div>
+                                            {{option.tasksCount}}
+                                        </div>
+                                    </div>
+                                </ng-template>
+                            </p-listbox>
+                        </div>
+                    </ng-container>
+                    <div class="input-label-wrapper" *ngIf="ic.tagsList$ | async as tags">
+                        <label>Теги</label>
+                        <p-listbox [options]="tags.value" formControlName="tags" [multiple]="true"
+                                   optionValue="taskTagId" [checkbox]="true" listStyleClass="max-h-20rem">
+                            <ng-template let-option pTemplate="item">
+                                <span class="flex align-items-center w-full justify-content-between gap-1">
+                                    <div [style.color]="option.color" class="max-w-10rem white-space-nowrap overflow-hidden" appTicker>
+                                            {{option.name}}
+                                    </div>
+                                    <ng-container *ngIf="option.tasksCount">
+                                        <app-colored-tag [color]="option.color" [caption]="option.tasksCount"></app-colored-tag>
+                                    </ng-container>
+                                </span>
+                            </ng-template>
+                        </p-listbox>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
 
 <ng-template #taskList>
-    <ng-container [ngSwitch]="status">
-        <div class="flexed column stretched gap10" *ngSwitchCase="'ready'">
-            <app-task-list-element [item]="item" *ngFor="let item of tasks; let i = index; trackBy: taskTrack"></app-task-list-element>
-            <div [style]="{flex:'1', minHeight: '2rem'}"></div>
-            <div class="sticky bottom0">
-                <p-paginator #paginator (onPageChange)="changePage($event)" [alwaysShow]="false"
-                             [rows]="PAGE_SIZE" [showCurrentPageReport]="true"
-                             [totalRecords]="taskPage?.totalElements ?? 0"
-                             currentPageReportTemplate="Показано с {first} по {last} из {totalRecords} задач"
-                             styleClass="panel"></p-paginator>
+    <ng-container *ngIf="ic.taskPage$ | async as taskPage">
+        <ng-container [ngSwitch]="taskPage.loadingState">
+            <div class="flexed column stretched gap10" *ngSwitchCase="'READY'">
+                <app-task-list-element [item]="item" *ngFor="let item of taskPage.value; let i = index; trackBy: taskTrack"></app-task-list-element>
+                <div [style]="{flex:'1', minHeight: '2rem'}"></div>
+                <div class="sticky" [style]="{bottom: '1rem'}">
+                    <p-paginator #paginator (onPageChange)="ic.controlForm.patchValue({page: $event.page})"
+                                 [alwaysShow]="true" [rows]="ic.controlForm.value.filters?.limit ?? 1" [showCurrentPageReport]="true"
+                                 [totalRecords]="taskPage?.totalElements ?? 0" [first]="(ic.controlForm.value.filters?.limit??1)*(ic.controlForm.value.page ?? 0)"
+                                 currentPageReportTemplate="Показано с {first} по {last} из {totalRecords} задач"
+                                 styleClass="panel"></p-paginator>
+                </div>
             </div>
-        </div>
-        <div class="flexed column stretched hcenter vcenter self-center" *ngSwitchCase="'loading'">
-            <p-progressSpinner class="custom-spinner custom-spinner-8xl custom-spinner-primary" strokeWidth="1"></p-progressSpinner>
-        </div>
-        <div class="flexed column stretched hcenter vcenter self-center" *ngSwitchCase="'empty'">
-            <span class="caption size-big wt-bold f-color-500 flexed column hcenter vcenter">
-                <span class="mds-inbox"></span>
-                <span>
-                    Входящих задач нет
+            <div class="flexed column stretched hcenter vcenter self-center" *ngSwitchCase="'LOADING'">
+                <p-progressSpinner class="custom-spinner custom-spinner-8xl custom-spinner-primary" strokeWidth="1"></p-progressSpinner>
+            </div>
+            <div class="flexed column stretched hcenter vcenter self-center" *ngSwitchCase="'EMPTY'">
+                <span class="caption size-big wt-bold f-color-500 flexed column hcenter vcenter">
+                    <span class="mds-inbox"></span>
+                    <span>
+                        Входящих задач нет
+                    </span>
                 </span>
-            </span>
-        </div>
+            </div>
+        </ng-container>
     </ng-container>
 </ng-template>

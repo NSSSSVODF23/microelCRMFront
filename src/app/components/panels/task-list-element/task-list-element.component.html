@@ -14,9 +14,9 @@
         <span class="with-label">
             <span class="label">
                 <i class="mdi-flag"></i>
-                <span>Статус</span>
+                <span>Стадия</span>
             </span>
-            <span [ngClass]="statusColor" class="value status-caption">{{item | taskStatus}}</span>
+            <span [ngClass]="statusColor" class="value">{{item?.currentStage?.label}}</span>
         </span>
         <ng-container *ngIf="item?.actualFrom || item?.actualTo">
             <span *ngIf="item?.actualFrom" class="with-label">
@@ -64,7 +64,9 @@
         </span>
     </div>
     <div class="task-item-footer">
+        <div class="flex-grow-1"></div>
         <app-employee-label [employee]="item?.creator" [inline]="true" class="caption size-tiny wt-bold f-color-500"></app-employee-label>
+        <span [ngClass]="statusColor" class="font-semibold text-xs">{{item | taskStatus}}</span>
         <span class="caption size-tiny wt-bold f-color-500">
             {{item?.created | date:'EEEE, dd MMMM yyyy HH:mm' | titlecase}}
         </span>

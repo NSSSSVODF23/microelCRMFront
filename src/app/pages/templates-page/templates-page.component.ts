@@ -127,7 +127,7 @@ export class TemplatesPageComponent implements OnInit, OnDestroy {
         this.api.getTaskTags().subscribe(this.tagLoadingHandler);
         this.subscription.addSubscription('swDelTag', this.deletedTagsSwitcher.valueChanges.subscribe(value => {
             this.tagLoadingState = LoadingState.LOADING;
-            this.api.getTaskTags(value ?? false).subscribe(this.tagLoadingHandler);
+            this.api.getTaskTags(null,value ?? false).subscribe(this.tagLoadingHandler);
         }));
 
     }

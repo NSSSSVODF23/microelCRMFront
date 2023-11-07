@@ -218,7 +218,7 @@ export interface TaskTag {
     deleted: boolean;
     created?: string;
     creator?: Employee;
-    task?: Task[];
+    tasksCount?: number;
 }
 
 export interface ModelItem {

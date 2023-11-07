@@ -1,6 +1,6 @@
 import {Injectable} from '@angular/core';
 import {HttpClient} from "@angular/common/http";
-import {catchError, map, Observable, share, tap, zip} from "rxjs";
+import {catchError, map, Observable, of, share, tap, zip} from "rxjs";
 import {
     AcpCommutator,
     AcpConf,
@@ -42,7 +42,7 @@ import {
     TaskCreationBody,
     TaskEvent,
     TaskFieldsSnapshot,
-    TaskFiltrationConditions,
+    TaskFiltrationConditions, TaskStage,
     TaskTag,
     TelegramConf,
     TokenChain,
@@ -370,14 +370,11 @@ export class ApiService {
         return this.sendPatch<Task>("api/private/task/" + taskId + "/append-links-to-children", childIds);
     }
 
-    getTaskTags(includingRemote?: boolean) {
+    getTaskTags(queryName?:string | null, includingRemove?: boolean | null) {
         const query: any = {};
-        if (includingRemote !== undefined) query.includingRemote = includingRemote;
+        if (queryName) query.query = queryName;
+        if (includingRemove !== undefined && includingRemove !== null) query.includingRemove = includingRemove;
         return this.sendGet<TaskTag[]>("api/private/task-tags", query);
-    }
-
-    getTaskTagsBySearch(query: string) {
-        return this.sendGet<TaskTag[]>(`api/private/task-tags/${query}`);
     }
 
     createTaskTag(taskTag: TaskTag) {
@@ -508,12 +505,18 @@ export class ApiService {
         return this.sendGet<Chat[]>("api/private/chats/my/active");
     }
 
-    getIncomingTasks(page: number, limit: number, filters: any) {
-        return this.sendGet<Page<Task>>("api/private/tasks/incoming", {
-            page,
-            limit,
-            ...filters
-        });
+    getIncomingTasks(page: number, filters: any) {
+        return this.sendGet<Page<Task>>(`api/private/tasks/incoming/${page}`, Utils.prepareForHttpRequest(filters));
+
+        // return this.sendGet<Page<Task>>("api/private/tasks/incoming", {
+        //     page,
+        //     limit,
+        //     ...filters
+        // });
+    }
+
+    getWireframeStages(wireframeId: number) {
+        return this.sendGet<TaskStage[]>("api/private/wireframe/" + wireframeId + "/stages");
     }
 
     getCountIncomingTasks() {
@@ -524,8 +527,32 @@ export class ApiService {
         return this.sendGet<number>("api/private/tasks/incoming/wireframe/" + wireframeId + "/count", {});
     }
 
+    getCountTasksByWireframeIdByTags(wireframeIds: number[]) {
+        if(wireframeIds.length === 0)
+            return of({} as {[key:string]:number})
+        return this.sendGet<{[key:number]:number}>("api/private/tasks/wireframe/by-tags/count", {wireframeIds});
+    }
+
+    getCountIncomingTasksByWireframeIdByTags(wireframeIds: number[]) {
+        if(wireframeIds.length === 0)
+            return of({} as {[key:string]:number})
+        return this.sendGet<{[key:number]:number}>("api/private/tasks/incoming/wireframe/by-tags/count", {wireframeIds});
+    }
+
     getCountAllTasksByWireframeId(wireframeId: number) {
         return this.sendGet<number>("api/private/tasks/wireframe/" + wireframeId + "/count", {});
+    }
+
+    getCountIncomingTasksByStages(wireframeId: number){
+        if(!wireframeId)
+            return of({} as {[key:string]:number})
+        return this.sendGet<{[key:string]:number}>(`api/private/tasks/incoming/wireframe/${wireframeId}/by-stages/count`, {});
+    }
+
+    getCountTasksByStages(wireframeId: number){
+        if(!wireframeId)
+            return of({} as {[key:string]:number})
+        return this.sendGet<{[key:string]:number}>(`api/private/tasks/wireframe/${wireframeId}/by-stages/count`, {});
     }
 
     getScheduledTask(start: string, end: string) {

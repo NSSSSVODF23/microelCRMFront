@@ -1,4 +1,4 @@
-<div class="template-selector" [ngClass]="{'panel': !inline}">
+<div class="template-selector" [ngClass]="{'shadow-1 p-2 border-round-md flex flex-column bg-white': !inline}">
     <div class="template-selector-title">
         <i class="mdi-checklist"></i>
         <span class="stretched">
@@ -40,19 +40,19 @@
             </div>
         </ng-container>
     </ng-container>
-    <div class="flexed column" *ngIf="deletedTemplates.length">
-        <div class="expand-button" [ngClass]="{closed}" (click)="toggleExpand()">
-            <span class="stretched">
-                Не активные
-            </span>
-            <i class="mdi-expand_more"></i>
-        </div>
-        <div #expandListEl class="expand-list" [style.height]="closed ? '0px' : expandListEl.scrollHeight+'px'">
-            <ng-container *ngFor="let template of deletedTemplates; trackBy: templateTrack">
-                <ng-container *ngTemplateOutlet="templateItem; context:{$implicit:template}"></ng-container>
-            </ng-container>
-        </div>
-    </div>
+<!--    <div class="flexed column" *ngIf="deletedTemplates.length">-->
+<!--        <div class="expand-button" [ngClass]="{closed}" (click)="toggleExpand()">-->
+<!--            <span class="stretched">-->
+<!--                Не активные-->
+<!--            </span>-->
+<!--            <i class="mdi-expand_more"></i>-->
+<!--        </div>-->
+<!--        <div #expandListEl class="expand-list" [style.height]="closed ? '0px' : expandListEl.scrollHeight+'px'">-->
+<!--            <ng-container *ngFor="let template of deletedTemplates; trackBy: templateTrack">-->
+<!--                <ng-container *ngTemplateOutlet="templateItem; context:{$implicit:template}"></ng-container>-->
+<!--            </ng-container>-->
+<!--        </div>-->
+<!--    </div>-->
 </div>
 
 <ng-template #templateItem let-template>
