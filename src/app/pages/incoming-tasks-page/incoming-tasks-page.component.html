@@ -27,6 +27,9 @@
                         <label>Теги</label>
                         <p-listbox [options]="tags.value" formControlName="tags" [multiple]="true"
                                    optionValue="taskTagId" [checkbox]="true" listStyleClass="max-h-20rem">
+                            <ng-template pTemplate="filter">
+                                <input type="text" pInputText placeholder="Поиск" [formControl]="ic.tagsFilterControl">
+                            </ng-template>
                             <ng-template let-option pTemplate="item">
                                 <span class="flex align-items-center w-full justify-content-between gap-1">
                                     <div [style.color]="option.color" class="max-w-10rem white-space-nowrap overflow-hidden" appTicker>

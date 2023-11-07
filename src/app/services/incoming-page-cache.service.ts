@@ -3,6 +3,7 @@ import {FieldItem, LoadingState, Page, Task, TaskTag} from "../transport-interfa
 import {ApiService} from "./api.service";
 import {RealTimeUpdateService} from "./real-time-update.service";
 import {
+    combineLatest,
     debounceTime,
     distinctUntilChanged,
     first,
@@ -101,13 +102,33 @@ export class IncomingPageCacheService {
             }))),
         ) : of([]))
     )
-    tagsList$ = DynamicValueFactory.of(
-        this.tagsLoaderIncoming$,
+    tagsFilterControl = new FormControl("");
+    tagsNameFilter$ = this.tagsFilterControl.valueChanges.pipe(debounceTime(300), distinctUntilChanged());
+    tagsFilters$ = combineLatest([this.tagsNameFilter$.pipe(startWith('')),
+        this.filtersForm.controls.template.valueChanges.pipe(startWith(this.filtersForm.controls.template.value))])
+        .pipe(map(([name, templates])=>[name,false]))
+    tagsList$ = DynamicValueFactory.ofWithFilter(
+        this.tagsFilters$,
+        this.api.getTaskTags.bind(this.api),
         'taskTagId',
         this.rt.taskTagCreated(),
         this.rt.taskTagUpdated(),
         this.rt.taskTagDeleted()
-    ).pipe(shareReplay(1));
+    ).pipe(
+        switchMap(tags=> {
+            return  this.api.getCountIncomingTasksByWireframeIdByTags(this.filtersForm.controls.template.value ?? [])
+                .pipe(
+                    map(tasksCount=>{
+                         tags.value.map(tag=>{
+                            const count = tasksCount[tag.taskTagId];
+                            tag.tasksCount = count ? count : 0;
+                            return tag;
+                        })
+                        return tags;
+                    })
+                )
+        }),
+        shareReplay(1));
     taskPage$ = DynamicValueFactory.ofPage(this.filters$, this.api.getIncomingTasks.bind(this.api), 'taskId', this.rt.taskCreated(), this.rt.taskUpdated(), this.rt.taskDeleted()).pipe(shareReplay(1))
 
     constructor(private api: ApiService, private rt: RealTimeUpdateService) {
