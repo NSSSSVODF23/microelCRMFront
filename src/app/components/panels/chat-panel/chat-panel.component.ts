@@ -14,6 +14,7 @@ import {
 import {debounceTime, tap} from "rxjs";
 import {MessageService} from "primeng/api";
 import {ChatService} from "../../../services/chat.service";
+import {FileInputComponent} from "../../controls/file-input/file-input.component";
 
 const MESSAGE_LIMIT = 25;
 
@@ -47,7 +48,14 @@ export class ChatPanelComponent implements OnInit, OnDestroy, AfterViewInit {
     startButtonVisibleEmitter = new EventEmitter();
     startButtonVisible = true;
     loadingsStubs = Array(5).fill(null);
+
     private subscriptions: SubscriptionsHolder = new SubscriptionsHolder();
+
+    attDialogVisible =false;
+    attDescription: string = "";
+    attRequestBegin = false;
+    attFilesCount = 0;
+    private attMessageId: number|null = null;
 
     constructor(readonly personality: PersonalityService,
                 readonly api: ApiService,
@@ -268,6 +276,17 @@ export class ChatPanelComponent implements OnInit, OnDestroy, AfterViewInit {
                 }
             }
         ];
+        if(message.attachments.length>0){
+            buttons.push({
+                label: 'Прикрепить к задаче',
+                icon: 'mdi-add_link',
+                command: () => {
+                    this.attFilesCount = message.attachments.length;
+                    this.attDialogVisible = true;
+                    this.attMessageId = message.superMessageId;
+                }
+            })
+        }
         if (this.isMy(message.author)) {
             buttons.push({
                     label: 'Редактировать',
@@ -297,6 +316,24 @@ export class ChatPanelComponent implements OnInit, OnDestroy, AfterViewInit {
     clearEditMessage() {
         this.editMessage = undefined;
         this.sendingText = "";
+    }
+
+    sendATT(){
+        if(this.attMessageId) {
+            this.attRequestBegin = true;
+            this.api.attachToTask(this.attMessageId, this.chatId, this.attDescription).subscribe({
+                next: () => this.clearATT(),
+                error: () => this.attRequestBegin = false
+            });
+        }
+    }
+
+    clearATT(){
+        this.attRequestBegin = false;
+        this.attDialogVisible = false;
+        this.attDescription = "";
+        this.attMessageId = null;
+        this.attFilesCount = 0;
     }
 
     private createMessage(message: SuperMessage) {

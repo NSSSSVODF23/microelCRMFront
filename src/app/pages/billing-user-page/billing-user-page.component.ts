@@ -152,6 +152,20 @@ export class BillingUserPageComponent implements OnInit, OnDestroy {
         shareReplay(1)
     );
     dhcpBindings$ = DynamicValueFactory.of(this.dhcpBindingsLoad$, 'id', null, this.rt.acpDhcpBindingUpdated());
+    hardwareEmptyMessage$ = this.dhcpBindings$.pipe(
+        map(bindings => {
+            if(bindings.value.length === 0){
+                return 'Нет абонентского оборудования';
+            }else if(bindings.value.every(b=>!b.isAuth)){
+                return 'Нет авторизованного оборудования';
+            }else{
+                return null;
+            }
+        }),
+    );
+    activeClientHardware$ = this.dhcpBindings$.pipe(
+        map(bindings => bindings.value.find(b=>b.isAuth)),
+    )
     firstVlanOfBindings$ = this.dhcpBindingsLoad$.pipe(
         filter(bindings => bindings && bindings.length > 0),
         map(binds => {

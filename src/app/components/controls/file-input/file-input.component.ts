@@ -84,9 +84,24 @@ export class FileInputComponent implements OnInit, OnDestroy, ControlValueAccess
         this.filesLoaded = 0;
 
         const filesArray = Object.values(this.fileManager.nativeElement.files ?? {});
-        this.filesCatching = filesArray.length + this.files.length;
+        this.loadFiles(filesArray);
+    }
 
-        for (const file of filesArray) {
+    appendFiles(event: ClipboardEvent){
+        if(!event.clipboardData) return;
+        this.loading = true;
+        this.filesCatching += event.clipboardData.files.length;
+        const filesArray = [];
+        for (let i = 0; i < event.clipboardData.files.length; i++) {
+            filesArray.push(event.clipboardData.files[i]);
+        }
+        this.loadFiles(filesArray);
+    }
+
+    private loadFiles(files: File[]) {
+        this.filesCatching = files.length + this.files.length;
+
+        for (const file of files) {
             if (file.size > FILE_SIZE_LIMIT) {
                 this.toast.add({
                     severity: 'warn',

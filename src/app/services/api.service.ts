@@ -1027,4 +1027,8 @@ export class ApiService {
     getCountingLivesCalculation(form: {[key:string]: any})  {
         return this.sendPost<{ result: string }>(`api/private/billing/counting-lives`, form)
     }
+
+    attachToTask(superMessageId: number, chatId: number, description: string) {
+        return this.sendPost(`api/private/chat/${chatId}/message/${superMessageId}/attach-to-task`, {description});
+    }
 }

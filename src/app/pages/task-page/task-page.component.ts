@@ -140,6 +140,7 @@ export class TaskPageComponent implements OnInit, OnDestroy {
     private actualToDurationCounter = new DurationCounter();
     // Возвращает текущее время до actualTo задачи
     actualToTime$ = this.actualToDurationCounter.observer.pipe(map(dur => dur.mode === 'after' ? '-' + dur.actualLabel : dur.actualLabel));
+    @ViewChild('fileInput') fileInput?: FileInputComponent;
 
     constructor(readonly api: ApiService,
                 readonly route: ActivatedRoute,
@@ -947,6 +948,30 @@ export class TaskPageComponent implements OnInit, OnDestroy {
         ];
     }
 
+    quillFormats = [
+        'background',
+        'bold',
+        'color',
+        'font',
+        'code',
+        'italic',
+        'link',
+        'size',
+        'strike',
+        'script',
+        'underline',
+        'blockquote',
+        'header',
+        'indent',
+        'list',
+        'align',
+        'direction',
+        'code-block',
+        'formula'
+        // 'image'
+        // 'video'
+    ];
+
     // Обновляет время в таймерах актуальности задачи
     private updateTaskActualTimers() {
         this.actualFromDurationCounter.setTime(this.currentTask?.actualFrom);
@@ -981,5 +1006,9 @@ export class TaskPageComponent implements OnInit, OnDestroy {
         } else {
             this.confirmation.confirm({header: "Подтверждение", message: "Вы уверены, что хотите удалить срок выполнения?", accept: () => this.api.clearActualToDate(this.taskId).subscribe()});
         }
+    }
+
+    pasteFiles(event: ClipboardEvent) {
+        this.fileInput?.appendFiles(event);
     }
 }

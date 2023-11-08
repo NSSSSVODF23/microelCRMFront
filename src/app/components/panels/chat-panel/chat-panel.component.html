@@ -75,11 +75,11 @@
                 </div>
             </div>
             <div class="input-wrapper">
-                <textarea #messageInput class="borderless-text-field" (keydown)="messageInputKeyDown($event)" [(ngModel)]="sendingText"
+                <textarea #messageInput class="borderless-text-field" (keydown)="messageInputKeyDown($event)" (paste)="fileInput.appendFiles($event)" [(ngModel)]="sendingText"
                           [disabled]="isBeginSending" appTextareaAutoresize placeholder="Сообщение"></textarea>
                 <div class="button-block">
                     <app-emoji-panel (onChoosing)="insertEmoji($event)"></app-emoji-panel>
-                    <app-file-input [(files)]="sendingFiles" [disabled]="isBeginSending || !!editMessage"
+                    <app-file-input #fileInput [(files)]="sendingFiles" [disabled]="isBeginSending || !!editMessage"
                                     [short]="true"></app-file-input>
                     <p-button (onClick)="sendMessage()" [disabled]="isNotReady" [loading]="isBeginSending"
                               icon="mdi-send"
@@ -231,3 +231,14 @@
         </div>
     </div>
 </ng-template>
+
+<p-dialog [header]="'Прикрепить к задаче'" [dismissableMask]="true" [(visible)]="attDialogVisible" [modal]="true"
+          [draggable]="false" appendTo="body" (onHide)="clearATT()" contentStyleClass="flex flex-column gap-2">
+    <ng-template pTemplate="content">
+        <span class="text-lg font-semibold text-bluegray-400">В комментарии к задаче будет прикреплено {{attFilesCount}} файлов</span>
+        <textarea pInputTextarea placeholder="Комментарий к файлам..." [autoResize]="true" [cols]="50" [rows]="4" [(ngModel)]="attDescription"></textarea>
+        <div class="flex gap-3 justify-content-end">
+            <p-button label="Прикрепить" icon="mdi-add_link" (onClick)="sendATT()" [loading]="attRequestBegin"></p-button>
+        </div>
+    </ng-template>
+</p-dialog>

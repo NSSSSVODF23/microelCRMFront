@@ -1,3 +1,4 @@
 <div appExtendPageHeight class="flexed column gap10 hcenter vcenter p10">
-    <app-acp-house-input [formControl]="control"></app-acp-house-input>
+    <app-chat-panel #testchat></app-chat-panel>
+    <button (click)="testchat.show(1)">Open</button>
 </div>

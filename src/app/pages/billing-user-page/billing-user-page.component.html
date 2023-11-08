@@ -114,52 +114,52 @@
 <ng-template #titleTagsTemp>
     <div class="flexed gap5 hcenter">
         <app-colored-tag [caption]="userInfo?.newTarif?.userStatusName" [color]="userInfo?.newTarif?.userStatusColor"></app-colored-tag>
-        <app-colored-tag [caption]="isOnline ? 'Онлайн' : 'Офлайн'"
-                         [color]="isOnline ? 'var(--scs-500)' : 'var(--danger-500)'"></app-colored-tag>
+<!--        <app-colored-tag *ngIf="activeClientHardware$ | async as activeClientHardware" [caption]="activeClientHardware ? 'Онлайн' : 'Офлайн'"-->
+<!--                         [color]="isOnline ? 'var(&#45;&#45;scs-500)' : 'var(&#45;&#45;danger-500)'"></app-colored-tag>-->
         <app-colored-tag *ngIf="hasCredit" caption="Кредит" color="var(--warm-500)"></app-colored-tag>
     </div>
 </ng-template>
 
 <ng-template #mainUserInfoTemp>
-    <div class="flexed column">
-        <span class="caption wt-bold size-big f-color-600">
+    <div class="flex flex-column">
+        <span class="text-lg font-bold text-gray-600">
             Пользователь
         </span>
-        <div class="flexed column gap5 p10">
+        <div class="flex flex-column gap-2 p-3">
             <span>
-                <span class="caption wt-black size-small f-color-500">
+                <span class="text-bluegray-400 text-sm font-bold">
                     Адрес:
                 </span>
-                <span class="caption">
+                <span class="text-bluegray-500">
                     {{userInfo?.ibase?.addr}}
                 </span>
             </span>
             <span>
-                <span class="caption wt-black size-small f-color-500">
+                <span class="text-bluegray-400 text-sm font-bold">
                     ФИО:
                 </span>
-                <span class="caption">
+                <span class="text-bluegray-500">
                     {{userInfo?.ibase?.fio}}
                 </span>
             </span>
             <span>
-                <span class="caption wt-black size-small f-color-500">
+                <span class="text-bluegray-400 text-sm font-bold">
                     Телефон:
                 </span>
-                <span class="caption">
+                <span class="text-bluegray-500">
                     {{userInfo?.ibase?.phone}}
                 </span>
             </span>
             <span>
-                <span class="caption wt-black size-small f-color-500">
+                <span class="text-bluegray-400 text-sm font-bold">
                     Договор заключен:
                 </span>
-                <span class="caption">
+                <span class="text-bluegray-500">
                     {{userInfo?.ibase?.ddog | date: 'EEEE dd MMMM yyyy' | titlecase}}г.
                 </span>
             </span>
             <span *ngIf="userInfo?.ibase?.coment">
-                <span class="caption wt-black size-small f-color-500">
+                <span class="text-bluegray-400 text-sm font-bold">
                     Комментарий:
                 </span>
                 <div class="caption ml-2" [style]="{maxWidth:'30rem'}">
@@ -171,31 +171,53 @@
 </ng-template>
 
 <ng-template #hardwareInfoTemp>
-    <div class="flexed column">
-        <span class="caption wt-bold size-big f-color-600">
+    <div class="flex flex-column" *ngIf="dhcpBindings$ | async">
+        <span class="text-lg font-bold text-gray-600">
             Оборудование
         </span>
-        <div class="flexed column gap5 p10">
+        <span class="flex gap-2 p-3 text-orange-400 font-semibold align-items-center" *ngIf="hardwareEmptyMessage$ | async as hardwareEmptyMessage">
+            <span class="mdi-warning"></span>
             <span>
-                <span class="caption wt-black size-small f-color-500">
-                    IP:
+                {{hardwareEmptyMessage}}
+            </span>
+        </span>
+        <div class="flex flex-column gap-2 p-3" *ngIf="activeClientHardware$ | async as activeClientHardware">
+            <span>
+                <span class="text-bluegray-400 text-sm font-bold">
+                    Статус:
                 </span>
-                <span class="caption">
-                    <span>
-                        {{userInfo?.newTarif?.intIp}}
+                <span class="font-bold" [ngClass]="(activeClientHardware.onlineStatus === 'ONLINE' ? 'text-green-400' : 'text-red-400')">
+                    {{activeClientHardware.onlineStatus === 'ONLINE' ? 'Онлайн' : 'Офлайн'}}
+                </span>
+            </span>
+            <span>
+                <span class="text-bluegray-400 text-sm font-bold">
+                    Оборудование:
+                </span>
+                <span>
+                    <span *ngIf="activeClientHardware.dhcpClient">
+                        {{activeClientHardware.dhcpClient}}
                     </span>
-                    <span [style.color]="isOnline ? 'var(--scs-500)' : 'var(--danger-500)'" class="caption wt-bold">
-                        {{isOnline ? 'Онлайн' : 'Офлайн'}}
+                    <span *ngIf="activeClientHardware.dhcpHostname">
+                        {{activeClientHardware.dhcpHostname}}
                     </span>
                 </span>
             </span>
             <span>
-                <span class="caption wt-black size-small f-color-500">
+                <span class="text-bluegray-400 text-sm font-bold">
+                    IP:
+                </span>
+                <span class="text-bluegray-500">
+                    {{activeClientHardware.ipaddr}}
+                </span>
+            </span>
+            <span>
+                <span class="text-bluegray-400 text-sm font-bold">
                     Активность:
                 </span>
-                <span class="caption">
-                    {{userInfo?.newTarif?.last | date: 'dd MMMM yyyy HH:mm:ss' | titlecase}}
-                    ({{userInfo?.newTarif?.last | elapsedTime:'':' назад':false:true}})
+                <span class="text-bluegray-500">
+                    {{activeClientHardware.leaseStart | date: 'dd MMMM yyyy HH:mm:ss' | titlecase}}
+                    ({{activeClientHardware.leaseStart | elapsedTime:'':' назад':false:true}})
                 </span>
                 <span class="mdi-help_outline caption size-big f-color-300"
                       pTooltip="Момент времени, когда оборудование отправило запрос серверу."></span>
@@ -205,16 +227,16 @@
 </ng-template>
 
 <ng-template #tariffInfoTemp>
-    <div class="flexed column">
-        <span class="caption wt-bold size-big f-color-600">
+    <div class="flex flex-column">
+        <span class="text-lg font-bold text-gray-600">
             Тарифы
         </span>
-        <div class="flexed column gap5 p10">
+        <div class="flex flex-column gap-2 p-3">
             <span>
-                <span class="caption wt-black size-small f-color-500">
+                <span class="text-bluegray-400 text-sm font-bold">
                     Основной:
                 </span>
-                <span class="caption">
+                <span class="text-bluegray-500">
                     <span>
                         {{mainTariff?.service ? mainTariff?.service : 'Нет тарифа'}}
                     </span>
@@ -224,7 +246,7 @@
                 </span>
             </span>
             <span *ngIf="services.length>0" class="flexed gap5 hstart">
-                <span class="caption wt-black size-small f-color-500">
+                <span class="text-bluegray-400 text-sm font-bold">
                     Сервисы:
                 </span>
                 <div class="flexed column gap5">
@@ -239,15 +261,15 @@
                 </div>
             </span>
             <span>
-                <span class="caption wt-black size-small f-color-500">
+                <span class="text-bluegray-400 text-sm font-bold">
                     Общая стоймость:
                 </span>
-                <span class="caption">
+                <span class="text-bluegray-500">
                     {{totalCost}} руб/период
                 </span>
             </span>
             <span class="flexed gap5 hstart">
-                <span class="caption wt-black size-small f-color-500">
+                <span class="text-bluegray-400 text-sm font-bold">
                     Скорость:
                 </span>
                 <div class="flexed column gap5">
@@ -270,32 +292,32 @@
                 </div>
             </span>
             <span *ngIf="userInfo?.newTarif?.hdate">
-                <span class="caption wt-black size-small f-color-500">
+                <span class="text-bluegray-400 text-sm font-bold">
                     Период тарифа:
                 </span>
-                <span class="caption">
+                <span class="text-bluegray-500">
                     {{userInfo?.newTarif?.hdate | date: 'dd MMMM yyyy HH:mm' | titlecase}}
                 </span>
                 -
-                <span class="caption">
+                <span class="text-bluegray-500">
                     {{userInfo?.newTarif?.edate | date: 'dd MMMM yyyy HH:mm' | titlecase}}
                 </span>
                 <span class="mdi-help_outline caption size-big f-color-300"
                       pTooltip="Дата начала и окончания действия основного тарифа. (Дата списания)"></span>
             </span>
             <span *ngIf="isEndTariffDateAfter">
-                <span class="caption wt-black size-small f-color-500">
+                <span class="text-bluegray-400 text-sm font-bold">
                     Списание через:
                 </span>
-                <span class="caption">
+                <span class="text-bluegray-500">
                     {{userInfo?.newTarif?.edate | elapsedTime:'':'':false:true}}
                 </span>
             </span>
             <span *ngIf="userInfo?.newTarif?.endstate">
-                <span class="caption wt-black size-small f-color-500">
+                <span class="text-bluegray-400 text-sm font-bold">
                     Изм. состояния:
                 </span>
-                <span class="caption">
+                <span class="text-bluegray-500">
                     {{userInfo?.newTarif?.endstate | date: 'dd MMMM yyyy HH:mm' | titlecase}}
                 </span>
                 <span class="mdi-help_outline caption size-big f-color-300"

@@ -209,9 +209,9 @@
                             <p-button [disabled]="commentInputForm.disabled" icon="mdi-text_fields"
                                       pTooltip="Расширенный редактор" (onClick)="commentEditorMode = 'extended'"
                                       styleClass="p-button-icon p-button-text"></p-button>
-                            <textarea (keydown)="sendCommentByEnter($event)" [disabled]="isTaskClose()" appTextareaAutoresize class="borderless-text-field stretched"
+                            <textarea (keydown)="sendCommentByEnter($event)" [disabled]="isTaskClose()" (paste)="pasteFiles($event)" appTextareaAutoresize class="borderless-text-field stretched"
                                       formControlName="text" placeholder="Новый комментарий..."></textarea>
-                            <app-file-input *ngIf="!editComment" [short]="true" formControlName="files"></app-file-input>
+                            <app-file-input #fileInput *ngIf="!editComment" [short]="true" formControlName="files"></app-file-input>
                             <p-button (onClick)="sendComment()" [disabled]="commentInputForm.disabled"
                                       icon="mdi-send" styleClass="p-button-icon p-button-text p-button-rounded"></p-button>
                         </div>
@@ -223,15 +223,15 @@
                                       pTooltip="Строка ввода" (onClick)="commentEditorMode = 'simple'; clearCommentText()"
                                       styleClass="p-button-icon p-button-text"></p-button>
                             <div class="stretched"></div>
-                            <app-file-input *ngIf="!editComment" formControlName="files"></app-file-input>
+                            <app-file-input #fileInput *ngIf="!editComment" formControlName="files"></app-file-input>
                             <p-button (onClick)="sendComment()" [disabled]="commentInputForm.disabled"
                                       icon="mdi-send" label="Отправить" styleClass=" p-button-text"></p-button>
                         </span>
                             <quill-editor #commentEditor (keydown)="sendCommentByEnter($event)"
                                           (onContentChanged)="empInsertPanel.setQuillEvent($event)"
-                                          [modules]="quillModules" [disabled]="isTaskClose()"
+                                          [modules]="quillModules" [disabled]="isTaskClose()" [formats]="quillFormats"
                                           [styles]="{maxHeight:'30vh', minHeight:'10rem', overflow:'auto'}"
-                                          class="input" formControlName="text"
+                                          class="input" formControlName="text" (paste)="pasteFiles($event)"
                                           placeholder="Новый комментарий..."></quill-editor>
                         </div>
                     </ng-container>
