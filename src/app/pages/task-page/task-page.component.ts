@@ -12,6 +12,7 @@ import {
     Page,
     Task,
     TaskFieldsSnapshot,
+    TaskJournalSortingTypes,
     TaskStatus,
     TaskTag,
     WorkLog
@@ -19,7 +20,14 @@ import {
 import {FileInputComponent} from "../../components/controls/file-input/file-input.component";
 import {ConfirmationService, MenuItem, MessageService, TreeNode} from "primeng/api";
 import {RealTimeUpdateService} from "../../services/real-time-update.service";
-import {DurationCounter, FormToModelItemConverter, quillDefaultModules, SubscriptionsHolder, Utils} from "../../util";
+import {
+    DurationCounter,
+    FormToModelItemConverter,
+    quillDefaultModules,
+    Storage,
+    SubscriptionsHolder,
+    Utils
+} from "../../util";
 import {fade, fadeIn} from "../../animations";
 import {OverlayPanel} from "primeng/overlaypanel";
 import {FormControl, FormGroup} from "@angular/forms";
@@ -970,6 +978,12 @@ export class TaskPageComponent implements OnInit, OnDestroy {
         'formula'
         // 'image'
         // 'video'
+    ];
+
+    taskJournalSorting = Storage.loadOrDefault("taskJournalSortingType", TaskJournalSortingTypes.CREATE_DATE_DESC);
+    taskJournalSortingOptions = [
+        {label:"Сначала новые", value: TaskJournalSortingTypes.CREATE_DATE_DESC},
+        {label:"Сначала старые", value: TaskJournalSortingTypes.CREATE_DATE_ASC},
     ];
 
     // Обновляет время в таймерах актуальности задачи

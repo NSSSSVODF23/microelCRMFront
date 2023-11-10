@@ -1361,3 +1361,14 @@ export class CacheUnit<T> {
     pageNumber!: number;
     filters: any;
 }
+
+export enum TaskJournalSortingTypes {
+    CREATE_DATE_ASC = "CREATE_DATE_ASC",
+    CREATE_DATE_DESC = "CREATE_DATE_DESC"
+}
+
+export interface WireframeTaskCounter{
+    id: number;
+    num: number;
+    stages: {id:string, num: number}[]
+}

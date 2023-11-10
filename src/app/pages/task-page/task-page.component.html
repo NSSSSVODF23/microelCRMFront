@@ -27,7 +27,7 @@
                                 <div class="flexed bline gap5 caption size-small f-color-500">
                                     <span>Стадия:</span>
                                     <app-tiny-button (onClick)="stageMenu.toggle($event)"
-                                                     [disabled]="!currentTask?.currentStage"
+                                                     [disabled]="!currentTask?.currentStage || currentTask?.taskStatus === 'CLOSE'"
                                                      [label]="currentTask?.currentStage?.label ?? 'не установлена'"
                                                      [size]=".9"
                                                      pTooltip="Изменить" tooltipPosition="bottom"></app-tiny-button>
@@ -161,16 +161,17 @@
                         </div>
                     </div>
                 </div>
-                <div class="panel flexed column gap20 p20" [hidden]="!journalVisible">
-                    <span class="header500 flexed hcenter gap10">
+                <div class="flex flex-column p-4 gap-4 shadow-1 border-round-lg bg-white" [hidden]="!journalVisible">
+                    <span class="text-bluegray-400 text-3xl font-semibold flex gap-3 align-items-center">
                         <span>
                             Комментарии
                         </span>
+                        <p-dropdown [options]="taskJournalSortingOptions" [(ngModel)]="taskJournalSorting"></p-dropdown>
                         <p-toggleButton onLabel="Cобытия" offLabel="Cобытия"
                                         onIcon="mdi-visibility" offIcon="mdi-visibility_off" [(ngModel)]="taskEventsVisible"></p-toggleButton>
                     </span>
                     <app-task-journal (editCommentChange)="editCommentChanged($event)" (onFirstLoad)="journalVisible = $event" [(editComment)]="editComment"
-                                      [(replyComment)]="replyComment" [taskId]="taskId" [showEvents]="taskEventsVisible"
+                                      [(replyComment)]="replyComment" [taskId]="taskId" [showEvents]="taskEventsVisible" [sortingType]="taskJournalSorting"
                                       class="indent1"></app-task-journal>
                 </div>
             </div>

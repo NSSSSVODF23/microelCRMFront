@@ -5,17 +5,18 @@ import {RealTimeUpdateService} from "./real-time-update.service";
 import {
     combineLatest,
     debounceTime,
-    distinctUntilChanged,
+    distinctUntilChanged, filter,
     first,
     flatMap,
-    map, mergeMap,
+    map, mergeMap, Observable,
     Observer, of,
     shareReplay,
     startWith,
     switchMap, tap
 } from "rxjs";
 import {FormControl, FormGroup} from "@angular/forms";
-import {DynamicContent, DynamicValueFactory, Storage} from "../util";
+import {DynamicContent, DynamicPageContent, DynamicValueFactory, Storage} from "../util";
+import {PersonalityService} from "./personality.service";
 
 
 @Injectable({
@@ -35,6 +36,18 @@ export class IncomingPageCacheService {
     });
 
     filters$ = this.controlForm.valueChanges.pipe(startWith(this.controlForm.value),map(form=>Object.values(form)), shareReplay(1));
+
+    stageList:{
+        label: string,
+        value: string | null,
+        orderIndex: number,
+        tasksCount: number
+    }[] = [];
+    tagsList: TaskTag[] = [];
+
+    get tagsListNames(){
+        return this.tagsList.map(tag=>tag.name)
+    }
 
     stageList$ = this.filtersForm.controls.template.valueChanges.pipe(
         startWith(this.filtersForm.controls.template.value),
@@ -78,30 +91,7 @@ export class IncomingPageCacheService {
         }),
         shareReplay(1)
     )
-    tagsLoaderIncoming$ = this.filtersForm.controls.template.valueChanges.pipe(
-        startWith(this.filtersForm.controls.template.value),
-        mergeMap((templates)=>templates ? this.api.getCountIncomingTasksByWireframeIdByTags(templates).pipe(
-            switchMap(tasksCount=>this.api.getTaskTags(null, true).pipe(map(tags=>{
-                return tags.map(tag=>{
-                    const count = tasksCount[tag.taskTagId];
-                    tag.tasksCount = count ? count : 0;
-                    return tag;
-                })
-            }))),
-        ) : of([]))
-    )
-    tagsLoader$ = this.filtersForm.controls.template.valueChanges.pipe(
-        startWith(this.filtersForm.controls.template.value),
-        mergeMap((templates)=>templates ? this.api.getCountTasksByWireframeIdByTags(templates).pipe(
-            switchMap(tasksCount=>this.api.getTaskTags(null, true).pipe(map(tags=>{
-                return tags.map(tag=>{
-                    const count = tasksCount[tag.taskTagId];
-                    tag.tasksCount = count ? count : 0;
-                    return tag;
-                })
-            }))),
-        ) : of([]))
-    )
+
     tagsFilterControl = new FormControl("");
     tagsNameFilter$ = this.tagsFilterControl.valueChanges.pipe(debounceTime(300), distinctUntilChanged());
     tagsFilters$ = combineLatest([this.tagsNameFilter$.pipe(startWith('')),
@@ -116,6 +106,7 @@ export class IncomingPageCacheService {
         this.rt.taskTagDeleted()
     ).pipe(
         switchMap(tags=> {
+            console.log(tags)
             return  this.api.getCountIncomingTasksByWireframeIdByTags(this.filtersForm.controls.template.value ?? [])
                 .pipe(
                     map(tasksCount=>{
@@ -127,12 +118,49 @@ export class IncomingPageCacheService {
                         return tags;
                     })
                 )
-        }),
-        shareReplay(1));
-    taskPage$ = DynamicValueFactory.ofPage(this.filters$, this.api.getIncomingTasks.bind(this.api), 'taskId', this.rt.taskCreated(), this.rt.taskUpdated(), this.rt.taskDeleted()).pipe(shareReplay(1))
+        })
+    );
 
-    constructor(private api: ApiService, private rt: RealTimeUpdateService) {
+
+    taskPage$ = DynamicValueFactory.ofPageAltAll(this.filters$,
+        this.api.getIncomingTasks.bind(this.api), 'taskId',
+        [this.rt.taskCreated(),
+            this.rt.taskUpdated(),
+            this.rt.taskDeleted()]
+    ).pipe(shareReplay(1))
+
+    constructor(private api: ApiService, private rt: RealTimeUpdateService, private personality: PersonalityService) {
         this.filters$.subscribe(console.log)
+        this.stageList$.subscribe(s=>this.stageList = [...s]);
+        this.tagsList$.subscribe(s=>this.tagsList = [...s.value]);
+        this.personality.userData.pipe(first()).subscribe(userData=>{
+            this.rt.incomingTaskCountChange(userData.login)
+                .pipe(filter((counter)=>(this.isSelectOneTemplate && counter.id === this.firstWireframeId)))
+                .subscribe(counter=>{
+                    this.stageList.forEach(stage=>{
+                        const find = counter.stages.find(s=>stage.value === s.id);
+                        if(find) stage.tasksCount = find.num;
+                        else stage.tasksCount = 0;
+                    })
+                    const allCounter = this.stageList.find(s=>s.value === null);
+                    if(allCounter) allCounter.tasksCount = counter.stages.reduce((prev,curr)=>prev+curr.num,0);
+                });
+            this.rt.incomingTagTaskCountChange(userData.login)
+                .subscribe(counter=>{
+                    this.tagsList.forEach(tag=>{
+                        const wireframeMap = counter[tag.taskTagId];
+                        if(wireframeMap){
+                            let wfCount = 0;
+                            this.filtersForm.value.template?.forEach(wfid=>{
+                               if(wireframeMap[wfid]) wfCount += wireframeMap[wfid];
+                            });
+                            tag.tasksCount = wfCount;
+                        }else{
+                            tag.tasksCount = 0;
+                        }
+                    })
+                })
+        })
     }
 
     get isSelectOneTemplate(): boolean {

@@ -1,10 +1,17 @@
 import {Component, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, SimpleChanges} from '@angular/core';
 import {ApiService} from "../../../services/api.service";
-import {Attachment, Comment, Employee, TaskEvent, TaskEventType} from "../../../transport-interfaces";
+import {
+    Attachment,
+    Comment,
+    Employee,
+    TaskEvent,
+    TaskEventType,
+    TaskJournalSortingTypes
+} from "../../../transport-interfaces";
 import {PersonalityService} from "../../../services/personality.service";
 import {ConfirmationService} from "primeng/api";
 import {RealTimeUpdateService} from "../../../services/real-time-update.service";
-import {SubscriptionsHolder} from "../../../util";
+import {Storage, SubscriptionsHolder} from "../../../util";
 import {fade} from "../../../animations";
 
 @Component({
@@ -28,6 +35,7 @@ export class TaskJournalComponent implements OnInit, OnDestroy{
     @Output() onFirstLoad: EventEmitter<boolean> = new EventEmitter();
 
     entries: (Comment | TaskEvent)[] = [];
+    journalIsFullyLoaded = false;
     get displayedEntries(): (Comment | TaskEvent)[]{
         if(this.showEvents) {
             return this.entries;
@@ -41,7 +49,20 @@ export class TaskJournalComponent implements OnInit, OnDestroy{
 
     @Input() showEvents = true;
 
-    counters = []
+    _sortingType = Storage.loadOrDefault("taskJournalSortingType", TaskJournalSortingTypes.CREATE_DATE_DESC);
+
+    @Input() set sortingType(value: TaskJournalSortingTypes) {
+        if(value !== this._sortingType){
+            this._sortingType = value;
+            Storage.save("taskJournalSortingType", value);
+            this.clearEntries();
+            this.loadComments();
+        }
+    }
+
+    get sortingType(): TaskJournalSortingTypes {
+        return this._sortingType;
+    }
 
     constructor(readonly api: ApiService, readonly personality: PersonalityService, readonly confirmation: ConfirmationService, readonly rt: RealTimeUpdateService) {
 
@@ -78,9 +99,20 @@ export class TaskJournalComponent implements OnInit, OnDestroy{
         if (!this.entries.some(entry =>
             "commentId" in entry ? entry.commentId === comment.commentId : false
         )) {
-            this.entries.unshift(comment);
-            this.totalEntries++;
-            this.onFirstLoad.emit(true);
+            switch (this.sortingType) {
+                case TaskJournalSortingTypes.CREATE_DATE_DESC:
+                    this.entries.unshift(comment);
+                    this.totalEntries++;
+                    this.onFirstLoad.emit(true);
+                    break;
+                case TaskJournalSortingTypes.CREATE_DATE_ASC:
+                    if(this.journalIsFullyLoaded){
+                        this.entries.push(comment);
+                        this.totalEntries++;
+                        this.onFirstLoad.emit(true);
+                    }
+                    break;
+            }
         }
     }
 
@@ -105,8 +137,18 @@ export class TaskJournalComponent implements OnInit, OnDestroy{
         if (!this.entries.some(entry =>
             "taskEventId" in entry ? entry.taskEventId === event.taskEventId : false
         )) {
-            this.entries.unshift(event);
-            this.onFirstLoad.emit(true);
+            switch (this.sortingType) {
+                case TaskJournalSortingTypes.CREATE_DATE_DESC:
+                    this.entries.unshift(event);
+                    this.onFirstLoad.emit(true);
+                    break;
+                case TaskJournalSortingTypes.CREATE_DATE_ASC:
+                    if(this.journalIsFullyLoaded){
+                        this.entries.push(event);
+                        this.onFirstLoad.emit(true);
+                    }
+                    break;
+            }
         }
     }
 
@@ -120,22 +162,28 @@ export class TaskJournalComponent implements OnInit, OnDestroy{
     loadComments() {
         if (!this._taskId) return
         const commentsCount = this.entries.filter(ent => 'commentId' in ent).length
-        if (commentsCount < this.totalEntries)
-            this.api.getTaskJournal(this._taskId, commentsCount, 10).subscribe(page => {
-                if (this.entries.length === 0) this.totalEntries = page.totalElements;
+        if (commentsCount < this.totalEntries) {
+            this.api.getTaskJournal(this._taskId, commentsCount, 10, this._sortingType).subscribe(page => {
+                if (this.entries.length === 0) {
+                    this.totalEntries = page.totalElements;
+                }
                 this.entries = [...this.entries, ...page.content];
                 this.loading = false;
             })
-        else if (this.firstLoad)
-            this.api.getTaskJournal(this._taskId, 0, 10).subscribe(page => {
+        } else if (this.firstLoad) {
+            this.api.getTaskJournal(this._taskId, 0, 10, this._sortingType).subscribe(page => {
                 this.totalEntries = page.totalElements;
                 this.entries = page.content;
                 this.loading = false;
                 this.firstLoad = false;
                 this.onFirstLoad.emit(this.totalEntries > 0 || page.content.length > 0);
             })
-        else
-            this.loading = false;
+        } else {
+            setTimeout(()=>{
+                this.loading = false;
+                this.journalIsFullyLoaded = true;
+            });
+        }
     }
 
     isComment(entry: Comment | TaskEvent) {
@@ -318,6 +366,7 @@ export class TaskJournalComponent implements OnInit, OnDestroy{
         this.entries = [];
         this.totalEntries = 0;
         this.firstLoad = true;
-        this.counters = []
+        this.journalIsFullyLoaded = false;
+        this.loading = false;
     }
 }

@@ -26,7 +26,7 @@ import {
     TreeElementPosition,
     TreeNodeMoveEvent,
     TreeNodeUpdateEvent,
-    Wireframe,
+    Wireframe, WireframeTaskCounter,
     WorkLog
 } from "../transport-interfaces";
 import {cyrb53} from "../util";
@@ -126,6 +126,10 @@ export class RealTimeUpdateService {
 
     incomingTaskCreated(login: string) {
         return this.watchUnicast<Task>(login, 'task', 'create')
+    }
+
+    incomingTaskDeleted(login: string) {
+        return this.watchUnicast<Task>(login, 'task', 'delete')
     }
 
     notificationCreated(login: string) {
@@ -407,4 +411,21 @@ export class RealTimeUpdateService {
     private deleteFromCache(hash: string) {
         delete this.watchCacheMap[hash];
     }
+
+    incomingTaskCountChange(login: string) {
+        return this.watchUnicast<WireframeTaskCounter>(login, 'task', 'count', 'change')
+    }
+
+    taskCountChange() {
+        return this.watch<WireframeTaskCounter>('task', 'count', 'change')
+    }
+
+    incomingTagTaskCountChange(login: string){
+        return this.watchUnicast<{[tagId: number]: {[wireframeId: number]: number}}>(login, 'task', 'tag', 'count', 'change')
+    }
+
+    tagTaskCountChange(){
+        return this.watch<{[tagId: number]: {[wireframeId: number]: number}}>( 'task', 'tag', 'count', 'change')
+    }
+
 }

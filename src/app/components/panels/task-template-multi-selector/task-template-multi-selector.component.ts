@@ -1,8 +1,12 @@
-import {Component, Input, OnInit} from '@angular/core';
-import {Wireframe} from "../../../transport-interfaces";
+import {Component, Input, OnDestroy, OnInit} from '@angular/core';
+import {Wireframe, WireframeTaskCounter} from "../../../transport-interfaces";
 import {ApiService} from "../../../services/api.service";
 import {ControlValueAccessor, NG_VALUE_ACCESSOR} from "@angular/forms";
-import {from, map, mergeMap} from "rxjs";
+import {filter, first, from, lastValueFrom, map, mergeMap} from "rxjs";
+import {RealTimeUpdateService} from "../../../services/real-time-update.service";
+import {PersonalityService} from "../../../services/personality.service";
+import {SubscriptionsHolder} from "../../../util";
+import {log} from "util";
 
 @Component({
     selector: 'app-task-template-multi-selector',
@@ -16,7 +20,7 @@ import {from, map, mergeMap} from "rxjs";
         }
     ]
 })
-export class TaskTemplateMultiSelectorComponent implements OnInit, ControlValueAccessor {
+export class TaskTemplateMultiSelectorComponent implements OnInit, OnDestroy, ControlValueAccessor {
 
     templates: Wireframe[] = [];
     deletedTemplates: Wireframe[] = [];
@@ -29,8 +33,9 @@ export class TaskTemplateMultiSelectorComponent implements OnInit, ControlValueA
     uniTargetId = 0;
     disabled = false;
     closed = true;
+    subscriptions: SubscriptionsHolder = new SubscriptionsHolder();
 
-    constructor(readonly api: ApiService) {
+    constructor(readonly api: ApiService, private rt: RealTimeUpdateService, private personality: PersonalityService) {
     }
 
     isUntarget(id: number) {
@@ -100,7 +105,9 @@ export class TaskTemplateMultiSelectorComponent implements OnInit, ControlValueA
                                         num
                                     })))
                             })
-                        ).subscribe(counter => this.counters.push(counter))
+                        ).subscribe(counter => {
+                            this.counters.push(counter)
+                        })
                     this.status = "ready";
                 }
             },
@@ -108,6 +115,22 @@ export class TaskTemplateMultiSelectorComponent implements OnInit, ControlValueA
                 this.status = "error";
             }
         })
+
+        this.personality.userData.pipe(first()).subscribe(user=>{
+            this.subscriptions.addSubscription('countUpdater', this.rt.incomingTaskCountChange(user.login).pipe(filter(()=>this.countersType === "incoming")).subscribe(this.counterUpdateHandler.bind(this)))
+        })
+
+        this.subscriptions.addSubscription('countUpdater', this.rt.taskCountChange().pipe(filter(()=>this.countersType === "all")).subscribe(this.counterUpdateHandler.bind(this)))
+    }
+
+    counterUpdateHandler(counter: WireframeTaskCounter){
+        const founded = this.counters.find(c => c.id === counter.id);
+        if(founded) founded.num = counter.num;
+        this.counters = [...this.counters];
+    }
+
+    ngOnDestroy() {
+        this.subscriptions.unsubscribeAll();
     }
 
     registerOnChange(fn: any): void {

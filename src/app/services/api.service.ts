@@ -42,7 +42,7 @@ import {
     TaskCreationBody,
     TaskEvent,
     TaskFieldsSnapshot,
-    TaskFiltrationConditions, TaskStage,
+    TaskFiltrationConditions, TaskJournalSortingTypes, TaskStage,
     TaskTag,
     TelegramConf,
     TokenChain,
@@ -197,8 +197,8 @@ export class ApiService {
         return this.sendGet<Page<Comment>>('api/private/comments', {taskId, offset, limit});
     }
 
-    getTaskJournal(taskId: number, offset: number, limit: number): Observable<Page<Comment | TaskEvent>> {
-        return this.sendGet<Page<Comment | TaskEvent>>(`api/private/task/${taskId}/journal`, {offset, limit});
+    getTaskJournal(taskId: number, offset: number, limit: number, sorting: TaskJournalSortingTypes): Observable<Page<Comment | TaskEvent>> {
+        return this.sendGet<Page<Comment | TaskEvent>>(`api/private/task/${taskId}/journal`, {offset, limit, sorting});
     }
 
     getEmployees(globalFilter?: string, showDeleted?: boolean, showOffsite?: boolean): Observable<Employee[]> {

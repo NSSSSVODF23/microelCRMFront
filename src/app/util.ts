@@ -7,7 +7,20 @@ import {
     Wireframe,
     WireframeFieldType
 } from "./transport-interfaces";
-import {combineLatest, map, merge, Observable, of, startWith, Subject, Subscription, switchMap, tap, timer} from "rxjs";
+import {
+    combineLatest,
+    map,
+    merge,
+    Observable,
+    of,
+    shareReplay,
+    startWith,
+    Subject,
+    Subscription,
+    switchMap,
+    tap,
+    timer
+} from "rxjs";
 import {ContentChange, QuillModules} from "ngx-quill";
 import {createCustomElement} from "@angular/elements";
 import {EmployeeLabelComponent} from "./components/controls/employee-label/employee-label.component";
@@ -612,8 +625,8 @@ export class DynamicValueFactory {
 
     static ofWithFilter<T>(filterObservable: Observable<any[]>, loadingObservable: (..._: any) => Observable<T[]>, id: keyof T,
                      appendObservable?: Observable<T> | null, updateObservable?: Observable<T> | null,
-                     deleteObservable?: Observable<T> | null): Observable<DynamicPageContent<T[]>> {
-        const content = new DynamicPageContent<T[]>([]);
+                     deleteObservable?: Observable<T> | null): Observable<DynamicContent<T[]>> {
+        const content = new DynamicContent<T[]>([]);
 
         const loadingStateChange = new Subject<LoadingState>();
         const loadingStateChange$ = loadingStateChange.pipe(map(state => {
@@ -630,8 +643,6 @@ export class DynamicValueFactory {
                     map(page => {
                         content.loadingState = page == null || page.length === 0 ? LoadingState.EMPTY : LoadingState.READY;
                         content.value = page || [];
-                        content.pageNumber = 0;
-                        content.totalElements = page?.length ?? 0
                         return content;
                     })
                 )
@@ -640,7 +651,7 @@ export class DynamicValueFactory {
 
         if (appendObservable) obsrvrs.push(appendObservable.pipe(
             map(value => {
-                if (content.pageNumber === 0) content.value.unshift(value);
+                content.value.unshift(value);
                 return content;
             })
         ))
@@ -801,6 +812,42 @@ export class DynamicValueFactory {
         ));
 
         return merge(...obsrvrs, loadingStateChange$).pipe(
+            startWith(content),
+        );
+    }
+
+    static ofPageAltAll<T>(filterObservable: Observable<any[]>, loadingObservable: (..._: any) => Observable<Page<T>>, id: keyof T, reloadObservables?: Observable<any>[] | null): Observable<DynamicPageContent<T[]>> {
+        const content = new DynamicPageContent<T[]>([]);
+
+        const loadingStateChange = new Subject<LoadingState>();
+        const loadingStateChange$ = loadingStateChange.pipe(map(state => {
+            content.loadingState = state;
+            return content;
+        }));
+
+        const ob = merge(filterObservable, merge(...(reloadObservables || [])).pipe(switchMap(() => filterObservable.pipe(shareReplay(1))), map(filter=>({
+            filter,
+            update: true
+        })))).pipe(
+                    tap({
+                        next: (f: any) => {
+                            if (!('update' in f)) loadingStateChange.next(LoadingState.LOADING)
+                        }
+                    }),
+                    switchMap((filter: any[] | { filter: any[], update: boolean }) => {
+                        return loadingObservable(...('update' in filter ? filter.filter : filter)).pipe(
+                            map(page => {
+                                content.loadingState = page == null || page.content.length === 0 ? LoadingState.EMPTY : LoadingState.READY;
+                                content.value = page.content || [];
+                                content.pageNumber = page.number;
+                                content.totalElements = page.totalElements;
+                                return content;
+                            })
+                        )
+                    })
+                )
+
+        return merge(ob, loadingStateChange$).pipe(
             startWith(content),
         );
     }

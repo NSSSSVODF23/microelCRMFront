@@ -6,26 +6,24 @@
             <div class="flex flex-column gap-3" [formGroup]="ic.filtersForm">
                 <app-task-template-multi-selector formControlName="template"></app-task-template-multi-selector>
                 <div class="shadow-1 p-3 border-round-md flex flex-column bg-white gap-2">
-                    <ng-container *ngIf="ic.stageList$ | async as stages">
-                        <div class="input-label-wrapper" *ngIf="stages.length>1 && ic.isSelectOneTemplate">
-                            <label>Стадия</label>
-                            <p-listbox [options]="stages" formControlName="stage" listStyleClass="max-h-20rem">
-                                <ng-template let-option pTemplate="item">
-                                    <div class="flex align-items-center w-full justify-content-between gap-1">
-                                        <div class="max-w-10rem white-space-nowrap overflow-hidden" appTicker>
-                                            {{option.label}}
-                                        </div>
-                                        <div>
-                                            {{option.tasksCount}}
-                                        </div>
+                    <div class="input-label-wrapper" *ngIf="ic.stageList.length>1 && ic.isSelectOneTemplate">
+                        <label>Стадия</label>
+                        <p-listbox [options]="ic.stageList" formControlName="stage" listStyleClass="max-h-20rem">
+                            <ng-template let-option pTemplate="item">
+                                <div class="flex align-items-center w-full justify-content-between gap-1">
+                                    <div class="max-w-10rem white-space-nowrap overflow-hidden" appTicker>
+                                        {{option.label}}
                                     </div>
-                                </ng-template>
-                            </p-listbox>
-                        </div>
-                    </ng-container>
-                    <div class="input-label-wrapper" *ngIf="ic.tagsList$ | async as tags">
+                                    <div>
+                                        {{option.tasksCount}}
+                                    </div>
+                                </div>
+                            </ng-template>
+                        </p-listbox>
+                    </div>
+                    <div class="input-label-wrapper">
                         <label>Теги</label>
-                        <p-listbox [options]="tags.value" formControlName="tags" [multiple]="true"
+                        <p-listbox [options]="ic.tagsList" formControlName="tags" [multiple]="true"
                                    optionValue="taskTagId" [checkbox]="true" listStyleClass="max-h-20rem">
                             <ng-template pTemplate="filter">
                                 <input type="text" pInputText placeholder="Поиск" [formControl]="ic.tagsFilterControl">

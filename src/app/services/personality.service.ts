@@ -2,7 +2,7 @@ import {EventEmitter, Injectable} from '@angular/core';
 import {ApiService} from "./api.service";
 import {Employee, EmployeeStatus, INotification} from "../transport-interfaces";
 import {RealTimeUpdateService} from "./real-time-update.service";
-import {fromEvent, Subscription} from "rxjs";
+import {fromEvent, lastValueFrom, shareReplay, Subscription} from "rxjs";
 import jwtDecode from "jwt-decode";
 
 interface Token {
@@ -26,6 +26,7 @@ export class PersonalityService {
     meUpdate?: Subscription;
     focusStatus: FocusStatus = FocusStatus.BLUR;
     onGettingUserData: EventEmitter<Employee> = new EventEmitter<Employee>();
+    userData = this.onGettingUserData.pipe(shareReplay(1));
     private lastTouch = 0;
 
     constructor(readonly api: ApiService, readonly rt: RealTimeUpdateService) {
