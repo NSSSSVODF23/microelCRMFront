@@ -1,0 +1,5 @@
+<ng-container [ngSwitch]="loadingState">
+    <span class="text-primary cursor-pointer hover:text-primary-600" *ngSwitchCase="'READY'" (click)="openChat()">{{chat?.title}}</span>
+    <span class="text-primary" *ngSwitchCase="'LOADING'">Загрузка...</span>
+    <span class="text-red-400" *ngSwitchCase="'ERROR'">Ошибка</span>
+</ng-container>

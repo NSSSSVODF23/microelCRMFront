@@ -183,6 +183,7 @@ import {KeyFilterModule} from "primeng/keyfilter";
 import {
     CountingLivesInputComponent
 } from "../../components/controls/counting-lives-input/counting-lives-input.component";
+import {ChatLinkComponent} from "../../components/controls/chat-link/chat-link.component";
 
 
 @NgModule({
@@ -277,7 +278,8 @@ import {
         CommutatorViewComponent,
         BindingConnectionLocationViewComponent,
         EquipmentsFieldFilterComponent,
-        CountingLivesInputComponent
+        CountingLivesInputComponent,
+        ChatLinkComponent
     ],
     exports: [
         AccountPanelComponent,
@@ -370,7 +372,8 @@ import {
         CommutatorViewComponent,
         BindingConnectionLocationViewComponent,
         EquipmentsFieldFilterComponent,
-        CountingLivesInputComponent
+        CountingLivesInputComponent,
+        ChatLinkComponent
     ],
     imports: [
         CommonPipesModule,

@@ -29,6 +29,7 @@ import {DepartmentLabelComponent} from "./components/controls/department-label/d
 import {Injector} from "@angular/core";
 import {PrimeNGConfig} from "primeng/api";
 import {AppointedInstallersComponent} from "./components/controls/appointed-installers/appointed-installers.component";
+import {ChatLinkComponent} from "./components/controls/chat-link/chat-link.component";
 
 
 export class Utils {
@@ -466,6 +467,7 @@ export function registerCustomElements(injector: Injector) {
         'task-link-element': createCustomElement(TaskLinkComponent, {injector}),
         'department-label-element': createCustomElement(DepartmentLabelComponent, {injector}),
         'appointed-installers-element': createCustomElement(AppointedInstallersComponent, {injector}),
+        'chat-link-element': createCustomElement(ChatLinkComponent, {injector}),
     }
 
     for (const [name, element] of Object.entries(elements)) {

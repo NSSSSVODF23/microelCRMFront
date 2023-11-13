@@ -35,7 +35,7 @@ export class IncomingPageCacheService {
         filters: this.filtersForm,
     });
 
-    filters$ = this.controlForm.valueChanges.pipe(startWith(this.controlForm.value),map(form=>Object.values(form)), shareReplay(1));
+    filters$ = this.controlForm.valueChanges.pipe(startWith(this.controlForm.value), map(form=>Object.values(form)), shareReplay(1));
 
     stageList:{
         label: string,
@@ -106,7 +106,6 @@ export class IncomingPageCacheService {
         this.rt.taskTagDeleted()
     ).pipe(
         switchMap(tags=> {
-            console.log(tags)
             return  this.api.getCountIncomingTasksByWireframeIdByTags(this.filtersForm.controls.template.value ?? [])
                 .pipe(
                     map(tasksCount=>{
@@ -130,7 +129,6 @@ export class IncomingPageCacheService {
     ).pipe(shareReplay(1))
 
     constructor(private api: ApiService, private rt: RealTimeUpdateService, private personality: PersonalityService) {
-        this.filters$.subscribe(console.log)
         this.stageList$.subscribe(s=>this.stageList = [...s]);
         this.tagsList$.subscribe(s=>this.tagsList = [...s.value]);
         this.personality.userData.pipe(first()).subscribe(userData=>{

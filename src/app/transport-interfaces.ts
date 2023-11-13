@@ -38,6 +38,7 @@ export interface Wireframe {
     detailedViewType?: string;
     stages?: TaskStage[];
     allFields?: FieldItem[];
+    countTask?: number;
 }
 
 export interface StepItem {
@@ -168,7 +169,7 @@ export interface Task {
  * Интерфейс для передачи данных о фильтрации задач на сервер
  */
 export interface TaskFiltrationConditions {
-    status?: TaskStatus[] | null;
+    status?: string[] | null;
     template?: number[] | null;
     templateFilter?: string | null;
     searchPhrase?: string | null;

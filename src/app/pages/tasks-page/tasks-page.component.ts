@@ -28,16 +28,12 @@ export class TasksPageComponent implements OnInit, AfterViewInit {
     };
 
     ngOnInit(): void {
-        this.taskService.loadPage();
         this.api.getEmployees().subscribe(employees => {
             this.employees = employees;
         })
     }
 
     ngAfterViewInit(): void {
-        this.taskService.setPaginatorPage = (page) => {
-            if (this.paginator) this.paginator.changePage(page);
-        }
     }
 
     isNewDate(taskItems: any, i: number) {

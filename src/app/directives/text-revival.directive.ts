@@ -11,10 +11,11 @@ import {TaskLinkComponent} from "../components/controls/task-link/task-link.comp
 import {EmployeeLabelComponent} from "../components/controls/employee-label/employee-label.component";
 import {DepartmentLabelComponent} from "../components/controls/department-label/department-label.component";
 import {AppointedInstallersComponent} from "../components/controls/appointed-installers/appointed-installers.component";
+import {ChatLinkComponent} from "../components/controls/chat-link/chat-link.component";
 
 type Substitution = {
     data: any,
-    type: 'task' | 'employee' | 'department' | 'appointedInstallers'
+    type: 'task' | 'employee' | 'department' | 'appointedInstallers' | 'chat'
 }
 
 @Directive({
@@ -54,6 +55,7 @@ export class TextRevivalDirective implements OnInit, AfterViewInit {
         const employeeRegexp = /\B@([A-z\d.\-_]+)/g;
         const departmentRegexp = /\B\$(\d+)/g;
         const appointedInstallersRegexp = /\B\^\((\d+)\)/g;
+        const chatRegexp = /#CHAT\((\d+)\)/g;
 
         // Находим вхождения и заменяем их элементами placeholder-ами
 
@@ -80,6 +82,12 @@ export class TextRevivalDirective implements OnInit, AfterViewInit {
             this.arrayOfSubstitutions.push({data: parseInt(args), type: 'appointedInstallers'});
             return ` <i id="replace${this.arrayOfSubstitutions.length - 1}"></i>`
         })
+
+        // Заменяем теги чатов
+        host.innerHTML = host.innerHTML.replaceAll(chatRegexp, (found: string, args: string) => {
+            this.arrayOfSubstitutions.push({data: parseInt(args), type: 'chat'});
+            return ` <i id="replace${this.arrayOfSubstitutions.length - 1}"></i>`
+        })
     }
 
     private replacePlaceholdersToComponents() {
@@ -98,7 +106,11 @@ export class TextRevivalDirective implements OnInit, AfterViewInit {
                     placeholder.replaceWith(DepartmentLabelComponent.createElement(substitution.data, true));
                     break;
                 case 'appointedInstallers':
-                    placeholder.replaceWith(AppointedInstallersComponent.createElement(substitution.data))
+                    placeholder.replaceWith(AppointedInstallersComponent.createElement(substitution.data));
+                    break;
+                case "chat":
+                    placeholder.replaceWith(ChatLinkComponent.createElement(substitution.data));
+                    break;
             }
         })
     }

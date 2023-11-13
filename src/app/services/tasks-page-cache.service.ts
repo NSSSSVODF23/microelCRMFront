@@ -1,10 +1,20 @@
 import {Injectable} from '@angular/core';
-import {FieldItem, LoadingState, Page, Task} from "../transport-interfaces";
+import {FieldItem, LoadingState, Page, Task, TaskStatus, TaskTag} from "../transport-interfaces";
 import {ApiService} from "./api.service";
 import {RealTimeUpdateService} from "./real-time-update.service";
-import {debounceTime, distinctUntilChanged, Observer} from "rxjs";
+import {
+    combineLatest,
+    debounceTime,
+    distinctUntilChanged, filter,
+    map,
+    mergeMap,
+    Observer, shareReplay,
+    startWith,
+    switchMap,
+    tap
+} from "rxjs";
 import {FormControl, FormGroup} from "@angular/forms";
-import {Storage} from "../util";
+import {DynamicValueFactory, Storage} from "../util";
 
 
 @Injectable({
@@ -12,206 +22,228 @@ import {Storage} from "../util";
 })
 export class TasksPageCacheService {
 
-    // Текущая страница
-    pageNumber: number = 0;
-
     // Количество задач загружаемых одновременно
-    TASK_PAGE_SIZE = 25;
-
-    // Массив загруженных задач
-    taskItems: Task[] = [];
-    // Общее количество задач в базе данных
-    totalTaskItems: number = 0;
-
-    // Форма поиска по основным параметрам задач
-    filterForm: FormGroup = new FormGroup({
-        status: new FormControl(['ACTIVE', 'PROCESSING']),
-        template: new FormControl(Storage.loadOrDefault('listPageTempFilter', [])),
-        searchPhrase: new FormControl(null),
-        tags: new FormControl([]),
-    })
-
-    // Флаг внутренней инициализации смены страницы для предотвращения зацикливания события
-    isPageChanging = false;
+    TASK_PAGE_SIZE = 15;
 
     // Форма поиска по полям из шаблона задачи, устанавливается из компонента страницы
-    templateFilterForm: FormGroup = new FormGroup<any>(this.templateFilterFormInit);
+
+    templateFilterForm = new FormGroup<any>(this.templateFilterFormInit);
     // Массив доступных фильтров полученный из шаблона
     templateFilterFields: FieldItem[] = Storage.loadOrDefault('templateFilterFields', []);
-    // Строка для контекстного поиска
-    contextSearchString = '';
-    // Состояние загрузки задач
-    loadingState: LoadingState = LoadingState.LOADING;
-    // Массив идентификаторов исключенных из поиска
-    exclusionIds: number[] = [];
+
+    searchPhrase = new FormControl<string | null>(null);
+
+    // Форма поиска по основным параметрам задач
+    filterForm = new FormGroup({
+        status: new FormControl<string[]>(['ACTIVE', 'PROCESSING']),
+        template: new FormControl<number[]>(Storage.loadOrDefault('listPageTempFilter', [])),
+        tags: new FormControl<number[]>([]),
+        stage: new FormControl(null),
+        author: new FormControl(null),
+        dateOfCreation: new FormControl(null),
+    })
+
+    stageList:{
+        label: string,
+        value: string | null,
+        orderIndex: number,
+        tasksCount: number
+    }[] = [];
+    tagsList: TaskTag[] = [];
+
+    tagsFilterControl = new FormControl("");
+    tagsNameFilter$ = this.tagsFilterControl.valueChanges.pipe(debounceTime(300), distinctUntilChanged());
+    tagsFilters$ = combineLatest([this.tagsNameFilter$.pipe(startWith('')),
+        this.filterForm.controls.template.valueChanges.pipe(startWith(this.filterForm.controls.template.value))])
+        .pipe(map(([name, templates])=>[name,false]))
+    tagsList$ = DynamicValueFactory.ofWithFilter(
+        this.tagsFilters$,
+        this.api.getTaskTags.bind(this.api),
+        'taskTagId',
+        this.rt.taskTagCreated(),
+        this.rt.taskTagUpdated(),
+        this.rt.taskTagDeleted()
+    ).pipe(
+        switchMap(tags=> {
+            return  this.api.getCountTasksByWireframeIdByTags(this.filterForm.controls.template.value ?? [])
+                .pipe(
+                    map(tasksCount=>{
+                        tags.value.map(tag=>{
+                            const count = tasksCount[tag.taskTagId];
+                            tag.tasksCount = count ? count : 0;
+                            return tag;
+                        })
+                        return tags;
+                    })
+                )
+        })
+    );
+    stageList$ = this.filterForm.controls.template.valueChanges.pipe(
+        startWith(this.filterForm.controls.template.value),
+        tap(templates=>Storage.save('incomListPageTempFilter', templates)),
+        switchMap(templates=>{
+            this.filterForm.controls.stage.setValue(null, {emitEvent: false});
+            if(templates?.length === 1){
+                return this.api.getWireframeStages(templates[0]).pipe(
+                    mergeMap(stages=>{
+                        return this.api.getCountTasksByStages(templates[0]).pipe(
+                            map((tasksCount)=>{
+                                return stages.map(stage=>{
+                                    const count = tasksCount[stage.stageId];
+                                    return {
+                                        label: stage.label,
+                                        value: stage.stageId,
+                                        orderIndex: stage.orderIndex,
+                                        tasksCount: count ? count : 0
+                                    }
+                                })
+                            })
+                        )
+                    })
+                )
+            }else{
+                return []
+            }
+        }),
+        map((stages:{label:string, value:string|null, orderIndex:number, tasksCount:number}[])=> {
+            const stageMap = stages.sort((a, b) => a.orderIndex - b.orderIndex);
+            stageMap.unshift({
+                label: 'Все',
+                value: null,
+                orderIndex: -1,
+                tasksCount: stages.reduce((prev, curr)=>{
+                    prev = prev + curr.tasksCount;
+                    return prev;
+                },0)
+            });
+            return stageMap;
+        }),
+        shareReplay(1)
+    )
+
+    pageNumber = new FormControl(0);
+    pageNumber$ = this.pageNumber.valueChanges.pipe(startWith(0),shareReplay(1));
+    mainFilters$ = this.filterForm.valueChanges.pipe(startWith(this.filterForm.value),shareReplay(1));
+    searchPhrase$ = this.searchPhrase.valueChanges.pipe(startWith(this.searchPhrase.value),debounceTime(1500),distinctUntilChanged(),shareReplay(1));
+    templateFilterFields$ = this.templateFilterForm.valueChanges.pipe(startWith(this.templateFilterForm.value), debounceTime(1500), map(this.translateTemplateForm.bind(this)), map(obj=>JSON.stringify(obj)),shareReplay(1));
+
+    templateFilterCount$ = combineLatest(
+        [
+            this.mainFilters$.pipe(map(filters=>{
+                let counter = 0;
+                if(!!filters.author){
+                    counter++;
+                }
+                if(!!filters.dateOfCreation && ('start' in filters.dateOfCreation && 'end' in filters.dateOfCreation)){
+                    counter++;
+                }
+                return counter;
+            })),
+        this.templateFilterForm.valueChanges.pipe(startWith(this.templateFilterForm.value), map(this.translateTemplateForm.bind(this)), map(templateFilter=>templateFilter.length))
+        ]
+    ).pipe(map(([mainFilters, templateFilter])=>{
+        return (mainFilters + templateFilter).toString();
+    }))
+
+
+    combinedFilters$ = combineLatest([this.mainFilters$, this.searchPhrase$, this.templateFilterFields$])
+        .pipe(map(([filter, searchPhrase, templateFilter])=>{return {...filter, searchPhrase, templateFilter}}), shareReplay(1));
+
+    filters$ = combineLatest([
+        this.pageNumber$,
+        this.combinedFilters$
+    ]);
+
+    private translateTemplateForm(templateFilterValue: {[key:string]:any}){
+        return Object.entries(templateFilterValue).filter(([key, value])=>value !== null && value !== undefined && value !== '' && !(Array.isArray(value) && value.length===0))
+            .map(([key, value])=>{
+                const fieldItem = this.templateFilterFields.find(ff=>ff.id === key);
+                if(fieldItem){
+                    return {
+                        id: fieldItem.id,
+                        wireframeFieldType: fieldItem.type,
+                        value: value
+                    }
+                }else{
+                    return null; // Не найдено поле в шаблоне для фильтрации, отменяем фильтрацию по этому полю
+                }
+            });
+    }
+
+    taskPage$ = DynamicValueFactory.ofPageAltAll(this.filters$,
+        this.api.getPageOfTasks.bind(this.api), 'taskId',
+        [this.rt.taskCreated(),
+            this.rt.taskUpdated(),
+            this.rt.taskDeleted()]
+    ).pipe(shareReplay(1))
 
     constructor(readonly api: ApiService, readonly rt: RealTimeUpdateService) {
-        this.rt.taskCreated().subscribe(this.createTask.bind(this))
-        this.rt.taskUpdated().subscribe(this.updateTask.bind(this))
-        this.rt.taskDeleted().subscribe(this.deleteTask.bind(this))
+
+        this.stageList$.subscribe(s=>this.stageList = [...s]);
+        this.tagsList$.subscribe(s=>this.tagsList = [...s.value]);
+
+        this.rt.taskCountChange()
+            .pipe(filter((counter)=>(this.isSelectOneTemplate && counter.id === this.firstWireframeId)))
+            .subscribe(counter=>{
+                this.stageList.forEach(stage=>{
+                    const find = counter.stages.find(s=>stage.value === s.id);
+                    if(find) stage.tasksCount = find.num;
+                    else stage.tasksCount = 0;
+                })
+                const allCounter = this.stageList.find(s=>s.value === null);
+                if(allCounter) allCounter.tasksCount = counter.stages.reduce((prev,curr)=>prev+curr.num,0);
+            });
+        this.rt.tagTaskCountChange()
+            .subscribe(counter=>{
+                this.tagsList.forEach(tag=>{
+                    const wireframeMap = counter[tag.taskTagId];
+                    if(wireframeMap){
+                        let wfCount = 0;
+                        this.filterForm.value.template?.forEach(wfid=>{
+                            if(wireframeMap[wfid]) wfCount += wireframeMap[wfid];
+                        });
+                        tag.tasksCount = wfCount;
+                    }else{
+                        tag.tasksCount = 0;
+                    }
+                })
+            })
 
         // Загрузка полей для фильтрации задач, если выделен 1 шаблон
-        this.filterForm.controls['template'].valueChanges.subscribe((selectedTemp: number[]) => {
+        this.filterForm.controls.template.valueChanges.subscribe((selectedTemp: number[] | null) => {
             Storage.save('listPageTempFilter', selectedTemp);
-            if (selectedTemp.length === 1) {
-                this.api.getWireframe(selectedTemp[0]).subscribe(wireframe => {
+            if (this.isSelectOneTemplate) {
+                this.api.getWireframe(this.firstWireframeId).subscribe(wireframe => {
                     const fieldItems = wireframe.allFields ?? [];
                     const controls = {
-                        author: this.templateFilterForm.controls['author'],
-                        dateOfCreation: this.templateFilterForm.controls['dateOfCreation'],
                         ...fieldItems.reduce((prev, fieldItem) => {
                             return {...prev, [fieldItem.id]: new FormControl(null)};
                         }, {})
                     };
                     this.templateFilterForm = new FormGroup(controls);
                     this.templateFilterFields = fieldItems;
-                    Storage.save('templateFilterFormControls', ['author', 'dateOfCreation', ...fieldItems.map(fieldItem => fieldItem.id)]);
+                    Storage.save('templateFilterFormControls', [...fieldItems.map(fieldItem => fieldItem.id)]);
                     Storage.save('templateFilterFields', this.templateFilterFields);
                 })
             } else {
-                const controls = {
-                    author: this.templateFilterForm.controls['author'],
-                    dateOfCreation: this.templateFilterForm.controls['dateOfCreation'],
-                }
-                this.templateFilterForm = new FormGroup(controls);
+                this.templateFilterForm = new FormGroup({});
                 this.templateFilterFields = [];
-                Storage.save('templateFilterFormControls', ['author', 'dateOfCreation']);
-                Storage.save('templateFilterFields', this.templateFilterFields);
             }
         });
+    }
 
-        this.filterForm.valueChanges.pipe(
-            debounceTime(500),
-            distinctUntilChanged(),
-        ).subscribe(this.filtersApply.bind(this))
+    get isSelectOneTemplate(): boolean {
+        return this.filterForm.value.template?.length === 1;
+    }
+
+    get firstWireframeId(): number {
+        return this.filterForm.value.template ? this.filterForm.value.template[0] : 0;
     }
 
     get templateFilterFormInit() {
-        return Storage.loadOrDefault('templateFilterFormControls', ['author', 'dateOfCreation']).reduce((prev, curr) => {
+        return Storage.loadOrDefault('templateFilterFormControls', []).reduce((prev, curr) => {
             prev[curr] = new FormControl(null);
             return prev
         }, {} as any);
-    }
-
-    // Ссылка на абстрактную функцию установки текущей страницы в Paginator
-    private _setPaginatorPage?: (page: number) => void;
-
-    set setPaginatorPage(value: (page: number) => void) {
-        this._setPaginatorPage = value;
-    }
-
-    // Осуществляет контекстный поиск по всем полям типа строка в задачах
-    contextSearch() {
-        setTimeout(() => {
-            this.loadPageOfTasks(0);
-        })
-    }
-
-    // Загружает первую страницу списка задач с примененными фильтрами
-    filtersApply() {
-        this.loadPageOfTasks(0);
-    }
-
-    // Загружает определенную страницу списка задач с примененными фильтрами (для paginator)
-    pageChange(event: any) {
-        if (this.isPageChanging) return;
-        this.pageNumber = event.page;
-        this.loadPageOfTasks(event.page);
-    }
-
-    // Если это первая загрузка, то загружает первую страницу, если нет загружает последнюю открытую страницу
-    loadPage() {
-        this.loadPageOfTasks(this.pageNumber);
-    }
-
-    // Добавление задачи в реальном времени
-    private createTask(task: Task) {
-        // Ищем задачу в массиве taskItems
-        let index = this.taskItems.findIndex(t => t.taskId === task.taskId);
-
-        // Если задача не найдена, добавляем её
-        if (index < 0 && this.pageNumber === 0) {
-            this.taskItems.splice(0, 1, task);
-            this.totalTaskItems++;
-        }
-    }
-
-    // Обновление задачи в реальном времени
-    private updateTask(task: Task) {
-        // Ищем задачу в массиве taskItems
-        let index = this.taskItems.findIndex(t => t.taskId === task.taskId);
-        // Если задача найдена, обновляем его
-        if (index >= 0) {
-            this.taskItems[index] = task;
-        }
-    }
-
-    // Удаление задачи в реальном времени
-    private deleteTask(task: Task) {
-        // Ищем задачу в массиве taskItems
-        let index = this.taskItems.findIndex(t => t.taskId === task.taskId);
-        // Если задача найдена, удаляем её
-        if (index >= 0) {
-            this.taskItems.splice(index, 1);
-        }
-    }
-
-    // Метод проверяет наличие ссылки на анонимный метод изменения страницы в Paginator
-    private changePage(page: number) {
-        this.isPageChanging = true;
-        if (this._setPaginatorPage) this._setPaginatorPage(page);
-        this.isPageChanging = false;
-    }
-
-    // Загружает определенное количество задач из базы данных с определенными фильтрами
-    private loadPageOfTasks(page: number): void {
-
-        // Обнуляем страницу paginator если надо
-        if (page === 0) this.changePage(0);
-
-        // Устанавливаем статус загрузки задач
-        this.loadingState = LoadingState.LOADING;
-
-
-        const formValues = this.templateFilterForm.getRawValue();
-        const templateFilter = JSON.stringify(this.templateFilterFields.filter(f => formValues[f.id]).map(field => {
-            const value = formValues[field.id];
-            return {
-                id: field.id,
-                wireframeFieldType: field.type,
-                value
-            }
-        }));
-
-
-        // Запрашиваем данные по задачам из базы данных
-        this.api.getPageOfTasks(page, {
-            ...this.filterForm.getRawValue(),
-            author: this.templateFilterForm.value['author'],
-            dateOfCreation: this.templateFilterForm.value['dateOfCreation'],
-            templateFilter
-        }).subscribe(this.observerHandlers());
-        this.filterForm.disable({emitEvent: false});
-        this.templateFilterForm.disable({emitEvent: false});
-    }
-
-    // Возвращает объект с обработчиками загрузки очередной страницы задач
-    private observerHandlers(): Partial<Observer<Page<Task>>> {
-        return {
-            next: (value) => {
-                this.totalTaskItems = value.totalElements;
-                if (this.totalTaskItems === 0) this.loadingState = LoadingState.EMPTY;
-                else this.loadingState = LoadingState.READY;
-                this.taskItems = value.content;
-                this.changePage(this.pageNumber);
-                this.filterForm.enable({emitEvent: false});
-                this.templateFilterForm.enable({emitEvent: false});
-            },
-            error: () => {
-                this.loadingState = LoadingState.ERROR;
-                this.filterForm.enable({emitEvent: false});
-                this.templateFilterForm.enable({emitEvent: false});
-            }
-        }
     }
 }

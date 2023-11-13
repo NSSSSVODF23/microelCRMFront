@@ -3,7 +3,7 @@
         <app-main-menu-panel></app-main-menu-panel>
         <div class="flexed gap10 stretched">
             <ng-container *ngTemplateOutlet="taskList"></ng-container>
-            <div class="flex flex-column gap-3" [formGroup]="ic.filtersForm">
+            <div class="flex flex-column gap-3 h-fit sticky-type-selector" [formGroup]="ic.filtersForm">
                 <app-task-template-multi-selector formControlName="template"></app-task-template-multi-selector>
                 <div class="shadow-1 p-3 border-round-md flex flex-column bg-white gap-2">
                     <div class="input-label-wrapper" *ngIf="ic.stageList.length>1 && ic.isSelectOneTemplate">

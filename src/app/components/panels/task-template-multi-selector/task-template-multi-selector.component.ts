@@ -2,7 +2,7 @@ import {Component, Input, OnDestroy, OnInit} from '@angular/core';
 import {Wireframe, WireframeTaskCounter} from "../../../transport-interfaces";
 import {ApiService} from "../../../services/api.service";
 import {ControlValueAccessor, NG_VALUE_ACCESSOR} from "@angular/forms";
-import {filter, first, from, lastValueFrom, map, mergeMap} from "rxjs";
+import {delay, filter, first, from, lastValueFrom, map, mergeMap} from "rxjs";
 import {RealTimeUpdateService} from "../../../services/real-time-update.service";
 import {PersonalityService} from "../../../services/personality.service";
 import {SubscriptionsHolder} from "../../../util";
@@ -27,7 +27,6 @@ export class TaskTemplateMultiSelectorComponent implements OnInit, OnDestroy, Co
     selected: number[] = [];
     @Input() countersType: "incoming" | "all" | "none" = "incoming";
     @Input() inline = false;
-    counters: { id: number, num: number }[] = [];
     status: "loading" | "ready" | "error" | "empty" = "loading";
     uniTargetMode = false;
     uniTargetId = 0;
@@ -74,7 +73,7 @@ export class TaskTemplateMultiSelectorComponent implements OnInit, OnDestroy, Co
     }
 
     templateTrack(index: number, item: Wireframe) {
-        return item.wireframeId;
+        return item.wireframeId + (item.countTask ?? '').toString();
     };
 
     ngOnInit(): void {
@@ -90,7 +89,6 @@ export class TaskTemplateMultiSelectorComponent implements OnInit, OnDestroy, Co
                         this.selected = [this.templates[0].wireframeId];
                         this.onChange(this.selected);
                     }
-                    this.counters = [];
                     if (this.countersType !== "none")
                         from(this.templates).pipe(
                             mergeMap(wireframe => {
@@ -106,7 +104,8 @@ export class TaskTemplateMultiSelectorComponent implements OnInit, OnDestroy, Co
                                     })))
                             })
                         ).subscribe(counter => {
-                            this.counters.push(counter)
+                            const wireframe = this.templates.find(t=>t.wireframeId === counter.id);
+                            if (wireframe) wireframe.countTask = counter.num;
                         })
                     this.status = "ready";
                 }
@@ -116,17 +115,18 @@ export class TaskTemplateMultiSelectorComponent implements OnInit, OnDestroy, Co
             }
         })
 
-        this.personality.userData.pipe(first()).subscribe(user=>{
-            this.subscriptions.addSubscription('countUpdater', this.rt.incomingTaskCountChange(user.login).pipe(filter(()=>this.countersType === "incoming")).subscribe(this.counterUpdateHandler.bind(this)))
-        })
-
-        this.subscriptions.addSubscription('countUpdater', this.rt.taskCountChange().pipe(filter(()=>this.countersType === "all")).subscribe(this.counterUpdateHandler.bind(this)))
+        if(this.countersType === "incoming"){
+            this.personality.userData.pipe(first()).subscribe(user=>{
+                this.subscriptions.addSubscription('countUpdater', this.rt.incomingTaskCountChange(user.login).pipe(filter(()=>this.countersType === "incoming")).subscribe(this.counterUpdateHandler.bind(this)))
+            })
+        }else if(this.countersType === "all"){
+            this.subscriptions.addSubscription('countUpdater', this.rt.taskCountChange().pipe(filter(()=>this.countersType === "all")).subscribe(this.counterUpdateHandler.bind(this)))
+        }
     }
 
     counterUpdateHandler(counter: WireframeTaskCounter){
-        const founded = this.counters.find(c => c.id === counter.id);
-        if(founded) founded.num = counter.num;
-        this.counters = [...this.counters];
+        const wireframe = this.templates.find(t=>t.wireframeId === counter.id);
+        if (wireframe) wireframe.countTask = counter.num;
     }
 
     ngOnDestroy() {
@@ -151,10 +151,6 @@ export class TaskTemplateMultiSelectorComponent implements OnInit, OnDestroy, Co
         } else {
             this.select(id);
         }
-    }
-
-    getCount(id: number) {
-        return this.counters.find(i => i.id === id)?.num || 0;
     }
 
     selectAll() {
