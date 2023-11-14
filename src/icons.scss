@@ -8851,6 +8851,9 @@
 }
 
 .mds {
+  &-frame_source {
+    @include mds("frame_source");
+  }
 
   &-stream{
     @include mds("stream");

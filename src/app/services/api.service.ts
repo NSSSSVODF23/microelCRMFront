@@ -48,7 +48,7 @@ import {
     TokenChain,
     TreeDragDropEvent,
     TreeElementPosition, UserEvents,
-    Wireframe,
+    Wireframe, WireframeDashboardStatistic,
     WorkingDay,
     WorkLog
 } from "../transport-interfaces";
@@ -71,6 +71,10 @@ export class ApiService {
 
     getWireframe(id: number) {
         return this.sendGet<Wireframe>('api/private/wireframe/' + id);
+    }
+
+    getWireframeDashboardStatistic(id: number) {
+        return this.sendGet<WireframeDashboardStatistic>('api/private/wireframe/' + id + '/dashboard-statistic');
     }
 
     getWireframeFields(id: number) {

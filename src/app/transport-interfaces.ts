@@ -41,6 +41,21 @@ export interface Wireframe {
     countTask?: number;
 }
 
+export interface WireframeDashboardStatistic{
+    taskCount: DataPair[];
+    taskCountByStage: DataPair[];
+    worksDone: DataPair[];
+    taskCountByTags: DataPair[];
+}
+
+export interface DataPair{
+    label: string;
+    value: any;
+    color?: string;
+    lcolor?: string;
+    vcolor?: string;
+}
+
 export interface StepItem {
     id: number;
     name: string;
@@ -190,6 +205,8 @@ export interface TaskCreationBody {
     childId?: number;
     parentId?: number;
     initialComment?: string;
+    tags?: TaskTag[];
+    observers?: DefaultObservers[];
 }
 
 export class TimestampItem {

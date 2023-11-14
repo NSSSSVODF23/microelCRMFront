@@ -1,7 +1,15 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
 import {ApiService} from "../../services/api.service";
 import {fade, flow, swipeChild} from "../../animations";
-import {FieldItem, ModelItem, Task, TaskCreationBody, Wireframe} from "../../transport-interfaces";
+import {
+    DefaultObservers,
+    FieldItem,
+    ModelItem,
+    Task,
+    TaskCreationBody,
+    TaskTag,
+    Wireframe
+} from "../../transport-interfaces";
 import {ActivatedRoute} from "@angular/router";
 import {FormArray, FormControl, FormGroup} from "@angular/forms";
 import {FormToModelItemConverter, SubscriptionsHolder} from "../../util";
@@ -44,6 +52,8 @@ export class TaskCreationPageComponent implements OnInit, OnDestroy {
 
     subscriptions = new SubscriptionsHolder();
     defaultValues: any;
+    initialObservers: DefaultObservers[] = [];
+    initialTags: TaskTag[] = [];
     initialComment?: string;
 
     constructor(readonly api: ApiService, readonly route: ActivatedRoute, readonly personality: PersonalityService, readonly toast: MessageService, private taskCreation: TaskCreatorService) {
@@ -86,7 +96,9 @@ export class TaskCreationPageComponent implements OnInit, OnDestroy {
             childId: this.childId,
             parentId: this.parentId,
             fields: FormToModelItemConverter.convert(rawValues, this.selectedTemplate),
-            initialComment: this.initialComment
+            initialComment: this.initialComment,
+            tags: this.initialTags,
+            observers: this.initialObservers
         };
     }
 
@@ -133,6 +145,8 @@ export class TaskCreationPageComponent implements OnInit, OnDestroy {
     selectTemplateForTask() {
         if (!this.selectedTemplate) return;
         this.isTemplateSelected = true;
+
+        this.initialObservers = this.selectedTemplate.defaultObservers ?? [];
 
         this.taskCreationForm = new FormArray(
             this.selectedTemplate.steps.map(step => {

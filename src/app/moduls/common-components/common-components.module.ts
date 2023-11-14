@@ -184,6 +184,9 @@ import {
     CountingLivesInputComponent
 } from "../../components/controls/counting-lives-input/counting-lives-input.component";
 import {ChatLinkComponent} from "../../components/controls/chat-link/chat-link.component";
+import {
+    DashboardTaskStatisticPanelComponent
+} from "../../components/panels/dashboard-task-statistic-panel/dashboard-task-statistic-panel.component";
 
 
 @NgModule({
@@ -279,7 +282,8 @@ import {ChatLinkComponent} from "../../components/controls/chat-link/chat-link.c
         BindingConnectionLocationViewComponent,
         EquipmentsFieldFilterComponent,
         CountingLivesInputComponent,
-        ChatLinkComponent
+        ChatLinkComponent,
+        DashboardTaskStatisticPanelComponent
     ],
     exports: [
         AccountPanelComponent,
@@ -373,7 +377,8 @@ import {ChatLinkComponent} from "../../components/controls/chat-link/chat-link.c
         BindingConnectionLocationViewComponent,
         EquipmentsFieldFilterComponent,
         CountingLivesInputComponent,
-        ChatLinkComponent
+        ChatLinkComponent,
+        DashboardTaskStatisticPanelComponent
     ],
     imports: [
         CommonPipesModule,

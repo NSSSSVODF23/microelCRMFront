@@ -1,0 +1,48 @@
+<div class="flex flex-column bg-white shadow-1 border-round-lg" *ngIf="statistic else loading">
+    <div class="flex align-items-center text-bluegray-400 text-xl font-semibold m-3">
+        {{title}}
+    </div>
+    <ng-container >
+        <div class="flex flex-column gap-2 px-4 pb-4">
+            <div class="border-bottom-1 border-bluegray-100 mt-2 text-bluegray-600">Количество задач</div>
+            <ng-container *ngFor="let row of statistic.taskCount">
+                <ng-container *ngTemplateOutlet="rowInfo; context:row"></ng-container>
+            </ng-container>
+            <div class="border-bottom-1 border-bluegray-100 mt-2 text-bluegray-600">Стадии</div>
+            <ng-container *ngFor="let row of statistic.taskCountByStage">
+                <ng-container *ngTemplateOutlet="rowInfo; context:row"></ng-container>
+            </ng-container>
+            <div class="border-bottom-1 border-bluegray-100 mt-2 text-bluegray-600">Выполнено работ</div>
+            <ng-container *ngFor="let row of statistic.worksDone">
+                <ng-container *ngTemplateOutlet="rowInfo; context:row"></ng-container>
+            </ng-container>
+            <div class="border-bottom-1 border-bluegray-100 mt-2 text-bluegray-600">Задачи с тегами</div>
+            <div class="flex flex-wrap gap-2">
+                <span *ngIf="statistic.taskCountByTags.length === 0" class="text-bluegray-300 text-lg font-semibold">
+                    Нет задач
+                </span>
+                <ng-container *ngFor="let row of statistic.taskCountByTags">
+                    <ng-container *ngTemplateOutlet="tag; context:row"></ng-container>
+                </ng-container>
+            </div>
+        </div>
+    </ng-container>
+</div>
+
+<ng-template #rowInfo let-label="label" let-value="value" let-lcolor="lcolor" let-vcolor="vcolor">
+    <div class="flex gap-2 align-items-center">
+        <span [style.color]="lcolor ? lcolor + ' !important' : null" class="text-bluegray-500 text-sm font-semibold">{{label}}</span>
+        <span [style.color]="vcolor ? vcolor + ' !important' : null" class="text-bluegray-600">{{value}}</span>
+    </div>
+</ng-template>
+
+<ng-template #tag let-label="label" let-value="value" let-color="color">
+    <div class="flex py-1 px-2 gap-2 align-items-center border-round-3xl text-xs font-bold text-white w-fit h-fit" [style.background-color]="color">
+        <span>{{label}}</span>
+        <span>{{value}}</span>
+    </div>
+</ng-template>
+
+<ng-template #loading>
+    <p-skeleton height="27rem"></p-skeleton>
+</ng-template>

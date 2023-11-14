@@ -9,10 +9,22 @@
             <app-task-template-input *ngFor="let field of currentStepFields" [formControlName]="field.id" [field]="field"
                                      class="stretched"></app-task-template-input>
         </div>
-        <span class="font-semibold text-lg text-bluegray-400 mt-3">Начальный комментарий</span>
-        <div class="flex gap-2">
-            <app-avatar *ngIf="personality.me" [name]="personality.me?.fullName" [src]="personality.me?.avatar" [size]="3"></app-avatar>
-            <textarea pInputTextarea placeholder="Комментарий..." [autoResize]="true" [rows]="5" [(ngModel)]="initialComment" class="flex-grow-1"></textarea>
+        <div class="flex flex-column gap-3 mt-3">
+            <div class="flex flex-column gap-1">
+                <span class="font-semibold text-lg text-bluegray-400">Наблюдатели</span>
+                <app-observer-selector-input [(ngModel)]="initialObservers"></app-observer-selector-input>
+            </div>
+            <div class="flex flex-column gap-1">
+                <span class="font-semibold text-lg text-bluegray-400">Теги</span>
+                <app-task-tag-selector [autoAccept]="true" [(ngModel)]="initialTags"></app-task-tag-selector>
+            </div>
+            <div class="flex flex-column gap-1">
+                <span class="font-semibold text-lg text-bluegray-400">Начальный комментарий</span>
+                <div class="flex gap-2">
+                    <app-avatar *ngIf="personality.me" [name]="personality.me?.fullName" [src]="personality.me?.avatar" [size]="3"></app-avatar>
+                    <textarea pInputTextarea placeholder="Комментарий..." [autoResize]="true" [rows]="5" [(ngModel)]="initialComment" class="flex-grow-1"></textarea>
+                </div>
+            </div>
         </div>
         <ng-container *ngTemplateOutlet="controls"></ng-container>
     </div>

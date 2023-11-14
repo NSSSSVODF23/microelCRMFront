@@ -1,8 +1,17 @@
-<div appExtendPageHeight class="flexed vcenter">
-    <div class="responsive-wrapper flexed gap10">
+<div appExtendPageHeight class="flex justify-content-center">
+    <div class="responsive-wrapper flex gap-3">
         <app-main-menu-panel></app-main-menu-panel>
-        <div>
-            <h2>Здесь общий дашбоард</h2>
+        <div class="grid h-fit w-full">
+            <ng-container *ngIf="wireframes$ | async as wireframes; else empty">
+                <app-dashboard-task-statistic-panel *ngFor="let wireframe of wireframes" [wireframe]="wireframe" class="col-4"></app-dashboard-task-statistic-panel>
+            </ng-container>
         </div>
     </div>
 </div>
+
+<ng-template #empty>
+    <div class="flex flex-column flex-grow-1 w-full align-items-center justify-content-center p-5 text-bluegray-400 text-4xl font-light">
+        <span class="mds-frame_source"></span>
+        <span>Нет активных шаблонов задач</span>
+    </div>
+</ng-template>

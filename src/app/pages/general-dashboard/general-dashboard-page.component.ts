@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import {ApiService} from "../../services/api.service";
 
 @Component({
   templateUrl: './general-dashboard-page.component.html',
@@ -6,7 +7,9 @@ import { Component, OnInit } from '@angular/core';
 })
 export class GeneralDashboardPageComponent implements OnInit {
 
-  constructor() { }
+  wireframes$ = this.api.getWireframes();
+
+  constructor(private api: ApiService) { }
 
   ngOnInit(): void {
   }
