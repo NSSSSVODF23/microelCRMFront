@@ -125,8 +125,8 @@
           [header]="createGroupDialogMode==='create'? 'Создание группы': 'Изменение группы'" [resizable]="false"
           appendTo="body">
     <ng-template pTemplate="content">
-        <div [formGroup]="createGroupForm" class="flexed column gap10 p1">
-            <input [style]="{maxWidth:'15rem'}" formControlName="name" pInputText placeholder="Название группы...">
+        <div [formGroup]="createGroupForm" class="flexed column gap10 p1" (keyup.enter)="enterButtonPress()">
+            <input [style]="{maxWidth:'15rem'}" formControlName="name" pInputText placeholder="Название группы..." autofocus>
             <textarea [autoResize]="true" cols="50" formControlName="description" pInputTextarea
                       placeholder="Описание группы..." rows="5"></textarea>
             <ng-container [ngSwitch]="createGroupDialogMode">
@@ -144,12 +144,12 @@
           [header]="createWorkDialogMode==='create'? 'Создание работы': 'Изменение работы'" [resizable]="false">
     <ng-template pTemplate="content">
         <div [formGroup]="createWorkForm" class="flexed column gap10 p1">
-            <input [style]="{maxWidth:'15rem'}" formControlName="name" pInputText placeholder="Название работы...">
+            <input [style]="{maxWidth:'15rem'}" formControlName="name" pInputText placeholder="Название работы..." autofocus>
             <textarea [autoResize]="true" cols="70" formControlName="description" pInputTextarea
                       placeholder="Описание работы..." rows="5"></textarea>
             <p-pickList (onMoveToSource)="unselectPaidAction($event)" (onMoveToTarget)="selectPaidAction($event)" [dragdrop]="true"
                         [showSourceControls]="false" [showTargetControls]="false" [source]="availablePaidActions"
-                        [sourceStyle]="{'height':'30rem'}" [targetStyle]="{'height':'30rem'}"
+                        [sourceStyle]="{'height':'30rem'}" [targetStyle]="{'height':'30rem'}" filterBy="name"
                         [target]="selectedPaidActions" sourceHeader="Доступные действия" targetHeader="Выбранные действия">
                 <ng-template let-item pTemplate="item">
                     <div class="flexed gap5">
@@ -161,8 +161,8 @@
                                 {{item.cost}} руб./{{item.unit | unitName}}
                             </span>
                         </div>
-                        <div *ngIf="item.mode === 'select'" class="w-min" [formGroup]="item.control">
-                            <p-inputNumber formControlName="count" [size]="4" [min]="0.01" [minFractionDigits]="0" [maxFractionDigits]="2"
+                        <div *ngIf="item.mode === 'select'" class="w-min z-5" [formGroup]="item.control">
+                            <p-inputNumber formControlName="count" [size]="4" [min]="0.01" (mousedown)="$event.stopPropagation()" (dblclick)="$event.stopPropagation()" [minFractionDigits]="0" [maxFractionDigits]="2"
                                            [max]="99999" [allowEmpty]="false"></p-inputNumber>
                         </div>
                     </div>

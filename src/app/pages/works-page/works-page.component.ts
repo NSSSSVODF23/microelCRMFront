@@ -636,4 +636,12 @@ export class WorksPageComponent implements OnInit, OnDestroy {
             }
         })
     }
+
+    enterButtonPress() {
+        if(this.createGroupDialogMode === 'create'){
+            this.createGroup()
+        }else if (this.createGroupDialogMode === 'edit'){
+            this.updateGroup()
+        }
+    }
 }
