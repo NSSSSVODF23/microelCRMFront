@@ -150,19 +150,20 @@ export class TaskCreationPageComponent implements OnInit, OnDestroy {
 
         this.taskCreationForm = new FormArray(
             this.selectedTemplate.steps.map(step => {
-                 return new FormGroup(
-                    step.fields.reduce(
-                        (prev, field) => {
-                            let defaultValue = null;
-                            if(this.defaultValues){
-                                switch (field.name.toLowerCase()) {
-                                    case "логин": defaultValue = this.defaultValues.login; break;
-                                    case "адрес": defaultValue = this.defaultValues.address; break;
-                                }
+                console.log(this.defaultValues);
+                return new FormGroup(
+                step.fields.reduce(
+                    (prev, field) => {
+                        let defaultValue = null;
+                        if(this.defaultValues){
+                            switch (field.name.toLowerCase()) {
+                                case "логин": defaultValue = this.defaultValues.login; break;
+                                case "адрес": defaultValue = this.defaultValues.address; break;
                             }
-                            return {...prev, [field.id]: new FormControl(defaultValue, CustomValidators.taskInput(field.type, field.variation))};
-                        }, {}
-                    )
+                        }
+                        return {...prev, [field.id]: new FormControl(defaultValue, CustomValidators.taskInput(field.type, field.variation))};
+                    }, {}
+                )
                 )
             })
         )

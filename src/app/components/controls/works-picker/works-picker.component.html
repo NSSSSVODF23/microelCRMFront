@@ -11,17 +11,15 @@
         Выполненные работы
     </div>
 
-    <div class="border-1 border-bluegray-100 border-round-md overflow-hidden" [ngClass]="{'cover-element': isDisabled}">
+    <div class="border-1 border-bluegray-100 border-round-md overflow-hidden h-fit" [style]="{minHeight:'500px', minWidth:'300px'}" [ngClass]="{'cover-element': isDisabled}">
         <p-tabView styleClass="tab-content-unpadding">
             <p-tabPanel header="Работы">
-                <p-table [loading]="worksTableLoading" [rowHover]="true" [value]="treeMenuWorksItems"
-                         scrollHeight="200px"
-                         styleClass="p-datatable-sm">
+                <p-table [loading]="worksTableLoading" [rowHover]="true" [value]="treeMenuWorksItems" scrollHeight="500px">
                     <ng-template let-node pTemplate="body">
                         <ng-container [ngSwitch]="node.type">
                             <tr (dblclick)="workingTableBack()" *ngSwitchCase="'back'" class="not-selectable">
-                                <td class="caption size-small with-icon">
-                                    <span [style.font-size]="'1em'" class="mdi-subdirectory_arrow_left"></span>
+                                <td class="text-bluegray-400 gap-1 flex align-items-center">
+                                    <span class="mdi-subdirectory_arrow_left"></span>
                                     <span>Назад</span>
                                 </td>
                                 <td>
@@ -29,21 +27,21 @@
                             </tr>
                             <tr (dblclick)="loadWorksByGroup(node.key)" *ngSwitchCase="'group'"
                                 class="not-selectable">
-                                <td class="caption size-small with-icon">
-                                    <span [class]="node.icon" [style.font-size]="'1em'"></span>
-                                    <span class="caption f-inline">{{node.label}}</span>
+                                <td class="text-bluegray-400 gap-1 flex align-items-center">
+                                    <span [class]="node.icon"></span>
+                                    <span>{{node.label}}</span>
                                 </td>
                                 <td>
                                 </td>
                             </tr>
                             <tr (onDragStart)="workDragging(node.data)" *ngSwitchCase="'work'"
-                                class="not-selectable cursor-move"
+                                class="not-selectable cursor-move" (dblclick)="workDragging(node.data); dropped();"
                                 dragEffect="move" [pDraggableDisabled]="isDisabled" pDraggable="dd">
-                                <td class="caption size-small with-icon">
-                                    <span [class]="node.icon" [style.font-size]="'1em'"></span>
-                                    <span class="caption f-inline">{{node.label}}</span>
+                                <td class="text-bluegray-400 gap-1 flex align-items-center">
+                                    <span [class]="node.icon"></span>
+                                    <span>{{node.label}}</span>
                                 </td>
-                                <td class="caption size-small">
+                                <td class="text-bluegray-400">
                                     {{workCost(node.data)}} руб.
                                 </td>
                             </tr>
@@ -60,14 +58,14 @@
                     </span>
                     <p-table #actionTableRef [globalFilterFields]="['name']" [loading]="actionsTableLoading"
                              [rowHover]="true" [value]="tableMenuActionsItems" [rowTrackBy]="trackByActionItems"
-                             scrollHeight="200px" styleClass="p-datatable-sm">
+                             scrollHeight="500px" styleClass="p-datatable-sm">
                         <ng-template let-action pTemplate="body">
                             <tr (onDragStart)="actionDragging(action)" class="not-selectable cursor-move"
-                                dragEffect="move"
+                                dragEffect="move" (dblclick)="actionDragging(action); dropped();"
                                 pDraggable="dd">
                                 <td class="caption size-small with-icon">
                                     <span [style.font-size]="'1em'" class="mdi-directions_run"></span>
-                                    <span [style.max-width]="'10rem'" appTicker
+                                    <span [style.max-width]="'20rem'" appTicker
                                           class="caption white-space-nowrap overflow-hidden">{{action.name}}</span>
                                 </td>
                                 <td>

@@ -1,5 +1,5 @@
-<div appExtendPageHeight class="flexed vcenter">
-    <div class="responsive-wrapper flexed gap10">
+<div appExtendPageHeight class="flex">
+    <div class="flex gap-3 flex-grow-1 px-3 mb-3">
         <app-main-menu-panel></app-main-menu-panel>
         <div [style.grid]="'min-content 1fr/1fr'" class="grided gap10 stretched">
             <div [formGroup]="filterForm" class="flexed gap10 panel p10 vcenter">
@@ -12,7 +12,7 @@
                 <p-button (onClick)="openCreationDialog()" icon="mdi-add" label="Создать"
                           styleClass="p-button-success"></p-button>
             </div>
-            <div [ngSwitch]="loadingState" [style]="{grid:'1fr min-content/1fr', marginBottom:'1rem'}"
+            <div [ngSwitch]="loadingState" [style]="{grid:'1fr min-content/1fr'}"
                  class="grided panel p10">
                 <ng-container *ngSwitchCase="'READY'">
                     <div class="flexed column">

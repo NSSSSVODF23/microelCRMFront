@@ -1,5 +1,5 @@
-<div appExtendPageHeight class="flex justify-content-center">
-    <div class="flex gap-3 responsive-wrapper mb-3">
+<div appExtendPageHeight class="flex flex-grow-1 px-4">
+    <div class="flex flex-grow-1 gap-3 mb-3">
         <app-main-menu-panel></app-main-menu-panel>
         <div class="flex flex-column flex-grow-1 panel">
             <span class="caption size-huge wt-tiny f-color-600 p-3 terminator-bottom">Создание задачи и подсчет работ</span>
@@ -39,7 +39,7 @@
                 <section *ngIf="templateLoadingState==='READY'" class="flex gap-4 p-4 terminator-bottom" [formGroup]="installersReportForm">
                     <div class="flex flex-column gap-1">
                         <span class="caption wt-bold f-color-500">Назначенные монтажники</span>
-                        <p-listbox [checkbox]="true" [metaKeySelection]="false" [multiple]="true"
+                        <p-listbox [checkbox]="true" [metaKeySelection]="false" [multiple]="true" [listStyle]="{'max-height':'200px'}"
                                    [options]="installers" formControlName="installers">
                             <ng-template let-installer pTemplate="item">
                                 <app-employee-label [employee]="installer"></app-employee-label>
