@@ -1,6 +1,6 @@
 import {Component, OnInit} from '@angular/core';
 import {MediaViewerService} from "../../../services/media-viewer.service";
-import {Attachment} from "../../../transport-interfaces";
+import {Attachment, TFile} from "../../../transport-interfaces";
 import {fade, fadeAlt, fadeFullAlt} from "../../../animations";
 
 @Component({
@@ -12,7 +12,7 @@ import {fade, fadeAlt, fadeFullAlt} from "../../../animations";
 export class MediaViewerComponent implements OnInit {
 
     showFullscreen = false;
-    media?: Attachment;
+    media?: Attachment | TFile;
     albumIndex: number = 0;
     mediaAlbum?: Attachment[];
     showNavigation = 'fade';
@@ -20,6 +20,17 @@ export class MediaViewerComponent implements OnInit {
     imageLoadingIndicator = true;
 
     constructor(readonly service: MediaViewerService) {
+    }
+
+    get url(){
+        if(this.media){
+            if('fileSystemItemId' in this.media){
+                return '/api/private/file/'+this.media.fileSystemItemId;
+            }else{
+                return '/api/private/attachment/'+this.media.name
+            }
+        }
+        return null;
     }
 
     ngOnInit(): void {

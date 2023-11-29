@@ -29,6 +29,7 @@ import {TelegramSettingsPageComponent} from "../../pages/telegram-settings-page/
 import {AcpSettingsPageComponent} from "../../pages/acp-settings-page/acp-settings-page.component";
 import {AcpSessionsPageComponent} from "../../pages/acp-sessions-page/acp-sessions-page.component";
 import {CommutatorListPageComponent} from "../../pages/commutator-list-page/commutator-list-page.component";
+import {FilesPageComponent} from "../../pages/files-page/files-page.component";
 
 const routes: Routes = [
     {
@@ -62,6 +63,7 @@ const routes: Routes = [
             {path: 'system/telegram', component: TelegramSettingsPageComponent},
             {path: 'system/acp', component: AcpSettingsPageComponent},
             {path: 'commutators/list', component: CommutatorListPageComponent},
+            {path: 'files', component: FilesPageComponent},
         ]
     },
     // {breadcrumb: '**', redirectTo: 'tasks/status/all', pathMatch: 'full'},

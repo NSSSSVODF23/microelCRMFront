@@ -21,9 +21,9 @@ import {
     Employee,
     EmployeeStatus, FdbItem,
     FieldItem,
-    FileData,
+    FileData, FilesLoadFileEvent, FileSystemItem,
     House,
-    INotification,
+    INotification, LoadingDirectoryWrapper,
     MessageData,
     ModelItem, NCLHistoryItem, NCLHistoryWrapper, NetworkConnectionLocation,
     NetworkRemoteControl,
@@ -874,6 +874,10 @@ export class ApiService {
         return this.sendGet<{ label: string, value: string }[]>('api/private/types/advertising-source');
     }
 
+    getFilesSortingTypes() {
+        return this.sendGet<{ label: string, value: string }[]>('api/private/types/files-sorting');
+    }
+
     getBillingConfiguration() {
         return this.sendGet<BillingConf>('api/private/configuration/billing');
     }
@@ -916,6 +920,79 @@ export class ApiService {
 
     deleteClientEquipment(clientEquipmentId: number) {
         return this.sendDelete(`api/private/client-equipment/${clientEquipmentId}`);
+    }
+
+    createCommutator(form: any) {
+        return this.sendPost('api/private/acp/commutator', form);
+    }
+
+    editCommutator(commutatorId: number, form: any) {
+        return this.sendPatch(`api/private/acp/commutator/${commutatorId}`, form);
+    }
+
+    deleteCommutator(id: number) {
+        return this.sendDelete(`api/private/acp/commutator/${id}`);
+    }
+
+    commutatorRemoteUpdate(id: number) {
+        return this.sendPost(`api/private/acp/commutator/${id}/get-remote-update`, {});
+    }
+
+    commutatorRemoteUpdateByVlan(vlan: number) {
+        return this.sendPost(`api/private/acp/commutators/vlan/${vlan}/get-remote-update`, {});
+    }
+
+    fdbTableByPort(id: number) {
+        return this.sendGet<FdbItem[]>(`api/private/acp/commutator/port/${id}/fdb`);
+    }
+
+    getCommutatorsByVlan(vlan: number) {
+        return this.sendGet<Switch[]>(`api/private/acp/commutators/vlan/${vlan}`);
+    }
+
+    getCountingLivesCalculation(form: {[key:string]: any})  {
+        return this.sendPost<{ result: string }>(`api/private/billing/counting-lives`, form)
+    }
+
+    attachToTask(superMessageId: number, chatId: number, description: string) {
+        return this.sendPost(`api/private/chat/${chatId}/message/${superMessageId}/attach-to-task`, {description});
+    }
+
+    getFilesRoot(sortingType?: string | null){
+        return this.sendGet<FileSystemItem[]>('api/private/files/root', {sortingType});
+    }
+
+    getFilesDirectory(id: number, sortingType?: string | null){
+        return this.sendGet<LoadingDirectoryWrapper>(`api/private/files/directory/${id}`, {sortingType});
+    }
+
+    filesMoveTo(target: number | null, source: number[]){
+        return this.sendPatch(`api/private/files/move-to`, {target, source});
+    }
+
+    filesCopyTo(target: number | null, source: number[]) {
+        return this.sendPatch(`api/private/files/copy-to`, {target, source});
+    }
+
+    filesDelete(id: number) {
+        return this.sendDelete(`api/private/files/delete/${id}`);
+    }
+
+    filesRename(id: number, name: string) {
+        return this.sendPatch(`api/private/files/rename`, {id, name});
+    }
+
+
+    filesCreateDirectory(name: string, parentDirectoryId?: number | null) {
+        return this.sendPost(`api/private/files/create-directory`, {parentDirectoryId, name});
+    }
+
+    filesUpload(fileEvents: FilesLoadFileEvent[]) {
+        return this.sendPost(`api/private/files/load`, fileEvents);
+    }
+
+    searchFiles(query: string, sortingType?: string | null){
+        return this.sendGet<FileSystemItem[]>('api/private/files/search', {query, sortingType});
     }
 
     // Результаты запросов на сервер кэшируются по таймауту, чтобы не было доп нагрузки на сервер
@@ -998,41 +1075,5 @@ export class ApiService {
 
     private generateHash(uri: string, query: any) {
         return cyrb53(uri + JSON.stringify(query), 0);
-    }
-
-    createCommutator(form: any) {
-        return this.sendPost('api/private/acp/commutator', form);
-    }
-
-    editCommutator(commutatorId: number, form: any) {
-        return this.sendPatch(`api/private/acp/commutator/${commutatorId}`, form);
-    }
-
-    deleteCommutator(id: number) {
-        return this.sendDelete(`api/private/acp/commutator/${id}`);
-    }
-
-    commutatorRemoteUpdate(id: number) {
-        return this.sendPost(`api/private/acp/commutator/${id}/get-remote-update`, {});
-    }
-
-    commutatorRemoteUpdateByVlan(vlan: number) {
-        return this.sendPost(`api/private/acp/commutators/vlan/${vlan}/get-remote-update`, {});
-    }
-
-    fdbTableByPort(id: number) {
-        return this.sendGet<FdbItem[]>(`api/private/acp/commutator/port/${id}/fdb`);
-    }
-
-    getCommutatorsByVlan(vlan: number) {
-        return this.sendGet<Switch[]>(`api/private/acp/commutators/vlan/${vlan}`);
-    }
-
-    getCountingLivesCalculation(form: {[key:string]: any})  {
-        return this.sendPost<{ result: string }>(`api/private/billing/counting-lives`, form)
-    }
-
-    attachToTask(superMessageId: number, chatId: number, description: string) {
-        return this.sendPost(`api/private/chat/${chatId}/message/${superMessageId}/attach-to-task`, {description});
     }
 }

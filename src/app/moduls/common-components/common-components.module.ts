@@ -187,6 +187,10 @@ import {ChatLinkComponent} from "../../components/controls/chat-link/chat-link.c
 import {
     DashboardTaskStatisticPanelComponent
 } from "../../components/panels/dashboard-task-statistic-panel/dashboard-task-statistic-panel.component";
+import {FilesViewerComponent} from "../../components/panels/files-system/files-viewer/files-viewer.component";
+import {TreeModule} from "primeng/tree";
+import {BreadcrumbModule} from "primeng/breadcrumb";
+import {MenubarModule} from "primeng/menubar";
 
 
 @NgModule({
@@ -283,7 +287,8 @@ import {
         EquipmentsFieldFilterComponent,
         CountingLivesInputComponent,
         ChatLinkComponent,
-        DashboardTaskStatisticPanelComponent
+        DashboardTaskStatisticPanelComponent,
+        FilesViewerComponent
     ],
     exports: [
         AccountPanelComponent,
@@ -378,7 +383,8 @@ import {
         EquipmentsFieldFilterComponent,
         CountingLivesInputComponent,
         ChatLinkComponent,
-        DashboardTaskStatisticPanelComponent
+        DashboardTaskStatisticPanelComponent,
+        FilesViewerComponent
     ],
     imports: [
         CommonPipesModule,
@@ -428,6 +434,9 @@ import {
         DragDropModule,
         ChartModule,
         KeyFilterModule,
+        TreeModule,
+        BreadcrumbModule,
+        MenubarModule,
     ],
     providers: [
         {

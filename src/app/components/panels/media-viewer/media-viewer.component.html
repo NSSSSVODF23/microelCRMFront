@@ -7,7 +7,7 @@
         <div *ngIf="imageLoadingIndicator" class="image-loading-indicator">
             <p-progressSpinner class="white-spinner"></p-progressSpinner>
         </div>
-        <img (error)="imageLoadError($event)" (load)="imageLoad($event)" [src]="'/api/private/attachment/'+media?.name">
+        <img (error)="imageLoadError($event)" (load)="imageLoad($event)" [src]="url">
         <div (mouseenter)="showNavigation='unfade'" (mouseleave)="showNavigation='fade'"
              *ngIf="mediaAlbum && mediaAlbum.length>1"
              class="navigation">
@@ -25,7 +25,7 @@
     </div>
     <div *ngSwitchCase="'VIDEO'" class="video-view">
         <div class="video-wrapper">
-            <video [ngClass]="{'controls-out':!(mediaAlbum && mediaAlbum.length>1)}" [controls]="true" [src]="'/api/private/attachment/'+media?.name"></video>
+            <video [ngClass]="{'controls-out':!(mediaAlbum && mediaAlbum.length>1)}" [controls]="true" [src]="url"></video>
             <div class="video-navigation" *ngIf="mediaAlbum && mediaAlbum.length>1">
                 <div (click)="goPrev()" class="video-navigation-button back">
                     <span class="material-icons-round">arrow_back_ios</span>
@@ -41,7 +41,7 @@
         <ng-component *ngTemplateOutlet="metadata"></ng-component>
     </div>
     <div *ngSwitchCase="'AUDIO'" class="audio-view">
-        <audio [controls]="true" [src]="'/api/private/attachment/'+media?.name"></audio>
+        <audio [controls]="true" [src]="url"></audio>
         <div class="audio-navigation" *ngIf="mediaAlbum && mediaAlbum.length>1">
             <div (click)="goPrev()" class="audio-navigation-button back">
                 <span class="material-icons-round">arrow_back_ios</span>
@@ -71,16 +71,16 @@
             </div>
             <div class="flexed hcenter gap3">
                 <span class="caption size-small wt-bold f-color-500">Дата создания</span>
-                <span class="caption size-small f-inline">{{media?.modified|date}}</span>
+                <span class="caption size-small f-inline">{{media?.modifiedAt|date}}</span>
             </div>
             <div class="flexed hcenter gap3">
                 <span class="caption size-small wt-bold f-color-500">Дата добавления</span>
-                <span class="caption size-small f-inline">{{media?.created|date}}</span>
+                <span class="caption size-small f-inline">{{media?.createdAt|date}}</span>
             </div>
         </div>
         <div class="stretched"></div>
         <app-button (onClick)="downloadLink.click()" icon="download" label="Скачать"
                     model="p-button-success"></app-button>
-        <a #downloadLink [download]="media?.name" [style.display]="'none'" [href]="'/api/private/attachment/'+media?.name"></a>
+        <a #downloadLink [download]="media?.name" [style.display]="'none'" [href]="url"></a>
     </div>
 </ng-template>

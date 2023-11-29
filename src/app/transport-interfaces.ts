@@ -372,8 +372,8 @@ export interface Attachment {
     mimeType?: string;
     type?: AttachmentType;
     size?: number;
-    created?: string;
-    modified?: string;
+    createdAt?: string;
+    modifiedAt?: string;
 }
 
 export enum AttachmentType {
@@ -1389,4 +1389,35 @@ export interface WireframeTaskCounter{
     id: number;
     num: number;
     stages: {id:string, num: number}[]
+}
+
+export interface FileSystemItem{
+    discriminator: string | null;
+    fileSystemItemId: number;
+    name: string;
+    size?: number;
+    createdAt?: string;
+    modifiedAt?: string;
+    parent: Directory | null;
+}
+
+export interface Directory extends FileSystemItem{
+    fileCount: number;
+}
+
+export interface TFile extends FileSystemItem{
+    mimeType: string | null;
+    sizeMbyte: number;
+    type: AttachmentType;
+}
+
+export interface FilesLoadFileEvent {
+    name: string;
+    data: number[];
+    targetDirectoryId?: number | null;
+}
+
+export interface LoadingDirectoryWrapper{
+    path: Directory[];
+    files: FileSystemItem[];
 }

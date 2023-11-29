@@ -1,0 +1,165 @@
+<div class="flex flex-column border-round-lg border-1 border-bluegray-100 overflow-hidden relative bg-bluegray-50"
+     (keydown.control.c)="$event.preventDefault(); setCopyItems()"
+     (keydown.control.x)="$event.preventDefault(); setMoveItems()"
+     (drop)="dropFilesHandler($event)"
+     (dragover)="$event.preventDefault()"
+     (keydown.delete)="deleteItems()"
+     (paste)="$event.preventDefault(); pasteItems()">
+    <p-menubar [model]="menuItems" styleClass="border-0">
+        <ng-template pTemplate="end">
+            <div class="flex gap-2">
+                <p-dropdown [options]="(filesSortingTypeItems$ | async) ?? []" [formControl]="filesSortingControl" appendTo="body"></p-dropdown>
+                <div class="p-inputgroup">
+                    <input type="text" pInputText placeholder="Поиск..." [formControl]="searchFilesQueryControl" (keydown.enter)="searchFiles()">
+                    <button type="button" pButton pRipple icon="mdi-search" (click)="searchFiles()"></button>
+                </div>
+            </div>
+        </ng-template>
+    </p-menubar>
+    <div class="flex flex-column flex-grow-1 border-top-1 border-bluegray-100 overflow-hidden">
+        <p-breadcrumb [home]="breadcrumbRoot" [model]="breadcrumbItems" class="flex-grow-1" styleClass="border-0 bg-transparent" *ngIf="!searchMode else searchTitle"></p-breadcrumb>
+        <p-table [value]="fileItems" [loading]="isLoading"
+                 selectionMode="multiple"
+                 [(selection)]="selectedItems"
+                 (selectionChange)="updateMenuItems()"
+                 [metaKeySelection]="true">
+            <ng-template pTemplate="header">
+                <tr>
+                    <th>Имя</th>
+                    <th>Создан</th>
+                    <th>Размер</th>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-fileItem>
+                <tr (dblclick)="doubleClick(fileItem)"
+                    [pSelectableRow]="fileItem"
+                    [pSelectableRowDisabled]="isBackButton(fileItem)"
+                    pDraggable="fileScope"
+                    pDroppable="fileScope"
+                    [pDroppableDisabled]="isNotADirectory(fileItem)"
+                    [pDraggableDisabled]="!selectedItems.includes(fileItem)"
+                    (onDragStart)="insideDragDrop = true"
+                    (onDragEnd)="insideDragDrop = false"
+                    (onDrop)="filesDropped(fileItem)"
+                    class="select-none text-bluegray-600">
+                    <ng-container [ngSwitch]="fileItem.discriminator">
+                        <ng-container *ngSwitchCase="'back'">
+                            <ng-container *ngTemplateOutlet="backButton"></ng-container>
+                        </ng-container>
+                        <ng-container *ngSwitchCase="'directory'">
+                            <ng-container *ngTemplateOutlet="directory; context:{$implicit:fileItem}"></ng-container>
+                        </ng-container>
+                        <ng-container *ngSwitchCase="'file'">
+                            <ng-container *ngTemplateOutlet="file; context:{$implicit:fileItem}"></ng-container>
+                        </ng-container>
+                    </ng-container>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="emptymessage">
+                <tr>
+                    <td colspan="3">
+                        Файлов не найденно
+                    </td>
+                </tr>
+            </ng-template>
+        </p-table>
+    </div>
+    <div class="absolute top-0 left-0 w-full h-full flex flex-column text-white text-2xl font-bold
+     align-items-center justify-content-center bg-black-alpha-40 pointer-events-none" *ngIf="dropMessageVisible && !insideDragDrop">
+        <span>
+            Загрузить файлы в текущую директорию
+        </span>
+    </div>
+    <div class="absolute top-0 left-0 w-full h-full flex flex-column text-white text-2xl font-bold
+     align-items-center justify-content-center bg-black-alpha-40" *ngIf="dropFilesUploadingVisible">
+        <p-progressSpinner></p-progressSpinner>
+        <span>
+            Загрузка файлов на сервер
+        </span>
+    </div>
+</div>
+
+<ng-template #directory let-item>
+    <td class="flex gap-2 align-items-center" [ngClass]="itemSelectionStyleClasses(item)">
+        <ng-container *ngTemplateOutlet="directoryIcon"></ng-container>
+        <span>
+            {{item.name}}
+        </span>
+    </td>
+    <td>
+        {{item.createdAt | date:'dd-MM-yyyy HH:mm'}}
+    </td>
+    <td>
+    </td>
+</ng-template>
+
+<ng-template #file let-item>
+    <td class="flex gap-2 align-items-center" [ngClass]="itemSelectionStyleClasses(item)">
+        <ng-container *ngTemplateOutlet="fileIcon; context:{$implicit: item.type}"></ng-container>
+        <span>
+            {{item.name}}
+        </span>
+    </td>
+    <td>
+        {{item.createdAt | date:'dd-MM-yyyy HH:mm'}}
+    </td>
+    <td>
+        {{item.sizeMbyte | number:'1.1-2'}} Mb
+    </td>
+</ng-template>
+
+<ng-template #backButton>
+    <td class="flex gap-2 align-items-center text-bluegray-300" (dblclick)="back()">
+        <span class="mdi-turn_left"></span>
+        <span>
+            Назад
+        </span>
+    </td>
+    <td>
+    </td>
+    <td>
+    </td>
+</ng-template>
+
+<ng-template #directoryIcon>
+    <span class="mdi-folder"></span>
+</ng-template>
+
+<ng-template #fileIcon let-type>
+    <ng-container [ngSwitch]="type">
+        <span class="mdi-image" *ngSwitchCase="'PHOTO'"></span>
+        <span class="mdi-videocam" *ngSwitchCase="'VIDEO'"></span>
+        <span class="mdi-audiotrack" *ngSwitchCase="'AUDIO'"></span>
+        <span class="mdi-picture_as_pdf" *ngSwitchCase="'DOCUMENT'"></span>
+        <span class="mdi-insert_drive_file" *ngSwitchDefault></span>
+    </ng-container>
+</ng-template>
+
+<ng-template #searchTitle>
+    <div class="flex gap-2 align-items-center py-2 px-3">
+        <span class="text-xl text-bluegray-500">
+            Результаты поиска:
+        </span>
+        <span class="text-xl text-bluegray-600 font-bold">
+            {{searchFilesQueryControl.value}}
+        </span>
+        <p-button icon="mdi-close" label="Отмена" (onClick)="cancelSearch()" styleClass="p-button-sm p-button-secondary p-button-text"></p-button>
+    </div>
+</ng-template>
+
+<p-dialog [(visible)]="createDirectoryDialogVisible" [draggable]="true" [modal]="true" [dismissableMask]="true"
+          appendTo="body" header="Создать папку" contentStyleClass="flex gap-3 pt-1" >
+    <input pInputText placeholder="Название" [formControl]="createDirectoryNameControl" (keydown.enter)="createDirectoryNameControl.valid && createDirectory()"/>
+    <p-button (onClick)="createDirectory()" label="Создать" icon="mdi-add" [disabled]="createDirectoryNameControl.invalid"
+              [loading]="directoryCreating"></p-button>
+</p-dialog>
+
+<p-dialog [(visible)]="renameItemDialogVisible" [draggable]="true" [modal]="true" [dismissableMask]="true"
+          appendTo="body" header="Переименовать файл" contentStyleClass="flex gap-3 pt-1" >
+    <ng-container [formGroup]="renameItemForm">
+        <input pInputText placeholder="Новое название" formControlName="name" (keydown.enter)="renameItemForm.valid && renameItem()"/>
+        <p-button (onClick)="renameItem()" label="Переименовать" icon="mdi-add" [disabled]="renameItemForm.invalid"
+                  [loading]="itemBeingRename"></p-button>
+    </ng-container>
+</p-dialog>
+<input #fileManager (change)="filesManagerChange($event)" [multiple]="true" [style.display]="'none'" type="file">

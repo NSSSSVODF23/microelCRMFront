@@ -55,7 +55,12 @@
                         <div *ngFor="let field of currentTask?.fields ?? []" class="flexed gap1 column">
                             <div class="caption size-small wt-bold f-color-500">{{field.name}}</div>
                             <div class="caption">
-                                {{field.textRepresentation}}
+                                <ng-container [ngSwitch]="field.wireframeFieldType">
+                                    <a *ngSwitchCase="'LOGIN'" [href]="'clients/billing/user/'+field.textRepresentation">{{field.textRepresentation}}</a>
+                                    <span *ngSwitchDefault>
+                                        {{field.textRepresentation}}
+                                    </span>
+                                </ng-container>
                             </div>
                         </div>
                     </div>

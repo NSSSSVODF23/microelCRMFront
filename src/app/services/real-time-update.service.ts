@@ -428,4 +428,7 @@ export class RealTimeUpdateService {
         return this.watch<{[tagId: number]: {[wireframeId: number]: number}}>( 'task', 'tag', 'count', 'change')
     }
 
+    updateFilesDirectory() {
+        return this.watch<number>('files', 'directory', 'update')
+    }
 }

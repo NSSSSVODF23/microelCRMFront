@@ -23,7 +23,7 @@ import {
     NgIf,
     NgStyle,
     NgSwitch,
-    NgSwitchCase,
+    NgSwitchCase, NgSwitchDefault,
     NgTemplateOutlet, SlicePipe, TitleCasePipe
 } from "@angular/common";
 import {TabViewModule} from "primeng/tabview";
@@ -98,6 +98,7 @@ import {AcpSessionsPageComponent} from "../../pages/acp-sessions-page/acp-sessio
 import {CommutatorListPageComponent} from "../../pages/commutator-list-page/commutator-list-page.component";
 import {AutoCompleteModule} from "primeng/autocomplete";
 import {KeyFilterModule} from "primeng/keyfilter";
+import {FilesPageComponent} from "../../pages/files-page/files-page.component";
 
 const mapConfig: YaConfig = {
     apikey: '008574e5-f34b-4270-b3d5-91aaabd036e8',
@@ -130,7 +131,8 @@ const mapConfig: YaConfig = {
         TelegramSettingsPageComponent,
         AcpSettingsPageComponent,
         AcpSessionsPageComponent,
-        CommutatorListPageComponent
+        CommutatorListPageComponent,
+        FilesPageComponent
     ],
     imports: [
         CommonComponentsModule,
@@ -155,6 +157,7 @@ const mapConfig: YaConfig = {
         NgTemplateOutlet,
         NgSwitch,
         NgSwitchCase,
+        NgSwitchDefault,
         DatePipe,
         TimelineModule,
         LMarkdownEditorModule,

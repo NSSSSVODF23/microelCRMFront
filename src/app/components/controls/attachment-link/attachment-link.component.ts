@@ -53,11 +53,7 @@ export class AttachmentLinkComponent implements OnInit {
     attachmentOpen() {
         switch (this.attachment?.type) {
             case 'PHOTO':
-                this.mediaViewer.showMedia(this.attachment);
-                break;
             case 'VIDEO':
-                this.mediaViewer.showMedia(this.attachment);
-                break;
             case 'AUDIO':
                 this.mediaViewer.showMedia(this.attachment);
                 break;
