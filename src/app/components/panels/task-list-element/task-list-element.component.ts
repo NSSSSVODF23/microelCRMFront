@@ -63,9 +63,10 @@ export class TaskListElementComponent implements OnInit, OnChanges {
     };
 
     get taskFields(){
+        const blocks = ['LARGE_TEXT', 'COUNTING_LIVES'];
         return {
-            inline: this.item?.fields?.filter(f=>f.wireframeFieldType !== 'LARGE_TEXT') ?? [],
-            block: this.item?.fields?.filter(f=>f.wireframeFieldType === 'LARGE_TEXT') ?? []
+            inline: this.item?.fields?.filter(f=>!blocks.includes(f.wireframeFieldType)) ?? [],
+            block: this.item?.fields?.filter(f=>blocks.includes(f.wireframeFieldType)) ?? []
         }
     }
 
