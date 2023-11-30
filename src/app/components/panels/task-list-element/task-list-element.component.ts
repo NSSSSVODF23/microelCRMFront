@@ -3,6 +3,7 @@ import {FieldItem, ModelItem, Task, TaskStatus, TaskTag, WorkLog} from "../../..
 import {TasksPageCacheService} from "../../../services/tasks-page-cache.service";
 import {OverlayPanel} from "primeng/overlaypanel";
 import {ApiService} from "../../../services/api.service";
+import {mediaQuery} from "../../../util";
 
 @Component({
     selector: 'app-task-list-element',
@@ -29,6 +30,8 @@ export class TaskListElementComponent implements OnInit, OnChanges {
     @Input() customClickHandler = false;
 
     @ViewChild('tagsPreview') tagsPreview?: OverlayPanel;
+
+    isWide$ = mediaQuery("(min-width: 1024px)");
 
     statusClass: any = {};
     itemClass: any = {};
@@ -59,6 +62,13 @@ export class TaskListElementComponent implements OnInit, OnChanges {
         }
     };
 
+    get taskFields(){
+        return {
+            inline: this.item?.fields?.filter(f=>f.wireframeFieldType !== 'LARGE_TEXT') ?? [],
+            block: this.item?.fields?.filter(f=>f.wireframeFieldType === 'LARGE_TEXT') ?? []
+        }
+    }
+
     get isMoreTwoTags() {
         if (!this.item?.tags) return false;
         return this.item.tags.length > 2;
@@ -75,6 +85,10 @@ export class TaskListElementComponent implements OnInit, OnChanges {
             'composite': this.item?.modelWireframe?.listViewType === 'COMPOSITE',
             'detailed': this.item?.modelWireframe?.listViewType === 'DETAILED'
         }
+    }
+
+    get actualWorkLogWorkers(){
+        return this.actualWorkLog?.employees.map(e=>e.fullName).join(", ") ?? "";
     }
 
     trackByIndex(index: number, item: any) {

@@ -1,45 +1,43 @@
-<div appExtendPageHeight class="flexed vcenter">
-    <div class="responsive-wrapper flexed gap10">
-        <app-main-menu-panel></app-main-menu-panel>
-        <div class="flexed gap10 stretched">
-            <ng-container *ngTemplateOutlet="taskList"></ng-container>
-            <div class="flex flex-column gap-3 h-fit sticky-type-selector" [formGroup]="ic.filtersForm">
-                <app-task-template-multi-selector formControlName="template"></app-task-template-multi-selector>
-                <div class="shadow-1 p-3 border-round-md flex flex-column bg-white gap-2">
-                    <div class="input-label-wrapper" *ngIf="ic.stageList.length>1 && ic.isSelectOneTemplate">
-                        <label>Стадия</label>
-                        <p-listbox [options]="ic.stageList" formControlName="stage" listStyleClass="max-h-20rem">
-                            <ng-template let-option pTemplate="item">
-                                <div class="flex align-items-center w-full justify-content-between gap-1">
-                                    <div class="max-w-10rem white-space-nowrap overflow-hidden" appTicker>
-                                        {{option.label}}
-                                    </div>
-                                    <div>
-                                        {{option.tasksCount}}
-                                    </div>
+<div appExtendPageHeight class="flex px-3 gap-3">
+    <app-main-menu-panel></app-main-menu-panel>
+    <div class="flex flex-grow-1 gap-3">
+        <ng-container *ngTemplateOutlet="taskList"></ng-container>
+        <div class="flex flex-column gap-3 h-fit sticky-type-selector" [formGroup]="ic.filtersForm">
+            <app-task-template-multi-selector formControlName="template"></app-task-template-multi-selector>
+            <div class="shadow-1 p-3 border-round-md flex flex-column bg-white gap-2">
+                <div class="input-label-wrapper" *ngIf="ic.stageList.length>1 && ic.isSelectOneTemplate">
+                    <label>Стадия</label>
+                    <p-listbox [options]="ic.stageList" formControlName="stage" listStyleClass="max-h-20rem">
+                        <ng-template let-option pTemplate="item">
+                            <div class="flex align-items-center w-full justify-content-between gap-1">
+                                <div class="max-w-10rem white-space-nowrap overflow-hidden" appTicker>
+                                    {{option.label}}
                                 </div>
-                            </ng-template>
-                        </p-listbox>
-                    </div>
-                    <div class="input-label-wrapper">
-                        <label>Теги</label>
-                        <p-listbox [options]="ic.tagsList" formControlName="tags" [multiple]="true"
-                                   optionValue="taskTagId" [checkbox]="true" listStyleClass="max-h-20rem">
-                            <ng-template pTemplate="filter">
-                                <input type="text" pInputText placeholder="Поиск" [formControl]="ic.tagsFilterControl">
-                            </ng-template>
-                            <ng-template let-option pTemplate="item">
-                                <span class="flex align-items-center w-full justify-content-between gap-1">
-                                    <div [style.color]="option.color" class="max-w-10rem white-space-nowrap overflow-hidden" appTicker>
-                                            {{option.name}}
-                                    </div>
-                                    <ng-container *ngIf="option.tasksCount">
-                                        <app-colored-tag [color]="option.color" [caption]="option.tasksCount"></app-colored-tag>
-                                    </ng-container>
-                                </span>
-                            </ng-template>
-                        </p-listbox>
-                    </div>
+                                <div>
+                                    {{option.tasksCount}}
+                                </div>
+                            </div>
+                        </ng-template>
+                    </p-listbox>
+                </div>
+                <div class="input-label-wrapper">
+                    <label>Теги</label>
+                    <p-listbox [options]="ic.tagsList" formControlName="tags" [multiple]="true"
+                               optionValue="taskTagId" [checkbox]="true" listStyleClass="max-h-20rem">
+                        <ng-template pTemplate="filter">
+                            <input type="text" pInputText placeholder="Поиск" [formControl]="ic.tagsFilterControl">
+                        </ng-template>
+                        <ng-template let-option pTemplate="item">
+                            <span class="flex align-items-center w-full justify-content-between gap-1">
+                                <div [style.color]="option.color" class="max-w-10rem white-space-nowrap overflow-hidden" appTicker>
+                                        {{option.name}}
+                                </div>
+                                <ng-container *ngIf="option.tasksCount">
+                                    <app-colored-tag [color]="option.color" [caption]="option.tasksCount"></app-colored-tag>
+                                </ng-container>
+                            </span>
+                        </ng-template>
+                    </p-listbox>
                 </div>
             </div>
         </div>
@@ -49,8 +47,10 @@
 <ng-template #taskList>
     <ng-container *ngIf="ic.taskPage$ | async as taskPage">
         <ng-container [ngSwitch]="taskPage.loadingState">
-            <div class="flexed column stretched gap10" *ngSwitchCase="'READY'">
-                <app-task-list-element [item]="item" *ngFor="let item of taskPage.value; let i = index; trackBy: taskTrack"></app-task-list-element>
+            <div class="flex flex-column flex-grow-1" *ngSwitchCase="'READY'">
+                <div class="flex flex-column shadow-1 border-round-md overflow-hidden bg-bluegray-100 gap-1 h-fit">
+                    <app-task-list-element [item]="item" *ngFor="let item of taskPage.value; let i = index; trackBy: taskTrack"></app-task-list-element>
+                </div>
                 <div [style]="{flex:'1', minHeight: '2rem'}"></div>
                 <div class="sticky" [style]="{bottom: '1rem'}">
                     <p-paginator #paginator (onPageChange)="ic.controlForm.patchValue({page: $event.page})"

@@ -1,11 +1,7 @@
 import {Component, OnInit, ViewChild} from '@angular/core';
-import {Storage, SubscriptionsHolder} from "../../util";
 import {ApiService} from "../../services/api.service";
 import {RealTimeUpdateService} from "../../services/real-time-update.service";
-import {Page, Task} from "../../transport-interfaces";
-import {FormControl, FormGroup} from "@angular/forms";
-import {Paginator} from "primeng/paginator";
-import {filter, of, switchMap} from "rxjs";
+import {Task} from "../../transport-interfaces";
 import {PersonalityService} from "../../services/personality.service";
 import {IncomingPageCacheService} from "../../services/incoming-page-cache.service";
 

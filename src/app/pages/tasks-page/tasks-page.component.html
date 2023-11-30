@@ -1,100 +1,95 @@
-<div appExtendPageHeight class="flexed vcenter">
-    <div class="responsive-wrapper flexed gap10">
-        <app-main-menu-panel></app-main-menu-panel>
-        <div class="tasks-list">
-            <div [formGroup]="taskService.filterForm" class="global-filters">
-                <span class="flexed gap5">
-                    <span class="p-input-icon-left stretched">
-                        <i class="mdi-search"></i>
-                        <input class="full-width" [formControl]="taskService.searchPhrase" pInputText placeholder="Поиск..."
-                               type="text">
-                    </span>
-                    <p-button (onClick)="filterDialogVisible=true" icon="mdi-filter_alt" label="Фильтры" [badge]="(taskService.templateFilterCount$ | async) ?? ''"
-                              styleClass="p-button-text"></p-button>
-                </span>
-                <span class="flexed gap5">
-                    <app-task-status-chooser class="stretched" formControlName="status"></app-task-status-chooser>
-                </span>
-            </div>
-            <ng-container *ngIf="taskService.taskPage$ | async as taskPage">
-                <ng-container [ngSwitch]="taskPage.loadingState">
-                    <div *ngSwitchCase="'LOADING'"
-                         class="flexed stretched hcenter vcenter caption size-big wt-bold f-color-500">
-                        <p-progressSpinner class="custom-spinner custom-spinner-8xl custom-spinner-primary" strokeWidth="1"></p-progressSpinner>
-                    </div>
+<div appExtendPageHeight class="flex gap-3 px-3">
+    <app-main-menu-panel></app-main-menu-panel>
+    <div class="tasks-list">
+        <div [formGroup]="taskService.filterForm" class="flex gap-4 bg-white shadow-1 border-round-md overflow-hidden p-3">
+            <span class="p-input-icon-left flex-grow-1">
+                <i class="mdi-search"></i>
+                <input class="full-width" [formControl]="taskService.searchPhrase" pInputText placeholder="Поиск..."
+                       type="text">
+            </span>
+            <app-task-status-chooser formControlName="status"></app-task-status-chooser>
+            <p-button (onClick)="filterDialogVisible=true" icon="mdi-filter_alt" label="Фильтры" [badge]="(taskService.templateFilterCount$ | async) ?? ''"
+                      styleClass="p-button-text"></p-button>
+        </div>
+        <ng-container *ngIf="taskService.taskPage$ | async as taskPage">
+            <ng-container [ngSwitch]="taskPage.loadingState">
+                <div *ngSwitchCase="'LOADING'"
+                     class="flexed stretched hcenter vcenter caption size-big wt-bold f-color-500">
+                    <p-progressSpinner class="custom-spinner custom-spinner-8xl custom-spinner-primary" strokeWidth="1"></p-progressSpinner>
+                </div>
 
-                    <ng-container *ngSwitchCase="'READY'">
-                        <div class="flexed gap10 column">
-                            <app-task-list-element *ngFor="let item of taskPage.value; trackBy: trackByTask"
-                                                   [item]="item"></app-task-list-element>
-                        </div>
-                    </ng-container>
-
-                    <div *ngSwitchCase="'EMPTY'" class="flexed column stretched hcenter vcenter caption size-big wt-bold f-color-500">
-                        <i class="mds-search_off"></i>
-                        <span>Задач не найдено</span>
-                    </div>
-
-                    <div *ngSwitchCase="'ERROR'"
-                         class="flexed stretched hcenter vcenter caption size-big wt-bold f-color-danger">
-                        <i class="mdi-error"></i>
-                        <span>Произошла ошибка</span>
+                <ng-container *ngSwitchCase="'READY'">
+                    <div class="flex flex-column gap-1 border-round-md shadow-1 overflow-hidden bg-bluegray-100 h-fit">
+                        <app-task-list-element *ngFor="let item of taskPage.value; trackBy: trackByTask"
+                                               [item]="item"></app-task-list-element>
                     </div>
                 </ng-container>
-                <div class="sticky bottom1">
-                    <p-paginator #paginator (onPageChange)="taskService.pageNumber.setValue($event.page)" [alwaysShow]="true"
-                                 [rows]="taskService.TASK_PAGE_SIZE" [showCurrentPageReport]="true"
-                                 [totalRecords]="taskPage.totalElements" [first]="(taskService.pageNumber.value ?? 0)*taskService.TASK_PAGE_SIZE"
-                                 currentPageReportTemplate="Показано с {first} по {last} из {totalRecords} задач"
-                                 styleClass="panel"></p-paginator>
+
+                <div *ngSwitchCase="'EMPTY'" class="flexed column stretched hcenter vcenter caption size-big wt-bold f-color-500">
+                    <i class="mds-search_off"></i>
+                    <span>Задач не найдено</span>
+                </div>
+
+                <div *ngSwitchCase="'ERROR'"
+                     class="flexed stretched hcenter vcenter caption size-big wt-bold f-color-danger">
+                    <i class="mdi-error"></i>
+                    <span>Произошла ошибка</span>
                 </div>
             </ng-container>
-        </div>
-
-        <ng-container [formGroup]="taskService.filterForm">
-            <div class="flex flex-column gap-3 h-fit sticky-type-selector">
-                <app-task-template-multi-selector countersType="all"
-                                                  formControlName="template"></app-task-template-multi-selector>
-                <div class="shadow-1 p-3 border-round-md flex flex-column bg-white gap-2">
-                    <div class="input-label-wrapper" *ngIf="taskService.stageList.length>1 && taskService.isSelectOneTemplate">
-                        <label>Стадия</label>
-                        <p-listbox [options]="taskService.stageList" formControlName="stage" listStyleClass="max-h-20rem">
-                            <ng-template let-option pTemplate="item">
-                                <div class="flex align-items-center w-full justify-content-between gap-1">
-                                    <div class="max-w-10rem white-space-nowrap overflow-hidden" appTicker>
-                                        {{option.label}}
-                                    </div>
-                                    <div>
-                                        {{option.tasksCount}}
-                                    </div>
-                                </div>
-                            </ng-template>
-                        </p-listbox>
-                    </div>
-                    <div class="input-label-wrapper">
-                        <label>Теги</label>
-                        <p-listbox [options]="taskService.tagsList" formControlName="tags" [multiple]="true"
-                                   optionValue="taskTagId" [checkbox]="true" listStyleClass="max-h-20rem">
-                            <ng-template pTemplate="filter">
-                                <input type="text" pInputText placeholder="Поиск" [formControl]="taskService.tagsFilterControl">
-                            </ng-template>
-                            <ng-template let-option pTemplate="item">
-                                <span class="flex align-items-center w-full justify-content-between gap-1">
-                                    <div [style.color]="option.color" class="max-w-10rem white-space-nowrap overflow-hidden" appTicker>
-                                            {{option.name}}
-                                    </div>
-                                    <ng-container *ngIf="option.tasksCount">
-                                        <app-colored-tag [color]="option.color" [caption]="option.tasksCount"></app-colored-tag>
-                                    </ng-container>
-                                </span>
-                            </ng-template>
-                        </p-listbox>
-                    </div>
-                </div>
+            <div class="sticky bottom1">
+                <p-paginator #paginator (onPageChange)="taskService.pageNumber.setValue($event.page)" [alwaysShow]="true"
+                             [rows]="taskService.TASK_PAGE_SIZE" [showCurrentPageReport]="true"
+                             [totalRecords]="taskPage.totalElements" [first]="(taskService.pageNumber.value ?? 0)*taskService.TASK_PAGE_SIZE"
+                             currentPageReportTemplate="Показано с {first} по {last} из {totalRecords} задач"
+                             styleClass="panel"></p-paginator>
             </div>
         </ng-container>
     </div>
+
+    <ng-container [formGroup]="taskService.filterForm">
+        <div class="flex flex-column gap-3 h-fit sticky-type-selector">
+            <app-task-template-multi-selector countersType="all"
+                                              formControlName="template"></app-task-template-multi-selector>
+            <div class="shadow-1 p-3 border-round-md flex flex-column bg-white gap-2">
+                <div class="input-label-wrapper" *ngIf="taskService.stageList.length>1 && taskService.isSelectOneTemplate">
+                    <label>Стадия</label>
+                    <p-listbox [options]="taskService.stageList" formControlName="stage" listStyleClass="max-h-20rem">
+                        <ng-template let-option pTemplate="item">
+                            <div class="flex align-items-center w-full justify-content-between gap-1">
+                                <div class="max-w-10rem white-space-nowrap overflow-hidden" appTicker>
+                                    {{option.label}}
+                                </div>
+                                <div>
+                                    {{option.tasksCount}}
+                                </div>
+                            </div>
+                        </ng-template>
+                    </p-listbox>
+                </div>
+                <div class="input-label-wrapper">
+                    <label>Теги</label>
+                    <p-listbox [options]="taskService.tagsList" formControlName="tags" [multiple]="true"
+                               optionValue="taskTagId" [checkbox]="true" listStyleClass="max-h-20rem">
+                        <ng-template pTemplate="filter">
+                            <input type="text" pInputText placeholder="Поиск" [formControl]="taskService.tagsFilterControl">
+                        </ng-template>
+                        <ng-template let-option pTemplate="item">
+                            <span class="flex align-items-center w-full justify-content-between gap-1">
+                                <div [style.color]="option.color" class="max-w-10rem white-space-nowrap overflow-hidden" appTicker>
+                                        {{option.name}}
+                                </div>
+                                <ng-container *ngIf="option.tasksCount">
+                                    <app-colored-tag [color]="option.color" [caption]="option.tasksCount"></app-colored-tag>
+                                </ng-container>
+                            </span>
+                        </ng-template>
+                    </p-listbox>
+                </div>
+            </div>
+        </div>
+    </ng-container>
 </div>
+
 <p-scrollTop></p-scrollTop>
 
 <p-dialog [(visible)]="filterDialogVisible" [breakpoints]="{'960px': '640px', '640px': '100vw'}"

@@ -1,75 +1,39 @@
-<div (click)="onClick.emit(item)" [ngClass]="{processing: item?.taskStatus === 'PROCESSING', inlined, hovered: isHover}" [routerLink]="!viewExample && !customClickHandler ? ['/task', item?.taskId] : null"
-     class="task-item outline-none">
-    <div class="task-item-header">
+<div (click)="onClick.emit(item)" [ngClass]="{processing: item?.taskStatus === 'PROCESSING', inlined, hovered: isHover}"
+     [routerLink]="!viewExample && !customClickHandler ? ['/task', item?.taskId] : null"
+     class="flex flex-column bg-white outline-none cursor-pointer hover:bg-gray-50">
+    <div class="flex gap-3 p-3 border-bottom-1 border-bluegray-50">
         <p-checkbox (click)="$event.stopPropagation()" (ngModelChange)="checkChange.emit($event)" [(ngModel)]="check"
                     [name]="checkGroup" *ngIf="check"
                     [value]="item?.taskId"></p-checkbox>
-        <span class="with-label">
-            <span class="label">
-                <i class="mdi-article"></i>
-                <span>Тип</span>
-            </span>
-            <span [ngClass]="statusColor" class="value">{{item?.modelWireframe?.name}}</span>
-        </span>
-        <span class="with-label">
-            <span class="label">
-                <i class="mdi-flag"></i>
-                <span>Стадия</span>
-            </span>
-            <span [ngClass]="statusColor" class="value">{{item?.currentStage?.label}}</span>
-        </span>
+        <ng-container *ngTemplateOutlet="headerItem; context:{label: 'Тип', value: item?.modelWireframe?.name}"></ng-container>
+        <ng-container *ngTemplateOutlet="headerItem; context:{label: 'Стадия', value: item?.currentStage?.label}"></ng-container>
         <ng-container *ngIf="item?.actualFrom || item?.actualTo">
-            <span *ngIf="item?.actualFrom" class="with-label">
-                <span class="label">
-                    <i class="mdi-today"></i>
-                    <span>Запланирована</span>
-                </span>
-                <span class="value">{{item?.actualFrom | date:'EEEE, dd MMMM yyyy HH:mm' | titlecase}}</span>
-            </span>
-            <span *ngIf="item?.actualTo && !item?.actualFrom" class="with-label">
-                <span class="label">
-                    <i class="mdi-today"></i>
-                    <span>Срок</span>
-                </span>
-                <span class="value">{{item?.actualTo | date:'EEEE, dd MMMM yyyy HH:mm' | titlecase}}</span>
-            </span>
+            <ng-container *ngIf="item?.actualFrom">
+                <ng-container *ngTemplateOutlet="headerItem; context:{label: 'Запланирована', value: item?.actualFrom | date:'dd/MM/yyyy HH:mm'}"></ng-container>
+            </ng-container>
+            <ng-container *ngIf="item?.actualTo && !item?.actualFrom">
+                <ng-container *ngTemplateOutlet="headerItem; context:{label: 'Срок', value: item?.actualTo | date:'dd/MM/yyyy HH:mm'}"></ng-container>
+            </ng-container>
         </ng-container>
         <ng-container *ngTemplateOutlet="statusTags"></ng-container>
         <div class="stretched"></div>
-        <app-employee-label *ngIf="item?.taskStatus !== 'PROCESSING'"
-                            [employee]="item?.responsible"></app-employee-label>
-        <app-avatar-list *ngIf="item?.taskStatus === 'PROCESSING' && actualWorkLog?.employees" [employees]="actualWorkLog?.employees ?? []"
-                         [size]="1.7"></app-avatar-list>
+        <ng-container *ngIf="item?.taskStatus === 'PROCESSING'; then workersEmployee; else responsibleEmployee"></ng-container>
     </div>
-    <div [ngClass]="this.item?.modelWireframe?.listViewType" class="task-item-body">
-        <ng-container *ngIf="!viewExample">
-            <ng-container *ngFor="let field of item?.listItemFields; let i = index; trackBy: trackByField">
-                <span *ngIf="i<fieldCountArray.length">{{field?.textRepresentation}}</span>
-            </ng-container>
-        </ng-container>
-        <ng-container *ngIf="viewExample">
-            <ng-container *ngFor="let field of fieldCountArray; trackBy: trackByIndex">
-                <app-select-field-to-view-button (selectView)="selectFieldToView.emit($event)"
-                                                 [fields]="wireframeFieldsList"
-                                                 [index]="field"></app-select-field-to-view-button>
-            </ng-container>
-        </ng-container>
-    </div>
-    <div *ngIf="item?.lastComment" class="task-item-last-comment">
-        <span class="autor">
+<!--    <ng-container *ngTemplateOutlet="(isWide$ | async) ? tableBodyView : bodyView; context: {$implicit: taskFields}"></ng-container>-->
+    <ng-container *ngTemplateOutlet="tableBodyView; context: {$implicit: taskFields}"></ng-container>
+    <div *ngIf="item?.lastComment" class="flex gap-2 border-top-1 border-bottom-1 border-bluegray-100 p-3">
+        <span class="text-sm white-space-nowrap text-primary-600">
             {{item?.lastComment?.creator?.fullName}}:
         </span>
-        <span class="comment">
+        <span class="text-bluegray-500">
             {{item?.lastComment?.simpleText}}
         </span>
     </div>
-    <div class="task-item-footer">
+    <div class="flex p-3 gap-2">
         <div class="flex-grow-1"></div>
-        <app-employee-label [employee]="item?.creator" [inline]="true" class="caption size-tiny wt-bold f-color-500"></app-employee-label>
-        <span [ngClass]="statusColor" class="font-semibold text-xs">{{item | taskStatus}}</span>
-        <span class="caption size-tiny wt-bold f-color-500">
-            {{item?.created | date:'EEEE, dd MMMM yyyy HH:mm' | titlecase}}
-        </span>
+        <span class="text-bluegray-500 text-sm font-semibold">Создатель: {{item?.creator?.fullName}}</span>
+        <span [ngClass]="statusColor" class="font-semibold text-sm">{{item | taskStatus}}</span>
+        <span class="text-bluegray-500 text-sm font-semibold">{{item?.created | date:'dd/MM/yyyy HH:mm'}}</span>
     </div>
 </div>
 
@@ -92,3 +56,76 @@
              class="tags-view-item">{{tag.name}}</div>
     </div>
 </p-overlayPanel>
+
+<ng-template #bodyView>
+    <div [ngClass]="this.item?.modelWireframe?.listViewType" class="task-item-body">
+        <ng-container *ngIf="!viewExample">
+            <ng-container *ngFor="let field of item?.listItemFields; let i = index; trackBy: trackByField">
+                <span *ngIf="i<fieldCountArray.length">{{field?.textRepresentation}}</span>
+            </ng-container>
+        </ng-container>
+        <ng-container *ngIf="viewExample">
+            <ng-container *ngFor="let field of fieldCountArray; trackBy: trackByIndex">
+                <app-select-field-to-view-button (selectView)="selectFieldToView.emit($event)"
+                                                 [fields]="wireframeFieldsList"
+                                                 [index]="field"></app-select-field-to-view-button>
+            </ng-container>
+        </ng-container>
+    </div>
+</ng-template>
+
+<ng-template #tableBodyView let-listItemFields>
+    <div class="p-3 bg-bluegray-50">
+        <ng-container *ngIf="listItemFields.inline.length>0">
+            <table class="w-full">
+                <thead>
+                    <tr class="text-sm text-bluegray-500">
+                        <th *ngFor="let field of listItemFields.inline; let i = index; trackBy: trackByField">{{field?.name}}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td *ngFor="let field of listItemFields.inline; let i = index; trackBy: trackByField">
+                            <span>{{field?.textRepresentation}}</span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </ng-container>
+        <ng-container *ngIf="listItemFields.block.length>0">
+            <table class="w-full" *ngFor="let field of listItemFields.block; let i = index; trackBy: trackByField">
+                <thead>
+                    <tr class="text-sm text-bluegray-500">
+                        <th>{{field?.name}}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td>
+                        <span>{{field?.textRepresentation}}</span>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </ng-container>
+    </div>
+</ng-template>
+
+<ng-template #headerItem let-label="label" let-value="value">
+    <span class="flex flex-column text-sm">
+        <span>{{label}}</span>
+        <span class="font-semibold" [ngClass]="statusColor">{{value}}</span>
+    </span>
+</ng-template>
+
+<ng-template #responsibleEmployee>
+    <ng-container *ngIf="item?.responsible">
+        <ng-container *ngTemplateOutlet="headerItem; context:{label:'Ответственный', value: item?.responsible?.fullName}"></ng-container>
+    </ng-container>
+</ng-template>
+
+<ng-template #workersEmployee>
+    <ng-container *ngIf="item?.responsible">
+        <ng-container *ngTemplateOutlet="headerItem; context:{label:'Монтажники', value: actualWorkLogWorkers}"></ng-container>
+    </ng-container>
+</ng-template>

@@ -8,7 +8,7 @@ import {
     WireframeFieldType
 } from "./transport-interfaces";
 import {
-    combineLatest,
+    combineLatest, fromEvent,
     map,
     merge,
     Observable,
@@ -539,6 +539,14 @@ export function cyrb53(str: string, seed = 0) {
     h2 ^= Math.imul(h1 ^ (h1 >>> 13), 3266489909);
 
     return (4294967296 * (2097151 & h2) + (h1 >>> 0)).toString(16);
+}
+
+export function mediaQuery(query: string): Observable<boolean> {
+    const mediaQuery = window.matchMedia(query);
+    return fromEvent<MediaQueryList>(mediaQuery, 'change').pipe(
+        startWith(mediaQuery),
+        map((list: MediaQueryList) => list.matches)
+    );
 }
 
 export class Storage {
