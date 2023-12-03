@@ -57,6 +57,7 @@
                             <div class="caption">
                                 <ng-container [ngSwitch]="field.wireframeFieldType">
                                     <a *ngSwitchCase="'LOGIN'" [href]="'clients/billing/user/'+field.textRepresentation">{{field.textRepresentation}}</a>
+                                    <app-dial-buttons-list *ngSwitchCase="'PHONE_ARRAY'" [phoneData]="field.phoneData"></app-dial-buttons-list>
                                     <span *ngSwitchDefault>
                                         {{field.textRepresentation}}
                                     </span>

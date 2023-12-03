@@ -95,6 +95,7 @@ export interface Employee {
     deleted?: boolean;
     status?: EmployeeStatus;
     lastSeen?: string;
+    phyPhoneInfo?: PhyPhoneModel;
 }
 
 export interface Department {
@@ -1420,4 +1421,25 @@ export interface FilesLoadFileEvent {
 export interface LoadingDirectoryWrapper{
     path: Directory[];
     files: FileSystemItem[];
+}
+
+export interface PhyPhoneInfo{
+    phyPhoneInfoId: number;
+    ip: string;
+    login: string;
+    password: string;
+    model: PhyPhoneModel;
+}
+
+export interface PhyPhoneInfoForm{
+    employeeLogin?: string | null;
+    ip?: string | null;
+    login?: string | null;
+    password?: string | null;
+    model?: PhyPhoneModel | null;
+}
+
+export enum PhyPhoneModel{
+    NEW = "NEW",
+    OLD = "OLD"
 }

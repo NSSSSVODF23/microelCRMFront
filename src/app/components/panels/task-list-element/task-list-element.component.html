@@ -25,9 +25,15 @@
         <span class="text-sm white-space-nowrap text-primary-600">
             {{item?.lastComment?.creator?.fullName}}:
         </span>
-        <span class="text-bluegray-500">
+        <div class="text-bluegray-500" [style]="{whiteSpace:'pre-wrap', wordWrap:'break-word', textAlign:'left'}">
             {{item?.lastComment?.simpleText}}
-        </span>
+        </div>
+    </div>
+    <div class="flex relative">
+        <textarea pInputTextarea [autoResize]="true" placeholder="Новый комментарий" [rows]="1" (keydown.control.enter)="sendComment()"
+                  (click)="$event.stopPropagation()" class="mt-2 mx-3 flex-grow-1" [formControl]="commentInputControl" [disabled]="commentSending"></textarea>
+        <p-button icon="mdi-send" class="absolute bottom-0 right-0 mr-3" (onClick)="$event.stopPropagation(); sendComment()"
+                  styleClass="p-button-text p-button-icon" [loading]="commentSending"></p-button>
     </div>
     <div class="flex p-3 gap-2">
         <div class="flex-grow-1"></div>
@@ -86,7 +92,12 @@
                 <tbody>
                     <tr>
                         <td *ngFor="let field of listItemFields.inline; let i = index; trackBy: trackByField">
-                            <span>{{field?.textRepresentation}}</span>
+                            <ng-container [ngSwitch]="field.wireframeFieldType">
+                                <span class="flex flex-column" *ngSwitchCase="'PHONE_ARRAY'">
+                                    <app-dial-buttons-list [phoneData]="field.phoneData"></app-dial-buttons-list>
+                                </span>
+                                <span *ngSwitchDefault>{{field.textRepresentation}}</span>
+                            </ng-container>
                         </td>
                     </tr>
                 </tbody>

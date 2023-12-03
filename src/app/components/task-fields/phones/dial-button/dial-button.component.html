@@ -1,0 +1,21 @@
+<ng-container *ngIf="isCalling then callingTemp else phoneTemp"></ng-container>
+
+<ng-template #phoneTemp>
+    <ng-container *ngIf="phone then fullNumber else emptyNumber"></ng-container>
+</ng-template>
+<ng-template #fullNumber>
+    <span class="text-primary font-semibold cursor-pointer hover:text-primary-700" (click)="$event.stopPropagation(); callToPhone()">
+        {{phone}}
+    </span>
+</ng-template>
+<ng-template #emptyNumber>
+    <span class="text-bluegray-300 font-semibold">
+        Нет номера
+    </span>
+</ng-template>
+<ng-template #callingTemp>
+    <span class="text-green-500 font-semibold flex align-items-center gap-1">
+        <span class="mdi-phone"></span>
+        <span>Набор{{dotAnimation | async}}</span>
+    </span>
+</ng-template>

@@ -3,7 +3,9 @@ import {FieldItem, ModelItem, Task, TaskStatus, TaskTag, WorkLog} from "../../..
 import {TasksPageCacheService} from "../../../services/tasks-page-cache.service";
 import {OverlayPanel} from "primeng/overlaypanel";
 import {ApiService} from "../../../services/api.service";
-import {mediaQuery} from "../../../util";
+import {dotAnimation, mediaQuery} from "../../../util";
+import {FormControl} from "@angular/forms";
+import {KeyValue} from "@angular/common";
 
 @Component({
     selector: 'app-task-list-element',
@@ -37,6 +39,10 @@ export class TaskListElementComponent implements OnInit, OnChanges {
     itemClass: any = {};
 
     actualWorkLog?: WorkLog;
+    commentInputControl = new FormControl("");
+    commentSending = false;
+
+    dotAnimation = dotAnimation;
 
     constructor(readonly taskService: TasksPageCacheService, readonly api: ApiService) {
     }
@@ -153,5 +159,21 @@ export class TaskListElementComponent implements OnInit, OnChanges {
                 }
             })
         }
+    }
+
+    sendComment() {
+        if(!this.item?.taskId || this.commentInputControl.value === "") return;
+        this.commentSending = true;
+        this.api.createComment(this.commentInputControl.value, this.item?.taskId, null).subscribe({
+            next: () => {
+                this.commentSending = false
+                this.commentInputControl.setValue("");
+            },
+            error: () => this.commentSending = false,
+        });
+    }
+
+    callToPhone(phone: any) {
+        this.api.callToPhone(phone.value).subscribe({});
     }
 }

@@ -191,6 +191,10 @@ import {FilesViewerComponent} from "../../components/panels/files-system/files-v
 import {TreeModule} from "primeng/tree";
 import {BreadcrumbModule} from "primeng/breadcrumb";
 import {MenubarModule} from "primeng/menubar";
+import {DialButtonComponent} from "../../components/task-fields/phones/dial-button/dial-button.component";
+import {
+    DialButtonsListComponent
+} from "../../components/task-fields/phones/dial-buttons-list/dial-buttons-list.component";
 
 
 @NgModule({
@@ -288,7 +292,9 @@ import {MenubarModule} from "primeng/menubar";
         CountingLivesInputComponent,
         ChatLinkComponent,
         DashboardTaskStatisticPanelComponent,
-        FilesViewerComponent
+        FilesViewerComponent,
+        DialButtonComponent,
+        DialButtonsListComponent
     ],
     exports: [
         AccountPanelComponent,
@@ -384,7 +390,9 @@ import {MenubarModule} from "primeng/menubar";
         CountingLivesInputComponent,
         ChatLinkComponent,
         DashboardTaskStatisticPanelComponent,
-        FilesViewerComponent
+        FilesViewerComponent,
+        DialButtonComponent,
+        DialButtonsListComponent
     ],
     imports: [
         CommonPipesModule,

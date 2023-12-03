@@ -2,7 +2,7 @@ import {Component, OnDestroy, OnInit} from '@angular/core';
 import {ApiService} from "../../services/api.service";
 import {FormControl, FormGroup, Validators} from "@angular/forms";
 import {ConfirmationService} from 'primeng/api';
-import {Department, Employee, Position} from "../../transport-interfaces";
+import {Department, Employee, PhyPhoneInfo, PhyPhoneModel, Position} from "../../transport-interfaces";
 import {SubscriptionsHolder} from "../../util";
 import {RealTimeUpdateService} from "../../services/real-time-update.service";
 import {debounceTime, distinctUntilChanged} from "rxjs";
@@ -100,6 +100,18 @@ export class EmployeesPageComponent implements OnInit, OnDestroy {
     isBeginEditingEmployee = false;
 
     subscriptions: SubscriptionsHolder = new SubscriptionsHolder();
+
+    phoneBindingDialogVisible = false;
+    phoneBindingForm = new FormGroup({
+        employeeLogin: new FormControl('', Validators.required),
+        ip: new FormControl('', Validators.required),
+        login: new FormControl('', Validators.required),
+        password: new FormControl('', Validators.required),
+        model: new FormControl<PhyPhoneModel | null>(null, Validators.required),
+    });
+    bindingPhoneInProgress = false;
+    unbindingPhoneInProgress = false;
+    phyPhoneModels$ = this.api.getPhyPhoneModelsTypes();
 
     constructor(readonly api: ApiService, readonly confirm: ConfirmationService, readonly rt: RealTimeUpdateService) {
     }
@@ -441,6 +453,45 @@ export class EmployeesPageComponent implements OnInit, OnDestroy {
                 this.showEditEmployeeDialog = true;
             },
             error: () => {
+            }
+        })
+    }
+
+    openPhoneBindingDialog(login: string) {
+        this.phoneBindingForm.setValue({
+            employeeLogin: login,
+            ip: "",
+            login: "",
+            password: "",
+            model: null
+        });
+        this.phoneBindingDialogVisible = true;
+        this.bindingPhoneInProgress = false;
+    }
+
+    phoneBinding() {
+        this.bindingPhoneInProgress = true;
+        this.api.createPhyPhoneBind(this.phoneBindingForm.value).subscribe({
+            complete: () => {
+                this.bindingPhoneInProgress = false;
+                this.phoneBindingDialogVisible = false;
+            },
+            error: () => {
+                this.bindingPhoneInProgress = false;
+            }
+        })
+    }
+
+    confirmUnbindPhone(login: string) {
+        this.unbindingPhoneInProgress = true;
+        this.confirm.confirm({
+            header: 'Подтверждение',
+            message: 'Удалить привязку к телефону?',
+            accept: () => {
+                this.api.removePhyPhoneBind(login).subscribe({
+                    next: () => this.unbindingPhoneInProgress = false,
+                    error: () => this.unbindingPhoneInProgress = false
+                })
             }
         })
     }

@@ -863,3 +863,11 @@ export class DynamicValueFactory {
     }
 }
 
+export const dotAnimation = new Observable((subscribe)=>{
+    let count = 1;
+    const handler = setInterval(()=>{
+        subscribe.next(".".repeat(count++))
+        if(count > 3) count=1;
+    },300);
+    return () => clearInterval(handler);
+})

@@ -14,6 +14,7 @@ import {RouterModule, RouterOutlet} from "@angular/router";
 import {ToastModule} from "primeng/toast";
 import {CommonComponentsModule} from "./moduls/common-components/common-components.module";
 import {AngularYandexMapsModule, YaConfig} from "angular8-yandex-maps";
+import { DialButtonsListComponent } from './components/task-fields/phones/dial-buttons-list/dial-buttons-list.component';
 
 registerLocaleData(localeRu, 'ru');
 

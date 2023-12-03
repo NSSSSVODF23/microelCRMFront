@@ -33,7 +33,7 @@ import {
     PaidActionForm,
     PaidWork,
     PaidWorkForm,
-    PaidWorkGroupForm,
+    PaidWorkGroupForm, PhyPhoneInfo, PhyPhoneInfoForm,
     Position,
     SalaryTable,
     SuperMessage,
@@ -993,6 +993,22 @@ export class ApiService {
 
     searchFiles(query: string, sortingType?: string | null){
         return this.sendGet<FileSystemItem[]>('api/private/files/search', {query, sortingType});
+    }
+
+    createPhyPhoneBind(form: PhyPhoneInfoForm) {
+        return this.sendPatch(`api/private/employee/phy-phone-bind/create`, form);
+    }
+
+    removePhyPhoneBind(login: string) {
+        return this.sendDelete(`api/private/employee/${login}/phy-phone-bind/remove`);
+    }
+
+    getPhyPhoneModelsTypes() {
+        return this.sendGet<{ label: string, value: string }[]>('api/private/types/phy-phone-models');
+    }
+
+    callToPhone(phoneNumber: string) {
+        return this.sendPost(`api/private/call-to-phone`, {phoneNumber});
     }
 
     // Результаты запросов на сервер кэшируются по таймауту, чтобы не было доп нагрузки на сервер
