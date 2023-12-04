@@ -42,6 +42,15 @@
     </div>
 </p-dialog>
 
+<p-dialog [(visible)]="phyPhoneSelectionDialogVisible" [draggable]="true" [modal]="true" [resizable]="false" appendTo="body"
+          [dismissableMask]="true" header="Привязать телефон" contentStyleClass="flex gap-3 align-items-center pt-1">
+    <ng-template pTemplate="content">
+        <p-dropdown [options]="(phones$ | async) ?? []" appendTo="body"
+                    [formControl]="phyPhoneControl" [disabled]="isPhyPhoneIsBinding"></p-dropdown>
+        <p-button (onClick)="bindPhone()" label="Привязать" [loading]="isPhyPhoneIsBinding"></p-button>
+    </ng-template>
+</p-dialog>
+
 <p-menu #menu [model]="controls" [popup]="true" appendTo="body" [baseZIndex]="2000"
         appCloseIfScroll [isVisible]="menu.visible" [alignFn]="menu.alignOverlay.bind(menu)"></p-menu>
 

@@ -45,7 +45,6 @@
                                 </div>
                             </div>
                             <div class="stretched"></div>
-                            <ng-container *ngTemplateOutlet="employee.phyPhoneInfo ? unbindPhoneButton : bindPhoneButton; context:{$implicit: employee}"></ng-container>
                             <p-button icon="mdi-edit" styleClass="p-button-text p-button-warning"
                                       label="Редактировать"
                                       (onClick)="openEmployeeEditor(employee.login)" [disabled]="employee.deleted ?? false"></p-button>
@@ -440,42 +439,3 @@
         </form>
     </ng-template>
 </p-dialog>
-
-<p-dialog [(visible)]="phoneBindingDialogVisible" [modal]="true" [dismissableMask]="true"
-          [resizable]="false" header="Привязка телефона" contentStyleClass="flex flex-column gap-3">
-    <ng-template pTemplate="content">
-        <ng-container [formGroup]="phoneBindingForm">
-            <span class="input-label-wrapper">
-                <label>IP Телефона</label>
-                <app-ip-input formControlName="ip" autofocus></app-ip-input>
-            </span>
-            <span class="input-label-wrapper">
-                <label>Логин</label>
-                <input pInputText formControlName="login"/>
-            </span>
-            <span class="input-label-wrapper">
-                <label>Пароль</label>
-                <input pInputText formControlName="password"/>
-            </span>
-            <span class="input-label-wrapper">
-                <label>Модель</label>
-                <p-dropdown formControlName="model" placeholder="Выбрать" appendTo="body"
-                            [options]="(phyPhoneModels$ | async) ?? []"></p-dropdown>
-            </span>
-            <p-button (onClick)="phoneBinding()" label="Привязать" [loading]="bindingPhoneInProgress"
-                      class="flex-grow-1" styleClass="w-full"></p-button>
-        </ng-container>
-    </ng-template>
-</p-dialog>
-
-<ng-template #bindPhoneButton let-employee>
-    <p-button icon="mdi-phone" styleClass="p-button-text p-button-secondary"
-              label="Привязать телефон"
-              (onClick)="openPhoneBindingDialog(employee.login)" [disabled]="employee.deleted ?? false"></p-button>
-</ng-template>
-
-<ng-template #unbindPhoneButton let-employee>
-    <p-button icon="mdi-phone_disabled" styleClass="p-button-text p-button-secondary"
-              label="Отвязать телефон"
-              (onClick)="confirmUnbindPhone(employee.login)" [disabled]="employee.deleted ?? false"></p-button>
-</ng-template>

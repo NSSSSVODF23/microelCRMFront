@@ -1011,6 +1011,14 @@ export class ApiService {
         return this.sendPost(`api/private/call-to-phone`, {phoneNumber});
     }
 
+    setPhyPhoneBind(phoneId: number | null) {
+        return this.sendPatch(`api/private/employee/phy-phone/${phoneId}/bind`, {});
+    }
+
+    getPhyPhoneList(){
+        return this.sendGet<{ label: string, value: number }[]>('api/private/phy-phone-list');
+    }
+
     // Результаты запросов на сервер кэшируются по таймауту, чтобы не было доп нагрузки на сервер
 
     private sendGet<T>(uri: string, query?: any) {

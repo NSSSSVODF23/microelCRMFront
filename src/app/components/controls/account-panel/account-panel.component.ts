@@ -6,8 +6,9 @@ import {NotificationsService} from "../../../services/notifications.service";
 import {Router} from "@angular/router";
 import {ImageCroppedEvent, LoadedImage} from "ngx-image-cropper";
 import {Menu} from "primeng/menu";
-import {fromEvent} from "rxjs";
+import {fromEvent, map} from "rxjs";
 import {SubscriptionsHolder} from "../../../util";
+import {FormControl} from "@angular/forms";
 
 @Component({
     selector: 'app-account-panel',
@@ -16,9 +17,12 @@ import {SubscriptionsHolder} from "../../../util";
 })
 export class AccountPanelComponent implements OnInit,OnDestroy {
     avatarChangeDialogVisible = false;
+    phyPhoneSelectionDialogVisible = false;
+    phyPhoneControl = new FormControl<number | null>(null);
+    isPhyPhoneIsBinding = false
     controls: MenuItem[] = [
         {label: "Изменить аватар", command: () => this.avatarChangeDialogVisible = true},
-        {label: "Настройки"},
+        {label: "Выбрать телефон", command: () => this.openPhyPhoneSelectionDialog()},
         {label: "Выйти из аккаунта", command: this.exitFromAccount.bind(this)}
     ];
     @ViewChild("menu") accountPanelMenu?: Menu;
@@ -39,6 +43,13 @@ export class AccountPanelComponent implements OnInit,OnDestroy {
     imageChangedEvent: any = '';
     croppedImage: any = '';
     avatarUpload = false;
+    phones$ = this.api.getPhyPhoneList().pipe(map(list=>[{label:"Без телефона", value: null}, ...list]));
+
+    openPhyPhoneSelectionDialog() {
+        if(this.personality.me)
+            this.phyPhoneControl.setValue(this.personality.me.phyPhoneInfo?.phyPhoneInfoId ?? null);
+        this.phyPhoneSelectionDialogVisible = true;
+    }
 
     imageCropped(event: ImageCroppedEvent) {
         this.croppedImage = event.base64;
@@ -70,6 +81,19 @@ export class AccountPanelComponent implements OnInit,OnDestroy {
 
     selectFile(fileInput: HTMLInputElement) {
         fileInput.click();
+    }
+
+    bindPhone(){
+        this.isPhyPhoneIsBinding = true;
+        this.api.setPhyPhoneBind(this.phyPhoneControl.value).subscribe({
+            next: () => {
+                this.isPhyPhoneIsBinding = false;
+                this.phyPhoneSelectionDialogVisible = false;
+            },
+            error: () => {
+                this.isPhyPhoneIsBinding = false;
+            }
+        })
     }
 
     ngOnDestroy(): void {

@@ -95,7 +95,7 @@ export interface Employee {
     deleted?: boolean;
     status?: EmployeeStatus;
     lastSeen?: string;
-    phyPhoneInfo?: PhyPhoneModel;
+    phyPhoneInfo?: PhyPhoneInfo;
 }
 
 export interface Department {
