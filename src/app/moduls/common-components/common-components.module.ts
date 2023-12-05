@@ -195,6 +195,10 @@ import {DialButtonComponent} from "../../components/task-fields/phones/dial-butt
 import {
     DialButtonsListComponent
 } from "../../components/task-fields/phones/dial-buttons-list/dial-buttons-list.component";
+import {BillingLoginComponent} from "../../components/task-fields/billing-login/billing-login.component";
+import {
+    TaskFieldsTableViewComponent
+} from "../../components/task-fields/task-fields-table-view/task-fields-table-view.component";
 
 
 @NgModule({
@@ -294,7 +298,9 @@ import {
         DashboardTaskStatisticPanelComponent,
         FilesViewerComponent,
         DialButtonComponent,
-        DialButtonsListComponent
+        DialButtonsListComponent,
+        BillingLoginComponent,
+        TaskFieldsTableViewComponent
     ],
     exports: [
         AccountPanelComponent,
@@ -392,7 +398,9 @@ import {
         DashboardTaskStatisticPanelComponent,
         FilesViewerComponent,
         DialButtonComponent,
-        DialButtonsListComponent
+        DialButtonsListComponent,
+        BillingLoginComponent,
+        TaskFieldsTableViewComponent
     ],
     imports: [
         CommonPipesModule,

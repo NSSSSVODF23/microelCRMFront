@@ -100,4 +100,7 @@ export class TestingPageComponent implements OnInit {
         this.items.push(result1);
     }
 
+    loadDocument() {
+
+    }
 }

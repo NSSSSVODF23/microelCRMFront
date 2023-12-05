@@ -5,6 +5,7 @@ import {first, map, merge, mergeMap, Observable, of, pairwise, shareReplay, Subj
 import {LoadingState, SalaryTableCell, WorkReport} from "../transport-interfaces";
 import {ApiService} from "./api.service";
 import {RealTimeUpdateService} from "./real-time-update.service";
+import {MenuItem} from "primeng/api";
 
 @Injectable({
     providedIn: 'root'
@@ -15,6 +16,19 @@ export class SalaryTableCacheService {
         date: new FormControl(new Date()),
         position: new FormControl<number | null>(null),
     })
+
+    accountingMenuItems$: Observable<MenuItem[]> = this.filtrationForm.valueChanges.pipe(
+        map(filters => {
+            return [
+                {
+                    label: 'Зарплата монтажников',
+                    url: "/api/private/accounting/monthly-salary-report-table?date="+filters.date?.getTime()
+                }
+            ]
+        })
+    );
+
+
 
     subscriptions: SubscriptionsHolder = new SubscriptionsHolder();
 

@@ -1020,7 +1020,6 @@ export class ApiService {
     }
 
     // Результаты запросов на сервер кэшируются по таймауту, чтобы не было доп нагрузки на сервер
-
     private sendGet<T>(uri: string, query?: any) {
         for (let q in query) {
             if (query[q] === undefined || query[q] === null) {

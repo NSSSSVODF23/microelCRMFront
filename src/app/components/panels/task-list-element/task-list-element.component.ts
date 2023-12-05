@@ -31,6 +31,8 @@ export class TaskListElementComponent implements OnInit, OnChanges {
     @Output() onClick: EventEmitter<Task> = new EventEmitter();
     @Input() customClickHandler = false;
 
+    @Input() isCommentInput = false;
+
     @ViewChild('tagsPreview') tagsPreview?: OverlayPanel;
 
     isWide$ = mediaQuery("(min-width: 1024px)");

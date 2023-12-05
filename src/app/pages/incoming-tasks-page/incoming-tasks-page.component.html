@@ -49,7 +49,7 @@
         <ng-container [ngSwitch]="taskPage.loadingState">
             <div class="flex flex-column flex-grow-1" *ngSwitchCase="'READY'">
                 <div class="flex flex-column shadow-1 border-round-md overflow-hidden bg-bluegray-100 gap-1 h-fit">
-                    <app-task-list-element [item]="item" *ngFor="let item of taskPage.value; let i = index; trackBy: taskTrack"></app-task-list-element>
+                    <app-task-list-element [isCommentInput]="true" [item]="item" *ngFor="let item of taskPage.value; let i = index; trackBy: taskTrack"></app-task-list-element>
                 </div>
                 <div [style]="{flex:'1', minHeight: '2rem'}"></div>
                 <div class="sticky" [style]="{bottom: '1rem'}">

@@ -20,7 +20,7 @@
         <ng-container *ngIf="item?.taskStatus === 'PROCESSING'; then workersEmployee; else responsibleEmployee"></ng-container>
     </div>
 <!--    <ng-container *ngTemplateOutlet="(isWide$ | async) ? tableBodyView : bodyView; context: {$implicit: taskFields}"></ng-container>-->
-    <ng-container *ngTemplateOutlet="tableBodyView; context: {$implicit: taskFields}"></ng-container>
+    <app-task-fields-table-view [task]="item"></app-task-fields-table-view>
     <div *ngIf="item?.lastComment" class="flex gap-2 border-top-1 border-bottom-1 border-bluegray-100 p-3">
         <span class="text-sm white-space-nowrap text-primary-600">
             {{item?.lastComment?.creator?.fullName}}:
@@ -29,7 +29,7 @@
             {{item?.lastComment?.simpleText}}
         </div>
     </div>
-    <div class="flex relative">
+    <div class="flex relative" *ngIf="isCommentInput">
         <textarea pInputTextarea [autoResize]="true" placeholder="Новый комментарий" [rows]="1" (keydown.control.enter)="sendComment()"
                   (click)="$event.stopPropagation()" class="mt-2 mx-3 flex-grow-1" [formControl]="commentInputControl" [disabled]="commentSending"></textarea>
         <p-button icon="mdi-send" class="absolute bottom-0 right-0 mr-3" (onClick)="$event.stopPropagation(); sendComment()"

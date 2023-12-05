@@ -150,6 +150,20 @@ export class TaskPageComponent implements OnInit, OnDestroy {
     actualToTime$ = this.actualToDurationCounter.observer.pipe(map(dur => dur.mode === 'after' ? '-' + dur.actualLabel : dur.actualLabel));
     @ViewChild('fileInput') fileInput?: FileInputComponent;
 
+    get taskStatusColor(){
+        if(this.currentTask){
+            switch (this.currentTask.taskStatus){
+                case 'ACTIVE':
+                    return 'text-primary';
+                case 'PROCESSING':
+                    return 'text-orange-400';
+                case 'CLOSE':
+                    return 'text-bluegray-300';
+            }
+        }
+        return '';
+    };
+
     constructor(readonly api: ApiService,
                 readonly route: ActivatedRoute,
                 readonly chatService: ChatService,

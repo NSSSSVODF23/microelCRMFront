@@ -8,7 +8,7 @@
                         <span class="p-inputgroup-addon"><i class="mdi-calendar_month"></i></span>
                         <p-calendar [readonlyInput]="true" appendTo="body" dateFormat="MM yy"
                                     formControlName="date" inputStyleClass="border-noround-left"
-                                    view="month"></p-calendar>
+                                    view="month" [firstDayOfWeek]="1"></p-calendar>
                     </div>
                     <div *ngIf="cache.positions$|async as pos" class="flex gap-2 align-items-center">
                         <span class="caption wt-black f-color-500 size-small with-icon">
@@ -19,6 +19,8 @@
                                     placeholder="Должность"></p-dropdown>
                     </div>
                     <div class="flex-grow-1"></div>
+                    <p-menu #otchetMenu [popup]="true" [model]="(cache.accountingMenuItems$ | async) ?? []"></p-menu>
+                    <button type="button" pButton label="Отчеты за месяц" (click)="otchetMenu.toggle($event)"></button>
                     <p-toggleButton [formControl]="cache.ndflSwitch" offLabel="БЕЗ НДФЛ" onLabel="С НДФЛ"></p-toggleButton>
                 </div>
                 <ng-container *ngIf="cache.salaryTable$|async as salaryTable">

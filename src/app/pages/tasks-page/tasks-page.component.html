@@ -20,7 +20,7 @@
 
                 <ng-container *ngSwitchCase="'READY'">
                     <div class="flex flex-column gap-1 border-round-md shadow-1 overflow-hidden bg-bluegray-100 h-fit">
-                        <app-task-list-element *ngFor="let item of taskPage.value; trackBy: trackByTask"
+                        <app-task-list-element [isCommentInput]="true" *ngFor="let item of taskPage.value; trackBy: trackByTask"
                                                [item]="item"></app-task-list-element>
                     </div>
                 </ng-container>
