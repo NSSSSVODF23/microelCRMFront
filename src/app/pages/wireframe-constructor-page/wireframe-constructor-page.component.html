@@ -83,9 +83,9 @@
             </div>
         </div>
         <div class="flexed hcenter column stretched">
-            <p-panel class="stage-list-panel" header="Стадии задачи">
+            <p-panel class="stage-list-panel" header="Типы задачи">
                 <div class="flexed column gap10">
-                    <app-button (onClick)="createStage()" icon="add" label="Добавить стадию"
+                    <app-button (onClick)="createStage()" icon="add" label="Добавить тип"
                                 model="p-button-success"></app-button>
                     <p-orderList (onReorder)="reorderStages()" [dragdrop]="true" [value]="this.wireframe.stages??[]">
                         <ng-template let-stage pTemplate="item">

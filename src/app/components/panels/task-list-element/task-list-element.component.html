@@ -1,12 +1,13 @@
 <div (click)="onClick.emit(item)" [ngClass]="{processing: item?.taskStatus === 'PROCESSING', inlined, hovered: isHover}"
      [routerLink]="!viewExample && !customClickHandler ? ['/task', item?.taskId] : null"
-     class="flex flex-column bg-white outline-none cursor-pointer hover:bg-gray-50">
+     class="flex flex-column bg-white outline-none cursor-pointer hover:bg-gray-50 relative pl-1">
+    <div class="absolute top-0 left-0 h-full opacity-50" [ngClass]="statusBgColor" [style.width]="'.3rem'"></div>
     <div class="flex gap-3 p-3 border-bottom-1 border-bluegray-50">
         <p-checkbox (click)="$event.stopPropagation()" (ngModelChange)="checkChange.emit($event)" [(ngModel)]="check"
                     [name]="checkGroup" *ngIf="check"
                     [value]="item?.taskId"></p-checkbox>
-        <ng-container *ngTemplateOutlet="headerItem; context:{label: 'Тип', value: item?.modelWireframe?.name}"></ng-container>
-        <ng-container *ngTemplateOutlet="headerItem; context:{label: 'Стадия', value: item?.currentStage?.label}"></ng-container>
+        <ng-container *ngTemplateOutlet="headerItem; context:{label: 'Класс', value: item?.modelWireframe?.name}"></ng-container>
+        <ng-container *ngTemplateOutlet="headerItem; context:{label: 'Тип', value: item?.currentStage?.label}"></ng-container>
         <ng-container *ngIf="item?.actualFrom || item?.actualTo">
             <ng-container *ngIf="item?.actualFrom">
                 <ng-container *ngTemplateOutlet="headerItem; context:{label: 'Запланирована', value: item?.actualFrom | date:'dd/MM/yyyy HH:mm'}"></ng-container>
@@ -22,7 +23,10 @@
 <!--    <ng-container *ngTemplateOutlet="(isWide$ | async) ? tableBodyView : bodyView; context: {$implicit: taskFields}"></ng-container>-->
     <app-task-fields-table-view [task]="item"></app-task-fields-table-view>
     <div *ngIf="item?.lastComment" class="flex gap-2 border-top-1 border-bottom-1 border-bluegray-100 p-3">
-        <span class="text-sm white-space-nowrap text-primary-600">
+        <span class="text-sm white-space-nowrap text-bluegray-400 line-height-4">
+            {{item?.lastComment?.created | date:'dd-MM-yyyy HH:mm'}}
+        </span>
+        <span class="text-sm white-space-nowrap text-primary-600 line-height-4">
             {{item?.lastComment?.creator?.fullName}}:
         </span>
         <div class="text-bluegray-500" [style]="{whiteSpace:'pre-wrap', wordWrap:'break-word', textAlign:'left'}">
@@ -39,7 +43,7 @@
         <div class="flex-grow-1"></div>
         <span class="text-bluegray-500 text-sm font-semibold">Создатель: {{item?.creator?.fullName}}</span>
         <span [ngClass]="statusColor" class="font-semibold text-sm">{{item | taskStatus}}</span>
-        <span class="text-bluegray-500 text-sm font-semibold">{{item?.created | date:'dd/MM/yyyy HH:mm'}}</span>
+        <span class="text-bluegray-500 text-sm font-semibold">{{item?.created | date:'dd-MM-yyyy HH:mm'}}</span>
     </div>
 </div>
 
@@ -136,7 +140,7 @@
 </ng-template>
 
 <ng-template #workersEmployee>
-    <ng-container *ngIf="item?.responsible">
+    <ng-container *ngIf="actualWorkLogWorkers">
         <ng-container *ngTemplateOutlet="headerItem; context:{label:'Монтажники', value: actualWorkLogWorkers}"></ng-container>
     </ng-container>
 </ng-template>

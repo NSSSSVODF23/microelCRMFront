@@ -80,24 +80,25 @@ export class EmployeesPageComponent implements OnInit, OnDestroy {
         showDeleted: new FormControl(false)
     })
 
-    employeeForm: FormGroup = new FormGroup({
+    employeeForm = new FormGroup({
         lastName: new FormControl(''),
         firstName: new FormControl('', Validators.required),
         secondName: new FormControl(''),
-        internalPhoneNumber: new FormControl(),
-        access: new FormControl([]),
+        internalPhoneNumber: new FormControl<string | null>(null),
+        access: new FormControl<number[]>([]),
         login: new FormControl('', [Validators.required, Validators.minLength(4)]),
         password: new FormControl('', Validators.required),
         telegramUserId: new FormControl(''),
-        department: new FormControl(undefined, Validators.required),
-        position: new FormControl(undefined, Validators.required),
+        telegramGroupChatId: new FormControl<string|null>(null),
+        department: new FormControl<number | null>(null, Validators.required),
+        position: new FormControl<number | null>(null, Validators.required),
         offsite: new FormControl(false)
     });
     isAccessOverride = false;
     accessOfSelectedPosition: number[] = [];
-    isBeginDeleteEmployee: { [id: string]: boolean } = {};
-    isBeginCreatingEmployee = false;
-    isBeginEditingEmployee = false;
+    isBeingDeleteEmployee: { [id: string]: boolean } = {};
+    isBeingCreatingEmployee = false;
+    isBeingEditingEmployee = false;
 
     subscriptions: SubscriptionsHolder = new SubscriptionsHolder();
 
@@ -329,7 +330,7 @@ export class EmployeesPageComponent implements OnInit, OnDestroy {
         this.employeeForm.reset({
             login: "",
             password: "",
-            access: 0,
+            access: [],
             department: null,
             position: null,
             secondName: "",
@@ -368,15 +369,16 @@ export class EmployeesPageComponent implements OnInit, OnDestroy {
 
     employeeCreate() {
         const rawValue = this.employeeForm.getRawValue();
-        this.isBeginCreatingEmployee = true;
-        if (Array.isArray(rawValue['access'])) rawValue['access'] = rawValue['access'].reduce((p: number, c: number) => p + c, 0)
-        this.api.createEmployee(rawValue).subscribe({
+        this.isBeingCreatingEmployee = true;
+        let access = 0;
+        if (Array.isArray(rawValue['access'])) access = rawValue['access'].reduce((p: number, c: number) => p + c, 0)
+        this.api.createEmployee({...rawValue, access}).subscribe({
             complete: () => {
-                this.isBeginCreatingEmployee = false;
+                this.isBeingCreatingEmployee = false;
                 this.showCreateEmployeeDialog = false;
             },
             error: () => {
-                this.isBeginCreatingEmployee = false;
+                this.isBeingCreatingEmployee = false;
             }
         })
     }
@@ -393,13 +395,13 @@ export class EmployeesPageComponent implements OnInit, OnDestroy {
 
     employeeDelete(login?: string) {
         if (typeof login !== 'string') return;
-        this.isBeginDeleteEmployee[login] = true;
+        this.isBeingDeleteEmployee[login] = true;
         this.api.deleteEmployee(login).subscribe({
             complete: () => {
-                delete this.isBeginDeleteEmployee[login];
+                delete this.isBeingDeleteEmployee[login];
             },
             error: () => {
-                delete this.isBeginDeleteEmployee[login];
+                delete this.isBeingDeleteEmployee[login];
             }
         });
     }
@@ -407,15 +409,16 @@ export class EmployeesPageComponent implements OnInit, OnDestroy {
     employeeEdit() {
         const rawValue = this.employeeForm.getRawValue();
         if (typeof rawValue['login'] !== 'string') return;
-        this.isBeginEditingEmployee = true;
-        if (Array.isArray(rawValue['access'])) rawValue['access'] = rawValue['access'].reduce((p: number, c: number) => p + c, 0)
-        this.api.editEmployee(rawValue, rawValue['login']).subscribe({
+        this.isBeingEditingEmployee = true;
+        let access = 0;
+        if (Array.isArray(rawValue['access'])) access = rawValue['access'].reduce((p: number, c: number) => p + c, 0)
+        this.api.editEmployee({...rawValue, access}, rawValue['login']).subscribe({
             complete: () => {
-                this.isBeginEditingEmployee = false;
+                this.isBeingEditingEmployee = false;
                 this.showEditEmployeeDialog = false;
             },
             error: () => {
-                this.isBeginEditingEmployee = false;
+                this.isBeingEditingEmployee = false;
             }
         })
     }
@@ -435,6 +438,7 @@ export class EmployeesPageComponent implements OnInit, OnDestroy {
                     lastName: employee.lastName,
                     internalPhoneNumber: employee.internalPhoneNumber,
                     telegramUserId: employee.telegramUserId,
+                    telegramGroupChatId: employee.telegramGroupChatId,
                     offsite: employee.offsite
                 })
                 this.positionSelecting({value: employee.position?.positionId})

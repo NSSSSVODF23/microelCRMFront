@@ -25,16 +25,16 @@
                             <div class="flexed column">
                                 <span class="header400">{{currentTask?.modelWireframe?.name ?? ''}}</span>
                                 <div class="flex align-items-baseline gap-2 text-bluegray-500">
-                                    <span>Стадия:</span>
+                                    <span>Тип:</span>
                                     <app-tiny-button (onClick)="stageMenu.toggle($event)"
                                                      [disabled]="!currentTask?.currentStage || currentTask?.taskStatus === 'CLOSE'"
                                                      [label]="currentTask?.currentStage?.label ?? 'не установлена'"
                                                      [size]=".9"
                                                      pTooltip="Изменить" tooltipPosition="bottom"></app-tiny-button>
-                                    <span (click)="moveToNextStage()" *ngIf="!isLastStage() && currentTask?.currentStage"
-                                          class="next-stage-button">
-                                Следующая <i class="mdi-chevron_right"></i>
-                            </span>
+<!--                                    <span (click)="moveToNextStage()" *ngIf="!isLastStage() && currentTask?.currentStage"-->
+<!--                                          class="next-stage-button">-->
+<!--                                Следующая <i class="mdi-chevron_right"></i>-->
+<!--                            </span>-->
                                 </div>
                             </div>
                         </div>

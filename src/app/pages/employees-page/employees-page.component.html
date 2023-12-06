@@ -51,7 +51,7 @@
                             <p-button icon="mdi-delete" styleClass="p-button-text p-button-danger"
                                       (onClick)="employeeDeleteConfirm(employee)" [disabled]="employee.deleted ?? false"
                                       label="Удалить"
-                                        [loading]="employee.login ? isBeginDeleteEmployee[employee.login] : false"></p-button>
+                                        [loading]="employee.login ? isBeingDeleteEmployee[employee.login] : false"></p-button>
                         </div>
                     </div>
                 </div>
@@ -222,166 +222,73 @@
     </ng-template>
 </p-dialog>
 
-<p-dialog [(visible)]="showCreateEmployeeDialog" [modal]="true" [dismissableMask]="true"
+<p-dialog [(visible)]="showCreateEmployeeDialog" [modal]="true" [dismissableMask]="true" contentStyleClass="flex flex-column gap-3"
           [resizable]="false" header="Создание сотрудника">
     <ng-template pTemplate="content">
-        <form [formGroup]="employeeForm" class="flexed column gap5">
-            <div class="flexed gap10 hcenter">
-                <span class="input-label-wrapper full-width">
-                    <label>Фамилия</label>
-                    <input appRegexPatternChecker formControlName="lastName" pInputText patternRx="^[А-я]+$"
-                           type="text">
-                </span>
-                <span class="input-label-wrapper full-width">
-                    <label>Имя</label>
-                    <input appRegexPatternChecker formControlName="firstName" pInputText patternRx="^[А-я]+$"
-                           type="text">
-                </span>
-                <span class="input-label-wrapper full-width">
-                    <label>Отчество</label>
-                    <input appRegexPatternChecker formControlName="secondName" pInputText patternRx="^[А-я]+$"
-                           type="text">
-                </span>
-            </div>
-            <div class="flexed gap10 hcenter">
-                <span class="input-label-wrapper full-width">
-                    <label>Логин</label>
-                    <input appRegexPatternChecker formControlName="login" pInputText patternRx="^[\w\.]+$"
-                           type="text">
-                </span>
-                <span class="input-label-wrapper full-width">
-                    <label>Пароль</label>
-                    <input appRegexPatternChecker formControlName="password" pInputText patternRx="^[\w\.]+$"
-                           type="text">
-                </span>
-            </div>
-            <div class="flexed gap10 hcenter">
-                <span class="input-label-wrapper full-width">
-                    <label>Внутренний номер телефона</label>
-                    <input appRegexPatternChecker formControlName="internalPhoneNumber" pInputText patternRx="^\d+$"
-                           type="text">
-                </span>
-                <span class="input-label-wrapper full-width">
-                    <label>Telegram ID</label>
-                    <input appRegexPatternChecker formControlName="telegramUserId" pInputText patternRx="^\d+$"
-                           type="text">
-                </span>
-
-            </div>
-            <div class="flexed gap10 hcenter">
-                <span class="input-label-wrapper">
-                    <label>Отдел</label>
-                    <p-dropdown [options]="departments" formControlName="department"
-                                optionLabel="name" optionValue="departmentId" placeholder="Выбрать">
-                        <ng-template let-department pTemplate="selectedItem">
-                            <div [colorString]="department.name" appColorize>{{department.name}}</div>
-                        </ng-template>
-                        <ng-template let-department pTemplate="item">
-                            <div appColorize>{{department.name}}</div>
-                        </ng-template>
-                    </p-dropdown>
-                </span>
-                <span class="input-label-wrapper">
-                    <label>Должность</label>
-                    <p-dropdown (onChange)="positionSelecting($event)" [options]="positions" formControlName="position"
-                                optionLabel="name" optionValue="positionId" placeholder="Выбрать">
-                        <ng-template let-position pTemplate="selectedItem">
-                            <div [colorString]="position.name" appColorize>
-                                {{position.name}}
-                            </div>
-                        </ng-template>
-                        <ng-template let-position pTemplate="item">
-                            <div appColorize>
-                                {{position.name}}
-                            </div>
-                        </ng-template>
-                    </p-dropdown>
-                </span>
-                <span class="input-label-wrapper flexed vcenter">
-                    <label>Монтажник?</label>
-                    <p-inputSwitch [falseValue]="false" [ngStyle]="{lineHeight:'0'}" [trueValue]="true"
-                                   formControlName="offsite"></p-inputSwitch>
-                </span>
-            </div>
-            <p-panel header="Параметры доступа">
-                <div class="flexed gap10 column">
-                    <div class="flexed gap10 hcenter">
-                        <p-toggleButton (onChange)="checkAllAccess($event)" [disabled]="!isAccessOverride"
-                                        offLabel="Выделить всё"
-                                        onLabel="Снять выделение"></p-toggleButton>
-                        <p-toggleButton (ngModelChange)="accessOverrideChange($event)" [(ngModel)]="isAccessOverride"
-                                        [ngModelOptions]="{standalone:true}" offLabel="Переопределить"
-                                        onLabel="Из должности"></p-toggleButton>
-                    </div>
-                    <div *ngIf="isAccessOverride" class="flexed gap10 wrapped">
-                        <p-checkbox *ngFor="let flag of accessFlags()" [label]="flag.name" [value]="flag.value"
-                                    formControlName="access" name="access"></p-checkbox>
-                    </div>
-                    <div *ngIf="!isAccessOverride" class="flexed gap10 wrapped">
-                        <p-checkbox *ngFor="let flag of accessFlags(); trackBy: accessFlagTrackBy" [disabled]="true"
-                                    [label]="flag.name"
-                                    [ngModelOptions]="{standalone:true}" [ngModel]="accessOfSelectedPosition"
-                                    [value]="flag.value" name="accessPosition"></p-checkbox>
-                    </div>
-                </div>
-            </p-panel>
-            <app-button (onClick)="employeeCreate()" [disabled]="!employeeForm.valid" icon="person_add"
-                        label="Создать"></app-button>
-        </form>
+        <ng-container *ngTemplateOutlet="employeeFormTemplate"></ng-container>
+        <app-button (onClick)="employeeCreate()" [disabled]="!employeeForm.valid" [loading]="isBeingCreatingEmployee" icon="person_add"
+                    label="Создать"></app-button>
     </ng-template>
 </p-dialog>
 
-<p-dialog [(visible)]="showEditEmployeeDialog" [modal]="true" [dismissableMask]="true"
+<p-dialog [(visible)]="showEditEmployeeDialog" [modal]="true" [dismissableMask]="true" contentStyleClass="flex flex-column gap-3"
           [resizable]="false" header="Редактирование сотрудника">
     <ng-template pTemplate="content">
-        <form [formGroup]="employeeForm" class="flexed column gap5">
-            <div class="flexed gap10 hcenter">
+        <ng-container *ngTemplateOutlet="employeeFormTemplate"></ng-container>
+        <app-button (onClick)="employeeEdit()" [disabled]="!employeeForm.valid" [loading]="isBeingEditingEmployee" icon="save"
+                    label="Сохранить"></app-button>
+    </ng-template>
+</p-dialog>
+
+<ng-template #employeeFormTemplate>
+    <form [formGroup]="employeeForm" class="flexed column gap5">
+        <div class="flexed gap10 hcenter">
                 <span class="input-label-wrapper full-width">
                     <label>Фамилия</label>
-                    <input appRegexPatternChecker formControlName="lastName" pInputText patternRx="^[А-я]+$"
-                           type="text">
+                    <input appRegexPatternChecker patternRx="^[А-я]+$" formControlName="lastName" pInputText
+                           [disabled]="isBeingCreatingEmployee || isBeingEditingEmployee" type="text">
                 </span>
-                <span class="input-label-wrapper full-width">
+            <span class="input-label-wrapper full-width">
                     <label>Имя</label>
                     <input appRegexPatternChecker formControlName="firstName" pInputText patternRx="^[А-я]+$"
-                           type="text">
+                           [disabled]="isBeingCreatingEmployee || isBeingEditingEmployee" type="text">
                 </span>
-                <span class="input-label-wrapper full-width">
+            <span class="input-label-wrapper full-width">
                     <label>Отчество</label>
                     <input appRegexPatternChecker formControlName="secondName" pInputText patternRx="^[А-я]+$"
-                           type="text">
+                           [disabled]="isBeingCreatingEmployee || isBeingEditingEmployee" type="text">
                 </span>
-            </div>
-            <div class="flexed gap10 hcenter">
+        </div>
+        <div class="flexed gap10 hcenter">
                 <span class="input-label-wrapper full-width">
                     <label>Логин</label>
                     <input appRegexPatternChecker formControlName="login" pInputText patternRx="^[\w\.]+$$"
-                           type="text">
+                           [disabled]="isBeingCreatingEmployee || isBeingEditingEmployee || showEditEmployeeDialog" type="text">
                 </span>
-                <span class="input-label-wrapper full-width">
+            <span class="input-label-wrapper full-width">
                     <label>Пароль</label>
                     <input appRegexPatternChecker formControlName="password" pInputText patternRx="^[\w\.]+$$"
-                           type="password">
+                           [disabled]="isBeingCreatingEmployee || isBeingEditingEmployee" type="password">
                 </span>
-            </div>
-            <div class="flexed gap10 hcenter">
+        </div>
+        <div class="flexed gap10 hcenter">
                 <span class="input-label-wrapper full-width">
                     <label>Внутренний номер телефона</label>
                     <input appRegexPatternChecker formControlName="internalPhoneNumber" pInputText patternRx="^\d+$"
-                           type="text">
+                           [disabled]="isBeingCreatingEmployee || isBeingEditingEmployee" type="text">
                 </span>
-                <span class="input-label-wrapper full-width">
+            <span class="input-label-wrapper full-width">
                     <label>Telegram ID</label>
                     <input appRegexPatternChecker formControlName="telegramUserId" pInputText patternRx="^\d+$"
-                           type="text">
+                           [disabled]="isBeingCreatingEmployee || isBeingEditingEmployee" type="text">
                 </span>
 
-            </div>
-            <div class="flexed gap10 hcenter">
+        </div>
+        <div class="flexed gap10 hcenter">
                 <span class="input-label-wrapper">
                     <label>Отдел</label>
                     <p-dropdown [options]="departments" formControlName="department"
-                                optionLabel="name" optionValue="departmentId" placeholder="Выбрать">
+                                [disabled]="isBeingCreatingEmployee || isBeingEditingEmployee" optionLabel="name" optionValue="departmentId" placeholder="Выбрать">
                         <ng-template let-department pTemplate="selectedItem">
                             <div [colorString]="department.name" appColorize>{{department.name}}</div>
                         </ng-template>
@@ -390,10 +297,10 @@
                         </ng-template>
                     </p-dropdown>
                 </span>
-                <span class="input-label-wrapper">
+            <span class="input-label-wrapper">
                     <label>Должность</label>
                     <p-dropdown (onChange)="positionSelecting($event)" [options]="positions" formControlName="position"
-                                optionLabel="name" optionValue="positionId" placeholder="Выбрать">
+                                [disabled]="isBeingCreatingEmployee || isBeingEditingEmployee" optionLabel="name" optionValue="positionId" placeholder="Выбрать">
                         <ng-template let-position pTemplate="selectedItem">
                             <div [colorString]="position.name" appColorize>
                                 {{position.name}}
@@ -406,36 +313,38 @@
                         </ng-template>
                     </p-dropdown>
                 </span>
-                <span class="input-label-wrapper flexed vcenter">
+            <span class="input-label-wrapper flexed vcenter">
                     <label>Монтажник?</label>
                     <p-inputSwitch [falseValue]="false" [ngStyle]="{lineHeight:'0'}" [trueValue]="true"
-                                   formControlName="offsite"></p-inputSwitch>
+                                   [disabled]="isBeingCreatingEmployee || isBeingEditingEmployee" formControlName="offsite"></p-inputSwitch>
                 </span>
-            </div>
-            <p-panel header="Параметры доступа">
-                <div class="flexed gap10 column">
-                    <div class="flexed gap10 hcenter">
-                        <p-toggleButton (onChange)="checkAllAccess($event)" [disabled]="!isAccessOverride"
-                                        offLabel="Выделить всё"
-                                        onLabel="Снять выделение"></p-toggleButton>
-                        <p-toggleButton (ngModelChange)="accessOverrideChange($event)" [(ngModel)]="isAccessOverride"
-                                        [ngModelOptions]="{standalone:true}" offLabel="Переопределить"
-                                        onLabel="Из должности"></p-toggleButton>
-                    </div>
-                    <div *ngIf="isAccessOverride" class="flexed gap10 wrapped">
-                        <p-checkbox *ngFor="let flag of accessFlags()" [label]="flag.name" [value]="flag.value"
-                                    formControlName="access" name="access"></p-checkbox>
-                    </div>
-                    <div *ngIf="!isAccessOverride" class="flexed gap10 wrapped">
-                        <p-checkbox *ngFor="let flag of accessFlags(); trackBy: accessFlagTrackBy" [disabled]="true"
-                                    [label]="flag.name"
-                                    [ngModelOptions]="{standalone:true}" [ngModel]="accessOfSelectedPosition"
-                                    [value]="flag.value" name="accessPosition"></p-checkbox>
-                    </div>
+            <span class="input-label-wrapper full-width" *ngIf="employeeForm.value.offsite">
+                    <label>ID Рабочей группы</label>
+                    <input appRegexPatternChecker formControlName="telegramGroupChatId" pInputText patternRx="^\d+$"
+                           [disabled]="isBeingCreatingEmployee || isBeingEditingEmployee" type="text">
+                </span>
+        </div>
+        <p-panel header="Параметры доступа">
+            <div class="flexed gap10 column">
+                <div class="flexed gap10 hcenter">
+                    <p-toggleButton (onChange)="checkAllAccess($event)"
+                                    [disabled]="isBeingCreatingEmployee || isBeingEditingEmployee || !isAccessOverride" offLabel="Выделить всё"
+                                    onLabel="Снять выделение"></p-toggleButton>
+                    <p-toggleButton (ngModelChange)="accessOverrideChange($event)" [(ngModel)]="isAccessOverride"
+                                    [ngModelOptions]="{standalone:true}" offLabel="Переопределить"
+                                    [disabled]="isBeingCreatingEmployee || isBeingEditingEmployee" onLabel="Из должности"></p-toggleButton>
                 </div>
-            </p-panel>
-            <app-button (onClick)="employeeEdit()" [disabled]="!employeeForm.valid" icon="save"
-                        label="Сохранить"></app-button>
-        </form>
-    </ng-template>
-</p-dialog>
+                <div *ngIf="isAccessOverride" class="flexed gap10 wrapped">
+                    <p-checkbox *ngFor="let flag of accessFlags()" [label]="flag.name" [value]="flag.value"
+                                [disabled]="isBeingCreatingEmployee || isBeingEditingEmployee" formControlName="access" name="access"></p-checkbox>
+                </div>
+                <div *ngIf="!isAccessOverride" class="flexed gap10 wrapped">
+                    <p-checkbox *ngFor="let flag of accessFlags(); trackBy: accessFlagTrackBy"
+                                [disabled]="isBeingCreatingEmployee || isBeingEditingEmployee || true" [label]="flag.name"
+                                [ngModelOptions]="{standalone:true}" [ngModel]="accessOfSelectedPosition"
+                                [value]="flag.value" name="accessPosition"></p-checkbox>
+                </div>
+            </div>
+        </p-panel>
+    </form>
+</ng-template>

@@ -19,7 +19,7 @@
                                     placeholder="Должность"></p-dropdown>
                     </div>
                     <div class="flex-grow-1"></div>
-                    <p-menu #otchetMenu [popup]="true" [model]="(cache.accountingMenuItems$ | async) ?? []"></p-menu>
+                    <p-menu #otchetMenu [popup]="true" [model]="(cache.accountingMenuItems$ | async) ?? []" appendTo="body"></p-menu>
                     <button type="button" pButton label="Отчеты за месяц" (click)="otchetMenu.toggle($event)"></button>
                     <p-toggleButton [formControl]="cache.ndflSwitch" offLabel="БЕЗ НДФЛ" onLabel="С НДФЛ"></p-toggleButton>
                 </div>

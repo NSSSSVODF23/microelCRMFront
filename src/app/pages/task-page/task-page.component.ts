@@ -353,7 +353,7 @@ export class TaskPageComponent implements OnInit, OnDestroy {
             .map(stage => {
                 if (stage.stageId == this.currentTask?.currentStage?.stageId) {
                     return <MenuItem>{
-                        label: `${stage.label} (текущая)` ?? '', disabled: true, icon: 'pi pi-fw pi-check'
+                        label: `${stage.label}` ?? '', disabled: true, icon: 'pi pi-fw pi-check'
                     }
                 }
                 return <MenuItem>{

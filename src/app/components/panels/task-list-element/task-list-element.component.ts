@@ -70,6 +70,14 @@ export class TaskListElementComponent implements OnInit, OnChanges {
         }
     };
 
+    get statusBgColor() {
+        return {
+            'bg-primary': this.item?.taskStatus === TaskStatus.ACTIVE,
+            'bg-orange-400': this.item?.taskStatus === TaskStatus.PROCESSING,
+            'bg-bluegray-200': this.item?.taskStatus === TaskStatus.CLOSE
+        }
+    };
+
     get taskFields(){
         const blocks = ['LARGE_TEXT', 'COUNTING_LIVES'];
         return {

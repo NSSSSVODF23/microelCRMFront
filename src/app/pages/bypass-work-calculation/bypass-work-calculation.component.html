@@ -7,7 +7,7 @@
                 <section class="flex gap-4 p-4 terminator-bottom">
                     <div>
                         <div class="flex flex-column gap-1">
-                            <span class="caption wt-bold f-color-500">Тип задачи</span>
+                            <span class="caption wt-bold f-color-500">Класс задачи</span>
                             <p-listbox (onChange)="selectTemplate($event.value)"
                                        [disabled]="templateLoadingState === 'LOADING'"
                                        [hidden]="wireframesLoadingState !== 'READY'"
@@ -27,7 +27,7 @@
                             <div *ngSwitchCase="'EMPTY'" class="flex justify-content-center">
                                 <div class="flex align-items-center caption size-big wt-bold f-color-400">
                                     <span class="mds-done"></span>
-                                    <span>Выберите тип задачи</span>
+                                    <span>Выберите класс задачи</span>
                                 </div>
                             </div>
                             <div *ngSwitchCase="'LOADING'" class="flex justify-content-center">

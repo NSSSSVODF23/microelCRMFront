@@ -89,6 +89,7 @@ export interface Employee {
     password?: string;
     created?: string;
     telegramUserId?: string;
+    telegramGroupChatId?: string | null;
     inventory?: InventoryItem[];
     offsite?: boolean;
     responsibilitiesTasks?: Task[];
