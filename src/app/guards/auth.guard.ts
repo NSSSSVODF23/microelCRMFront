@@ -7,7 +7,7 @@ import {
     RouterStateSnapshot,
     UrlTree
 } from '@angular/router';
-import {catchError, map, Observable, of} from 'rxjs';
+import {catchError, map, Observable, of, tap} from 'rxjs';
 import {ApiService} from '../services/api.service';
 
 @Injectable({
@@ -24,7 +24,11 @@ export class AuthGuard implements CanActivate, CanActivateChild {
         return this.api.authCheckout().pipe(catchError((err, caught)=>{
             return of(this.router.createUrlTree(['/login']));
         }), map((value)=> {
-            if (value instanceof UrlTree) return value; else return true;
+            if (value instanceof UrlTree) {
+                return value;
+            } else {
+                return true;
+            }
         }));
     }
 
@@ -34,7 +38,11 @@ export class AuthGuard implements CanActivate, CanActivateChild {
         return this.api.authCheckout().pipe(catchError((err, caught)=>{
             return of(this.router.createUrlTree(['/login']));
         }), map((value)=> {
-            if (value instanceof UrlTree) return value; else return true;
+            if (value instanceof UrlTree) {
+                return value;
+            } else {
+                return true;
+            }
         }));
     }
 

@@ -2,8 +2,10 @@ import {EventEmitter, Injectable} from '@angular/core';
 import {ApiService} from "./api.service";
 import {Employee, EmployeeStatus, INotification} from "../transport-interfaces";
 import {RealTimeUpdateService} from "./real-time-update.service";
-import {fromEvent, lastValueFrom, shareReplay, Subscription} from "rxjs";
+import {fromEvent, shareReplay, Subscription, tap} from "rxjs";
 import jwtDecode from "jwt-decode";
+import {AuthGuard} from "../guards/auth.guard";
+import {Router} from "@angular/router";
 
 interface Token {
     access: number;
@@ -29,18 +31,9 @@ export class PersonalityService {
     userData = this.onGettingUserData.pipe(shareReplay(1));
     private lastTouch = 0;
 
-    constructor(readonly api: ApiService, readonly rt: RealTimeUpdateService) {
+    constructor(readonly api: ApiService, readonly rt: RealTimeUpdateService, private router: Router) {
 
-        this.api.getMe().subscribe({
-            next: (value) => {
-                this.me = value;
-                this.onGettingUserData.emit(value);
-                if (this.meUpdate) this.meUpdate.unsubscribe()
-                this.meUpdate = this.rt.employeeUpdated(value.login).subscribe(emp => {
-                    this.me = emp;
-                });
-            }
-        })
+        this.updateMe().subscribe();
 
         fromEvent(window,'focus').subscribe(event=>{
             if(!this.api.loggedIn) return;
@@ -78,5 +71,18 @@ export class PersonalityService {
                 console.log("Проверка токена")
             }
         }, 10000)
+    }
+
+    updateMe() {
+        return this.api.getMe().pipe(tap({
+            next: (value) => {
+                this.me = value;
+                this.onGettingUserData.emit(value);
+                if (this.meUpdate) this.meUpdate.unsubscribe()
+                this.meUpdate = this.rt.employeeUpdated(value.login).subscribe(emp => {
+                    this.me = emp;
+                });
+            }
+        }))
     }
 }

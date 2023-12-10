@@ -51,45 +51,45 @@
                 Чат пуст
             </span>
         </div>
-        <div [ngClass]="{unread: unreadCount>0}" *ngIf="!currentChat?.closed" class="chat-input">
-            <div *ngIf="editMessage" class="preview-message-wrapper">
-                <div class="flexed hcenter gap2 caption size-small wt-bold f-color-500">
-                    <i class="mdi-edit"></i> <span>Редактирование</span>
-                </div>
-                <div class="flexed hcenter gap5">
-                    <ng-container
-                            *ngTemplateOutlet="editMessagePreview; context: {$implicit: editMessage}"></ng-container>
-                    <p-button (onClick)="clearEditMessage()" icon="mdi-close"
-                              styleClass="p-button-text p-button-icon p-button-secondary p-button-rounded"></p-button>
-                </div>
-            </div>
-            <div *ngIf="replyMessage" class="preview-message-wrapper">
-                <div class="flexed hcenter gap2 caption size-small wt-bold f-color-500">
-                    <i class="mdi-reply"></i> <span>Ответ</span>
-                </div>
-                <div class="flexed hcenter gap5">
-                    <ng-container
-                            *ngTemplateOutlet="editMessagePreview; context: {$implicit: replyMessage}"></ng-container>
-                    <p-button (onClick)="clearReplyMessage()" icon="mdi-close"
-                              styleClass="p-button-text p-button-icon p-button-secondary p-button-rounded"></p-button>
-                </div>
-            </div>
-            <div class="input-wrapper">
-                <textarea #messageInput class="borderless-text-field" (keydown)="messageInputKeyDown($event)" (paste)="fileInput.appendFiles($event)" [(ngModel)]="sendingText"
-                          [disabled]="isBeginSending" appTextareaAutoresize placeholder="Сообщение"></textarea>
-                <div class="button-block">
-                    <app-emoji-panel (onChoosing)="insertEmoji($event)"></app-emoji-panel>
-                    <app-file-input #fileInput [(files)]="sendingFiles" [disabled]="isBeginSending || !!editMessage"
-                                    [short]="true"></app-file-input>
-                    <p-button (onClick)="sendMessage()" [disabled]="isNotReady" [loading]="isBeginSending"
-                              icon="mdi-send"
-                              styleClass="p-button-text p-button-icon p-button-rounded"></p-button>
-                </div>
-            </div>
-        </div>
-        <div class="chat-input p10 flexed hcenter vcenter" *ngIf="currentChat?.closed">
-            <span class="caption size-big wt-bold f-color-500 flexed hcenter"><i class="mdi-history"></i><span>История сообщений</span></span>
-        </div>
+<!--        <div [ngClass]="{unread: unreadCount>0}" *ngIf="!currentChat?.closed" class="chat-input">-->
+<!--            <div *ngIf="editMessage" class="preview-message-wrapper">-->
+<!--                <div class="flexed hcenter gap2 caption size-small wt-bold f-color-500">-->
+<!--                    <i class="mdi-edit"></i> <span>Редактирование</span>-->
+<!--                </div>-->
+<!--                <div class="flexed hcenter gap5">-->
+<!--                    <ng-container-->
+<!--                            *ngTemplateOutlet="editMessagePreview; context: {$implicit: editMessage}"></ng-container>-->
+<!--                    <p-button (onClick)="clearEditMessage()" icon="mdi-close"-->
+<!--                              styleClass="p-button-text p-button-icon p-button-secondary p-button-rounded"></p-button>-->
+<!--                </div>-->
+<!--            </div>-->
+<!--            <div *ngIf="replyMessage" class="preview-message-wrapper">-->
+<!--                <div class="flexed hcenter gap2 caption size-small wt-bold f-color-500">-->
+<!--                    <i class="mdi-reply"></i> <span>Ответ</span>-->
+<!--                </div>-->
+<!--                <div class="flexed hcenter gap5">-->
+<!--                    <ng-container-->
+<!--                            *ngTemplateOutlet="editMessagePreview; context: {$implicit: replyMessage}"></ng-container>-->
+<!--                    <p-button (onClick)="clearReplyMessage()" icon="mdi-close"-->
+<!--                              styleClass="p-button-text p-button-icon p-button-secondary p-button-rounded"></p-button>-->
+<!--                </div>-->
+<!--            </div>-->
+<!--            <div class="input-wrapper">-->
+<!--                <textarea #messageInput class="borderless-text-field" (keydown)="messageInputKeyDown($event)" (paste)="fileInput.appendFiles($event)" [(ngModel)]="sendingText"-->
+<!--                          [disabled]="isBeginSending" appTextareaAutoresize placeholder="Сообщение"></textarea>-->
+<!--                <div class="button-block">-->
+<!--                    <app-emoji-panel (onChoosing)="insertEmoji($event)"></app-emoji-panel>-->
+<!--                    <app-file-input #fileInput [(files)]="sendingFiles" [disabled]="isBeginSending || !!editMessage"-->
+<!--                                    [short]="true"></app-file-input>-->
+<!--                    <p-button (onClick)="sendMessage()" [disabled]="isNotReady" [loading]="isBeginSending"-->
+<!--                              icon="mdi-send"-->
+<!--                              styleClass="p-button-text p-button-icon p-button-rounded"></p-button>-->
+<!--                </div>-->
+<!--            </div>-->
+<!--        </div>-->
+<!--        <div class="chat-input p10 flexed hcenter vcenter" *ngIf="currentChat?.closed">-->
+<!--            <span class="caption size-big wt-bold f-color-500 flexed hcenter"><i class="mdi-history"></i><span>История сообщений</span></span>-->
+<!--        </div>-->
     </ng-template>
 </p-dialog>
 

@@ -10,6 +10,10 @@
                                      class="stretched"></app-task-template-input>
         </div>
         <div class="flex flex-column gap-3 mt-3">
+            <div class="flex flex-column gap-1" *ngIf="types.length>0">
+                <span class="font-semibold text-lg text-bluegray-400">Тип задачи</span>
+                <p-dropdown [options]="types" [(ngModel)]="type"></p-dropdown>
+            </div>
             <div class="flex flex-column gap-1">
                 <span class="font-semibold text-lg text-bluegray-400">Наблюдатели</span>
                 <app-observer-selector-input [(ngModel)]="initialObservers"></app-observer-selector-input>

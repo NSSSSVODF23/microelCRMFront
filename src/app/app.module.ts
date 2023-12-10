@@ -15,12 +15,17 @@ import {ToastModule} from "primeng/toast";
 import {CommonComponentsModule} from "./moduls/common-components/common-components.module";
 import {AngularYandexMapsModule, YaConfig} from "angular8-yandex-maps";
 import { DialButtonsListComponent } from './components/task-fields/phones/dial-buttons-list/dial-buttons-list.component';
+import { UncompletedReportsPageComponent } from './pages/uncompleted-reports-page/uncompleted-reports-page.component';
+import { InstallersBootstrapComponent } from './pages/bootstaps/installers-bootstrap/installers-bootstrap.component';
+import { ModuleLoadingBootstrapComponent } from './pages/bootstaps/module-loading-bootstrap/module-loading-bootstrap.component';
+import {ProgressSpinnerModule} from "primeng/progressspinner";
+import {ButtonModule} from "primeng/button";
 
 registerLocaleData(localeRu, 'ru');
 
 
 @NgModule({
-    declarations: [AppComponent],
+    declarations: [AppComponent, InstallersBootstrapComponent, ModuleLoadingBootstrapComponent],
     imports: [
         AppRoutingModule,
         BrowserAnimationsModule,
@@ -33,6 +38,8 @@ registerLocaleData(localeRu, 'ru');
         HttpClientModule,
         ToastModule,
         CommonComponentsModule,
+        ProgressSpinnerModule,
+        ButtonModule,
 
     ],
     exports: [BrowserAnimationsModule, RouterOutlet, FormsModule, HttpClientModule],

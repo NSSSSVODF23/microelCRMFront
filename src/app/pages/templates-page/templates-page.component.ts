@@ -14,10 +14,17 @@ import {map, merge, of, shareReplay, switchMap, tap} from "rxjs";
 export class TemplatesPageComponent implements OnInit, OnDestroy {
     templateItems: Wireframe[] = [];
     availableTags: TaskTag[] = [];
-    showCreateTagDialog = false;
-    tagNameToCreate: string = '';
-    tagColorToCreate: string = '';
-    isTagCreating = false;
+
+    createTagDialogVisible = false;
+    editTagDialogVisible = false;
+    tagDialogForm = new FormGroup({
+        id: new FormControl<number | null | undefined>(null),
+        name: new FormControl('', Validators.required),
+        color: new FormControl('', Validators.required),
+        unbindAfterClose: new FormControl(false)
+    });
+    isTagSaving = false;
+
     subscription: SubscriptionsHolder = new SubscriptionsHolder();
     deletedTemplatesSwitcher = new FormControl(false);
     deletedTagsSwitcher = new FormControl(false);
@@ -181,29 +188,51 @@ export class TemplatesPageComponent implements OnInit, OnDestroy {
     }
 
     createTag() {
-        this.isTagCreating = true;
-        this.api.createTaskTag({
-            taskTagId: 0,
-            deleted: false,
-            name: this.tagNameToCreate,
-            color: this.tagColorToCreate
-        }).subscribe({
+        this.isTagSaving = true;
+        this.api.createTaskTag(this.tagDialogForm.value).subscribe({
             next: () => {
-                this.isTagCreating = false;
-                this.showCreateTagDialog = false;
+                this.isTagSaving = false;
+                this.createTagDialogVisible = false;
             },
             error: () => {
-                this.isTagCreating = false;
+                this.isTagSaving = false;
+            }
+        })
+    }
+
+    editTag() {
+        this.isTagSaving = true;
+        this.api.modifyTaskTag(this.tagDialogForm.value).subscribe({
+            next: () => {
+                this.isTagSaving = false;
+                this.editTagDialogVisible = false;
+            },
+            error: () => {
+                this.isTagSaving = false;
             }
         })
     }
 
     openCreateTagDialog() {
-        // Cleaning up old values
-        this.tagNameToCreate = '';
-        this.tagColorToCreate = this.generateRandomHslColor();
-        // Opening dialog
-        this.showCreateTagDialog = true;
+        this.tagDialogForm.setValue({
+            id: null,
+            name: "",
+            color: this.generateRandomHslColor(),
+            unbindAfterClose: false
+        })
+        this.createTagDialogVisible = true;
+        this.isTagSaving = false;
+    }
+
+    openEditTagDialog(tag: TaskTag) {
+        this.tagDialogForm.setValue({
+            id: tag.taskTagId,
+            name: tag.name,
+            color: tag.color,
+            unbindAfterClose: tag.unbindAfterClose
+        })
+        this.editTagDialogVisible = true;
+        this.isTagSaving = false;
     }
 
     openCreateEquipmentDialog() {
@@ -274,8 +303,8 @@ export class TemplatesPageComponent implements OnInit, OnDestroy {
             accept: () => this.api.deleteClientEquipment(equipment.clientEquipmentId).subscribe()
         })
     }
-
     // Private methods to convert hsl color value to hex color value
+
     private hslToHex(h: number, s: number, l: number): string {
         h /= 360;
         s /= 100;
@@ -304,8 +333,8 @@ export class TemplatesPageComponent implements OnInit, OnDestroy {
         };
         return `#${toHex(r)}${toHex(g)}${toHex(b)}`;
     }
-
     // Private methods to generate random hsl color, with limits
+
     private generateRandomHslColor(minSaturation = 50, maxSaturation = 60, minLightness = 50, maxLightness = 60) {
         // Get random hue
         let hue = Math.floor(Math.random() * 360);

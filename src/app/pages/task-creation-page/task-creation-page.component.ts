@@ -4,8 +4,6 @@ import {fade, flow, swipeChild} from "../../animations";
 import {
     DefaultObservers,
     FieldItem,
-    ModelItem,
-    Task,
     TaskCreationBody,
     TaskTag,
     Wireframe
@@ -56,6 +54,9 @@ export class TaskCreationPageComponent implements OnInit, OnDestroy {
     initialTags: TaskTag[] = [];
     initialComment?: string;
 
+    types: {label:string, value:string}[] = [];
+    type?: string;
+
     constructor(readonly api: ApiService, readonly route: ActivatedRoute, readonly personality: PersonalityService, readonly toast: MessageService, private taskCreation: TaskCreatorService) {
         document.body.classList.add("whited");
     }
@@ -69,6 +70,13 @@ export class TaskCreationPageComponent implements OnInit, OnDestroy {
 
     set selectedTemplate(value: Wireframe | null) {
         this._selectedTemplate = value;
+        if(value?.stages){
+            this.types = value.stages.map(stage=>({label:stage.label, value:stage.stageId})) ?? [];
+            this.type = this.types[0].value;
+        }else{
+            this.types = [];
+            this.type = undefined;
+        }
     }
 
     get currentStepFields(): FieldItem[] {
@@ -98,7 +106,8 @@ export class TaskCreationPageComponent implements OnInit, OnDestroy {
             fields: FormToModelItemConverter.convert(rawValues, this.selectedTemplate),
             initialComment: this.initialComment,
             tags: this.initialTags,
-            observers: this.initialObservers
+            observers: this.initialObservers,
+            type: this.type
         };
     }
 

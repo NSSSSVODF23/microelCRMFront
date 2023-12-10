@@ -8851,6 +8851,10 @@
 }
 
 .mds {
+  &-summarize{
+    @include mds("summarize");
+  }
+
   &-frame_source {
     @include mds("frame_source");
   }

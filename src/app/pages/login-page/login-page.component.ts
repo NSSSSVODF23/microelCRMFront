@@ -3,6 +3,10 @@ import {FormControl, FormGroup, Validators} from '@angular/forms';
 import {ApiService} from "../../services/api.service";
 import {fade} from "../../animations";
 import { Router } from '@angular/router';
+import {PersonalityService} from "../../services/personality.service";
+import {AuthGuard} from "../../guards/auth.guard";
+import {MainGuard} from "../../guards/main.guard";
+import {routes} from "../../app-routing.module";
 
 @Component({
     templateUrl: './login-page.component.html',
@@ -18,7 +22,7 @@ export class LoginPageComponent implements OnInit {
     isWrongCredentials = false;
     isLogining = false;
 
-    constructor(readonly api: ApiService, readonly router: Router) {
+    constructor(readonly api: ApiService, readonly personalityService: PersonalityService, readonly router: Router) {
     }
 
     ngOnInit(): void {
@@ -34,9 +38,13 @@ export class LoginPageComponent implements OnInit {
         if (!this.loginForm.valid) return;
         this.isLogining = true;
         this.api.signIn(this.loginForm.getRawValue()).subscribe({
-            next: () => {
-                this.router.navigate(['/']).then();
-                this.isLogining = false;
+            next: (tokenUserinfo) => {
+                this.personalityService.updateMe().subscribe()
+                this.router.resetConfig(routes);
+                setTimeout(
+                    ()=>this.router.navigate(['/']).then(()=>this.isLogining = false),
+                    100
+                )
             },
             error: (err) => {
                 this.setWrongCredentials();

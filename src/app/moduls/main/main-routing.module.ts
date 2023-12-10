@@ -30,6 +30,9 @@ import {AcpSettingsPageComponent} from "../../pages/acp-settings-page/acp-settin
 import {AcpSessionsPageComponent} from "../../pages/acp-sessions-page/acp-sessions-page.component";
 import {CommutatorListPageComponent} from "../../pages/commutator-list-page/commutator-list-page.component";
 import {FilesPageComponent} from "../../pages/files-page/files-page.component";
+import {UncompletedReportsPageComponent} from "../../pages/uncompleted-reports-page/uncompleted-reports-page.component";
+import {AuthGuard} from "../../guards/auth.guard";
+import {MainGuard} from "../../guards/main.guard";
 
 const routes: Routes = [
     {
@@ -64,14 +67,15 @@ const routes: Routes = [
             {path: 'system/acp', component: AcpSettingsPageComponent},
             {path: 'commutators/list', component: CommutatorListPageComponent},
             {path: 'files', component: FilesPageComponent},
-        ]
+            // {path: '**', redirectTo: ''}
+        ], canActivate:[AuthGuard, MainGuard], canActivateChild:[AuthGuard, MainGuard]
     },
     // {breadcrumb: '**', redirectTo: 'tasks/status/all', pathMatch: 'full'},
 ];
 
 @NgModule({
     imports: [RouterModule.forChild(routes)],
-    exports: [RouterModule]
+    exports: [RouterModule],
 })
 export class MainRoutingModule {
 }

@@ -1,6 +1,6 @@
 import {Injectable} from '@angular/core';
 import {HttpClient} from "@angular/common/http";
-import {catchError, map, Observable, of, share, tap, zip} from "rxjs";
+import {catchError, delay, map, Observable, of, share, tap, zip} from "rxjs";
 import {
     AcpCommutator,
     AcpConf,
@@ -45,7 +45,7 @@ import {
     TaskFiltrationConditions, TaskJournalSortingTypes, TaskStage,
     TaskTag,
     TelegramConf,
-    TokenChain,
+    TokenChain, TokenChainWithUserInfo,
     TreeDragDropEvent,
     TreeElementPosition, UserEvents,
     Wireframe, WireframeDashboardStatistic,
@@ -289,11 +289,12 @@ export class ApiService {
     }
 
     signIn(formValues: any) {
-        return this.sendPost<TokenChain>("api/public/sign-in", formValues)
+        return this.sendPost<TokenChainWithUserInfo>("api/public/sign-in", formValues)
             .pipe(tap(chain => {
-                Storage.save('token', chain.token);
+                Storage.save('token', chain.tokenChain.token);
+                Storage.save('isOffsite', chain.employee.offsite)
                 this.loggedIn = true;
-            }))
+            }), delay(100))
     }
 
     authCheckout(): Observable<TokenChain> {
@@ -347,8 +348,12 @@ export class ApiService {
         return this.sendGet<Employee[]>("api/private/employees/installers");
     }
 
-    assignInstallersToTask(taskId: number, targetInstallers: { installers: Employee[], description: String }) {
+    assignInstallersToTask(taskId: number, targetInstallers: { installers: Employee[], gangLeader?: string, deferredReport: boolean, description: string }) {
         return this.sendPost("api/private/task/" + taskId + "/assign-installers", targetInstallers);
+    }
+
+    saveReport(form: any) {
+        return this.sendPatch("api/private/work-log/writing-report", form);
     }
 
     forceCloseWorkLog(taskId: number, reasonOfClosing: string) {
@@ -381,11 +386,11 @@ export class ApiService {
         return this.sendGet<TaskTag[]>("api/private/task-tags", query);
     }
 
-    createTaskTag(taskTag: TaskTag) {
+    createTaskTag(taskTag: any) {
         return this.sendPost<TaskTag>("api/private/task-tag", taskTag);
     }
 
-    modifyTaskTag(taskTag: TaskTag) {
+    modifyTaskTag(taskTag: any) {
         return this.sendPatch<TaskTag>("api/private/task-tag", taskTag);
     }
 
@@ -679,6 +684,10 @@ export class ApiService {
 
     getUncalculatedWorkLogs() {
         return this.sendGet<WorkLog[]>('api/private/work-logs/uncalculated');
+    }
+
+    getUncompletedReports(){
+        return this.sendGet<WorkLog[]>('api/private/uncompleted-reports');
     }
 
     sendWorkCalculation(form: any) {
@@ -1099,4 +1108,6 @@ export class ApiService {
     private generateHash(uri: string, query: any) {
         return cyrb53(uri + JSON.stringify(query), 0);
     }
+
+
 }

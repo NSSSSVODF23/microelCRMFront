@@ -1,0 +1,37 @@
+<div class="flex flex-column px-5 py-3 gap-3">
+    <ng-container *ngIf="error then errorTemp else mainTemp"></ng-container>
+</div>
+
+<ng-template #mainTemp>
+    <ng-container *ngIf="workLog$ | async as workLog else loadingTemp" [formGroup]="reportForm">
+        <div class="flex gap-3 align-items-center">
+            <p-button icon="mdi-arrow_back" styleClass="p-button-icon p-button-text p-button-secondary" (onClick)="nav.backOrDefault(['/'])"></p-button>
+            <span class="text-bluegray-500 text-4xl font-medium">Отчет {{workLog.created | date: "EEEE, dd MMMM yyyy" | titlecase}}</span>
+        </div>
+        <app-task-fields-table-view [task]="workLog.task"></app-task-fields-table-view>
+        <div class="flex flex-column">
+            <!--TODO Загружать отдельно сообщения-->
+            <div *ngFor="let message of workLog.chat.messages">
+                {{message.text}}
+            </div>
+        </div>
+        <div class="flex flex-column gap-3 px-3">
+            <textarea pInputTextarea placeholder="Напишите отчет..." [autoResize]="true" [rows]="5" formControlName="reportDescription"></textarea>
+            <p-button label="Отправить" class="align-self-end" [disabled]="reportForm.invalid" (onClick)="saveReport()"></p-button>
+        </div>
+    </ng-container>
+</ng-template>
+
+<ng-template #loadingTemp>
+    <div class="flex align-items-center justify-content-center h-30rem">
+        <p-progressSpinner></p-progressSpinner>
+    </div>
+</ng-template>
+
+<ng-template #errorTemp>
+    <div class="flex flex-column align-items-center justify-content-center h-30rem text-red-400 text-2xl font-bold">
+        <span class="mds-error"></span>
+        <span>{{error}}</span>
+        <p-button label="Обратно к списку" [routerLink]="['/uncompleted-reports']" class="pt-3" styleClass="p-button-outlined p-button-success"></p-button>
+    </div>
+</ng-template>

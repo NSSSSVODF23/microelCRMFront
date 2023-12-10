@@ -1,12 +1,16 @@
 <div class="flexed hcenter gap5 wrapper">
-    <app-avatar [name]="personality.me?.fullName" [size]="3" [src]="personality.me?.avatar"></app-avatar>
-    <div class="flexed column account">
-        <span class="account-name">{{personality.me?.fullName}}</span>
-        <span class="account-position">{{personality.me?.position?.name}}</span>
-    </div>
-    <p-button (onClick)="menu.toggle($event)" icon="mdi-more_vert"
-              styleClass="p-button-text p-button-icon p-button-rounded"></p-button>
-    <ng-container *ngIf="notifyService.isHasUnread; then fullNoti else emptyNoti"></ng-container>
+    <ng-container *ngIf="personality.me as user">
+        <app-avatar [name]="user.fullName" [size]="3" [src]="user.avatar"></app-avatar>
+        <div class="flexed column account">
+            <span class="account-name">{{user.fullName}}</span>
+            <span class="account-position">{{user.position?.name}}</span>
+        </div>
+        <ng-container *ngIf="!user.offsite else logoutButtonTemp">
+            <p-button (onClick)="menu.toggle($event)" icon="mdi-more_vert"
+                      styleClass="p-button-text p-button-icon p-button-rounded"></p-button>
+            <ng-container *ngIf="notifyService.isHasUnread; then fullNoti else emptyNoti"></ng-container>
+        </ng-container>
+    </ng-container>
 </div>
 
 <p-dialog [(visible)]="avatarChangeDialogVisible" [draggable]="false" [modal]="true" [resizable]="false" appendTo="body"
@@ -54,7 +58,6 @@
 <p-menu #menu [model]="controls" [popup]="true" appendTo="body" [baseZIndex]="2000"
         appCloseIfScroll [isVisible]="menu.visible" [alignFn]="menu.alignOverlay.bind(menu)"></p-menu>
 
-
 <ng-template #emptyNoti>
     <p-button (onClick)="notifyService.showSideBar()" icon="mdi-notifications_none"
               styleClass="p-button-text p-button-icon p-button-rounded"></p-button>
@@ -65,4 +68,8 @@
         <p-button (onClick)="notifyService.showSideBar()" icon="mdi-notifications_active"
                   styleClass="p-button-text p-button-icon p-button-rounded"></p-button>
     </span>
+</ng-template>
+
+<ng-template #logoutButtonTemp>
+    <p-button (onClick)="this.exitFromAccount()" label="Выйти из аккаунта" icon="mdi-logout" styleClass="p-button-text p-button-secondary"></p-button>
 </ng-template>

@@ -69,7 +69,8 @@
                         <div class="flexed gap5 hcenter">
                             <span class="caption size-small wt-bold f-color-600">#{{work.workLogId}}</span>
                             <span class="caption">Работа по задаче <app-task-link
-                                    [task]="work.task"></app-task-link> </span>
+                                    [task]="work.task"></app-task-link>
+                            </span>
                         </div>
                         <div class="flexed gap5 hcenter">
                             <span class="caption size-small wt-bold f-color-600">Назначена: {{work.created | date:"EEEE, dd MMMM yyyy HH:mm" | titlecase}}</span>
@@ -81,8 +82,16 @@
                         </div>
                     </div>
                     <div class="stretched"></div>
-                    <div class="flexed hcenter">
-                        <p-button (onClick)="selectWork(work)" label="Расcчитать"
+                    <div class="flex gap-3 align-items-center">
+                        <span *ngIf="work.isReportsUncompleted" class="text-red-400 text-sm font-bold">
+                            Не написали отчеты:
+                            <ng-container *ngFor="let report of work.workReports">
+                                <ng-container *ngIf="report.awaitingWriting">
+                                    {{report.author.fullName}}
+                                </ng-container>
+                            </ng-container>
+                        </span>
+                        <p-button (onClick)="selectWork(work)" label="Расcчитать" [disabled]="work.isReportsUncompleted"
                                   styleClass="p-button-outlined p-button-success"></p-button>
                     </div>
                 </div>

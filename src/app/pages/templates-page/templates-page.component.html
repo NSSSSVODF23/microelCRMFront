@@ -1,7 +1,7 @@
-<div appExtendPageHeight class="flexed vcenter">
-    <div class="responsive-wrapper flexed gap10">
+<div appExtendPageHeight class="flex justify-content-center">
+    <div class="responsive-wrapper flex gap-3">
         <app-main-menu-panel></app-main-menu-panel>
-        <div [style.margin-bottom]="'1rem'" class="flexed column stretched gap10 panel overflow">
+        <div [style.margin-bottom]="'1rem'" class="flex flex-column flex-grow-1 gap-3 shadow-1 overflow-hidden">
             <ng-container *ngTemplateOutlet="tabview"></ng-container>
         </div>
     </div>
@@ -10,7 +10,7 @@
 <ng-template #tabview>
     <p-tabView>
         <p-tabPanel header="Шаблоны" leftIcon="mdi-list_alt">
-            <div [style.padding-bottom]="'1rem'" class="flexed gap10">
+            <div [style.padding-bottom]="'1rem'" class="flex gap-3">
                 <p-button [routerLink]="['constructor']" icon="mdi-add" label="Создать"
                           styleClass="p-button-outlined p-button-success"></p-button>
                 <p-toggleButton [formControl]="deletedTemplatesSwitcher" offLabel="Показать удаленные"
@@ -18,7 +18,7 @@
             </div>
             <ng-container [ngSwitch]="templateLoadingState">
                 <ng-container *ngSwitchCase="'LOADING'">
-                    <div class="flexed hcenter vcenter p20">
+                    <div class="flex align-items-center justify-content-center p-5">
                         <p-progressSpinner class="custom-spinner custom-spinner-8xl custom-spinner-primary"
                                            strokeWidth="1"></p-progressSpinner>
                     </div>
@@ -29,13 +29,13 @@
                     </ng-container>
                 </ng-container>
                 <ng-container *ngSwitchCase="'ERROR'">
-                    <div class="flexed hcenter vcenter p20 caption size-big wt-bold f-color-danger">
+                    <div class="flex align-items-center justify-content-center p-5 text-5xl font-bold text-red-400">
                         <i class="mdi-alert"></i>
                         <span>Ошибка загрузки шаблонов</span>
                     </div>
                 </ng-container>
                 <ng-container *ngSwitchCase="'EMPTY'">
-                    <div class="flexed hcenter vcenter p20 caption size-big wt-bold f-color-500">
+                    <div class="flex align-items-center justify-content-center p-5 text-5xl font-bold text-bluegray-300">
                         <i class="mdi-alert"></i>
                         <span>Нет шаблонов</span>
                     </div>
@@ -44,7 +44,7 @@
 
         </p-tabPanel>
         <p-tabPanel header="Теги" leftIcon="mdi-local_offer">
-            <div [style.padding-bottom]="'1rem'" class="flexed gap10">
+            <div class="flex gap-3 pb-3">
                 <p-button (click)="openCreateTagDialog()" icon="mdi-add" label="Создать"
                           styleClass="p-button-outlined p-button-success"></p-button>
                 <p-toggleButton [formControl]="deletedTagsSwitcher" offLabel="Показать удаленные"
@@ -52,23 +52,23 @@
             </div>
             <ng-container [ngSwitch]="tagLoadingState">
                 <ng-container *ngSwitchCase="'LOADING'">
-                    <div class="flexed hcenter vcenter p20">
+                    <div class="flex align-items-center justify-content-center p-5">
                         <p-progressSpinner class="custom-spinner custom-spinner-8xl custom-spinner-primary"
                                            strokeWidth="1"></p-progressSpinner>
                     </div>
                 </ng-container>
                 <ng-container *ngSwitchCase="'READY'">
                     <app-task-tag-list-item *ngFor="let tag of availableTags; trackBy: trackByTag"
-                                            [tag]="tag"></app-task-tag-list-item>
+                                            [tag]="tag" (onEditTag)="openEditTagDialog($event)"></app-task-tag-list-item>
                 </ng-container>
                 <ng-container *ngSwitchCase="'ERROR'">
-                    <div class="flexed hcenter vcenter p20 caption size-big wt-bold f-color-danger">
+                    <div class="flex align-items-center justify-content-center p-5 text-5xl font-bold text-red-400">
                         <i class="mdi-alert"></i>
                         <span>Ошибка загрузки тегов</span>
                     </div>
                 </ng-container>
                 <ng-container *ngSwitchCase="'EMPTY'">
-                    <div class="flexed hcenter vcenter p20 caption size-big wt-bold f-color-500">
+                    <div class="flex align-items-center justify-content-center p-5 text-5xl font-bold text-bluegray-300">
                         <i class="mdi-alert"></i>
                         <span>Нет тегов</span>
                     </div>
@@ -141,9 +141,9 @@
 </ng-template>
 
 <ng-template #templateItem let-item>
-    <div class="template-item flexed hcenter gap5">
-        <div class="flexed column gap5 stretched">
-            <span [style.opacity]="item.deleted ? 0.5 : 1" class="flexed hcenter caption stretched hcenter gap3">
+    <div class="template-item flex align-items-center gap-2">
+        <div class="flex flex-column gap-2 flex-grow-1">
+            <span [style.opacity]="item.deleted ? 0.5 : 1" class="flex align-items-center flex-grow-1 gap-1">
                 <i *ngIf="item.deleted" class="mdi-not_interested"></i>
                 <span>
                     {{item.name}}
@@ -166,20 +166,22 @@
     </div>
 </ng-template>
 
-<p-dialog [(visible)]="showCreateTagDialog" [breakpoints]="{'960px': '75vw'}" [draggable]="false" [modal]="true"
-          [resizable]="false" [dismissableMask]="true"
-          [style]="{width: 'max-content'}" header="Создать тег">
-    <div class="flexed column gap10 p3">
-        <div class="flexed hcenter gap15">
-            <input [(ngModel)]="tagNameToCreate" pInputText placeholder="Введите название тега" type="text"/>
-            <span class="flexed hcenter gap3">
-                <span>Фон тега</span>
-                <p-colorPicker [(ngModel)]="tagColorToCreate" appendTo="body"></p-colorPicker>
-            </span>
-        </div>
-        <app-button (onClick)="createTag()" [disabled]="!tagNameToCreate && !tagColorToCreate" [loading]="isTagCreating"
+<p-dialog [(visible)]="createTagDialogVisible" [breakpoints]="{'960px': '75vw'}" [draggable]="false" [modal]="true"
+          [resizable]="false" [dismissableMask]="true" [style]="{width: 'max-content'}" header="Создать тег" contentStyleClass="flex flex-column gap-3 pt-1">
+    <ng-template pTemplate="content">
+        <ng-container *ngTemplateOutlet="tagFormTemplate"></ng-container>
+        <app-button (onClick)="createTag()" [disabled]="tagDialogForm.invalid" [loading]="isTagSaving"
                     icon="check" label="Создать"></app-button>
-    </div>
+    </ng-template>
+</p-dialog>
+
+<p-dialog [(visible)]="editTagDialogVisible" [breakpoints]="{'960px': '75vw'}" [draggable]="false" [modal]="true"
+          [resizable]="false" [dismissableMask]="true" [style]="{width: 'max-content'}" header="Редактировать тег" contentStyleClass="flex flex-column gap-3 pt-1">
+    <ng-template pTemplate="content">
+        <ng-container *ngTemplateOutlet="tagFormTemplate"></ng-container>
+        <app-button (onClick)="editTag()" [disabled]="tagDialogForm.invalid" [loading]="isTagSaving"
+                    icon="check" label="Сохранить"></app-button>
+    </ng-template>
 </p-dialog>
 
 <p-dialog [(visible)]="showEquipmentDialog" [breakpoints]="{'960px':'450px'}" [draggable]="false" [dismissableMask]="true"
@@ -209,3 +211,20 @@
         </div>
     </div>
 </p-dialog>
+
+<ng-template #tagFormTemplate>
+    <div class="flex flex-column gap-2" [formGroup]="tagDialogForm">
+        <span class="input-label-wrapper">
+            <label>Название тега</label>
+            <input formControlName="name" pInputText placeholder="Название..." type="text"/>
+        </span>
+        <span class="input-label-wrapper">
+            <label>Фон тега</label>
+            <p-colorPicker formControlName="color" appendTo="body"></p-colorPicker>
+        </span>
+        <span class="input-label-wrapper">
+            <label>Открепить после закрытия</label>
+            <p-inputSwitch formControlName="unbindAfterClose" class="w-fit h-fit"></p-inputSwitch>
+        </span>
+    </div>
+</ng-template>

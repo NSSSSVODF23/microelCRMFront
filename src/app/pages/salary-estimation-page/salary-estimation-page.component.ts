@@ -123,7 +123,20 @@ export class SalaryEstimationPageComponent implements OnInit, OnDestroy {
             if (!value) return;
             this.actionsTaken = value.actionsTaken;
             this.factorsActions = value.factorsActions ?? [];
-        }))
+        }));
+        this.subscriptions.addSubscription('wlUpd', this.rt.workLogUpdated().subscribe(()=>this.api.getUncalculatedWorkLogs().subscribe({
+            next: workLogs => {
+                this.uncalculatedWorkLogs = workLogs;
+                if (workLogs.length > 0) {
+                    this.loadingState = LoadingState.READY;
+                } else {
+                    this.loadingState = LoadingState.EMPTY;
+                }
+            },
+            error: error => {
+                this.loadingState = LoadingState.ERROR;
+            }
+        })))
         this.subscriptions.addSubscription('chQue', this.selectedWorkLog$.subscribe(value => this.selectedWorkLog = value))
         this.subscriptions.addSubscription('setupForm', this.setupFormValues$.subscribe(value => {
             if (value) {

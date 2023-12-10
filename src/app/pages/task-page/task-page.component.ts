@@ -70,6 +70,11 @@ export class TaskPageComponent implements OnInit, OnDestroy {
 
     sourceInstallers: Employee[] = [];
     targetInstallers: Employee[] = [];
+    targetDescription: string = "";
+    gangLeader?: string;
+    deferredReport = false;
+    gangLeaders: {label:string, value: string|undefined|null}[] = [{label:"Без бригадира", value:null}];
+
     appointmentRequested = false;
     showAppointInstallersMenu = false;
     showChangeObserversDialog = false;
@@ -125,7 +130,6 @@ export class TaskPageComponent implements OnInit, OnDestroy {
     @ViewChild('commentEditor') commentEditor?: QuillEditorComponent;
     @ViewChild('taskLinkingDialog') taskLinkingDialog?: TaskSelectingDialogComponent;
     @ViewChild('workLogsDialogEl') workLogsDialogEl?: WorkLogsDialogComponent;
-    targetDescription: string = "";
     forceCloseWorkLogDialogVisible: boolean = false;
     forceCloseWorkLogReason: string = "";
     isForceClosingWorkLog = false;
@@ -402,7 +406,9 @@ export class TaskPageComponent implements OnInit, OnDestroy {
         this.appointmentRequested = true;
         this.api.assignInstallersToTask(this._taskId, {
             installers: this.targetInstallers,
-            description: this.targetDescription
+            description: this.targetDescription,
+            gangLeader: this.gangLeader,
+            deferredReport: this.deferredReport
         }).subscribe(
             {
                 next: () => {
@@ -417,6 +423,8 @@ export class TaskPageComponent implements OnInit, OnDestroy {
     clearAppointInstallers() {
         this.targetDescription = "";
         this.targetInstallers = [];
+        this.gangLeader = undefined;
+        this.deferredReport = false;
     }
 
     resetListAppointedInstallers() {
@@ -961,12 +969,12 @@ export class TaskPageComponent implements OnInit, OnDestroy {
                 label: "Прикрепленные файлы",
                 command: () => this.showFilesHistory = true
             },
-            {
-                icon: 'mdi-forum',
-                label: "Активный чат",
-                visible: this.isTaskProcessing(),
-                command: () => this.api.getActiveTaskChat(this._taskId).subscribe(chat => this.chatService.open.emit(chat.chatId))
-            }
+            // {
+            //     icon: 'mdi-forum',
+            //     label: "Активный чат",
+            //     visible: this.isTaskProcessing(),
+            //     command: () => this.api.getActiveTaskChat(this._taskId).subscribe(chat => this.chatService.open.emit(chat.chatId))
+            // }
         ];
     }
 
@@ -1038,5 +1046,15 @@ export class TaskPageComponent implements OnInit, OnDestroy {
 
     pasteFiles(event: ClipboardEvent) {
         this.fileInput?.appendFiles(event);
+    }
+
+    updateGangLeaders(){
+        setTimeout(()=>{
+            if(this.targetInstallers.length > 1){
+                this.gangLeaders = [{label: "Без бригадира", value: null}, ...this.targetInstallers.map(installers=>({label: installers.fullName ?? installers.login, value: installers.login}))];
+            }else{
+                this.gangLeaders = [{label: "Без бригадира", value: null}];
+            }
+        })
     }
 }

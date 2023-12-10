@@ -246,15 +246,16 @@
 <!--Диалог назначения монтажников-->
 <p-dialog (onHide)="clearAppointInstallers()" [(visible)]="showAppointInstallersMenu" [dismissableMask]="true"
           [breakpoints]="{'960px': '75vw', '640px': '100vw'}" [draggable]="false" [modal]="true" [resizable]="false"
-          [style]="{width: '50vw'}" header="Назначение монтажников">
-    <div class="flexed column gap10">
+          [style]="{width: '50vw'}" header="Назначение монтажников" contentStyleClass="flex flex-column gap-3">
+    <ng-template pTemplate="content">
         <p-pickList [dragdrop]="true" [showSourceControls]="false" [showTargetControls]="false"
                     [sourceStyle]="{height: '40vh', maxHeight: '15rem'}" [source]="sourceInstallers"
-                    [targetStyle]="{height:'40vh', maxHeight: '15rem'}"
+                    [targetStyle]="{height:'40vh', maxHeight: '15rem'}" (onMoveToTarget)="updateGangLeaders()"
+                    (onMoveToSource)="updateGangLeaders()" (onMoveAllToSource)="updateGangLeaders()" (onMoveAllToTarget)="updateGangLeaders()"
                     [target]="targetInstallers" sourceHeader="Доступные"
                     targetHeader="Назначенные">
             <ng-template let-installer pTemplate="item">
-                <div class="flexed hcenter gap5">
+                <div class="flex align-items-center gap-2">
                     <app-employee-label [employee]="installer" [size]="1.9"></app-employee-label>
                 </div>
             </ng-template>
@@ -264,7 +265,15 @@
             <textarea [(ngModel)]="targetDescription" [autoResize]="true" [rows]="3" class="stretched"
                       pInputTextarea></textarea>
         </div>
-        <div class="flexed gap5 vend">
+        <div class="flex gap-3 align-items-end justify-content-end">
+            <div class="input-label-wrapper">
+                <label>Бригадир</label>
+                <p-dropdown [(ngModel)]="gangLeader" [options]="gangLeaders" appendTo="body"></p-dropdown>
+            </div>
+            <div class="flex gap-2 text-bluegray-500 font-bold align-items-center h-3rem">
+                <span>Отложенный отчет</span>
+                <p-checkbox [(ngModel)]="deferredReport" [binary]="true"></p-checkbox>
+            </div>
             <app-button (onClick)="resetListAppointedInstallers()"
                         [disabled]="targetInstallers.length === 0 || appointmentRequested"
                         icon="delete" label="Сбросить" model="p-button-text p-button-secondary"></app-button>
@@ -272,7 +281,7 @@
                         [loading]="appointmentRequested"
                         icon="assignment" label="Назначить"></app-button>
         </div>
-    </div>
+    </ng-template>
 </p-dialog>
 
 <!--Диалог назначения наблюдателей-->

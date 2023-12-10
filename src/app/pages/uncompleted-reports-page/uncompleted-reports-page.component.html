@@ -1,0 +1,49 @@
+<div class="flex flex-column px-5 pb-5 gap-4">
+    <span class="text-bluegray-500 text-4xl font-medium">Отчеты по работам</span>
+    <ng-container [ngSwitch]="loadingState">
+        <ng-container *ngSwitchCase="'LOADING'">
+            <ng-container *ngTemplateOutlet="loadingTemp"></ng-container>
+        </ng-container>
+        <ng-container *ngSwitchCase="'READY'">
+            <ng-container *ngTemplateOutlet="listTemp"></ng-container>
+        </ng-container>
+        <ng-container *ngSwitchCase="'ERROR'">
+            <ng-container *ngTemplateOutlet="errorTemp"></ng-container>
+        </ng-container>
+        <ng-container *ngSwitchCase="'EMPTY'">
+            <ng-container *ngTemplateOutlet="emptyTemp"></ng-container>
+        </ng-container>
+    </ng-container>
+</div>
+
+<ng-template #listTemp>
+    <div class="flex flex-column px-4">
+        <div *ngFor="let work of uncompletedReports;"
+             class="flex gap-3 split-line align-items-center">
+            <app-task-list-element [item]="work.task"></app-task-list-element>
+            <div class="flex-grow-1">
+                <p-button label="Написать отчет" styleClass="white-space-nowrap" [routerLink]="['/writing-report', work.workLogId]"></p-button>
+            </div>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #loadingTemp>
+    <div class="flex align-items-center justify-content-center h-30rem">
+        <p-progressSpinner></p-progressSpinner>
+    </div>
+</ng-template>
+
+<ng-template #errorTemp>
+    <div class="flex flex-column align-items-center justify-content-center h-30rem text-red-400 text-2xl font-bold">
+        <span class="mds-error"></span>
+        <span>Ошибка сервера</span>
+    </div>
+</ng-template>
+
+<ng-template #emptyTemp>
+    <div class="flex flex-column flex-grow-1 w-full align-items-center justify-content-center p-5 text-bluegray-400 text-2xl font-bold">
+        <span class="mds-summarize"></span>
+        <span>Нет не написанных отчетов</span>
+    </div>
+</ng-template>

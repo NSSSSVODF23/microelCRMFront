@@ -1,4 +1,4 @@
-import {AfterViewInit, Component, OnDestroy, OnInit, ViewChild} from '@angular/core';
+import {Component, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {MenuItem} from "primeng/api";
 import {PersonalityService} from "../../../services/personality.service";
 import {ApiService} from "../../../services/api.service";
@@ -6,8 +6,7 @@ import {NotificationsService} from "../../../services/notifications.service";
 import {Router} from "@angular/router";
 import {ImageCroppedEvent, LoadedImage} from "ngx-image-cropper";
 import {Menu} from "primeng/menu";
-import {fromEvent, map} from "rxjs";
-import {SubscriptionsHolder} from "../../../util";
+import {map} from "rxjs";
 import {FormControl} from "@angular/forms";
 
 @Component({

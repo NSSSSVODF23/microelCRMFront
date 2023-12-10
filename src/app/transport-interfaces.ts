@@ -209,6 +209,7 @@ export interface TaskCreationBody {
     initialComment?: string;
     tags?: TaskTag[];
     observers?: DefaultObservers[];
+    type?: string;
 }
 
 export class TimestampItem {
@@ -239,6 +240,7 @@ export interface TaskTag {
     created?: string;
     creator?: Employee;
     tasksCount?: number;
+    unbindAfterClose: boolean;
 }
 
 export interface ModelItem {
@@ -529,6 +531,7 @@ export interface WorkReport {
     description: string;
     author: Employee;
     created: string;
+    awaitingWriting: boolean;
 }
 
 export interface WorkLog {
@@ -550,6 +553,7 @@ export interface WorkLog {
     creator: Employee;
     calculated: boolean;
     targetDescription?: string;
+    isReportsUncompleted: boolean;
 }
 
 export enum NotificationType {
@@ -583,6 +587,11 @@ export interface INotification {
 export interface TokenChain {
     token: string;
     refreshToken: string;
+}
+
+export interface TokenChainWithUserInfo {
+    tokenChain: TokenChain;
+    employee: Employee;
 }
 
 export enum EmployeeStatus {
