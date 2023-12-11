@@ -6,7 +6,7 @@
 
 <p-overlayPanel #overlayPanelEl [baseZIndex]="2000" appendTo="body">
     <ng-template pTemplate="content">
-        <div class="caption size-big title">Активные журналы работ</div>
+        <div class="caption size-big title">Активные работы</div>
         <div [style.max-height]="'30rem'" class="work-logs list-view">
             <ng-container *ngFor="let workLog of workLogs; trackBy: trackByWorkLog">
                 <ng-container *ngTemplateOutlet="workLogItem; context: {$implicit: workLog}"></ng-container>
@@ -19,11 +19,12 @@
     <div class="work-log-item">
         <p-button [label]="'Задача #'+workLog.task.taskId" (onClick)="overlayPanelEl.hide()" [routerLink]="['/task', workLog.task.taskId]"
                   [style]="{whiteSpace: 'nowrap'}" styleClass="p-button-info p-button-text"></p-button>
-        <div [style]="{}" class="flexed column">
-            <span class="caption size-tiny wt-bold f-color-500">Активные монтажники:</span>
-            <span *ngIf="workLog.whoActive.length===0" class="caption size-small wt-bold f-color-500">-</span>
-            <app-avatar-list *ngIf="workLog.whoActive.length>0" [employees]="workLog.whoActive"
-                             [size]="1.7"></app-avatar-list>
+        <div [style]="{}" class="flex flex-column">
+            <span class="caption size-tiny wt-bold f-color-500">Монтажники:</span>
+            <div class="flex gap-2 align-items-center">
+                <app-avatar-list [employees]="workLog.employees" [size]="1.7"></app-avatar-list>
+                <span class="mdi-report_gmailerrorred text-orange-400" pTooltip="Не все монтажники приняли" tooltipPosition="bottom" *ngIf="workLog.employees.length > workLog.acceptedEmployees.length"></span>
+            </div>
         </div>
         <div>
             <div class="flexed gap3 hcenter">
