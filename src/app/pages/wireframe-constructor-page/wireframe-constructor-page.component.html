@@ -79,7 +79,7 @@
                             icon="arrow_back_ios" label="Назад"
                             model="p-button-secondary p-button-text"></app-button>
                 <app-button (onClick)="changeViewSettingsStep()" [disabled]="!wireframe.name" icon="navigate_next"
-                            label="Далее: Настройка отображения"></app-button>
+                            label="Далее: Отображение и документация"></app-button>
             </div>
         </div>
         <div class="flexed hcenter column stretched">
@@ -92,11 +92,15 @@
                             <div class="flexed hcenter gap5 caption">
                                 <span class="material-icons-round drag-icon">drag_indicator</span>
                                 <span class="caption size-small f-color-500">{{stage.orderIndex+1}}.</span>
-                                <input (mousedown)="mouseDown($event)" [(ngModel)]="stage.label" class="inline-input">
+                                <input #taskTypeInput (mousedown)="mouseDown($event)" (focus)="taskTypeInput.select()"
+                                       [(ngModel)]="stage.label" class="inline-input">
                                 <div class="stretched"></div>
-                                <app-icon-button (mousedown)="mouseDown($event)" (onClick)="removeStage(stage.stageId)" [size]="1.4"
-                                                 icon="delete"
-                                                 model="danger"></app-icon-button>
+                                <p-button icon="mdi-link" styleClass="p-button-warning p-button-icon p-button-text"
+                                          (onClick)="openOldTrackerStageBind(stage)" (mousedown)="$event.stopPropagation()"
+                                          pTooltip="Настроить интеграцию со старым трекером"></p-button>
+                                <p-button icon="mdi-delete" styleClass="p-button-danger p-button-icon p-button-text"
+                                          (onClick)="removeStage(stage.stageId)" (mousedown)="$event.stopPropagation()"
+                                          pTooltip="Удалить тип задачи"></p-button>
                             </div>
                         </ng-template>
                     </p-orderList>
@@ -116,27 +120,27 @@
                 <app-button (onClick)="updateWireframe()" *ngIf="editingId!==undefined" icon="edit"
                             label="Редактировать шаблон задачи"></app-button>
             </div>
-            <div class="gap5 flexed column p10">
-                <span class="header400">
-                    Элемент списка
-                </span>
-                <div class="gap10 flexed column">
-                    <div class="input-label-wrapper">
-                        <label>
-                            Вариант отображения
-                        </label>
-                        <p-dropdown [(ngModel)]="_wireframe.listViewType" [options]="listItemViewOptions"></p-dropdown>
-                    </div>
-                    <app-task-list-element (selectFieldToView)="selectFieldToView($event)" [item]="taskItemForView()"
-                                           [viewExample]="true" [isHover]="false"
-                                           [wireframeFieldsList]="wireframeFieldsList"></app-task-list-element>
-                </div>
-            </div>
-            <div class="gap5 flexed column p10">
+<!--            <div class="gap5 flexed column p10">-->
+<!--                <span class="header400">-->
+<!--                    Элемент списка-->
+<!--                </span>-->
+<!--                <div class="gap10 flexed column">-->
+<!--                    <div class="input-label-wrapper">-->
+<!--                        <label>-->
+<!--                            Вариант отображения-->
+<!--                        </label>-->
+<!--                        <p-dropdown [(ngModel)]="_wireframe.listViewType" [options]="listItemViewOptions"></p-dropdown>-->
+<!--                    </div>-->
+<!--                    <app-task-list-element (selectFieldToView)="selectFieldToView($event)" [item]="taskItemForView()"-->
+<!--                                           [viewExample]="true" [isHover]="false"-->
+<!--                                           [wireframeFieldsList]="wireframeFieldsList"></app-task-list-element>-->
+<!--                </div>-->
+<!--            </div>-->
+            <div class="flex flex-column p-3 gap-2">
                 <span class="header400">
                     Порядок полей
                 </span>
-                <div class="gap5 flexed column overflow">
+                <div class="flex flex-column overflow-hidden gap-2">
                     <p-orderList (onReorder)="reorderFields()" [dragdrop]="true" [value]="wireframeFieldsList">
                         <ng-template let-field pTemplate="item">
                             <div>
@@ -146,9 +150,114 @@
                     </p-orderList>
                 </div>
             </div>
+            <div class="flex flex-column p-3 gap-2">
+                <span class="header400">
+                    Документация
+                </span>
+                <div class="flex flex-column overflow-hidden gap-2">
+                    <p-listbox [options]="wireframe.documentTemplates ?? []" dataKey="temporalId" (onClick)="openEditDocumentDialog($event.option)">
+                        <ng-template pTemplate="header">
+                            <p-button icon="mdi-add" label="Добавить" (onClick)="openAppendDocumentDialog()"
+                                      styleClass="p-button-success"></p-button>
+                        </ng-template>
+                        <ng-template pTemplate="item" let-item let-index="index">
+                            <div class="flex justify-content-between align-items-center w-full">
+                                <span>{{item.name}}</span>
+                                <p-button icon="mdi-delete" (mousedown)="$event.stopPropagation()" (onClick)="$event.stopPropagation(); deleteDocumentTemplate(index)"
+                                          styleClass="p-button-icon p-button-text p-button-danger"></p-button>
+                            </div>
+                        </ng-template>
+                        <ng-template pTemplate="empty">
+                            <span>Нет документов</span>
+                        </ng-template>
+                    </p-listbox>
+                </div>
+            </div>
         </div>
     </ng-container>
 </div>
+
+<p-dialog [(visible)]="documentDialogVisible" [modal]="true" contentStyleClass="flex flex-column gap-3 pt-1"
+          [dismissableMask]="true" [header]="documentDialogHeader">
+    <ng-template pTemplate="content" [formGroup]="documentDialogForm">
+        <div class="input-label-wrapper">
+            <label>Тип документа</label>
+            <p-dropdown [options]="(documentTypesOptions$ | async) ?? []" placeholder="Выбрать" formControlName="type"
+                        [disabled]="documentDialogMode==='edit'" appendTo="body"></p-dropdown>
+        </div>
+        <ng-container [ngSwitch]="documentDialogForm.value.type">
+            <ng-container *ngSwitchCase="'ConnectionAgreementTemplate'">
+                <ng-container *ngTemplateOutlet="connectionAgreementFieldsTemplate; context:{$implicit: documentDialogForm}"></ng-container>
+            </ng-container>
+            <ng-container *ngSwitchDefault>
+                <div class="w-30rem h-20rem flex flex-column align-items-center justify-content-center text-3xl text-bluegray-300 font-bold">
+                    <span class="mds-check_circle"></span>
+                    <span>Выберите тип документа</span>
+                </div>
+            </ng-container>
+            <ng-container *ngIf="documentDialogForm.value.type">
+                <ng-container *ngIf="documentDialogMode === 'new' then createDocumentButtonTemplate else editDocumentButtonTemplate"></ng-container>
+            </ng-container>
+        </ng-container>
+    </ng-template>
+</p-dialog>
+
+<ng-template #createDocumentButtonTemplate>
+    <p-button (onClick)="createDocumentTemplate()" class="align-self-end" label="Добавить документ"></p-button>
+</ng-template>
+
+<ng-template #editDocumentButtonTemplate>
+    <p-button (onClick)="editDocumentTemplate()" class="align-self-end" label="Редактировать документ"></p-button>
+</ng-template>
+
+<ng-template #connectionAgreementFieldsTemplate let-form>
+    <div class="flex flex-column gap-3 px-3" [formGroup]="form">
+        <div class="flex gap-3">
+            <div class="input-label-wrapper">
+                <label>Поле логина</label>
+                <p-dropdown [options]="wireframeFieldsList" appendTo="body" formControlName="loginFieldId" placeholder="Выбрать" optionValue="id"></p-dropdown>
+            </div>
+            <div class="input-label-wrapper">
+                <label>Поле пароля</label>
+                <p-dropdown [options]="wireframeFieldsList" appendTo="body" formControlName="passwordFieldId" placeholder="Выбрать" optionValue="id"></p-dropdown>
+            </div>
+            <div class="input-label-wrapper">
+                <label>Поле ФИО</label>
+                <p-dropdown [options]="wireframeFieldsList" appendTo="body" formControlName="fullNameFieldId" placeholder="Выбрать" optionValue="id"></p-dropdown>
+            </div>
+            <div class="input-label-wrapper">
+                <label>Поле дата рождения</label>
+                <p-dropdown [options]="wireframeFieldsList" appendTo="body" formControlName="dateOfBirthFieldId" placeholder="Выбрать" optionValue="id"></p-dropdown>
+            </div>
+            <div class="input-label-wrapper">
+                <label>Поле регион рождения</label>
+                <p-dropdown [options]="wireframeFieldsList" appendTo="body" formControlName="regionOfBirthFieldId" placeholder="Выбрать" optionValue="id"></p-dropdown>
+            </div>
+        </div>
+        <div class="flex gap-3">
+            <div class="input-label-wrapper">
+                <label>Поле город рождения</label>
+                <p-dropdown [options]="wireframeFieldsList" appendTo="body" formControlName="cityOfBirthFieldId" placeholder="Выбрать" optionValue="id"></p-dropdown>
+            </div>
+            <div class="input-label-wrapper">
+                <label>Поле данные паспорта</label>
+                <p-dropdown [options]="wireframeFieldsList" appendTo="body" formControlName="passportDetailsFieldId" placeholder="Выбрать" optionValue="id"></p-dropdown>
+            </div>
+            <div class="input-label-wrapper">
+                <label>Поле адрес подключения</label>
+                <p-dropdown [options]="wireframeFieldsList" appendTo="body" formControlName="addressFieldId" placeholder="Выбрать" optionValue="id"></p-dropdown>
+            </div>
+            <div class="input-label-wrapper">
+                <label>Поле телефон</label>
+                <p-dropdown [options]="wireframeFieldsList" appendTo="body" formControlName="phoneFieldId" placeholder="Выбрать" optionValue="id"></p-dropdown>
+            </div>
+            <div class="input-label-wrapper">
+                <label>Поле тариф</label>
+                <p-dropdown [options]="wireframeFieldsList" appendTo="body" formControlName="tariffFieldId" placeholder="Выбрать" optionValue="id"></p-dropdown>
+            </div>
+        </div>
+    </div>
+</ng-template>
 
 <p-menu #stepsContextMenuElem [model]="stepsContextMenu" [popup]="true"></p-menu>
 <p-dialog [(visible)]="chooseFieldTypeDialogVisible" [modal]="true"
@@ -217,4 +326,235 @@
             </div>
         </div>
     </ng-container>
+</ng-template>
+
+<p-dialog [(visible)]="oldTrackerIntegrationDialogVisible" [modal]="true" contentStyleClass="flex flex-column gap-3 pt-1"
+          [dismissableMask]="true" header="Настроить интеграцию со старым трекером">
+    <ng-template pTemplate="content" [formGroup]="oldTrackerIntegrationForm">
+        <div class="input-label-wrapper">
+            <label>Целевой класс задачи</label>
+            <p-dropdown formControlName="classId" optionLabel="name" optionValue="id" placeholder="Выбрать"
+                        [options]="(oldTrackerTaskClasses$ | async) ?? []" appendTo="body"></p-dropdown>
+        </div>
+        <ng-container *ngIf="selectedTaskClass$ | async as selectedTaskClass">
+            <div class="flex gap-3">
+                <div class="input-label-wrapper">
+                    <label>Начальный этап задачи</label>
+                    <p-dropdown [options]="selectedTaskClass.stages" formControlName="initialStageId" optionLabel="name" optionValue="id"
+                                placeholder="Выбрать" appendTo="body"></p-dropdown>
+                </div>
+                <div class="input-label-wrapper">
+                    <label>Этап задачи в работе</label>
+                    <p-dropdown [options]="selectedTaskClass.stages" formControlName="processingStageId" optionLabel="name" optionValue="id"
+                                placeholder="Выбрать" appendTo="body"></p-dropdown>
+                </div>
+                <div class="input-label-wrapper">
+                    <label>Этап задачи закрыт в ручную</label>
+                    <p-dropdown [options]="selectedTaskClass.stages" formControlName="manualCloseStageId" optionLabel="name" optionValue="id"
+                                placeholder="Выбрать" appendTo="body"></p-dropdown>
+                </div>
+                <div class="input-label-wrapper">
+                    <label>Этап задачи закрыт автоматически</label>
+                    <p-dropdown [options]="selectedTaskClass.stages" formControlName="autoCloseStageId" optionLabel="name" optionValue="id"
+                                placeholder="Выбрать" appendTo="body"></p-dropdown>
+                </div>
+            </div>
+            <div class="flex flex-column gap-2 px-3">
+                <p-button (onClick)="openAppendBindToIntegrationDialog()" label="Добавить соединение" class="align-self-center"
+                          styleClass="p-button-success p-button-outlined" icon="mdi-add"></p-button>
+                <div class="flex flex-column gap-3">
+                    <ng-container *ngFor="let bind of oldTrackerIntegrationForm.controls.fieldDataBinds.controls" [ngSwitch]="bind.value.type">
+                        <ng-container *ngSwitchCase="'AddressFieldDataBind'">
+                            <ng-container *ngTemplateOutlet="addressBindTemp; context:{$implicit:bind}"></ng-container>
+                        </ng-container>
+                        <ng-container *ngSwitchCase="'PassportDetailsFieldDataBind'">
+                            <ng-container *ngTemplateOutlet="passportBindTemp; context:{$implicit:bind}"></ng-container>
+                        </ng-container>
+                        <ng-container *ngSwitchCase="'AdSourceFieldDataBind'">
+                            <ng-container *ngTemplateOutlet="adSourceBindTemp; context:{$implicit:bind}"></ng-container>
+                        </ng-container>
+                        <ng-container *ngSwitchCase="'ConnectionTypeFieldDataBind'">
+                            <ng-container *ngTemplateOutlet="connectionTypeBindTemp; context:{$implicit:bind}"></ng-container>
+                        </ng-container>
+                        <ng-container *ngSwitchCase="'DateFieldDataBind'">
+                            <ng-container *ngTemplateOutlet="dateBindTemp; context:{$implicit:bind}"></ng-container>
+                        </ng-container>
+                        <ng-container *ngSwitchCase="'DateTimeFieldDataBind'">
+                            <ng-container *ngTemplateOutlet="dateTimeBindTemp; context:{$implicit:bind}"></ng-container>
+                        </ng-container>
+                        <ng-container *ngSwitchCase="'DefaultFieldDataBind'">
+                        </ng-container>
+                        <ng-container *ngSwitchCase="'InstallersHardAssignFieldDataBind'">
+                        </ng-container>
+                        <ng-container *ngSwitchCase="'InstallersSimpleAssignFieldDataBind'">
+                        </ng-container>
+                        <ng-container *ngSwitchCase="'TextFieldDataBind'">
+                            <ng-container *ngTemplateOutlet="simpleTextBindTemp; context:{$implicit:bind}"></ng-container>
+                        </ng-container>
+                        <ng-container *ngSwitchCase="'FullNameFieldDataBind'">
+                            <ng-container *ngTemplateOutlet="fullNameBindTemp; context:{$implicit:bind}"></ng-container>
+                        </ng-container>
+                    </ng-container>
+                </div>
+            </div>
+            <p-button (onClick)="saveOldTrackerIntegration()" label="Сохранить"
+                      icon="mdi-save" class="align-self-end"></p-button>
+        </ng-container>
+    </ng-template>
+</p-dialog>
+
+<p-dialog [(visible)]="appendBindToIntegrationDialogVisible" [modal]="true" contentStyleClass="flex flex-column gap-3 pt-1"
+          [dismissableMask]="true" header="Добавить соединение">
+    <ng-template pTemplate="content">
+        <p-dropdown [options]="dataBindFieldOptions" appendTo="body" [(ngModel)]="selectedDataBind"></p-dropdown>
+        <p-button (onClick)="appendBindToIntegration()" label="Добавить"></p-button>
+    </ng-template>
+</p-dialog>
+
+<ng-template #fieldSelectorTemp let-fGroup>
+    <div class="input-label-wrapper" [formGroup]="fGroup">
+        <label>Поле в задаче</label>
+        <p-dropdown [options]="wireframeFieldsList" appendTo="body" formControlName="fieldItemId" placeholder="Выбрать" optionValue="id"></p-dropdown>
+    </div>
+</ng-template>
+
+<ng-template #removeButtonTemp let-fGroup>
+    <div class="flex-grow-1"></div>
+    <p-button (onClick)="removeBind(fGroup)" class="align-self-end" icon="mdi-delete" styleClass="p-button-danger p-button-outlined p-button-icon"></p-button>
+</ng-template>
+
+<ng-template #simpleTextBindTemp let-fGroup>
+    <div class="flex gap-3" *ngIf="selectedClassFields$ | async as fields" [formGroup]="fGroup">
+        <ng-container *ngTemplateOutlet="fieldSelectorTemp; context:{$implicit: fGroup}"></ng-container>
+        <div class="input-label-wrapper">
+            <label>Текстовое поле трекера</label>
+            <p-dropdown [options]="fields" appendTo="body" formControlName="textFieldId"></p-dropdown>
+        </div>
+        <ng-container *ngTemplateOutlet="removeButtonTemp; context:{$implicit: fGroup}"></ng-container>
+    </div>
+</ng-template>
+
+<ng-template #addressBindTemp let-fGroup>
+    <div class="flex gap-3" *ngIf="selectedClassFields$ | async as fields" [formGroup]="fGroup">
+        <ng-container *ngTemplateOutlet="fieldSelectorTemp; context:{$implicit: fGroup}"></ng-container>
+        <div class="input-label-wrapper">
+            <label>Поле выбора улицы</label>
+            <p-dropdown [options]="fields" appendTo="body" formControlName="streetFieldId"></p-dropdown>
+        </div>
+        <div class="input-label-wrapper">
+            <label>Поле номера дома</label>
+            <p-dropdown [options]="fields" appendTo="body" formControlName="houseFieldId"></p-dropdown>
+        </div>
+        <div class="input-label-wrapper">
+            <label>Поле номера квартиры</label>
+            <p-dropdown [options]="fields" appendTo="body" formControlName="apartmentFieldId"></p-dropdown>
+        </div>
+        <div class="input-label-wrapper">
+            <label>Поле номера подъезда</label>
+            <p-dropdown [options]="fields" appendTo="body" formControlName="entranceFieldId"></p-dropdown>
+        </div>
+        <div class="input-label-wrapper">
+            <label>Поле этажа</label>
+            <p-dropdown [options]="fields" appendTo="body" formControlName="floorFieldId"></p-dropdown>
+        </div>
+        <div class="input-label-wrapper">
+            <label>Запасное поле</label>
+            <p-dropdown [options]="fields" appendTo="body" formControlName="backupFieldId"></p-dropdown>
+        </div>
+        <ng-container *ngTemplateOutlet="removeButtonTemp; context:{$implicit: fGroup}"></ng-container>
+    </div>
+</ng-template>
+
+<ng-template #passportBindTemp let-fGroup>
+    <div class="flex gap-3" *ngIf="selectedClassFields$ | async as fields" [formGroup]="fGroup">
+        <ng-container *ngTemplateOutlet="fieldSelectorTemp; context:{$implicit: fGroup}"></ng-container>
+        <div class="input-label-wrapper">
+            <label>Поле серии паспорта</label>
+            <p-dropdown [options]="fields" appendTo="body" formControlName="passportSeriesFieldId"></p-dropdown>
+        </div>
+        <div class="input-label-wrapper">
+            <label>Поле номера паспорта</label>
+            <p-dropdown [options]="fields" appendTo="body" formControlName="passportNumberFieldId"></p-dropdown>
+        </div>
+        <div class="input-label-wrapper">
+            <label>Поле кем выдан паспорт</label>
+            <p-dropdown [options]="fields" appendTo="body" formControlName="passportIssuedByFieldId"></p-dropdown>
+        </div>
+        <div class="input-label-wrapper">
+            <label>Поле даты выдачи паспорта</label>
+            <p-dropdown [options]="fields" appendTo="body" formControlName="passportIssuedDateFieldId"></p-dropdown>
+        </div>
+        <div class="input-label-wrapper">
+            <label>Поле адреса регистрации</label>
+            <p-dropdown [options]="fields" appendTo="body" formControlName="registrationAddressFieldId"></p-dropdown>
+        </div>
+        <ng-container *ngTemplateOutlet="removeButtonTemp; context:{$implicit: fGroup}"></ng-container>
+    </div>
+</ng-template>
+
+<ng-template #fullNameBindTemp let-fGroup>
+    <div class="flex gap-3" *ngIf="selectedClassFields$ | async as fields" [formGroup]="fGroup">
+        <ng-container *ngTemplateOutlet="fieldSelectorTemp; context:{$implicit: fGroup}"></ng-container>
+        <div class="input-label-wrapper">
+            <label>Поле фамилии</label>
+            <p-dropdown [options]="fields" appendTo="body" formControlName="lastNameFieldId"></p-dropdown>
+        </div>
+        <div class="input-label-wrapper">
+            <label>Поле имени</label>
+            <p-dropdown [options]="fields" appendTo="body" formControlName="firstNameFieldId"></p-dropdown>
+        </div>
+        <div class="input-label-wrapper">
+            <label>Поле отчества</label>
+            <p-dropdown [options]="fields" appendTo="body" formControlName="patronymicFieldId"></p-dropdown>
+        </div>
+        <ng-container *ngTemplateOutlet="removeButtonTemp; context:{$implicit: fGroup}"></ng-container>
+    </div>
+</ng-template>
+
+<ng-template #adSourceBindTemp let-fGroup>
+    <div class="flex gap-3" *ngIf="selectedClassFields$ | async as fields" [formGroup]="fGroup">
+        <ng-container *ngTemplateOutlet="fieldSelectorTemp; context:{$implicit: fGroup}"></ng-container>
+        <div class="input-label-wrapper">
+            <label>Поле выбора рекламного источника</label>
+            <p-dropdown [options]="fields" appendTo="body" formControlName="adSourceFieldId"></p-dropdown>
+        </div>
+        <ng-container *ngTemplateOutlet="removeButtonTemp; context:{$implicit: fGroup}"></ng-container>
+    </div>
+</ng-template>
+
+<ng-template #connectionTypeBindTemp let-fGroup>
+    <div class="flex gap-3" *ngIf="selectedClassFields$ | async as fields" [formGroup]="fGroup">
+        <ng-container *ngTemplateOutlet="fieldSelectorTemp; context:{$implicit: fGroup}"></ng-container>
+        <div class="input-label-wrapper">
+            <label>Поле в задаче выбора сервисов</label>
+            <p-dropdown [options]="wireframeFieldsList" appendTo="body" formControlName="connectionServicesInnerFieldId" placeholder="Выбрать" optionValue="id"></p-dropdown>
+        </div>
+        <div class="input-label-wrapper">
+            <label>Поле выбора типа подключения</label>
+            <p-dropdown [options]="fields" appendTo="body" formControlName="ctFieldDataBind"></p-dropdown>
+        </div>
+        <ng-container *ngTemplateOutlet="removeButtonTemp; context:{$implicit: fGroup}"></ng-container>
+    </div>
+</ng-template>
+
+<ng-template #dateBindTemp let-fGroup>
+    <div class="flex gap-3" *ngIf="selectedClassFields$ | async as fields" [formGroup]="fGroup">
+        <ng-container *ngTemplateOutlet="fieldSelectorTemp; context:{$implicit: fGroup}"></ng-container>
+        <div class="input-label-wrapper">
+            <label>Поле выбора даты</label>
+            <p-dropdown [options]="fields" appendTo="body" formControlName="dateFieldDataBind"></p-dropdown>
+        </div>
+        <ng-container *ngTemplateOutlet="removeButtonTemp; context:{$implicit: fGroup}"></ng-container>
+    </div>
+</ng-template>
+
+<ng-template #dateTimeBindTemp let-fGroup>
+    <div class="flex gap-3" *ngIf="selectedClassFields$ | async as fields" [formGroup]="fGroup">
+        <ng-container *ngTemplateOutlet="fieldSelectorTemp; context:{$implicit: fGroup}"></ng-container>
+        <div class="input-label-wrapper">
+            <label>Поле выбора даты и времени</label>
+            <p-dropdown [options]="fields" appendTo="body" formControlName="dateTimeFieldDataBind"></p-dropdown>
+        </div>
+        <ng-container *ngTemplateOutlet="removeButtonTemp; context:{$implicit: fGroup}"></ng-container>
+    </div>
 </ng-template>

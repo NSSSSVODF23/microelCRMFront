@@ -1,5 +1,5 @@
 import {AbstractControl, ValidationErrors, ValidatorFn} from "@angular/forms";
-import {DhcpBinding, WireframeFieldType} from "./transport-interfaces";
+import {WireframeFieldType} from "./transport-interfaces";
 
 export class CustomValidators {
 
@@ -94,6 +94,18 @@ export class CustomValidators {
                             return null;
 
                     }
+                    return null;
+                }
+            case WireframeFieldType.PASSPORT_DETAILS:
+                return (control: AbstractControl): ValidationErrors | null => {
+                    const passport = control.value;
+                    if(!passport) return {'required': true};
+                    if (
+                        CustomValidators.isValueEmpty(passport.passportSeries) ||
+                        CustomValidators.isValueEmpty(passport.passportNumber) ||
+                        CustomValidators.isValueEmpty(passport.passportIssuedBy) ||
+                        CustomValidators.isValueEmpty(passport.passportIssuedDate)
+                    ) return {'required': true};
                     return null;
                 }
             default:

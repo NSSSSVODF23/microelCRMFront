@@ -1,22 +1,38 @@
-import {Component, OnInit, ViewChild} from '@angular/core';
+import {Component, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
 import {MenuItem} from "primeng/api";
 import {Menu} from "primeng/menu";
 import {ApiService} from 'src/app/services/api.service';
 import {v4} from "uuid";
-import {FieldItem, StepItem, Task, Wireframe, WireframeFieldType, WireframeType} from "../../transport-interfaces";
+import {
+    FieldDataBind,
+    FieldItem,
+    StepItem,
+    Task, TaskClassOT,
+    TaskStage,
+    Wireframe,
+    WireframeFieldType,
+    WireframeType
+} from "../../transport-interfaces";
 import {CustomNavigationService} from "../../services/custom-navigation.service";
+import {AbstractControl, FormArray, FormControl, FormGroup, Validators} from "@angular/forms";
+import {delay, delayWhen, find, map, mergeMap, shareReplay, startWith, switchMap, tap, combineLatest, of} from "rxjs";
+import {SubscriptionsHolder} from "../../util";
 
 const defaultStep: StepItem = {
     id: 0, name: 'Название этапа', fields: []
 }
+
+type FieldBindType = 'AddressFieldDataBind' | 'AdSourceFieldDataBind' | 'ConnectionTypeFieldDataBind'
+    | 'DateFieldDataBind' | 'DateTimeFieldDataBind' | 'DefaultFieldDataBind' | 'InstallersHardAssignFieldDataBind'
+    | 'InstallersSimpleAssignFieldDataBind' | 'TextFieldDataBind' | 'FullNameFieldDataBind' | 'PassportDetailsFieldDataBind';
 
 @Component({
     selector: 'app-wireframe-constructor-page',
     templateUrl: './wireframe-constructor-page.component.html',
     styleUrls: ['./wireframe-constructor-page.component.scss']
 })
-export class WireframeConstructorPageComponent implements OnInit {
+export class WireframeConstructorPageComponent implements OnInit, OnDestroy {
 
     @ViewChild('stepsContextMenuElem') stepsContextMenuElem?: Menu;
 
@@ -42,6 +58,172 @@ export class WireframeConstructorPageComponent implements OnInit {
     // stages = [{label: "Начальный", stageId: v4(), orderIndex: 0}]
     draggedField?: FieldItem;
     stageHoverTarget: number | null = null;
+
+    oldTrackerIntegrationDialogVisible = false;
+    oldTrackerTaskClasses$ = this.api.getOldTrackerClasses();
+    oldTrackerIntegrationForm = new FormGroup({
+        classId: new FormControl<number | null>(null, [Validators.required]),
+        initialStageId: new FormControl<number | null>(null, [Validators.required]),
+        processingStageId: new FormControl<number | null>(null, [Validators.required]),
+        manualCloseStageId: new FormControl<number | null>(null, [Validators.required]),
+        autoCloseStageId: new FormControl<number | null>(null, [Validators.required]),
+        fieldDataBinds: new FormArray<FormGroup>([]),
+    })
+
+    selectedTaskClass$ = combineLatest([this.oldTrackerIntegrationForm.controls.classId.valueChanges, this.oldTrackerTaskClasses$]).pipe(
+            tap(console.log),
+            map(([classId, classList]:[number, TaskClassOT[]])=>classList?.find(cl=>cl.id === classId) ?? null),
+            shareReplay(1)
+        );
+
+    selectedClassFields$ = this.selectedTaskClass$.pipe(map(cls=>[{label: "Нет", value: null},...(cls?.fields.map(f=>{return {label: f.name, value: f.id}})??[])]), shareReplay(1));
+
+    appendBindToIntegrationDialogVisible = false;
+    selectedDataBind?: ()=>FormGroup;
+    dataBindFieldOptions = [
+        {
+            label: 'Простой текст',
+            value: this.simpleTextFieldFormGroup
+        },
+        {
+            label: 'ФИО',
+            value: this.fullNameFieldFormGroup
+        },
+        {
+            label: 'Адрес',
+            value: this.addressFieldFormGroup
+        },
+        {
+            label: 'Рекламный источник',
+            value: this.adSourceFieldFormGroup
+        },
+        {
+            label: 'Тип подключения',
+            value: this.connectionTypeFieldFormGroup
+        },
+        {
+            label: 'Дата',
+            value: this.dateFieldFormGroup
+        },
+        {
+            label: 'Дата и время',
+            value: this.dateTimeFieldFormGroup
+        },
+        {
+            label: 'Паспортные данные',
+            value: this.passportFieldFormGroup
+        }
+    ]
+    selectedStageForIntegration?: TaskStage;
+
+    simpleTextFieldFormGroup(){
+        return new FormGroup({
+            type: new FormControl<FieldBindType>('TextFieldDataBind'),
+            fieldDataBindId: new FormControl<null | number>(null),
+            fieldItemId: new FormControl<null | string>(null, [Validators.required]),
+            textFieldId: new FormControl<null | number>(null, [Validators.required]),
+        })
+    }
+
+    fullNameFieldFormGroup(){
+        return new FormGroup({
+            type: new FormControl<FieldBindType>('FullNameFieldDataBind'),
+            fieldDataBindId: new FormControl<null | number>(null),
+            fieldItemId: new FormControl<null | string>(null, [Validators.required]),
+            lastNameFieldId: new FormControl<null | number>(null, [Validators.required]),
+            firstNameFieldId: new FormControl<null | number>(null, [Validators.required]),
+            patronymicFieldId: new FormControl<null | number>(null, [Validators.required]),
+        })
+    }
+
+    addressFieldFormGroup(){
+        return new FormGroup({
+            type: new FormControl<FieldBindType>('AddressFieldDataBind'),
+            fieldDataBindId: new FormControl<null | number>(null),
+            fieldItemId: new FormControl<null | string>(null, [Validators.required]),
+            streetFieldId: new FormControl<null | number>(null, [Validators.required]),
+            houseFieldId: new FormControl<null | number>(null),
+            apartmentFieldId: new FormControl<null | number>(null),
+            entranceFieldId: new FormControl<null | number>(null),
+            floorFieldId: new FormControl<null | number>(null),
+            backupFieldId: new FormControl<null | number>(null),
+        })
+    }
+
+    adSourceFieldFormGroup(){
+        return new FormGroup({
+            type: new FormControl<FieldBindType>('AdSourceFieldDataBind'),
+            fieldDataBindId: new FormControl<null | number>(null),
+            fieldItemId: new FormControl<null | string>(null, [Validators.required]),
+            adSourceFieldId: new FormControl<null | number>(null, [Validators.required]),
+        })
+    }
+
+    connectionTypeFieldFormGroup(){
+        return new FormGroup({
+            type: new FormControl<FieldBindType>('ConnectionTypeFieldDataBind'),
+            fieldDataBindId: new FormControl<null | number>(null),
+            fieldItemId: new FormControl<null | string>(null, [Validators.required]),
+            connectionServicesInnerFieldId: new FormControl<null | number>(null, [Validators.required]),
+            ctFieldDataBindId: new FormControl<null | number>(null, [Validators.required]),
+        })
+    }
+
+    dateFieldFormGroup(){
+        return new FormGroup({
+            type: new FormControl<FieldBindType>('DateFieldDataBind'),
+            fieldDataBindId: new FormControl<null | number>(null),
+            fieldItemId: new FormControl<null | string>(null, [Validators.required]),
+            dateFieldDataBind: new FormControl<null | number>(null, [Validators.required]),
+        })
+    }
+
+    dateTimeFieldFormGroup(){
+        return new FormGroup({
+            type: new FormControl<FieldBindType>('DateTimeFieldDataBind'),
+            fieldDataBindId: new FormControl<null | number>(null),
+            fieldItemId: new FormControl<null | string>(null, [Validators.required]),
+            dateTimeFieldDataBind: new FormControl<null | number>(null, [Validators.required]),
+        })
+    }
+
+    passportFieldFormGroup(){
+        return new FormGroup({
+            type: new FormControl<FieldBindType>('PassportDetailsFieldDataBind'),
+            fieldDataBindId: new FormControl<null | number>(null),
+            fieldItemId: new FormControl<null | string>(null, [Validators.required]),
+            passportSeriesFieldId: new FormControl<null | number>(null),
+            passportNumberFieldId: new FormControl<null | number>(null),
+            passportIssuedByFieldId: new FormControl<null | number>(null),
+            passportIssuedDateFieldId: new FormControl<null | number>(null),
+            registrationAddressFieldId: new FormControl<null | number>(null),
+        })
+    }
+
+    documentDialogVisible = false;
+    documentDialogMode: 'new' | 'edit' = 'new';
+    get documentDialogHeader(){
+        return this.documentDialogMode === 'new' ? 'Добавление документа' : 'Редактирование документа';
+    }
+    documentTypesOptions$ = this.api.getDocumentTemplateTypes().pipe(shareReplay(1));
+    documentDialogForm = new FormGroup({
+        temporalId: new FormControl<string | null>(null),
+        documentTemplateId: new FormControl<number | null>(null),
+        type: new FormControl<string | null>(null, [Validators.required]),
+        name: new FormControl(""),
+        loginFieldId: new FormControl<string | null>(null),
+        fullNameFieldId: new FormControl<string | null>(null),
+        dateOfBirthFieldId: new FormControl<string | null>(null),
+        regionOfBirthFieldId: new FormControl<string | null>(null),
+        cityOfBirthFieldId: new FormControl<string | null>(null),
+        passportDetailsFieldId: new FormControl<string | null>(null),
+        addressFieldId: new FormControl<string | null>(null),
+        phoneFieldId: new FormControl<string | null>(null),
+        passwordFieldId: new FormControl<string | null>(null),
+        tariffFieldId: new FormControl<string | null>(null),
+    })
+
+    subscriptions = new SubscriptionsHolder();
 
     constructor(readonly api: ApiService, readonly route: ActivatedRoute, readonly nav: CustomNavigationService) {
     }
@@ -82,6 +264,41 @@ export class WireframeConstructorPageComponent implements OnInit {
                 });
             }
         })
+        this.subscriptions.addSubscription('docNameUpd', this.documentDialogForm.controls.type.valueChanges
+            .pipe(
+                switchMap(value => this.documentTypesOptions$.pipe(
+                    map(opt=>opt.find(o=>o.value === value)?.label ?? ""))
+                )
+            ).subscribe(label=>this.documentDialogForm.controls.name.setValue(label))
+        )
+    }
+
+    ngOnDestroy(): void{
+        this.subscriptions.unsubscribeAll();
+    }
+
+    createDocumentTemplate(){
+        if(this.documentDialogForm.valid) {
+            if (!this.wireframe.documentTemplates) this.wireframe.documentTemplates = [];
+            this.wireframe.documentTemplates.push(this.documentDialogForm.value);
+            this.wireframe.documentTemplates = [...this.wireframe.documentTemplates];
+            this.documentDialogVisible = false;
+        }
+    }
+
+    editDocumentTemplate(){
+        if(this.documentDialogForm.valid && this.wireframe.documentTemplates) {
+            const templateIndex = this.wireframe.documentTemplates.findIndex(item=>item.temporalId === this.documentDialogForm.value.temporalId);
+            if(templateIndex>-1){
+                this.wireframe.documentTemplates[templateIndex] = this.documentDialogForm.value;
+                this.wireframe.documentTemplates = [...this.wireframe.documentTemplates];
+            }
+            this.documentDialogVisible = false;
+        }
+    }
+
+    deleteDocumentTemplate(index:number){
+        this.wireframe.documentTemplates?.splice(index,1);
     }
 
     createField(createFieldType: WireframeFieldType) {
@@ -89,7 +306,7 @@ export class WireframeConstructorPageComponent implements OnInit {
         const step: StepItem | undefined = this.wireframe.steps.find(s => s.id === this.activeStepIndex)
         if (step) {
             step.fields.push({
-                name: 'Имя поля', id, type: createFieldType
+                name: 'Имя поля', id, type: createFieldType, variation: 'MANDATORY', displayType: 'LIST_AND_TELEGRAM'
             })
         } else {
             console.error("Этап для добавления поля не найден")
@@ -102,12 +319,12 @@ export class WireframeConstructorPageComponent implements OnInit {
             step.fields = step.fields.filter(f => f.id !== id);
         }
     }
-
     //swap index fields in array
     // swapFields(currentIndex: number, targetIndex: number) {
     //     //get wireframe by activeStepIndex
     //     const wireframe = this.wireframe.steps[this.activeStepIndex];
     //     //swap fields
+
     //     wireframe.fields.splice(targetIndex, 0, wireframe.fields.splice(currentIndex, 1));
 
     createStep() {
@@ -178,7 +395,7 @@ export class WireframeConstructorPageComponent implements OnInit {
     }
 
     updateWireframe() {
-        this.api.updateWireframe(this.wireframe).subscribe(() => {
+        this.api.updateWireframe(this.wireframe.wireframeId, this.wireframe).subscribe(() => {
             this.nav.backOrDefault(["/"])
         });
     }
@@ -239,7 +456,7 @@ export class WireframeConstructorPageComponent implements OnInit {
 
     createStage() {
         this.wireframe.stages = [...this.wireframe.stages ?? [], {
-            label: 'Новая стадия',
+            label: 'Название типа задачи',
             stageId: v4(),
             orderIndex: this.wireframe.stages?.length ?? 0
         }]
@@ -262,7 +479,6 @@ export class WireframeConstructorPageComponent implements OnInit {
             return stage;
         });
     }
-
     trackByStep = (index: number, step: MenuItem) => (index + (step.label ?? ''));
 
     dragStart(event: any, field: FieldItem) {
@@ -324,5 +540,105 @@ export class WireframeConstructorPageComponent implements OnInit {
 
     dragLeaveStage(event: any, stageIndex: number) {
         this.stageHoverTarget = null;
+    }
+
+    openOldTrackerStageBind(stage: TaskStage) {
+        this.oldTrackerIntegrationDialogVisible = true;
+        this.selectedStageForIntegration = stage;
+
+        setTimeout(()=> {
+            this.oldTrackerIntegrationForm.patchValue({
+                classId: stage.oldTrackerBind?.classId ?? null,
+                initialStageId: stage.oldTrackerBind?.initialStageId ?? null,
+                processingStageId: stage.oldTrackerBind?.processingStageId ?? null,
+                manualCloseStageId: stage.oldTrackerBind?.manualCloseStageId ?? null,
+                autoCloseStageId: stage.oldTrackerBind?.autoCloseStageId ?? null
+            })
+            this.oldTrackerIntegrationForm.controls.fieldDataBinds.clear();
+            stage.oldTrackerBind?.fieldDataBinds.forEach((bind:any) => this.oldTrackerIntegrationForm.controls.fieldDataBinds.push(new FormGroup<any>({
+                type: new FormControl(bind.type),
+                fieldDataBindId: new FormControl(bind.fieldDataBindId),
+                fieldItemId: new FormControl(bind.fieldItemId),
+                streetFieldId: new FormControl(bind.streetFieldId),
+                houseFieldId: new FormControl(bind.houseFieldId),
+                apartmentFieldId: new FormControl(bind.apartmentFieldId),
+                entranceFieldId: new FormControl(bind.entranceFieldId),
+                floorFieldId: new FormControl(bind.floorFieldId),
+                adSourceFieldId: new FormControl(bind.adSourceFieldId),
+                connectionServicesInnerFieldId: new FormControl(bind.connectionServicesInnerFieldId),
+                ctFieldDataBind: new FormControl(bind.ctFieldDataBind),
+                dateFieldDataBind: new FormControl(bind.dateFieldDataBind),
+                dateTimeFieldDataBind: new FormControl(bind.dateTimeFieldDataBind),
+                defaultFieldId: new FormControl(bind.defaultFieldId),
+                hardAssignTimeFieldId: new FormControl(bind.hardAssignTimeFieldId),
+                hardAssignNamesFieldId: new FormControl(bind.hardAssignNamesFieldId),
+                simpleAssignFieldId: new FormControl(bind.simpleAssignFieldId),
+                textFieldId: new FormControl(bind.textFieldId),
+                lastNameFieldId: new FormControl(bind.lastNameFieldId),
+                firstNameFieldId: new FormControl(bind.firstNameFieldId),
+                patronymicFieldId: new FormControl(bind.patronymicFieldId),
+                backupFieldId: new FormControl(bind.backupFieldId),
+                passportSeriesFieldId: new FormControl(bind.passportSeriesFieldId),
+                passportNumberFieldId: new FormControl(bind.passportNumberFieldId),
+                passportIssuedByFieldId: new FormControl(bind.passportIssuedByFieldId),
+                passportIssuedDateFieldId: new FormControl(bind.passportIssuedDateFieldId),
+                registrationAddressFieldId: new FormControl(bind.registrationAddressFieldId),
+            })))
+        }, 100)
+    }
+
+    appendBindToIntegration() {
+        if(this.selectedDataBind) {
+            this.oldTrackerIntegrationForm.controls.fieldDataBinds.push(this.selectedDataBind())
+            this.appendBindToIntegrationDialogVisible = false;
+        }
+    }
+
+    openAppendBindToIntegrationDialog() {
+        this.appendBindToIntegrationDialogVisible = true;
+    }
+
+    saveOldTrackerIntegration() {
+        if(this.selectedStageForIntegration) {
+            console.log(this.oldTrackerIntegrationForm.value);
+            this.selectedStageForIntegration.oldTrackerBind = this.oldTrackerIntegrationForm.value;
+        }
+    }
+
+    removeBind(fGroup: FormGroup) {
+        this.oldTrackerIntegrationForm.controls.fieldDataBinds.removeAt(this.oldTrackerIntegrationForm.controls.fieldDataBinds.controls.indexOf(fGroup));
+    }
+
+    openAppendDocumentDialog() {
+        this.clearDocumentDialogForm();
+        this.documentDialogVisible=true;
+        this.documentDialogMode='new';
+    }
+
+    openEditDocumentDialog(item:any){
+        console.log(item);
+        this.clearDocumentDialogForm();
+        this.documentDialogVisible=true;
+        this.documentDialogMode='edit';
+        this.documentDialogForm.patchValue(item)
+    }
+
+    clearDocumentDialogForm(){
+        this.documentDialogForm.reset({
+            temporalId: v4(),
+            documentTemplateId: null,
+            name: "",
+            type: null,
+            addressFieldId: null,
+            regionOfBirthFieldId: null,
+            cityOfBirthFieldId: null,
+            dateOfBirthFieldId: null,
+            fullNameFieldId: null,
+            loginFieldId: null,
+            passportDetailsFieldId: null,
+            passwordFieldId: null,
+            phoneFieldId: null,
+            tariffFieldId: null
+        })
     }
 }

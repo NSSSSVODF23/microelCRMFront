@@ -1,0 +1,18 @@
+<div class="flex flex-column gap-2" [formGroup]="dataForm" [ngClass]="inputClasses">
+    <div>
+        <input pInputText formControlName="passportSeries" (blur)="onTouched(); onBlur.emit()" placeholder="0000"
+               pKeyFilter="pint" [maxlength]="4" [disabled]="disabled" [size]="4"/>
+        - <input pInputText formControlName="passportNumber" (blur)="onTouched(); onBlur.emit()" placeholder="000000"
+                 pKeyFilter="pint" [maxlength]="6" [disabled]="disabled" [size]="6"/>
+    </div>
+    <input pInputText formControlName="passportIssuedBy" placeholder="Кем выдан"
+           (blur)="onTouched(); onBlur.emit()" [disabled]="disabled" />
+    <div class="flex gap-2">
+        <p-calendar formControlName="passportIssuedDate" (blur)="onTouched(); onBlur.emit()" placeholder="Дата выдачи"
+                    [disabled]="disabled" [firstDayOfWeek]="1"></p-calendar>
+        <p-inputMask formControlName="departmentCode" (blur)="onTouched(); onBlur.emit()" placeholder="Код подр."
+                     [disabled]="disabled" mask="999-999" [size]="7"></p-inputMask>
+    </div>
+    <input pInputText formControlName="registrationAddress" (blur)="onTouched(); onBlur.emit()" placeholder="Адрес регистрации"
+           [disabled]="disabled" />
+</div>

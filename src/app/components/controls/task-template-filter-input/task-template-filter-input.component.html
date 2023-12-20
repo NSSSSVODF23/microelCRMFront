@@ -1,10 +1,9 @@
-<ng-container [ngSwitch]="field?.type">
+<ng-container [ngSwitch]="field?.value.wireframeFieldType" *ngIf="field" [formGroup]="field">
 
     <div *ngSwitchCase="'BOOLEAN'" class="input-label-wrapper">
         <ng-container *ngTemplateOutlet="label"></ng-container>
         <p-dropdown
-                (ngModelChange)="onChange($event)"
-                [(ngModel)]="controlValue"
+                formControlName="value"
                 [options]="[
                     {label:'Да',value:true},
                     {label:'Нет',value:false},
@@ -15,86 +14,74 @@
 
     <div *ngSwitchCase="'SMALL_TEXT'" class="input-label-wrapper">
         <ng-container *ngTemplateOutlet="label"></ng-container>
-        <input (ngModelChange)="onChange($event)"
-               [(ngModel)]="controlValue" pInputText>
+        <input formControlName="value" pInputText>
     </div>
 
     <div *ngSwitchCase="'LARGE_TEXT'" class="input-label-wrapper">
         <ng-container *ngTemplateOutlet="label"></ng-container>
-        <input (ngModelChange)="onChange($event)"
-               [(ngModel)]="controlValue" pInputText>
+        <input formControlName="value" pInputText>
     </div>
 
     <div *ngSwitchCase="'INTEGER'" class="input-label-wrapper">
         <ng-container *ngTemplateOutlet="label"></ng-container>
-        <p-inputNumber (ngModelChange)="onChange($event)"
-                       [(ngModel)]="controlValue"></p-inputNumber>
+        <p-inputNumber formControlName="value"></p-inputNumber>
     </div>
 
     <div *ngSwitchCase="'FLOAT'" class="input-label-wrapper">
         <ng-container *ngTemplateOutlet="label"></ng-container>
-        <p-inputNumber (ngModelChange)="onChange($event)"
-                       [(ngModel)]="controlValue" [minFractionDigits]="1"></p-inputNumber>
+        <p-inputNumber formControlName="value" [minFractionDigits]="1"></p-inputNumber>
     </div>
 
     <div *ngSwitchCase="'ADDRESS'" class="input-label-wrapper">
         <ng-container *ngTemplateOutlet="label"></ng-container>
-        <app-address-input (ngModelChange)="onChange($event)" (onBlur)="onTouched()"
-                           [(ngModel)]="controlValue"></app-address-input>
+        <app-address-input formControlName="value" (onBlur)="onTouched()"></app-address-input>
     </div>
 
     <div *ngSwitchCase="'LOGIN'" class="input-label-wrapper">
         <ng-container *ngTemplateOutlet="label"></ng-container>
-        <input (ngModelChange)="onChange($event)"
-               [(ngModel)]="controlValue" appRegexPatternChecker pInputText patternRx="^[\dA-z_]+$">
+        <input formControlName="value" appRegexPatternChecker pInputText patternRx="^[\dA-z_]+$">
     </div>
 
     <div *ngSwitchCase="'AD_SOURCE'" class="input-label-wrapper">
         <ng-container *ngTemplateOutlet="label"></ng-container>
-        <p-dropdown (onBlur)="onTouched()" (ngModelChange)="onChange($event)" placeholder="Рекламный источник" appendTo="body" [(ngModel)]="controlValue"
+        <p-dropdown (onBlur)="onTouched()" placeholder="Рекламный источник" appendTo="body" formControlName="value"
                     [options]="(adSources$ | async) ?? []" [showClear]="true"></p-dropdown>
     </div>
 
     <div *ngSwitchCase="'REQUEST_INITIATOR'" class="input-label-wrapper">
         <ng-container *ngTemplateOutlet="label"></ng-container>
-        <input (ngModelChange)="onChange($event)"
-               [(ngModel)]="controlValue" appRegexPatternChecker pInputText patternRx="^[\dA-z_]+$">
+        <input formControlName="value" appRegexPatternChecker pInputText patternRx="^[\dA-z_]+$">
     </div>
 
     <div *ngSwitchCase="'IP'" class="input-label-wrapper">
         <ng-container *ngTemplateOutlet="label"></ng-container>
-        <input (ngModelChange)="onChange($event)"
-               [(ngModel)]="controlValue" appRegexPatternChecker pInputText patternRx="^[\d\.]+$">
+        <input formControlName="value" appRegexPatternChecker pInputText patternRx="^[\d\.]+$">
     </div>
 
     <div *ngSwitchCase="'EQUIPMENTS'" class="input-label-wrapper">
         <ng-container *ngTemplateOutlet="label"></ng-container>
-        <app-equipments-field-filter (ngModelChange)="onChange($event)"
-                                    [(ngModel)]="controlValue"></app-equipments-field-filter>
+        <app-equipments-field-filter formControlName="value"></app-equipments-field-filter>
     </div>
 
     <div *ngSwitchCase="'CONNECTION_SERVICES'" class="input-label-wrapper">
         <ng-container *ngTemplateOutlet="label"></ng-container>
-        <app-connection-services-input (ngModelChange)="onChange($event)" (onBlur)="onTouched()"
-                                       [(ngModel)]="controlValue"></app-connection-services-input>
+        <app-connection-services-input formControlName="value" (onBlur)="onTouched()"></app-connection-services-input>
     </div>
 
     <div *ngSwitchCase="'CONNECTION_TYPE'" class="input-label-wrapper">
         <ng-container *ngTemplateOutlet="label"></ng-container>
-        <p-dropdown (onBlur)="onTouched()" (ngModelChange)="onChange($event)" placeholder="Тип подключения" appendTo="body" [(ngModel)]="controlValue"
+        <p-dropdown (onBlur)="onTouched()" formControlName="value" placeholder="Тип подключения" appendTo="body"
                     [options]="(connectionTypes$ | async) ?? []" [showClear]="true"></p-dropdown>
     </div>
 
     <div *ngSwitchCase="'PHONE_ARRAY'" class="input-label-wrapper">
         <ng-container *ngTemplateOutlet="label"></ng-container>
-        <input (ngModelChange)="onChange($event)" (blur)="onTouched()"
-               [(ngModel)]="controlValue" appRegexPatternChecker pInputText patternRx="^[1-9]\d{0,10}$">
+        <input formControlName="value" (blur)="onTouched()" appRegexPatternChecker pInputText patternRx="^[1-9]\d{0,10}$">
     </div>
 
     <div *ngSwitchCase="'COUNTING_LIVES'" class="input-label-wrapper">
         <ng-container *ngTemplateOutlet="label"></ng-container>
-        <input (ngModelChange)="onChange($event)" (blur)="onTouched()"
-               [(ngModel)]="controlValue" pInputText/>
+        <input formControlName="value" (blur)="onTouched()" pInputText/>
     </div>
 
     <div *ngSwitchDefault [style.background-color]="'red'"></div>
@@ -103,6 +90,6 @@
 
 <ng-template #label>
     <label>
-        {{field?.name}}
+        {{field?.value.name}}
     </label>
 </ng-template>

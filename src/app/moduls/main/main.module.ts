@@ -99,6 +99,7 @@ import {CommutatorListPageComponent} from "../../pages/commutator-list-page/comm
 import {AutoCompleteModule} from "primeng/autocomplete";
 import {KeyFilterModule} from "primeng/keyfilter";
 import {FilesPageComponent} from "../../pages/files-page/files-page.component";
+import {AnimateModule} from "primeng/animate";
 
 const mapConfig: YaConfig = {
     apikey: '008574e5-f34b-4270-b3d5-91aaabd036e8',
@@ -210,7 +211,8 @@ const mapConfig: YaConfig = {
         InputMaskModule,
         AngularYandexMapsModule.forRoot(mapConfig),
         AutoCompleteModule,
-        KeyFilterModule
+        KeyFilterModule,
+        AnimateModule
     ],
     providers: [MessageService, {provide: LOCALE_ID, useValue: 'ru'}, ConfirmationService]
 })

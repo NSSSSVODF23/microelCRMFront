@@ -4,8 +4,8 @@
 </span>
 <p-overlayPanel #overlayPanelEl styleClass="no-paddings">
     <ng-template pTemplate="content">
-        <div pRipple class="list-item" *ngFor="let variation of variationList; trackBy: trackByVariation" (click)="onChange(variation.id); overlayPanelEl.hide()">
-            {{variation.name}}
+        <div pRipple class="list-item" *ngFor="let variation of variationList; trackBy: trackByVariation" (click)="onChange(variation.value); overlayPanelEl.hide()">
+            {{variation.label}}
         </div>
     </ng-template>
 </p-overlayPanel>

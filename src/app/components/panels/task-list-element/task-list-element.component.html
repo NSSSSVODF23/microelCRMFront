@@ -21,7 +21,7 @@
         <ng-container *ngIf="item?.taskStatus === 'PROCESSING'; then workersEmployee; else responsibleEmployee"></ng-container>
     </div>
 <!--    <ng-container *ngTemplateOutlet="(isWide$ | async) ? tableBodyView : bodyView; context: {$implicit: taskFields}"></ng-container>-->
-    <app-task-fields-table-view [task]="item"></app-task-fields-table-view>
+    <app-task-fields-table-view [task]="item" [isTaskBody]="false"></app-task-fields-table-view>
     <div *ngIf="item?.lastComment" class="flex gap-2 border-top-1 border-bottom-1 border-bluegray-100 p-3">
         <span class="text-sm white-space-nowrap text-bluegray-400 line-height-4">
             {{item?.lastComment?.created | date:'dd-MM-yyyy HH:mm'}}
@@ -40,6 +40,11 @@
                   styleClass="p-button-text p-button-icon" [loading]="commentSending"></p-button>
     </div>
     <div class="flex p-3 gap-2">
+        <div class="flex align-items-center gap-1 text-bluegray-400 hover:text-primary text-sm"
+             *ngIf="item?.oldTrackerTaskId" (click)="$event.stopPropagation(); openTaskInOldTracker(item?.oldTrackerTaskId)">
+            <span class="mdi-sync"></span>
+            <span>{{item?.oldTrackerTaskId}}</span>
+        </div>
         <div class="flex-grow-1"></div>
         <span class="text-bluegray-500 text-sm font-semibold">Создатель: {{item?.creator?.fullName}}</span>
         <span [ngClass]="statusColor" class="font-semibold text-sm">{{item | taskStatus}}</span>
@@ -80,48 +85,6 @@
                                                  [fields]="wireframeFieldsList"
                                                  [index]="field"></app-select-field-to-view-button>
             </ng-container>
-        </ng-container>
-    </div>
-</ng-template>
-
-<ng-template #tableBodyView let-listItemFields>
-    <div class="p-3 bg-bluegray-50">
-        <ng-container *ngIf="listItemFields.inline.length>0">
-            <table class="w-full">
-                <thead>
-                    <tr class="text-sm text-bluegray-500">
-                        <th *ngFor="let field of listItemFields.inline; let i = index; trackBy: trackByField">{{field?.name}}</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td *ngFor="let field of listItemFields.inline; let i = index; trackBy: trackByField">
-                            <ng-container [ngSwitch]="field.wireframeFieldType">
-                                <span class="flex flex-column" *ngSwitchCase="'PHONE_ARRAY'">
-                                    <app-dial-buttons-list [phoneData]="field.phoneData"></app-dial-buttons-list>
-                                </span>
-                                <span *ngSwitchDefault>{{field.textRepresentation}}</span>
-                            </ng-container>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </ng-container>
-        <ng-container *ngIf="listItemFields.block.length>0">
-            <table class="w-full" *ngFor="let field of listItemFields.block; let i = index; trackBy: trackByField">
-                <thead>
-                    <tr class="text-sm text-bluegray-500">
-                        <th>{{field?.name}}</th>
-                    </tr>
-                </thead>
-                <tbody>
-                <tr>
-                    <td>
-                        <span>{{field?.textRepresentation}}</span>
-                    </td>
-                </tr>
-                </tbody>
-            </table>
         </ng-container>
     </div>
 </ng-template>

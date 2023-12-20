@@ -90,6 +90,10 @@ export class TestingPageComponent implements OnInit {
     unsub = true;
     control = new FormControl([ { "equipment": { "clientEquipmentId": 2, "name": "Роутер 5", "description": "Необычный роутер", "price": 2000, "created": "2023-08-16T07:12:42.701+00:00", "creator": { "login": "admin", "department": { "departmentId": 1, "name": "ТП", "description": null, "deleted": false, "created": "2023-05-02T13:35:15.746+00:00" }, "position": { "positionId": 1, "name": "Стандартная", "description": null, "access": 0, "created": "2023-05-02T13:40:51.279+00:00", "deleted": false }, "avatar": "9599810d-5d86-4aba-b71b-83fa120ace9c.png", "secondName": "Андреевич", "firstName": "Максим", "lastName": "Ушаков", "internalPhoneNumber": "", "access": 0, "created": "2023-05-01T15:53:59.919+00:00", "telegramUserId": "", "offsite": false, "deleted": false, "status": "ONLINE", "lastSeen": "2023-08-16T13:08:43.102+00:00", "fullName": "Максим Ушаков" }, "editedBy": [], "deleted": false, "lastEdit": null }, "count": 1 } ]);
     ctrl$ = this.control.valueChanges.pipe(shareReplay(1))
+    value = null;
+    valueChange(value:any){
+        console.log(value)
+    }
     generateRandomString() {
         const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
         let result1 = '';

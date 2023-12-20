@@ -19,6 +19,8 @@ export class PhoneListInputComponent implements OnInit, ControlValueAccessor, Af
 
     controlValue: { [key: string]: string; } = {};
     disable = false;
+    autoFocusFlag = false;
+    autoFocusTimeout?: any;
 
     @Input() inputClasses: {[key:string]:boolean} = {};
 

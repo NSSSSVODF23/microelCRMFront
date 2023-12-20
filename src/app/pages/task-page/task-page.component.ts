@@ -30,9 +30,9 @@ import {
 } from "../../util";
 import {fade, fadeIn} from "../../animations";
 import {OverlayPanel} from "primeng/overlaypanel";
-import {FormControl, FormGroup} from "@angular/forms";
+import {AbstractControl, AsyncValidatorFn, FormControl, FormGroup, ValidationErrors} from "@angular/forms";
 import {CustomValidators} from "../../custom-validators";
-import {map} from 'rxjs';
+import {delay, map, Observable, of, shareReplay, switchMap} from 'rxjs';
 import {CustomNavigationService} from "../../services/custom-navigation.service";
 import {QuillEditorComponent} from "ngx-quill";
 import {
@@ -153,6 +153,32 @@ export class TaskPageComponent implements OnInit, OnDestroy {
     // Возвращает текущее время до actualTo задачи
     actualToTime$ = this.actualToDurationCounter.observer.pipe(map(dur => dur.mode === 'after' ? '-' + dur.actualLabel : dur.actualLabel));
     @ViewChild('fileInput') fileInput?: FileInputComponent;
+
+    @ViewChild('oldTrackerPanel') oldTrackerPanel?: OverlayPanel;
+    oldTrackerBindInfoForm = new FormGroup({
+        id: new FormControl<number|null>(null, [], [this.compatibilityTaskValidator()]),
+        taskClassId: new FormControl<number|null>(null),
+        taskStageId: new FormControl<number|null>(null)
+    });
+    oldTrackerClassOptions$ = this.api.getOldTrackerClasses().pipe(shareReplay(1));
+    currentOldTrackerClass$ = this.oldTrackerClassOptions$.pipe(map(classes=>classes.find(cls=>cls.id===this.currentTask?.currentStage?.oldTrackerBind?.classId)));
+    oldTrackerStageOptions$ = this.oldTrackerBindInfoForm.controls.taskClassId.valueChanges
+        .pipe(
+            switchMap(taskClassId => {
+                return this.oldTrackerClassOptions$.pipe(map(classes=>classes.find(cls=>cls.id === taskClassId)?.stages ?? []))
+            }),
+            shareReplay(1)
+        );
+    isChangeOldTrackerBindDisabled = false;
+    isTaskInConnectionProcess = false;
+    isTaskInStageChangeProcess = false;
+
+    compatibilityTaskValidator(): AsyncValidatorFn {
+        return (control: AbstractControl): Observable<ValidationErrors> => {
+            if(!this._taskId || !control.value) return of({});
+            return of(control.value).pipe(delay(1500), switchMap(oldTaskId=>this.api.checkCompatibility(this._taskId, oldTaskId)))
+        };
+    }
 
     get taskStatusColor(){
         if(this.currentTask){
@@ -285,6 +311,8 @@ export class TaskPageComponent implements OnInit, OnDestroy {
         })
         this.subscriptions.addSubscription("wlCrd", this.rt.workLogCreated().subscribe(this.workLogCreated.bind(this)));
         this.subscriptions.addSubscription("wlCls", this.rt.workLogClosed().subscribe(this.workLogClosed.bind(this)));
+        this.subscriptions.addSubscription('hrSchCh', this.hourScheduledControl.valueChanges.subscribe(value => {if(value) this.selectedTaskDateTime.setHours(value)}))
+        this.subscriptions.addSubscription('mnSchCh', this.minuteScheduledControl.valueChanges.subscribe(value => {if(value) this.selectedTaskDateTime.setMinutes(value)}))
     }
 
     updateObservableList() {
@@ -573,6 +601,8 @@ export class TaskPageComponent implements OnInit, OnDestroy {
             currentDate.setMinutes(15, 0, 0);
         }
         this.selectedTaskDateTime = currentDate;
+        this.hourScheduledControl.setValue(currentDate.getHours());
+        this.minuteScheduledControl.setValue(currentDate.getMinutes());
     }
 
     setDateTimeOfTaskRelevance() {
@@ -792,28 +822,30 @@ export class TaskPageComponent implements OnInit, OnDestroy {
         this.workLogsDialogEl.open(this._taskId);
     };
 
-    private taskManagementMenu() {
+    private taskManagementMenu(): MenuItem[] {
+        const docs = this.currentTask?.modelWireframe?.documentTemplates?.map((doc)=>{
+            return {
+                label: doc.name,
+                command: ()=>{
+                    window.open(`api/private/document-template?taskId=${this.currentTask?.taskId}&documentTemplateId=${doc.documentTemplateId}`)
+                }
+            }
+        }) ?? [];
         return [
             {
                 icon: 'mdi-task',
                 label: "Задача",
                 items: [
                     {
-                        label: "Данные",
-                        icon: 'mdi-format_list_bulleted',
-                        items: [
-                            {
-                                label: "Изменить",
-                                icon: 'mdi-edit',
-                                command: this.showEditTaskDialog.bind(this)
-                            },
-                            {
-                                label: "История изменений",
-                                icon: 'mdi-history',
-                                command: this.showEditHistoryDialog.bind(this)
-                            }
-                        ],
-                        disabled: this.isTaskClose()
+                        label: "История изменений",
+                        icon: 'mdi-history',
+                        command: this.showEditHistoryDialog.bind(this)
+                    },
+                    {
+                        label: "Документы",
+                        icon: 'mdi-document_scanner',
+                        disabled: docs.length === 0,
+                        items: docs
                     },
                     {
                         label: "Ответственный",
@@ -942,6 +974,12 @@ export class TaskPageComponent implements OnInit, OnDestroy {
                 ]
             },
             {
+                label: "Редактировать задачу",
+                icon: 'mdi-edit',
+                command: this.showEditTaskDialog.bind(this),
+                disabled: this.isTaskClose()
+            },
+            {
                 icon: 'mdi-engineering',
                 label: "Монтажники",
                 items: [
@@ -968,6 +1006,13 @@ export class TaskPageComponent implements OnInit, OnDestroy {
                 icon: 'mdi-inventory_2',
                 label: "Прикрепленные файлы",
                 command: () => this.showFilesHistory = true
+            },
+            {
+                icon: 'mdi-sync',
+                label: 'Старый трекер',
+                command: (event:any)=> {
+                    this.openOldTrackerDialog(event.originalEvent)
+                },
             },
             // {
             //     icon: 'mdi-forum',
@@ -1001,6 +1046,9 @@ export class TaskPageComponent implements OnInit, OnDestroy {
         // 'image'
         // 'video'
     ];
+
+    hourScheduledControl = new FormControl(0);
+    minuteScheduledControl = new FormControl(0);
 
     taskJournalSorting = Storage.loadOrDefault("taskJournalSortingType", TaskJournalSortingTypes.CREATE_DATE_DESC);
     taskJournalSortingOptions = [
@@ -1056,5 +1104,49 @@ export class TaskPageComponent implements OnInit, OnDestroy {
                 this.gangLeaders = [{label: "Без бригадира", value: null}];
             }
         })
+    }
+
+    openOldTrackerDialog(event: Event){
+        if(this.oldTrackerPanel && this.currentTask){
+            this.isChangeOldTrackerBindDisabled = !!this.currentTask.oldTrackerTaskId;
+            if(this.isChangeOldTrackerBindDisabled){
+                this.oldTrackerBindInfoForm.setValue({
+                    id: this.currentTask.oldTrackerTaskId ?? null,
+                    taskClassId: this.currentTask.oldTrackerTaskClassId ?? null,
+                    taskStageId: this.currentTask.oldTrackerCurrentStageId ?? null
+                })
+            }
+            this.oldTrackerPanel.show(event);
+        }
+    }
+
+    bindTaskToTask() {
+        if(this.currentTask && this.oldTrackerBindInfoForm.value.id && this.oldTrackerBindInfoForm.controls.id.valid && !this.oldTrackerBindInfoForm.controls.id.pending) {
+            this.isTaskInConnectionProcess = true;
+            this.api.connectToOldTracker(this.currentTask.taskId, this.oldTrackerBindInfoForm.value.id).subscribe({
+                next:()=>{
+                    this.isTaskInConnectionProcess = false;
+                    this.oldTrackerPanel?.hide();
+                },
+                error:()=>{
+                    this.isTaskInConnectionProcess = false;
+                }
+            })
+        }
+    }
+
+    changeTaskStageInOldTracker(){
+        if(this.currentTask && this.oldTrackerBindInfoForm.value.taskStageId) {
+            this.isTaskInStageChangeProcess = true;
+            this.api.changeTaskStageInOldTracker(this.currentTask.taskId, this.oldTrackerBindInfoForm.value.taskStageId).subscribe({
+                next:()=>{
+                    this.isTaskInStageChangeProcess = false;
+                    this.oldTrackerPanel?.hide();
+                },
+                error:()=>{
+                    this.isTaskInStageChangeProcess = false;
+                }
+            })
+        }
     }
 }

@@ -4,6 +4,7 @@ import {TasksPageCacheService} from "../../services/tasks-page-cache.service";
 import {ApiService} from "../../services/api.service";
 import {Employee, FieldItem, Task} from "../../transport-interfaces";
 import {Paginator} from "primeng/paginator";
+import {FormControl, FormGroup} from "@angular/forms";
 
 
 @Component({
@@ -19,8 +20,8 @@ export class TasksPageComponent implements OnInit, AfterViewInit {
     constructor(readonly taskService: TasksPageCacheService, readonly api: ApiService, readonly route: ActivatedRoute) {
     }
 
-    trackByField(index: number, field: FieldItem) {
-        return field.id + field.variation;
+    trackByField(index: number, field: FormGroup) {
+        return field.value.id + field.value.wireframeFieldType + field.value.name;
     };
 
     trackByTask(index: number, task: Task) {
@@ -57,6 +58,6 @@ export class TasksPageComponent implements OnInit, AfterViewInit {
     }
 
     clearTemplateFilters() {
-        this.taskService.templateFilterForm.reset()
+        // this.taskService.templateFilterForm.reset()
     }
 }

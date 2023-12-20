@@ -21,7 +21,7 @@ import {
     Employee,
     EmployeeStatus, FdbItem,
     FieldItem,
-    FileData, FilesLoadFileEvent, FileSystemItem,
+    FileData, FilesLoadFileEvent, FileSystemItem, FilterModelItem,
     House,
     INotification, LoadingDirectoryWrapper,
     MessageData,
@@ -38,7 +38,7 @@ import {
     SalaryTable,
     SuperMessage,
     Switch, SwitchBaseInfo, SwitchEditingPreset, SwitchModel, SwitchWithAddress,
-    Task,
+    Task, TaskClassOT,
     TaskCreationBody,
     TaskEvent,
     TaskFieldsSnapshot,
@@ -92,12 +92,12 @@ export class ApiService {
         return this.sendGet('api/private/wireframes/names');
     }
 
-    createWireframe(wireframe: Wireframe): Observable<Wireframe> {
+    createWireframe(wireframe: any): Observable<Wireframe> {
         return this.sendPost('api/private/wireframe', wireframe);
     }
 
-    updateWireframe(wireframe: Wireframe): Observable<Wireframe> {
-        return this.sendPatch('api/private/wireframe', wireframe);
+    updateWireframe(id: number, wireframe: any): Observable<Wireframe> {
+        return this.sendPatch('api/private/wireframe/'+id, wireframe);
     }
 
     createTask(taskCreationBody: TaskCreationBody): Observable<Task> {
@@ -141,7 +141,19 @@ export class ApiService {
     }
 
     getPageOfTasks(page: number, filter: TaskFiltrationConditions): Observable<Page<Task>> {
-        return this.sendGet<Page<Task>>(`api/private/tasks/${page}`, Utils.prepareForHttpRequest(filter));
+        return this.sendPost<Page<Task>>(`api/private/tasks/${page}`, filter);
+    }
+
+    getWireframeFiltrationFields(wireframeId: number){
+        return this.sendGet<FilterModelItem[]>(`api/private/wireframe/${wireframeId}/filter-fields`);
+    }
+
+    checkCompatibility(taskId: number, otTaskId: number): Observable<any> {
+        return this.sendGet<any>(`api/private/task/${taskId}/check-compatibility/${otTaskId}`);
+    }
+
+    connectToOldTracker(taskId: number, otTaskId: number): Observable<any> {
+        return this.sendPatch(`api/private/task/${taskId}/connect-to/${otTaskId}`, {});
     }
 
     // getPageTasksByStatus(page: number, limit: number, status: string[], commonFilteringString?: string, taskCreator?: string, taskCreationDate?: Date[], filterTags?: TaskTag[], exclusionIds?: number[]): Observable<Page<Task>> {
@@ -859,6 +871,14 @@ export class ApiService {
         return this.sendGet<NetworkRemoteControl>(`api/private/remote-control/${ipaddr}/check-access`);
     }
 
+    getDocumentTemplateTypes(){
+        return this.sendGet<{ label: string, value: string }[]>('api/private/types/document-template');
+    }
+
+    getFieldDisplayTypes() {
+        return this.sendGet<{ label: string, value: string }[]>('api/private/types/field-display');
+    }
+
     getWireframeFieldTypesList() {
         return this.sendGet<{ label: string, value: string }[]>('api/private/types/wireframe-field');
     }
@@ -1028,7 +1048,16 @@ export class ApiService {
         return this.sendGet<{ label: string, value: number }[]>('api/private/phy-phone-list');
     }
 
+    getOldTrackerClasses(){
+        return this.sendGet<TaskClassOT[]>('api/private/ot/classes');
+    }
+
+    changeTaskStageInOldTracker(taskId: number, taskStageId: number) {
+        return this.sendPatch(`api/private/task/${taskId}/old-tracker-stage/${taskStageId}/change`, {});
+    }
+
     // Результаты запросов на сервер кэшируются по таймауту, чтобы не было доп нагрузки на сервер
+
     private sendGet<T>(uri: string, query?: any) {
         for (let q in query) {
             if (query[q] === undefined || query[q] === null) {
@@ -1105,9 +1134,8 @@ export class ApiService {
             }));
     }
 
+
     private generateHash(uri: string, query: any) {
         return cyrb53(uri + JSON.stringify(query), 0);
     }
-
-
 }

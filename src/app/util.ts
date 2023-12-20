@@ -8,7 +8,8 @@ import {
     WireframeFieldType
 } from "./transport-interfaces";
 import {
-    combineLatest, fromEvent,
+    combineLatest,
+    fromEvent,
     map,
     merge,
     Observable,
@@ -179,6 +180,8 @@ export class Utils {
                 return modelItem.connectionServicesData;
             case WireframeFieldType.EQUIPMENTS:
                 return modelItem.equipmentRealizationsData;
+            case WireframeFieldType.PASSPORT_DETAILS:
+                return modelItem.passportDetailsData;
             default:
                 return null;
         }
@@ -217,6 +220,9 @@ export class Utils {
                 break;
             case WireframeFieldType.EQUIPMENTS:
                 fieldItem.equipmentRealizationsData = formValue;
+                break;
+            case WireframeFieldType.PASSPORT_DETAILS:
+                fieldItem.passportDetailsData = formValue;
                 break;
             default:
                 break;
@@ -271,7 +277,8 @@ export class FormToModelItemConverter {
                 id: fieldItem.id,
                 wireframeFieldType: fieldItem.type,
                 name: fieldItem.name,
-                variation: fieldItem.variation
+                variation: fieldItem.variation,
+                displayType: fieldItem.displayType
             }
 
             // todo Для добавления типа поля, нужно добавить сюда4
@@ -306,6 +313,10 @@ export class FormToModelItemConverter {
                     break;
                 case WireframeFieldType.EQUIPMENTS:
                     modelItem.equipmentRealizationsData = formValue;
+                    break;
+                case WireframeFieldType.PASSPORT_DETAILS:
+                    modelItem.passportDetailsData = formValue;
+                    break;
             }
 
             return modelItem;

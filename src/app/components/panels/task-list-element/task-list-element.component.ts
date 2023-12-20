@@ -186,4 +186,8 @@ export class TaskListElementComponent implements OnInit, OnChanges {
     callToPhone(phone: any) {
         this.api.callToPhone(phone.value).subscribe({});
     }
+
+    openTaskInOldTracker(oldTrackerTaskId: number | undefined) {
+        if(oldTrackerTaskId) window.open(`http://tracker.vdonsk.ru/main.php?mode=show_obji&obji=${oldTrackerTaskId}&from_cat=1`, "_blank");
+    }
 }

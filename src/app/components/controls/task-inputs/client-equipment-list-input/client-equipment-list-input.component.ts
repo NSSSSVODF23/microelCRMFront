@@ -7,8 +7,8 @@ import {
     FormGroup,
     NG_VALUE_ACCESSOR
 } from "@angular/forms";
-import {ClientEquipment, ClientEquipmentRealization, LoadingState} from "../../../transport-interfaces";
-import {ApiService} from "../../../services/api.service";
+import {ClientEquipment, ClientEquipmentRealization, LoadingState} from "../../../../transport-interfaces";
+import {ApiService} from "../../../../services/api.service";
 import {
     BehaviorSubject,
     debounceTime,
@@ -26,7 +26,7 @@ import {
     takeUntil,
     tap
 } from "rxjs";
-import {SubscriptionsHolder} from "../../../util";
+import {SubscriptionsHolder} from "../../../../util";
 import {OverlayPanel} from "primeng/overlaypanel";
 
 @Component({

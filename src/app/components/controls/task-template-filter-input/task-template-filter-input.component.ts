@@ -1,6 +1,6 @@
 import {Component, forwardRef, Input, OnInit} from '@angular/core';
-import {ControlValueAccessor, NG_VALUE_ACCESSOR} from "@angular/forms";
-import {FieldItem} from "../../../transport-interfaces";
+import {ControlValueAccessor, FormGroup, NG_VALUE_ACCESSOR} from "@angular/forms";
+import {FieldItem, FilterModelItem} from "../../../transport-interfaces";
 import {ApiService} from "../../../services/api.service";
 
 @Component({
@@ -17,7 +17,7 @@ import {ApiService} from "../../../services/api.service";
 })
 export class TaskTemplateFilterInputComponent implements OnInit, ControlValueAccessor {
 
-    @Input() field?: FieldItem;
+    @Input() field?: FormGroup;
     controlValue: any;
 
     connectionTypes$ = this.api.getConnectionTypesList();

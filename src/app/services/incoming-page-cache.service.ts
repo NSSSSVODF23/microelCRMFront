@@ -24,18 +24,18 @@ import {PersonalityService} from "./personality.service";
 })
 export class IncomingPageCacheService {
 
+    pageControl = new FormControl(0);
     filtersForm =  new FormGroup({
         limit: new FormControl(15),
         template: new FormControl(Storage.loadOrDefault('incomListPageTempFilter', [])),
         stage: new FormControl(null),
-        tags: new FormControl([]),
+        tags: new FormControl<string[]>([]),
     })
-    controlForm = new FormGroup({
-        page: new FormControl(0),
-        filters: this.filtersForm,
-    });
 
-    filters$ = this.controlForm.valueChanges.pipe(startWith(this.controlForm.value), map(form=>Object.values(form)), shareReplay(1));
+    pageChange$ = this.pageControl.valueChanges.pipe(startWith(0));
+    filtersChange$ = this.filtersForm.valueChanges.pipe(tap(()=>this.pageControl.setValue(0)),startWith(this.filtersForm.value));
+
+    filters$ = combineLatest([this.pageChange$, this.filtersChange$]).pipe(shareReplay(1));
 
     stageList:{
         label: string,

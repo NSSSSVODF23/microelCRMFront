@@ -452,15 +452,23 @@
 
 <!--Диалог для установки даты и времени актуальности задачи-->
 <p-dialog [(visible)]="isShowSchedulingDialog" [dismissableMask]="true"
-          [draggable]="false" [modal]="true" [resizable]="false"
-          [style]="{maxHeight: '70vh'}" header="Планирование задачи">
+          [draggable]="false" [modal]="true" [resizable]="false" contentStyleClass="flex flex-column gap-3 pt-1"
+          header="Планирование задачи">
     <ng-template pTemplate="content">
-        <div class="flexed column gap10">
-            <p-calendar [(ngModel)]="selectedTaskDateTime" [inline]="true" [selectOtherMonths]="true"
-                        [showTime]="true" [firstDayOfWeek]="1"></p-calendar>
-            <app-button (onClick)="setDateTimeOfTaskRelevance()" [loading]="changingTaskDateTime"
-                        label="Установить"></app-button>
+        <p-calendar [(ngModel)]="selectedTaskDateTime" class="w-fit align-self-center"
+                    [inline]="true" [selectOtherMonths]="true" [firstDayOfWeek]="1"></p-calendar>
+        <div class="flex gap-3 align-self-center">
+            <div class="input-label-wrapper">
+                <label>Час</label>
+                <p-inputNumber [formControl]="hourScheduledControl" [min]="0" [max]="23" [showButtons]="true" [size]="2"></p-inputNumber>
+            </div>
+            <div class="input-label-wrapper">
+                <label>Минута</label>
+                <p-inputNumber [formControl]="minuteScheduledControl" [min]="0" [max]="59" [showButtons]="true" [step]="10" [size]="2"></p-inputNumber>
+            </div>
         </div>
+        <app-button (onClick)="setDateTimeOfTaskRelevance()" [loading]="changingTaskDateTime"
+                    label="Установить"></app-button>
     </ng-template>
 </p-dialog>
 
@@ -521,6 +529,41 @@
         </span>
         <span>
             {{actualToTime$ | async}}
+        </span>
+    </div>
+</ng-template>
+
+<p-overlayPanel #oldTrackerPanel appendTo="body" [dismissable]="true">
+    <div class="flex flex-column gap-3" [formGroup]="oldTrackerBindInfoForm" *ngIf="!!this.currentTask?.currentStage?.oldTrackerBind else oldTrackerBindWarningTemp">
+        <div class="flex flex-column gap-1" *ngIf="currentOldTrackerClass$ | async as currentOldTrackerClass">
+            <span class="text-bluegray-400 text-sm font-bold">Класс задач в старом трекере</span>
+            <span class="text-primary">{{currentOldTrackerClass.name}}</span>
+        </div>
+        <div class="input-label-wrapper">
+            <label>ID Задачи</label>
+            <input pInputText formControlName="id" pKeyFilter="pint" [readonly]="isChangeOldTrackerBindDisabled"/>
+            <span @fadeIn *ngIf="oldTrackerBindInfoForm.controls.id.errors" class="text-red-400 text-xs font-bold w-15rem">
+                {{oldTrackerBindInfoForm.controls.id.errors['error']}}
+            </span>
+        </div>
+        <p-button @fadeIn label="Привязать" styleClass="p-button-success w-full" icon="mdi-add_link" [disabled]="oldTrackerBindInfoForm.controls.id.invalid || oldTrackerBindInfoForm.controls.id.pending"
+                    *ngIf="oldTrackerBindInfoForm.controls.id.dirty && oldTrackerBindInfoForm.value.id && !isChangeOldTrackerBindDisabled" (onClick)="bindTaskToTask()" [loading]="isTaskInConnectionProcess"></p-button>
+        <div class="input-label-wrapper">
+            <label>Этап задачи</label>
+            <p-dropdown appendTo="body" [options]="(oldTrackerStageOptions$ | async) ?? []" formControlName="taskStageId"
+                        optionLabel="name" optionValue="id" placeholder="Выбрать"></p-dropdown>
+        </div>
+        <p-button @fadeIn label="Изменить этап" styleClass="p-button-success w-full" icon="mdi-redo"
+                    *ngIf="oldTrackerBindInfoForm.controls.taskStageId.dirty && oldTrackerBindInfoForm.value.taskStageId && isChangeOldTrackerBindDisabled"
+                  (onClick)="changeTaskStageInOldTracker()" [loading]="isTaskInStageChangeProcess"></p-button>
+    </div>
+</p-overlayPanel>
+
+<ng-template #oldTrackerBindWarningTemp>
+    <div class="flex gap-2 align-items-center text-orange-400 font-bold w-20rem">
+        <span class="mdi-warning"></span>
+        <span>
+            Для синхронизации задачи со старым трекером нужно настроить привязку в шаблоне задачи
         </span>
     </div>
 </ng-template>

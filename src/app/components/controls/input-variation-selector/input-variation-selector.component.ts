@@ -17,11 +17,11 @@ export class InputVariationSelectorComponent implements OnInit, OnChanges {
 
     get currentName(): string {
         if (!this.value) return '';
-        return this.variationList.find(v => v.id === this.value)?.name ?? '';
+        return this.variationList.find(v => v.value === this.value)?.label ?? '';
     }
 
     trackByVariation(index: number, variation: VariationItem): string {
-        return variation.id;
+        return variation.value;
     };
 
     ngOnInit(): void {
@@ -31,7 +31,7 @@ export class InputVariationSelectorComponent implements OnInit, OnChanges {
         const value = changes['value'];
 
         if (value && !value.currentValue && this.variationList && this.variationList.length) {
-            this.onChange(this.variationList[0].id);
+            this.onChange(this.variationList[0].value);
         }
     }
 

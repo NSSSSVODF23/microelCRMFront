@@ -53,7 +53,7 @@ import {ScrollControllerDirective} from "../../directives/scroll-controller.dire
 import {RegexPatternCheckerDirective} from "../../directives/regex-pattern-checker.directive";
 import {ColorizeDirective} from "../../directives/colorize.directive";
 import {ExtendPageHeightDirective} from "../../directives/extend-page-height.directive";
-import {IpInputComponent} from "../../components/controls/ip-input/ip-input.component";
+import {IpInputComponent} from "../../components/controls/task-inputs/ip-input/ip-input.component";
 import {ListPanelComponent} from "../../components/panels/simple-panel/list-panel.component";
 import {ColoredTagComponent} from "../../components/controls/colored-tag/colored-tag.component";
 import {CheckboxModule} from "primeng/checkbox";
@@ -83,8 +83,8 @@ import {TaskStatusChooserComponent} from "../../components/controls/task-status-
 import {
     TaskTemplateFilterInputComponent
 } from "../../components/controls/task-template-filter-input/task-template-filter-input.component";
-import {AddressInputComponent} from "../../components/controls/address-input/address-input.component";
-import {PhoneListInputComponent} from "../../components/controls/phone-list-input/phone-list-input.component";
+import {AddressInputComponent} from "../../components/controls/task-inputs/address-input/address-input.component";
+import {PhoneListInputComponent} from "../../components/controls/task-inputs/phone-list-input/phone-list-input.component";
 import {EmployeeLabelComponent} from "../../components/controls/employee-label/employee-label.component";
 import {MessagesModule} from "primeng/messages";
 import {TimestampChipsComponent} from "../../components/panels/timestamp-chips/timestamp-chips.component";
@@ -166,10 +166,10 @@ import {ChartModule} from "primeng/chart";
 import {CopyClipboardDirective} from "../../directives/copy-clipboard.directive";
 import {
     ConnectionServicesInputComponent
-} from "../../components/controls/connection-services-input/connection-services-input.component";
+} from "../../components/controls/task-inputs/connection-services-input/connection-services-input.component";
 import {
     ClientEquipmentListInputComponent
-} from "../../components/controls/client-equipment-list-input/client-equipment-list-input.component";
+} from "../../components/controls/task-inputs/client-equipment-list-input/client-equipment-list-input.component";
 import {CountInputComponent} from "../../components/controls/count-input/count-input.component";
 import {AcpHouseInputComponent} from "../../components/controls/acp-house-input/acp-house-input.component";
 import {CommutatorViewComponent} from "../../components/panels/commutator-view/commutator-view.component";
@@ -182,7 +182,7 @@ import {
 import {KeyFilterModule} from "primeng/keyfilter";
 import {
     CountingLivesInputComponent
-} from "../../components/controls/counting-lives-input/counting-lives-input.component";
+} from "../../components/controls/task-inputs/counting-lives-input/counting-lives-input.component";
 import {ChatLinkComponent} from "../../components/controls/chat-link/chat-link.component";
 import {
     DashboardTaskStatisticPanelComponent
@@ -199,6 +199,10 @@ import {BillingLoginComponent} from "../../components/task-fields/billing-login/
 import {
     TaskFieldsTableViewComponent
 } from "../../components/task-fields/task-fields-table-view/task-fields-table-view.component";
+import {
+    PassportDetailsInputComponent
+} from "../../components/controls/task-inputs/passport-details-input/passport-details-input.component";
+import {FocusAfterInitDirective} from "../../directives/focus-after-init.directive";
 
 
 @NgModule({
@@ -300,7 +304,9 @@ import {
         DialButtonComponent,
         DialButtonsListComponent,
         BillingLoginComponent,
-        TaskFieldsTableViewComponent
+        TaskFieldsTableViewComponent,
+        PassportDetailsInputComponent,
+        FocusAfterInitDirective
     ],
     exports: [
         AccountPanelComponent,
@@ -400,7 +406,9 @@ import {
         DialButtonComponent,
         DialButtonsListComponent,
         BillingLoginComponent,
-        TaskFieldsTableViewComponent
+        TaskFieldsTableViewComponent,
+        PassportDetailsInputComponent,
+        FocusAfterInitDirective
     ],
     imports: [
         CommonPipesModule,

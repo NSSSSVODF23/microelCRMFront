@@ -117,6 +117,15 @@
         </fieldset>
     </div>
 
+    <div *ngSwitchCase="'PASSPORT_DETAILS'" class="input-label-wrapper">
+        <fieldset class="node flexed gap5 column" [ngClass]="classes">
+            <legend>
+                <ng-container *ngTemplateOutlet="label"></ng-container>
+            </legend>
+            <app-passport-details-input (ngModelChange)="onChange($event)" [(ngModel)]="controlValue" (onBlur)="onTouched()"></app-passport-details-input>
+        </fieldset>
+    </div>
+
     <div *ngSwitchDefault [style.background-color]="'red'"></div>
 </ng-container>
 
@@ -125,6 +134,7 @@
     <label class="flexed hcenter gap5">
         <app-editing-caption (captionChange)="setName($event)" [caption]="field?.name"></app-editing-caption>
         <app-input-variation-selector [variationList]="currentVariationsList" [(value)]="currentVariation"></app-input-variation-selector>
+        <app-input-variation-selector [variationList]="(displayTypeOptions$ | async) ?? []" [(value)]="currentDisplayType"></app-input-variation-selector>
     </label>
 </ng-template>
 

@@ -10,8 +10,8 @@ import {ControlValueAccessor, NG_VALUE_ACCESSOR} from "@angular/forms";
  * @param name русскоязычное название
  */
 export interface VariationItem {
-    id: string;
-    name: string;
+    value: string;
+    label: string;
 }
 
 @Component({
@@ -33,6 +33,7 @@ export class TaskTemplateInputComponent implements OnInit, ControlValueAccessor 
     disable = false;
     connectionTypes$ = this.api.getConnectionTypesList();
     adSources$ = this.api.getAdSourcesList();
+    displayTypeOptions$ = this.api.getFieldDisplayTypes();
 
     constructor(readonly api: ApiService, private el: ElementRef) {
     }
@@ -71,12 +72,13 @@ export class TaskTemplateInputComponent implements OnInit, ControlValueAccessor 
                 case WireframeFieldType.AD_SOURCE:
                 case WireframeFieldType.REQUEST_INITIATOR:
                 case WireframeFieldType.COUNTING_LIVES:
-                    return [{id: "MANDATORY", name: "Обязательное поле"}, {id: "OPTIONAL", name: "Необязательное поле"}];
+                case WireframeFieldType.PASSPORT_DETAILS:
+                    return [{value: "MANDATORY", label: "Обязательное поле"}, {value: "OPTIONAL", label: "Необязательное поле"}];
                 case WireframeFieldType.ADDRESS:
-                    return [{id: "ALL", name: "Все данные"}, {
-                        id: "APARTMENT_ONLY",
-                        name: "Только номер квартиры"
-                    }, {id: "HOUSE_ONLY", name: "Только номер дома"}, {id: "OPTIONAL", name: "Необязательное поле"}];
+                    return [{value: "ALL", label: "Все данные"}, {
+                        value: "APARTMENT_ONLY",
+                        label: "Только номер квартиры"
+                    }, {value: "HOUSE_ONLY", label: "Только номер дома"}, {value: "OPTIONAL", label: "Необязательное поле"}];
                 default:
                     return [];
             }
@@ -93,6 +95,17 @@ export class TaskTemplateInputComponent implements OnInit, ControlValueAccessor 
     set currentVariation(value: string) {
         if (!this.field) return;
         if ('type' in this.field) this.field.variation = value;
+    }
+
+    get currentDisplayType(): string {
+        if (!this.field) return 'LIST_AND_TELEGRAM';
+        if ('displayType' in this.field) return this.field.displayType ?? 'LIST_AND_TELEGRAM';
+        return '';
+    }
+
+    set currentDisplayType(value: string) {
+        if (!this.field) return;
+        if ('displayType' in this.field) this.field.displayType = value;
     }
 
     registerOnChange(fn: any): void {

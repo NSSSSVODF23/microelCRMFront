@@ -92,7 +92,12 @@ export class EmployeesPageComponent implements OnInit, OnDestroy {
         telegramGroupChatId: new FormControl<string|null>(null),
         department: new FormControl<number | null>(null, Validators.required),
         position: new FormControl<number | null>(null, Validators.required),
-        offsite: new FormControl(false)
+        offsite: new FormControl(false),
+        oldTrackerCredentials: new FormGroup({
+            username: new FormControl(''),
+            password: new FormControl(''),
+            installerId: new FormControl('')
+        })
     });
     isAccessOverride = false;
     accessOfSelectedPosition: number[] = [];
@@ -439,7 +444,12 @@ export class EmployeesPageComponent implements OnInit, OnDestroy {
                     internalPhoneNumber: employee.internalPhoneNumber,
                     telegramUserId: employee.telegramUserId,
                     telegramGroupChatId: employee.telegramGroupChatId,
-                    offsite: employee.offsite
+                    offsite: employee.offsite,
+                    oldTrackerCredentials: {
+                        username: employee.oldTrackerCredentials?.username ?? "",
+                        password: employee.oldTrackerCredentials?.password ?? "",
+                        installerId: employee.oldTrackerCredentials?.installerId ?? "",
+                    }
                 })
                 this.positionSelecting({value: employee.position?.positionId})
                 this.showEditEmployeeDialog = true;

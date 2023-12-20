@@ -53,9 +53,9 @@
                 </div>
                 <div [style]="{flex:'1', minHeight: '2rem'}"></div>
                 <div class="sticky" [style]="{bottom: '1rem'}">
-                    <p-paginator #paginator (onPageChange)="ic.controlForm.patchValue({page: $event.page})"
-                                 [alwaysShow]="true" [rows]="ic.controlForm.value.filters?.limit ?? 1" [showCurrentPageReport]="true"
-                                 [totalRecords]="taskPage?.totalElements ?? 0" [first]="(ic.controlForm.value.filters?.limit??1)*(ic.controlForm.value.page ?? 0)"
+                    <p-paginator #paginator (onPageChange)="ic.pageControl.setValue($event.page)"
+                                 [alwaysShow]="true" [rows]="ic.filtersForm.value.limit ?? 1" [showCurrentPageReport]="true"
+                                 [totalRecords]="taskPage?.totalElements ?? 0" [first]="(ic.filtersForm.value.limit??1)*(ic.pageControl.value ?? 0)"
                                  currentPageReportTemplate="Показано с {first} по {last} из {totalRecords} задач"
                                  styleClass="panel"></p-paginator>
                 </div>

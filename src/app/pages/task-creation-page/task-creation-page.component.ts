@@ -4,7 +4,7 @@ import {fade, flow, swipeChild} from "../../animations";
 import {
     DefaultObservers,
     FieldItem,
-    TaskCreationBody,
+    TaskCreationBody, TaskStage,
     TaskTag,
     Wireframe
 } from "../../transport-interfaces";
@@ -54,8 +54,10 @@ export class TaskCreationPageComponent implements OnInit, OnDestroy {
     initialTags: TaskTag[] = [];
     initialComment?: string;
 
-    types: {label:string, value:string}[] = [];
+    types: TaskStage[] = [];
     type?: string;
+
+    isDuplicateInOldTracker = true;
 
     constructor(readonly api: ApiService, readonly route: ActivatedRoute, readonly personality: PersonalityService, readonly toast: MessageService, private taskCreation: TaskCreatorService) {
         document.body.classList.add("whited");
@@ -68,15 +70,32 @@ export class TaskCreationPageComponent implements OnInit, OnDestroy {
         return this._selectedTemplate;
     }
 
-    set selectedTemplate(value: Wireframe | null) {
-        this._selectedTemplate = value;
-        if(value?.stages){
-            this.types = value.stages.map(stage=>({label:stage.label, value:stage.stageId})) ?? [];
-            this.type = this.types[0].value;
+    set selectedTemplate(wireframe: Wireframe | null) {
+        this._selectedTemplate = wireframe;
+        if(wireframe?.stages){
+            this.types = wireframe.stages.sort((a, b)=>a.orderIndex-b.orderIndex) ?? [];
+            this.type = this.types[0].stageId;
+            this.isDuplicateInOldTracker = (!!this.types[0].oldTrackerBind && this.isUserHasOldTrackerCredentials);
         }else{
             this.types = [];
             this.type = undefined;
+            this.isDuplicateInOldTracker = false;
         }
+    }
+
+    changeTaskType(type: string){
+        if(!type) this.isDuplicateInOldTracker = false;
+        const currentStage = this.types.find(t=>t.stageId===type);
+        if(currentStage) {
+            this.isDuplicateInOldTracker = (!!currentStage.oldTrackerBind && this.isUserHasOldTrackerCredentials);
+            return;
+        }
+        this.isDuplicateInOldTracker = false;
+    }
+
+    get isUserHasOldTrackerCredentials(){
+        const credentials = this.personality.me?.oldTrackerCredentials;
+        return (!!credentials && !!credentials.username && !!credentials.password);
     }
 
     get currentStepFields(): FieldItem[] {
@@ -107,7 +126,8 @@ export class TaskCreationPageComponent implements OnInit, OnDestroy {
             initialComment: this.initialComment,
             tags: this.initialTags,
             observers: this.initialObservers,
-            type: this.type
+            type: this.type,
+            isDuplicateInOldTracker: this.isDuplicateInOldTracker,
         };
     }
 
@@ -230,6 +250,15 @@ export class TaskCreationPageComponent implements OnInit, OnDestroy {
         // Иначе вернем пустое значение
         return ControlsType.NONE;
     }
+
+    get isCurrentTypeHasBind(){
+        if(!this.type) return false;
+        const currentStage = this.types.find(t=>t.stageId===this.type);
+        if(currentStage) {
+            return !!currentStage.oldTrackerBind;
+        }
+        return false;
+    };
 
     // Создание задачи
     createTask() {

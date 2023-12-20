@@ -16,12 +16,106 @@ export enum WireframeFieldType {
     CONNECTION_TYPE = "CONNECTION_TYPE",
     PHONE_ARRAY = "PHONE_ARRAY",
     COUNTING_LIVES = "COUNTING_LIVES",
+    PASSPORT_DETAILS = "PASSPORT_DETAILS",
 }
 
 export interface TaskStage {
     stageId: string;
     label: string;
     orderIndex: number;
+    oldTrackerBind?: any;
+}
+
+export interface OldTrackerBind {
+    oldTrackerBindId: number;
+    classId: number;
+    initialStageId: number;
+    processingStageId: number;
+    manualCloseStageId: number;
+    autoCloseStageId: number;
+    fieldDataBinds: FieldDataBind[];
+    assignFieldDataBinds: FieldDataBind;
+}
+
+export interface FieldDataBind {
+    fieldDataBindId: number;
+    fieldItemId: string;
+}
+
+export interface AddressFieldDataBind extends FieldDataBind {
+    streetFieldId: number;
+    houseFieldId: number;
+    apartmentFieldId: number;
+    entranceFieldId: number;
+    floorFieldId: number;
+}
+
+export interface AdSourceFieldDataBind extends FieldDataBind {
+    adSourceFieldId: number;
+}
+
+export interface ConnectionTypeFieldDataBind extends FieldDataBind {
+    connectionServicesInnerFieldId: string;
+    ctFieldDataBind: number;
+}
+
+export interface DateFieldDataBind extends FieldDataBind {
+    dateFieldDataBind: number;
+}
+
+export interface DateTimeFieldDataBind extends FieldDataBind {
+    dateTimeFieldDataBind: number;
+}
+
+export interface DefaultFieldDataBind extends FieldDataBind {
+    defaultFieldId: number;
+}
+
+export interface InstallersHardAssignFieldDataBind extends FieldDataBind {
+    hardAssignTimeFieldId: number;
+    hardAssignNamesFieldId: number;
+}
+
+export interface InstallersSimpleAssignFieldDataBind extends FieldDataBind {
+    simpleAssignFieldId: number;
+}
+
+export interface TextFieldDataBind extends FieldDataBind {
+    textFieldId: number;
+}
+
+export interface TaskClassOT {
+    id: number;
+    name: string;
+    stages: TaskStageOT[];
+    fields: TaskFieldOT[];
+}
+
+export interface TaskStageOT {
+    id: number;
+    name: string;
+    type: TaskStageOTTypes;
+}
+
+export enum TaskStageOTTypes{
+    ARCHIVE = 0,
+    ACTIVE = 1,
+}
+
+export interface TaskFieldOT {
+    id: number;
+    name: string;
+    type: TaskFieldOTTypes;
+}
+
+export enum TaskFieldOTTypes{
+    TEXT = 0,
+    STREET = 1,
+    DEFAULT = 2,
+    DATE = 3,
+    DATETIME = 4,
+    AD_SOURCE = 5,
+    CONNECTION_TYPE = 6,
 }
 
 export interface Wireframe {
@@ -39,6 +133,7 @@ export interface Wireframe {
     stages?: TaskStage[];
     allFields?: FieldItem[];
     countTask?: number;
+    documentTemplates?: any[];
 }
 
 export interface WireframeDashboardStatistic{
@@ -69,6 +164,7 @@ export interface FieldItem {
     variation?: string;
     listViewIndex?: number;
     orderPosition?: number;
+    displayType?: string;
 }
 
 export enum WireframeType {
@@ -97,6 +193,13 @@ export interface Employee {
     status?: EmployeeStatus;
     lastSeen?: string;
     phyPhoneInfo?: PhyPhoneInfo;
+    oldTrackerCredentials?: OldTrackerCredentials;
+}
+
+export interface OldTrackerCredentials {
+    username: string;
+    password: string;
+    installerId: string;
 }
 
 export interface Department {
@@ -180,6 +283,9 @@ export interface Task {
     children?: Task[];
     // Список полей для отображения в элементе списка
     listItemFields: ModelItem[];
+    oldTrackerTaskId?: number;
+    oldTrackerTaskClassId?: number;
+    oldTrackerCurrentStageId?: number;
 }
 
 /**
@@ -188,7 +294,7 @@ export interface Task {
 export interface TaskFiltrationConditions {
     status?: string[] | null;
     template?: number[] | null;
-    templateFilter?: string | null;
+    templateFilter?: FilterModelItem[] | null;
     searchPhrase?: string | null;
     author?: string | null;
     dateOfCreation?: string[] | null;
@@ -210,6 +316,7 @@ export interface TaskCreationBody {
     tags?: TaskTag[];
     observers?: DefaultObservers[];
     type?: string;
+    isDuplicateInOldTracker?: boolean;
 }
 
 export class TimestampItem {
@@ -249,6 +356,7 @@ export interface ModelItem {
     name?: string;
     wireframeFieldType: WireframeFieldType;
     variation?: string;
+    displayType?: string;
     addressData?: Address;
     booleanData?: boolean;
     integerData?: number;
@@ -258,7 +366,18 @@ export interface ModelItem {
     phoneData?: { [id: string]: string };
     connectionServicesData?: { connectionService: string }[];
     equipmentRealizationsData?: ClientEquipmentRealization[];
+    passportDetailsData?: PassportDetails;
     textRepresentation?: string;
+}
+
+export interface PassportDetails {
+    passportDetailsId: number;
+    passportSeries: string;
+    passportNumber: string;
+    passportIssuedBy: string;
+    passportIssuedDate: string;
+    departmentCode: string;
+    registrationAddress: string;
 }
 
 export interface Address {
@@ -437,7 +556,8 @@ export interface TaskFieldsSnapshot {
 
 export interface FilterModelItem {
     id: string;
-    wireframeFieldType: WireframeFieldType;
+    wireframeFieldType: string;
+    name: string;
     value: any;
 }
 

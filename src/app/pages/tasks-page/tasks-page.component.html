@@ -1,10 +1,10 @@
 <div appExtendPageHeight class="flex gap-3 px-3">
     <app-main-menu-panel></app-main-menu-panel>
     <div class="tasks-list">
-        <div [formGroup]="taskService.filterForm" class="flex flex-wrap gap-4 bg-white shadow-1 border-round-md overflow-hidden p-3">
+        <div [formGroup]="taskService.mainFilterForm" class="flex flex-wrap gap-4 bg-white shadow-1 border-round-md overflow-hidden p-3">
             <span class="p-input-icon-left flex-grow-1">
                 <i class="mdi-search"></i>
-                <input class="full-width" [formControl]="taskService.searchPhrase" pInputText placeholder="Поиск..."
+                <input class="full-width" formControlName="searchPhrase" pInputText placeholder="Поиск..."
                        type="text">
             </span>
             <app-task-status-chooser formControlName="status"></app-task-status-chooser>
@@ -46,7 +46,7 @@
         </ng-container>
     </div>
 
-    <ng-container [formGroup]="taskService.filterForm">
+    <ng-container [formGroup]="taskService.mainFilterForm">
         <div class="flex flex-column gap-3 h-fit sticky-type-selector">
             <app-task-template-multi-selector countersType="all"
                                               formControlName="template"></app-task-template-multi-selector>
@@ -92,13 +92,13 @@
 
 <p-scrollTop></p-scrollTop>
 
-<p-dialog [(visible)]="filterDialogVisible" [breakpoints]="{'960px': '640px', '640px': '100vw'}"
-          [dismissableMask]="true" [draggable]="true" [modal]="true"
+<p-dialog [(visible)]="filterDialogVisible" [breakpoints]="{'960px': '640px', '640px': '100vw'}" (onShow)="taskService.cacheFilters()"
+          [dismissableMask]="true" [draggable]="true" [modal]="true" (onHide)="taskService.applyFilters()"
           [resizable]="false" [style]="{width: '25rem'}" header="Фильтры задач">
     <ng-template pTemplate="content">
         <div class="flexed column gap15">
             <div class="flexed column gap5">
-                <ng-container  [formGroup]="taskService.filterForm">
+                <ng-container  [formGroup]="taskService.mainFilterForm">
                     <span class="input-label-wrapper">
                         <label>Автор задачи</label>
                         <app-employee-selector formControlName="author"></app-employee-selector>
@@ -108,17 +108,15 @@
                         <app-data-range-input formControlName="dateOfCreation"></app-data-range-input>
                     </span>
                 </ng-container>
-                <ng-container *ngIf="taskService.templateFilterFields.length > 0"  [formGroup]="taskService.templateFilterForm">
-                    <app-task-template-filter-input *ngFor="let field of taskService.templateFilterFields; trackBy: trackByField"
-                                                    [field]="field"
-                                                    [formControlName]="field.id">
+                <ng-container *ngIf="taskService.mainFilterForm.controls.templateFilter.length > 0" >
+                    <app-task-template-filter-input *ngFor="let field of taskService.mainFilterForm.controls.templateFilter.controls ?? []; trackBy: trackByField" [field]="field">
                     </app-task-template-filter-input>
                 </ng-container>
             </div>
-            <span class="flexed gap10">
-<!--                <p-button (onClick)="filterDialogVisible=false; taskService.filtersApply()" icon="mdi-filter_alt"-->
-<!--                          label="Применить"></p-button>-->
-                <p-button (onClick)="clearTemplateFilters()" icon="mdi-clear" label="Отчистить"
+            <span class="flex gap-3 align-items-center justify-content-between">
+                <p-button (onClick)="filterDialogVisible=false; taskService.applyFilters()" icon="mdi-filter_alt"
+                          label="Применить"></p-button>
+                <p-button (onClick)="filterDialogVisible=false; taskService.clearFilters()" icon="mdi-clear" label="Отчистить"
                           styleClass="p-button-secondary p-button-outlined"></p-button>
             </span>
         </div>

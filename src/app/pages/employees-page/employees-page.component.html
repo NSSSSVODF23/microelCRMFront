@@ -260,16 +260,16 @@
                 </span>
         </div>
         <div class="flexed gap10 hcenter">
-                <span class="input-label-wrapper full-width">
-                    <label>Логин</label>
-                    <input appRegexPatternChecker formControlName="login" pInputText patternRx="^[\w\.]+$$"
-                           [disabled]="isBeingCreatingEmployee || isBeingEditingEmployee || showEditEmployeeDialog" type="text">
-                </span>
             <span class="input-label-wrapper full-width">
-                    <label>Пароль</label>
-                    <input appRegexPatternChecker formControlName="password" pInputText patternRx="^[\w\.]+$$"
-                           [disabled]="isBeingCreatingEmployee || isBeingEditingEmployee" type="password">
-                </span>
+                <label>Логин</label>
+                <input appRegexPatternChecker formControlName="login" pInputText patternRx="^[\w\.]+$$"
+                       [disabled]="isBeingCreatingEmployee || isBeingEditingEmployee || showEditEmployeeDialog" type="text">
+            </span>
+            <span class="input-label-wrapper full-width">
+                <label>Пароль</label>
+                <input appRegexPatternChecker formControlName="password" pInputText patternRx="^[\w\.]+$$"
+                       [disabled]="isBeingCreatingEmployee || isBeingEditingEmployee" type="password">
+            </span>
         </div>
         <div class="flexed gap10 hcenter">
                 <span class="input-label-wrapper full-width">
@@ -284,7 +284,7 @@
                 </span>
 
         </div>
-        <div class="flexed gap10 hcenter">
+        <div class="flex gap-3 align-items-center">
                 <span class="input-label-wrapper">
                     <label>Отдел</label>
                     <p-dropdown [options]="departments" formControlName="department"
@@ -323,6 +323,30 @@
                     <input appRegexPatternChecker formControlName="telegramGroupChatId" pInputText patternRx="^\d+$"
                            [disabled]="isBeingCreatingEmployee || isBeingEditingEmployee" type="text">
                 </span>
+        </div>
+        <div class="flex flex-column mt-3">
+            <span class="text-bluegray-400 font-bold">Реквизиты от старого трекера</span>
+            <div class="flex gap-3 align-items-center" formGroupName="oldTrackerCredentials">
+                <ng-container *ngIf="!employeeForm.value.offsite">
+                    <span class="input-label-wrapper">
+                        <label>Логин</label>
+                        <input appRegexPatternChecker formControlName="username" pInputText patternRx="^[\w\.]+$"
+                               [disabled]="isBeingCreatingEmployee || isBeingEditingEmployee" type="text">
+                    </span>
+                    <span class="input-label-wrapper">
+                        <label>Пароль</label>
+                        <input appRegexPatternChecker formControlName="password" pInputText patternRx="^[\w\.]+$"
+                               [disabled]="isBeingCreatingEmployee || isBeingEditingEmployee" type="text">
+                    </span>
+                </ng-container>
+                <ng-container *ngIf="employeeForm.value.offsite">
+                    <span class="input-label-wrapper">
+                        <label>ID Монтажника в трекере</label>
+                        <input appRegexPatternChecker formControlName="installerId" pInputText patternRx="^[\d]+$"
+                               [disabled]="isBeingCreatingEmployee || isBeingEditingEmployee" type="text">
+                    </span>
+                </ng-container>
+            </div>
         </div>
         <p-panel header="Параметры доступа">
             <div class="flexed gap10 column">
