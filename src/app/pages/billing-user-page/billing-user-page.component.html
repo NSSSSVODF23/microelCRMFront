@@ -447,8 +447,8 @@
             </div>
             <div class="flex gap-2 align-items-center">
                 <span class="text-xs font-bold text-bluegray-300">VLAN: {{binding.vlanid}}</span>
-                <span class="text-xs font-bold text-bluegray-300">Смена состояния: <app-time-elapsed [startTime]="binding.leaseStart"
-                                                         type="short"></app-time-elapsed> назад</span>
+                <span class="text-xs font-bold text-bluegray-300">{{binding.onlineStatus === 'ONLINE' ? "Онлайн" : "Оффлайн"}}: <app-time-elapsed [startTime]="binding.leaseStart"
+                                                         type="short"></app-time-elapsed></span>
             </div>
         </div>
         <div class="flex align-items-center">

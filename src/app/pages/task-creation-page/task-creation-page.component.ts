@@ -15,6 +15,7 @@ import {PersonalityService} from "../../services/personality.service";
 import {CustomValidators} from "../../custom-validators";
 import {MessageService} from "primeng/api";
 import {TaskCreationMode, TaskCreatorService} from "../../services/task-creator.service";
+import {switchMap} from "rxjs";
 
 enum ControlsType {
     NEXT_ONLY = "NEXT_ONLY", BOTH = "BOTH", PREV_FIN = "PREV_FIN", FIN_ONLY = "FIN_ONLY", NONE = "NONE"
@@ -276,6 +277,33 @@ export class TaskCreationPageComponent implements OnInit, OnDestroy {
         // Отправляем запрос на сервер для создания задачи
         this.api.createTask(this.taskCreationBody).subscribe({
             next: () => {
+                // Устанавливаем статус создания задачи
+                this.isCreatedTask = false;
+                // Закрываем окно создания задачи
+                window.close();
+            },
+            error: () => {
+                // Устанавливаем статус создания задачи
+                this.isCreatedTask = false;
+            }
+        });
+    }
+
+    createTaskAndClose() {
+        // Если this.taskCreationBody равно null, прерываем создание
+        if (!this.taskCreationBody) {
+            this.toast.add({severity: 'danger', summary: 'Ошибка', detail: 'Не выбран шаблон для создания задачи'});
+            return;
+        }
+        if(!this.taskCreationForm.valid){
+            this.taskCreationForm.markAllAsTouched();
+            return;
+        }
+        // Устанавливаем статус создания задачи
+        this.isCreatedTask = true;
+        // Отправляем запрос на сервер для создания задачи
+        this.api.createTask(this.taskCreationBody).pipe(switchMap((task)=>this.api.closeTask(task.taskId))).subscribe({
+            next: (task) => {
                 // Устанавливаем статус создания задачи
                 this.isCreatedTask = false;
                 // Закрываем окно создания задачи

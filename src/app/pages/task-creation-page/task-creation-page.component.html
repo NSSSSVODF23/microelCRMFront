@@ -46,29 +46,33 @@
 
 <ng-template #controls>
     <ng-container [ngSwitch]="controlsType()">
-        <div *ngSwitchCase="'NEXT_ONLY'" class="flexed">
+        <div *ngSwitchCase="'NEXT_ONLY'" class="flex gap-3">
             <div class="stretched"></div>
             <app-button (onClick)="changeCreationStep(1)" icon="navigate_next"
                         iconPos="right" label="Далее"></app-button>
         </div>
-        <div *ngSwitchCase="'BOTH'" class="flexed">
+        <div *ngSwitchCase="'BOTH'" class="flex gap-3">
             <app-button (onClick)="changeCreationStep(-1)" icon="navigate_before"
                         label="Назад" model="p-button-text p-button-secondary"></app-button>
             <div class="stretched"></div>
             <app-button (onClick)="changeCreationStep(1)" icon="navigate_next"
                         iconPos="right" label="Далее"></app-button>
         </div>
-        <div *ngSwitchCase="'PREV_FIN'" class="flexed">
+        <div *ngSwitchCase="'PREV_FIN'" class="flex gap-3">
             <app-button (onClick)="changeCreationStep(-1)" icon="navigate_before"
                         label="Назад" model="p-button-text p-button-secondary"></app-button>
             <div class="stretched"></div>
-            <app-button (onClick)="createTask()" icon="add_circle_outline"
-                        label="Создать"></app-button>
+            <p-button (onClick)="createTaskAndClose()" icon="mdi-add_circle_outline" styleClass="p-button-secondary p-button-outlined"
+                        label="Создать и закрыть задачу"></p-button>
+            <p-button (onClick)="createTask()" icon="mdi_add_circle_outline"
+                        label="Создать"></p-button>
         </div>
-        <div *ngSwitchCase="'FIN_ONLY'" class="flexed">
+        <div *ngSwitchCase="'FIN_ONLY'" class="flex gap-3">
             <div class="stretched"></div>
-            <app-button (onClick)="createTask()" icon="add_circle_outline"
-                        label="Создать"></app-button>
+            <p-button (onClick)="createTaskAndClose()" icon="mdi-add_circle_outline" styleClass="p-button-secondary p-button-outlined"
+                        label="Создать и закрыть задачу"></p-button>
+            <p-button (onClick)="createTask()" icon="mdi-add_circle_outline"
+                        label="Создать"></p-button>
         </div>
     </ng-container>
 </ng-template>
