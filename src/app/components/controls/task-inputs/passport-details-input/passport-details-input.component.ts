@@ -65,6 +65,15 @@ export class PassportDetailsInputComponent implements OnInit, OnDestroy, Control
                 departmentCode: obj.departmentCode ?? "",
                 registrationAddress: obj.registrationAddress ?? ""
             });
+        }else{
+            this.dataForm.patchValue({
+                passportSeries: "",
+                passportNumber: "",
+                passportIssuedBy: "",
+                passportIssuedDate: null,
+                departmentCode: "",
+                registrationAddress: ""
+            });
         }
     }
 
