@@ -1,25 +1,5 @@
 <div class="p-3 flex flex-column gap-2">
     <ng-container *ngIf="taskFields.inline.length>0">
-<!--        <table class="w-full">-->
-<!--            <thead>-->
-<!--                <tr class="text-bluegray-500">-->
-<!--                    <th *ngFor="let field of taskFields.inline; let i = index; trackBy: trackByField">{{field?.name}}</th>-->
-<!--                </tr>-->
-<!--            </thead>-->
-<!--            <tbody>-->
-<!--                <tr>-->
-<!--                    <td class="text-bluegray-600 text-xl" *ngFor="let field of taskFields.inline; let i = index; trackBy: trackByField">-->
-<!--                        <ng-container [ngSwitch]="field.wireframeFieldType">-->
-<!--                            <app-billing-login *ngSwitchCase="'LOGIN'" [loginData]="field.stringData"></app-billing-login>-->
-<!--                            <span class="flex flex-column" *ngSwitchCase="'PHONE_ARRAY'">-->
-<!--                                <app-dial-buttons-list [phoneData]="field.phoneData"></app-dial-buttons-list>-->
-<!--                            </span>-->
-<!--                            <span *ngSwitchDefault>{{field.textRepresentation}}</span>-->
-<!--                        </ng-container>-->
-<!--                    </td>-->
-<!--                </tr>-->
-<!--            </tbody>-->
-<!--        </table>-->
         <div class="flex flex-wrap gap-4">
             <div class="flex flex-column gap-1" *ngFor="let field of taskFields.inline; let i = index; trackBy: trackByField">
                 <span class="text-bluegray-500 font-bold">{{field?.name}}</span>

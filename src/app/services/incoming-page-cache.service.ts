@@ -32,10 +32,17 @@ export class IncomingPageCacheService {
         tags: new FormControl<string[]>([]),
     })
 
+    searchPhrase = new FormControl('');
+
     pageChange$ = this.pageControl.valueChanges.pipe(startWith(0));
     filtersChange$ = this.filtersForm.valueChanges.pipe(tap(()=>this.pageControl.setValue(0)),startWith(this.filtersForm.value));
 
-    filters$ = combineLatest([this.pageChange$, this.filtersChange$]).pipe(shareReplay(1));
+    filters$ = combineLatest([this.pageChange$, this.filtersChange$]).pipe(map(([page, filter])=>{
+        return [
+            page,
+            {...filter, searchPhrase: this.searchPhrase.value}
+        ]
+    }), shareReplay(1));
 
     stageList:{
         label: string,
@@ -131,6 +138,7 @@ export class IncomingPageCacheService {
     constructor(private api: ApiService, private rt: RealTimeUpdateService, private personality: PersonalityService) {
         this.stageList$.subscribe(s=>this.stageList = [...s]);
         this.tagsList$.subscribe(s=>this.tagsList = [...s.value]);
+        this.searchPhrase.valueChanges.pipe(debounceTime(1000), filter(phrase=>phrase === null || phrase.length === 0)).subscribe(()=>this.pageControl.setValue(0))
         this.personality.userData.pipe(first()).subscribe(userData=>{
             this.rt.incomingTaskCountChange(userData.login)
                 .pipe(filter((counter)=>(this.isSelectOneTemplate && counter.id === this.firstWireframeId)))

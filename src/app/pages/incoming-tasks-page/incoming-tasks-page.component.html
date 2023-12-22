@@ -3,6 +3,13 @@
     <div class="flex flex-grow-1 gap-3">
         <ng-container *ngTemplateOutlet="taskList"></ng-container>
         <div class="flex flex-column gap-3 h-fit sticky-type-selector" [formGroup]="ic.filtersForm">
+            <div class="flex flex-column bg-white shadow-1 border-round p-3 gap-2">
+                <span class="text-bluegray-400 text-lg font-bold">Поиск задач</span>
+                <div class="p-inputgroup">
+                    <input type="text" pInputText placeholder="Запрос..." [formControl]="ic.searchPhrase" (keydown.enter)="ic.pageControl.setValue(0)">
+                    <button type="button" pButton pRipple icon="mdi-search" (click)="ic.pageControl.setValue(0)"></button>
+                </div>
+            </div>
             <app-task-template-multi-selector formControlName="template"></app-task-template-multi-selector>
             <div class="shadow-1 p-3 border-round-md flex flex-column bg-white gap-2">
                 <div class="input-label-wrapper" *ngIf="ic.stageList.length>1 && ic.isSelectOneTemplate">
