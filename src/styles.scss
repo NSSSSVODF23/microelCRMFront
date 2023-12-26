@@ -1420,17 +1420,17 @@ markdown > p:last-child {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: .3rem .6rem;
+  padding: .15rem .45rem;
   border-radius: 999px;
   background-color: var(--gray-600);
   color: var(--tc-100);
   white-space: nowrap;
-  font-size: .74rem;
+  font-size: .8rem;
   font-weight: bold;
   line-height: normal;
 
   &.small {
-    font-size: .6rem;
+    font-size: .8rem;
   }
 
   &.clickable {
@@ -1610,6 +1610,10 @@ markdown > p:last-child {
 .sticky-type-selector {
   position: sticky;
   top: calc(var(--top-panel-height) + 1.5rem);
+  max-height: calc(100vh - (var(--top-panel-height) + 1.5rem + 1rem));
+  overflow: auto;
+  padding: 0 0.5rem 1rem 0.5rem;
+  min-width: fit-content;
 }
 
 .borderless-text-field {

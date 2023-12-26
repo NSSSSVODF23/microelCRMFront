@@ -21,9 +21,13 @@ export class TaskFieldsTableViewComponent implements OnInit {
       }
     }
     return {
-      inline: this.task?.fields?.filter(f=>listDisplayTypes.includes(f.displayType)).filter(f=>!blocks.includes(f.wireframeFieldType)) ?? [],
-      block: this.task?.fields?.filter(f=>listDisplayTypes.includes(f.displayType)).filter(f=>blocks.includes(f.wireframeFieldType)) ?? []
+      inline: this.task?.fields?.filter(f=>listDisplayTypes.includes(this.getDisplayType(f.id))).filter(f=>!blocks.includes(f.wireframeFieldType)) ?? [],
+      block: this.task?.fields?.filter(f=>listDisplayTypes.includes(this.getDisplayType(f.id))).filter(f=>blocks.includes(f.wireframeFieldType)) ?? []
     }
+  }
+
+  getDisplayType(fieldId: string) {
+    return this.task?.modelWireframe?.allFields?.find(fieldItem=>fieldItem.id === fieldId)?.displayType ?? null;
   }
 
   trackByField(index: number, field: ModelItem) {
