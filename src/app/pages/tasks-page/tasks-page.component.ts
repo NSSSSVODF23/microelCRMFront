@@ -1,4 +1,4 @@
-import {AfterViewInit, Component, OnInit, ViewChild} from '@angular/core';
+import {AfterViewInit, Component, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
 import {TasksPageCacheService} from "../../services/tasks-page-cache.service";
 import {ApiService} from "../../services/api.service";
@@ -10,7 +10,7 @@ import {FormControl, FormGroup} from "@angular/forms";
 @Component({
     templateUrl: './tasks-page.component.html', styleUrls: ['./tasks-page.component.scss']
 })
-export class TasksPageComponent implements OnInit, AfterViewInit {
+export class TasksPageComponent implements OnInit, AfterViewInit, OnDestroy {
 
     employees: Employee[] = [];
     @ViewChild('paginator') paginator!: Paginator;
@@ -35,6 +35,11 @@ export class TasksPageComponent implements OnInit, AfterViewInit {
     }
 
     ngAfterViewInit(): void {
+        setTimeout(()=>window.scrollTo({top: this.taskService.readScrollPos()}),10)
+    }
+
+    ngOnDestroy(): void {
+        this.taskService.saveScrollPos(window.scrollY)
     }
 
     isNewDate(taskItems: any, i: number) {

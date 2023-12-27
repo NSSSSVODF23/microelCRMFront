@@ -91,6 +91,10 @@
   --br-900: 100%;
 }
 
+html{
+  scroll-behavior: auto !important;
+}
+
 html:not(.whited), body:not(.whited) {
   padding: 0 !important;
   margin: 0 !important;
@@ -1423,7 +1427,7 @@ markdown > p:last-child {
   padding: .15rem .45rem;
   border-radius: 999px;
   background-color: var(--gray-600);
-  color: var(--tc-100);
+  color: white;
   white-space: nowrap;
   font-size: .8rem;
   font-weight: bold;
@@ -1730,4 +1734,19 @@ markdown > p:last-child {
 
 .success-menu-button > a span{
   color: var(--green-400) !important;
+}
+
+.simple-list{
+  overscroll-behavior: contain !important;
+}
+
+.simple-list .p-listbox-list > .p-listbox-item {
+  padding: 0 !important;
+  //cursor: default;
+  display: flex;
+  align-items: center;
+}
+
+.simple-list .p-listbox-list > .p-listbox-item:hover {
+  background-color: white !important;
 }

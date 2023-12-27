@@ -31,6 +31,8 @@ import {DynamicValueFactory, Storage} from "../util";
 })
 export class TasksPageCacheService {
 
+    private scrollPos = 0;
+
     // Количество задач загружаемых одновременно
     TASK_PAGE_SIZE = 15;
 
@@ -170,7 +172,7 @@ export class TasksPageCacheService {
         [this.rt.taskCreated(),
             this.rt.taskUpdated(),
             this.rt.taskDeleted()]
-    ).pipe(shareReplay(1))
+    ).pipe(tap(()=>window.scrollTo({top:0})),shareReplay(1))
 
     constructor(readonly api: ApiService, readonly rt: RealTimeUpdateService) {
 
@@ -261,5 +263,13 @@ export class TasksPageCacheService {
             dateOfCreation: null,
         });
         this.mainFilterForm.controls.template.setValue(this.mainFilterForm.value.template ?? null);
+    }
+
+    saveScrollPos(pos: number) {
+        this.scrollPos = pos;
+    }
+
+    readScrollPos(): number {
+        return this.scrollPos;
     }
 }

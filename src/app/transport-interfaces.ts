@@ -1188,6 +1188,31 @@ export interface DhcpBinding {
     lastConnectionLocation?: NetworkConnectionLocation;
 }
 
+export interface DhcpSessions {
+    id: number;
+    authName: string;
+    macaddr: string;
+    ipaddr: string;
+    evTime: string;
+    evType: string;
+    description: string;
+}
+
+export interface DhcpLogsRequest {
+    logs: DhcpLog[];
+    isLast: boolean;
+    currentPage: number;
+}
+
+export interface DhcpLog {
+    startDatetime: string;
+    endDatetime: string;
+    type: 'SIMPLE_ONLINE' | 'SIMPLE_OFFLINE' | 'REPEATED' | 'EMPTY';
+    description: string;
+    numberRepetitions: number;
+    macAddresses: string;
+}
+
 export interface NetworkConnectionLocation {
     id: number;
     commutatorName: string;

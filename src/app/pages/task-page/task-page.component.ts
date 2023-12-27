@@ -109,7 +109,7 @@ export class TaskPageComponent implements OnInit, OnDestroy {
     selectingResponsible = false;
 
     setDateTimeToTaskType: "from" | "to" = "from";
-    selectedTaskDateTime: Date = new Date();
+    selectedTaskDateTime = new FormControl(new Date());
     changingTaskDateTime = false;
     @ViewChild('taskActualDateSetPanel') taskActualDateSetPanel?: OverlayPanel;
 
@@ -311,8 +311,30 @@ export class TaskPageComponent implements OnInit, OnDestroy {
         })
         this.subscriptions.addSubscription("wlCrd", this.rt.workLogCreated().subscribe(this.workLogCreated.bind(this)));
         this.subscriptions.addSubscription("wlCls", this.rt.workLogClosed().subscribe(this.workLogClosed.bind(this)));
-        this.subscriptions.addSubscription('hrSchCh', this.hourScheduledControl.valueChanges.subscribe(value => {if(value) this.selectedTaskDateTime.setHours(value)}))
-        this.subscriptions.addSubscription('mnSchCh', this.minuteScheduledControl.valueChanges.subscribe(value => {if(value) this.selectedTaskDateTime.setMinutes(value)}))
+        this.subscriptions.addSubscription('dateSchCh', this.selectedTaskDateTime.valueChanges.subscribe(value => {
+            if(value) {
+                this.hourScheduledControl.setValue(value.getHours());
+                this.minuteScheduledControl.setValue(value.getMinutes());
+            }
+        }))
+        this.subscriptions.addSubscription('hrSchCh', this.hourScheduledControl.valueChanges.subscribe(value => {
+            if(value) {
+                const selectedDate = this.selectedTaskDateTime.value;
+                if(selectedDate) {
+                    selectedDate.setHours(value);
+                    this.selectedTaskDateTime.setValue(selectedDate, {emitEvent:false});
+                }
+            }
+        }))
+        this.subscriptions.addSubscription('mnSchCh', this.minuteScheduledControl.valueChanges.subscribe(value => {
+            if(value){
+                const selectedDate = this.selectedTaskDateTime.value;
+                if(selectedDate) {
+                    selectedDate.setMinutes(value);
+                    this.selectedTaskDateTime.setValue(selectedDate, {emitEvent:false});
+                }
+            }
+        }))
     }
 
     updateObservableList() {
@@ -600,15 +622,16 @@ export class TaskPageComponent implements OnInit, OnDestroy {
         } else if (minutes > 0) {
             currentDate.setMinutes(15, 0, 0);
         }
-        this.selectedTaskDateTime = currentDate;
+        this.selectedTaskDateTime.setValue(currentDate);
         this.hourScheduledControl.setValue(currentDate.getHours());
         this.minuteScheduledControl.setValue(currentDate.getMinutes());
     }
 
     setDateTimeOfTaskRelevance() {
+        if(this.selectedTaskDateTime.value == null) return;
         this.changingTaskDateTime = true;
         if (this.setDateTimeToTaskType === 'from') {
-            this.api.changeTaskActualFrom(this._taskId, this.selectedTaskDateTime).subscribe({
+            this.api.changeTaskActualFrom(this._taskId, this.selectedTaskDateTime.value).subscribe({
                 next: () => {
                     this.changingTaskDateTime = false;
                     this.isShowSchedulingDialog = false;
@@ -618,7 +641,7 @@ export class TaskPageComponent implements OnInit, OnDestroy {
                 }
             });
         } else if (this.setDateTimeToTaskType === 'to') {
-            this.api.changeTaskActualTo(this._taskId, this.selectedTaskDateTime).subscribe(
+            this.api.changeTaskActualTo(this._taskId, this.selectedTaskDateTime.value).subscribe(
                 {
                     next: () => {
                         this.changingTaskDateTime = false;
@@ -1148,5 +1171,9 @@ export class TaskPageComponent implements OnInit, OnDestroy {
                 }
             })
         }
+    }
+
+    log($event: any) {
+        console.log($event);
     }
 }

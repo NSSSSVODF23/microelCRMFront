@@ -203,6 +203,7 @@ import {
     PassportDetailsInputComponent
 } from "../../components/controls/task-inputs/passport-details-input/passport-details-input.component";
 import {FocusAfterInitDirective} from "../../directives/focus-after-init.directive";
+import {ListElementLazyScrollDirective} from "../../directives/list-element-lazy-scroll.directive";
 
 
 @NgModule({
@@ -306,7 +307,8 @@ import {FocusAfterInitDirective} from "../../directives/focus-after-init.directi
         BillingLoginComponent,
         TaskFieldsTableViewComponent,
         PassportDetailsInputComponent,
-        FocusAfterInitDirective
+        FocusAfterInitDirective,
+        ListElementLazyScrollDirective
     ],
     exports: [
         AccountPanelComponent,
@@ -408,7 +410,8 @@ import {FocusAfterInitDirective} from "../../directives/focus-after-init.directi
         BillingLoginComponent,
         TaskFieldsTableViewComponent,
         PassportDetailsInputComponent,
-        FocusAfterInitDirective
+        FocusAfterInitDirective,
+        ListElementLazyScrollDirective
     ],
     imports: [
         CommonPipesModule,

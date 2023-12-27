@@ -4,12 +4,13 @@ import {ActivatedRoute} from "@angular/router";
 import {
     BillingTotalUserInfo,
     DhcpBinding,
+    DhcpLog,
+    DhcpLogsRequest,
     LoadingState,
-    NCLHistoryItem,
     NCLHistoryWrapper,
     UserEvents
 } from "../../transport-interfaces";
-import {DynamicValueFactory, SubscriptionsHolder} from "../../util";
+import {DynamicValueFactory, SubscriptionsHolder, Utils} from "../../util";
 import {CustomNavigationService} from "../../services/custom-navigation.service";
 import {
     BehaviorSubject,
@@ -237,6 +238,12 @@ export class BillingUserPageComponent implements OnInit, OnDestroy {
         })
     )
 
+    dhcpLogs = [] as DhcpLog[];
+    dhcpLogsGroupedList: MenuItem[] = [];
+    dhcpLogsPageNum = 0;
+    dhcpLogsLoadingState = LoadingState.READY;
+    dhcpLogsIsLastPage = false;
+
     constructor(private api: ApiService, private rt: RealTimeUpdateService, private route: ActivatedRoute, readonly customNav: CustomNavigationService,
                 readonly taskCreation: TaskCreatorService, readonly toast: MessageService, private confirm: ConfirmationService) {
     }
@@ -379,9 +386,93 @@ export class BillingUserPageComponent implements OnInit, OnDestroy {
         if (this.currentLogin) {
             this.subscriptions.unsubscribe('userUpd');
             this.api.getBillingUserInfo(this.currentLogin).subscribe(this.userInfoHandler);
+            this.dhcpLogsPageNum = 0;
+            this.dhcpLogsIsLastPage = false;
+            this.logsLoad(this.currentLogin);
             this.subscriptions.addSubscription('userUpd', this.rt.billingUserUpdated(this.currentLogin).subscribe(this.userInfoHandler));
         } else {
             this.loadingState = LoadingState.ERROR;
+        }
+    }
+
+    logsLoad(login?: string){
+        if(!this.dhcpLogsIsLastPage && login && this.dhcpLogsLoadingState === LoadingState.READY){
+            this.dhcpLogsLoadingState = LoadingState.LOADING;
+            this.api.getDhcpLogsByLogin(login, this.dhcpLogsPageNum).subscribe(this.logsLoadHandler);
+        }
+    }
+
+    logsLoadHandler = {
+        next: (logs: DhcpLogsRequest) => {
+            this.dhcpLogsLoadingState = LoadingState.READY;
+            if(this.dhcpLogsPageNum === 0){
+                this.dhcpLogs = [...logs.logs];
+            }else{
+                this.dhcpLogs = [...this.dhcpLogs, ...logs.logs];
+            }
+            this.dhcpLogsIsLastPage = logs.isLast;
+            this.dhcpLogsGroupedList = this.dhcpLogs.reduce((previousValue, currentValue)=>{
+                const date = new Date(currentValue.startDatetime).toLocaleDateString();
+                const groupItem = previousValue.find(value=>value.label===date);
+                if(!groupItem){
+                    previousValue.push({label: date, state: {date: currentValue.startDatetime}, items: [{
+                            state: {
+                                startTime: currentValue.startDatetime,
+                                endTime: currentValue.endDatetime,
+                                color: this.logColor(currentValue.type),
+                                description: currentValue.description,
+                                numbers: currentValue.numberRepetitions,
+                                macAddresses: currentValue.macAddresses,
+                            }
+                        }]})
+                }else{
+                    groupItem.items?.push({
+                        state: {
+                            startTime: currentValue.startDatetime,
+                            endTime: currentValue.endDatetime,
+                            color: this.logColor(currentValue.type),
+                            description: currentValue.description,
+                            numbers: currentValue.numberRepetitions,
+                            macAddresses: currentValue.macAddresses,
+                        }
+                    })
+                }
+                return previousValue;
+            },[] as MenuItem[]);
+            this.dhcpLogsPageNum++;
+        },
+        error: () => {
+            this.dhcpLogsLoadingState = LoadingState.ERROR;
+            this.dhcpLogs = [];
+            this.dhcpLogsGroupedList = [];
+            this.dhcpLogsIsLastPage = false;
+        }
+    }
+
+    copyMacAddress(event:any){
+        if(event.value){
+            Utils.copyToClipboard(event.value.state.macAddresses, this.toast, 'MAC адреса скопированы', 'Не удалось скопировать MAC адреса');
+        }
+    }
+
+    isToday(date: string) {
+        return new Date(date).toDateString() === new Date().toDateString();
+    }
+
+    logColor(logType: "SIMPLE_ONLINE" | "SIMPLE_OFFLINE" | "REPEATED" | "EMPTY" | "USER_AUTH" | "USER_AUTH_FAIL") {
+        switch (logType) {
+            case "SIMPLE_ONLINE":
+                return "#16e116";
+            case "SIMPLE_OFFLINE":
+                return "#db21ec";
+            case "REPEATED":
+                return "#e81f1f";
+            case "EMPTY":
+                return "#838383";
+            case "USER_AUTH":
+                return "#16d0e1";
+            case "USER_AUTH_FAIL":
+                return "#2132ec";
         }
     }
 

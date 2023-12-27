@@ -5,7 +5,7 @@ import {BehaviorSubject, debounceTime, delay, map, merge, Observable, of, share}
 import {PingMonitoring} from "../../../transport-interfaces";
 import "chartjs-adapter-moment";
 import {MessageService} from "primeng/api";
-import {SubscriptionsHolder} from "../../../util";
+import {SubscriptionsHolder, Utils} from "../../../util";
 
 @Component({
     selector: 'app-ip-view',
@@ -95,49 +95,7 @@ export class IpViewComponent implements OnInit, OnDestroy {
     }
 
     copyMessage(ip: string) {
-        if (navigator.clipboard?.writeText) {
-            navigator.clipboard.writeText(ip).then(
-                () => {
-                    this.toast.add({
-                        detail: 'IP адрес скопирован',
-                        severity: 'dark',
-                        key: 'darktoast',
-                        icon: 'mdi-copy',
-                        closable: false
-                    });
-                }
-            );
-        } else {
-            const textArea = document.createElement("textarea");
-            textArea.style.display = "fixed";
-            textArea.style.top = "-100";
-            textArea.style.left = "-100";
-            textArea.style.opacity = "0";
-            textArea.style.userSelect = "none";
-            textArea.style.pointerEvents = "none";
-            textArea.value = ip;
-            document.body.appendChild(textArea);
-            textArea.select();
-            try {
-                document.execCommand('copy');
-                this.toast.add({
-                    detail: 'IP адрес скопирован',
-                    severity: 'dark',
-                    key: 'darktoast',
-                    icon: 'mdi-copy',
-                    closable: false
-                });
-            } catch (err) {
-                this.toast.add({
-                    detail: 'IP адрес не удалось скопировать',
-                    severity: 'dark',
-                    key: 'darktoast',
-                    icon: 'mdi-copy',
-                    closable: false
-                });
-            }
-            document.body.removeChild(textArea);
-        }
+        Utils.copyToClipboard(ip, this.toast, 'IP адрес скопирован', 'IP адрес не удалось скопировать');
     }
 
     openWeb(ip: string) {

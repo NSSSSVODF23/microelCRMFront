@@ -24,6 +24,8 @@ import {PersonalityService} from "./personality.service";
 })
 export class IncomingPageCacheService {
 
+    private scrollPos = 0;
+
     pageControl = new FormControl(0);
     filtersForm =  new FormGroup({
         limit: new FormControl(15),
@@ -133,7 +135,7 @@ export class IncomingPageCacheService {
         [this.rt.taskCreated(),
             this.rt.taskUpdated(),
             this.rt.taskDeleted()]
-    ).pipe(shareReplay(1))
+    ).pipe(tap(()=>window.scrollTo({top:0})),shareReplay(1))
 
     constructor(private api: ApiService, private rt: RealTimeUpdateService, private personality: PersonalityService) {
         this.stageList$.subscribe(s=>this.stageList = [...s]);
@@ -175,5 +177,13 @@ export class IncomingPageCacheService {
 
     get firstWireframeId(): number {
         return this.filtersForm.controls.template.value ? this.filtersForm.controls.template.value[0] : 0;
+    }
+
+    saveScrollPos(pos: number) {
+        this.scrollPos = pos;
+    }
+
+    readScrollPos(): number {
+        return this.scrollPos;
     }
 }

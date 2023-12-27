@@ -28,7 +28,7 @@ import {EmployeeLabelComponent} from "./components/controls/employee-label/emplo
 import {TaskLinkComponent} from "./components/controls/task-link/task-link.component";
 import {DepartmentLabelComponent} from "./components/controls/department-label/department-label.component";
 import {Injector} from "@angular/core";
-import {PrimeNGConfig} from "primeng/api";
+import {MessageService, PrimeNGConfig} from "primeng/api";
 import {AppointedInstallersComponent} from "./components/controls/appointed-installers/appointed-installers.component";
 import {ChatLinkComponent} from "./components/controls/chat-link/chat-link.component";
 
@@ -228,6 +228,52 @@ export class Utils {
                 break;
         }
         return fieldItem;
+    }
+
+    static copyToClipboard(data: string, toast: MessageService, acceptMessage:string, errorMessage:string) {
+        if (navigator.clipboard?.writeText) {
+            navigator.clipboard.writeText(data).then(
+                () => {
+                    toast.add({
+                        detail: acceptMessage,
+                        severity: 'dark',
+                        key: 'darktoast',
+                        icon: 'mdi-copy',
+                        closable: false
+                    });
+                }
+            );
+        } else {
+            const textArea = document.createElement("textarea");
+            textArea.style.display = "fixed";
+            textArea.style.top = "-100";
+            textArea.style.left = "-100";
+            textArea.style.opacity = "0";
+            textArea.style.userSelect = "none";
+            textArea.style.pointerEvents = "none";
+            textArea.value = data;
+            document.body.appendChild(textArea);
+            textArea.select();
+            try {
+                document.execCommand('copy');
+                toast.add({
+                    detail: acceptMessage,
+                    severity: 'dark',
+                    key: 'darktoast',
+                    icon: 'mdi-copy',
+                    closable: false
+                });
+            } catch (err) {
+                toast.add({
+                    detail: errorMessage,
+                    severity: 'dark',
+                    key: 'darktoast',
+                    icon: 'mdi-copy',
+                    closable: false
+                });
+            }
+            document.body.removeChild(textArea);
+        }
     }
 
     static prepareForHttpRequest(obj: any) {

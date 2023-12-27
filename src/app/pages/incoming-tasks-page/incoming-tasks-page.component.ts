@@ -1,4 +1,4 @@
-import {Component, OnInit, ViewChild} from '@angular/core';
+import {AfterViewInit, Component, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {ApiService} from "../../services/api.service";
 import {RealTimeUpdateService} from "../../services/real-time-update.service";
 import {Task} from "../../transport-interfaces";
@@ -9,13 +9,21 @@ import {IncomingPageCacheService} from "../../services/incoming-page-cache.servi
     templateUrl: './incoming-tasks-page.component.html',
     styleUrls: ['./incoming-tasks-page.component.scss']
 })
-export class IncomingTasksPageComponent implements OnInit {
+export class IncomingTasksPageComponent implements OnInit, OnDestroy, AfterViewInit {
 
     constructor(readonly api: ApiService, readonly rt: RealTimeUpdateService, readonly personality: PersonalityService, readonly ic: IncomingPageCacheService) {
     }
 
     ngOnInit(): void {
 
+    }
+
+    ngOnDestroy() {
+        this.ic.saveScrollPos(window.scrollY)
+    }
+
+    ngAfterViewInit() {
+        setTimeout(()=>window.scrollTo({top: this.ic.readScrollPos()}),10)
     }
 
     taskTrack(index: number, task: Task) {

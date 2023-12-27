@@ -455,16 +455,16 @@
           [draggable]="false" [modal]="true" [resizable]="false" contentStyleClass="flex flex-column gap-3 pt-1"
           header="Планирование задачи">
     <ng-template pTemplate="content">
-        <p-calendar [(ngModel)]="selectedTaskDateTime" class="w-fit align-self-center"
+        <p-calendar [formControl]="selectedTaskDateTime" class="w-fit align-self-center"
                     [inline]="true" [selectOtherMonths]="true" [firstDayOfWeek]="1"></p-calendar>
         <div class="flex gap-3 align-self-center">
             <div class="input-label-wrapper">
                 <label>Час</label>
-                <p-inputNumber [formControl]="hourScheduledControl" [min]="0" [max]="23" [showButtons]="true" [size]="2"></p-inputNumber>
+                <p-inputNumber [formControl]="hourScheduledControl" [min]="0" [max]="23" [showButtons]="true" [size]="2" (onFocus)="$event.target.select()"></p-inputNumber>
             </div>
             <div class="input-label-wrapper">
                 <label>Минута</label>
-                <p-inputNumber [formControl]="minuteScheduledControl" [min]="0" [max]="59" [showButtons]="true" [step]="10" [size]="2"></p-inputNumber>
+                <p-inputNumber [formControl]="minuteScheduledControl" [min]="0" [max]="59" [showButtons]="true" [step]="10" [size]="2" (onFocus)="$event.target.select()"></p-inputNumber>
             </div>
         </div>
         <app-button (onClick)="setDateTimeOfTaskRelevance()" [loading]="changingTaskDateTime"

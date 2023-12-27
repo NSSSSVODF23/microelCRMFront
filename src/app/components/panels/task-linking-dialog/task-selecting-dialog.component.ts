@@ -57,6 +57,9 @@ export class TaskSelectingDialogComponent implements OnInit, OnDestroy {
         this.subscriptions.addSubscription("filter", filters$.subscribe(filters => {
             this.loadingState = LoadingState.LOADING;
             this.mainFilterForm.disable({emitEvent: false});
+            if(Array.isArray(filters.dateOfCreation) && filters.dateOfCreation.length !== 2){
+                filters.dateOfCreation = null;
+            }
             this.api.getPageOfTasks(0, {...filters, exclusionIds: this.excludedTasks, onlyMy: this.onlyMy}).subscribe(this.loadHandler())
         }));
     }
@@ -74,7 +77,11 @@ export class TaskSelectingDialogComponent implements OnInit, OnDestroy {
     changePage(event: any) {
         this.loadingState = LoadingState.LOADING;
         this.mainFilterForm.disable({emitEvent: false});
-        this.api.getPageOfTasks(event.page, {...this.mainFilterForm.getRawValue(), exclusionIds: this.excludedTasks, onlyMy: this.onlyMy}).subscribe(this.loadHandler())
+        const filters = this.mainFilterForm.value;
+        if(Array.isArray(filters.dateOfCreation) && filters.dateOfCreation.length !== 2){
+            filters.dateOfCreation = null;
+        }
+        this.api.getPageOfTasks(event.page, {...filters, exclusionIds: this.excludedTasks, onlyMy: this.onlyMy}).subscribe(this.loadHandler())
     }
 
     loadHandler() {
