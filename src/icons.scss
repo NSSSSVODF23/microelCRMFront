@@ -8851,6 +8851,11 @@
 }
 
 .mds {
+
+  &-folder_open {
+    @include mds("folder_open");
+  }
+
   &-summarize{
     @include mds("summarize");
   }

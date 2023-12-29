@@ -137,7 +137,7 @@ export class TasksPageCacheService {
     )
 
     pageNumber = new FormControl(0);
-    pageNumberChange$ = this.pageNumber.valueChanges.pipe(startWith(0),shareReplay(1));
+    pageNumberChange$ = this.pageNumber.valueChanges.pipe(startWith(0),tap(()=>window.scrollTo({top:0})),shareReplay(1));
 
     filters$ = combineLatest([
         this.pageNumberChange$,
@@ -172,7 +172,7 @@ export class TasksPageCacheService {
         [this.rt.taskCreated(),
             this.rt.taskUpdated(),
             this.rt.taskDeleted()]
-    ).pipe(tap(()=>window.scrollTo({top:0})),shareReplay(1))
+    ).pipe(shareReplay(1))
 
     constructor(readonly api: ApiService, readonly rt: RealTimeUpdateService) {
 

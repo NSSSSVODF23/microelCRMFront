@@ -100,6 +100,7 @@ import {AutoCompleteModule} from "primeng/autocomplete";
 import {KeyFilterModule} from "primeng/keyfilter";
 import {FilesPageComponent} from "../../pages/files-page/files-page.component";
 import {AnimateModule} from "primeng/animate";
+import {TaskCatalogPageComponent} from "../../pages/task-catalog-page/task-catalog-page.component";
 
 const mapConfig: YaConfig = {
     apikey: '008574e5-f34b-4270-b3d5-91aaabd036e8',
@@ -133,7 +134,8 @@ const mapConfig: YaConfig = {
         AcpSettingsPageComponent,
         AcpSessionsPageComponent,
         CommutatorListPageComponent,
-        FilesPageComponent
+        FilesPageComponent,
+        TaskCatalogPageComponent
     ],
     imports: [
         CommonComponentsModule,

@@ -576,6 +576,10 @@ export class ApiService {
         return this.sendGet<{[key:string]:number}>(`api/private/tasks/wireframe/${wireframeId}/by-stages/count`, {});
     }
 
+    getCountTasks(status: string[], cls: number[] | null, type: string | null, tags: number[] | null, filters: any) {
+        return this.sendPost<number>("api/private/tasks/count", {...filters, status, template: cls, stage: type, tags});
+    }
+
     getScheduledTask(start: string, end: string) {
         return this.sendGet<Task[]>("api/private/tasks/scheduled", {start, end});
     }

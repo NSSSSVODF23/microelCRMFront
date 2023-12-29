@@ -33,12 +33,18 @@ import {FilesPageComponent} from "../../pages/files-page/files-page.component";
 import {UncompletedReportsPageComponent} from "../../pages/uncompleted-reports-page/uncompleted-reports-page.component";
 import {AuthGuard} from "../../guards/auth.guard";
 import {MainGuard} from "../../guards/main.guard";
+import {TaskCatalogPageComponent} from "../../pages/task-catalog-page/task-catalog-page.component";
 
 const routes: Routes = [
     {
         path: '', component: MainBootstrapComponent, children: [
             {path: '', component: GeneralDashboardPageComponent},
             {path: 'tasks/incoming', component: IncomingTasksPageComponent},
+            {path: 'tasks/catalog/:status', component: TaskCatalogPageComponent},
+            {path: 'tasks/catalog/:status/:class', component: TaskCatalogPageComponent},
+            {path: 'tasks/catalog/:status/:class/:type', component: TaskCatalogPageComponent},
+            {path: 'tasks/catalog/:status/:class/:type/:tag', component: TaskCatalogPageComponent},
+            {path: 'tasks/catalog', pathMatch:'full', redirectTo:'tasks/catalog/active'},
             {path: 'tasks/calendar', component: TaskCalendarPageComponent},
             {path: 'tasks/list', component: TasksPageComponent},
             {path: 'tasks/status/:status', component: TasksPageComponent},

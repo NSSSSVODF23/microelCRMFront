@@ -1,0 +1,6 @@
+<div class="flex align-items-center p-2 text-bluegray-500 user-select-none">
+    <span class="hover:text-primary cursor-pointer" [ngClass]="{'mdi-expand_more': !expand, 'mdi-expand_less': expand}"></span>
+    <span class="flex-grow-1 hover:text-primary hover:bg-white px-2 py-1 border-round-sm cursor-pointer"
+          [routerLink]="link" routerLinkActive="text-write bg-primary pointer-events-none cursor-default">{{label}}</span>
+    <span class="font-bold text-sm ml-2" *ngIf="counter">{{counter}}</span>
+</div>

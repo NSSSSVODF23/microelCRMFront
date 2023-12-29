@@ -24,6 +24,14 @@ export interface TaskStage {
     label: string;
     orderIndex: number;
     oldTrackerBind?: any;
+    directories: TaskTypeDirectory[];
+}
+
+export interface TaskTypeDirectory{
+    taskTypeDirectoryId: number;
+    name: string;
+    description: string;
+    orderIndex?: number;
 }
 
 export interface OldTrackerBind {

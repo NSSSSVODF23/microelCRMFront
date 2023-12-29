@@ -1,0 +1,44 @@
+<div appExtendPageHeight class="flex px-3 gap-3">
+    <app-main-menu-panel></app-main-menu-panel>
+    <div class="flex flex-grow-1 gap-3 mb-3">
+        <div class="flex flex-column flex-grow-1">
+
+        </div>
+        <div class="flex flex-column border-round border-1 bg-white border-bluegray-100 p-3 h-fit sticky-type-selector gap-3">
+            <span class="text-lg text-bluegray-600 font-bold">Каталог</span>
+            <ng-container *ngTemplateOutlet="activeTasksMenuItemTemplate"></ng-container>
+            <ng-container *ngTemplateOutlet="processingTasksMenuItemTemplate"></ng-container>
+        </div>
+    </div>
+</div>
+
+<ng-template #activeTasksMenuItemTemplate>
+    <div class="flex flex-column gap-2">
+        <app-catalog-menu-item [link]="'/tasks/catalog/active'" [label]="'Активные'" [counter]="(cacheService.activeStatusCounter$ | async) ?? 0"></app-catalog-menu-item>
+        <div *ngIf="cacheService.wireframes$ | async as wireframes" class="pl-2 flex flex-column gap-2">
+            <ng-container *ngFor="let wireframe of wireframes">
+                <ng-container *ngTemplateOutlet="menuItemTemplate; context: {link: '/tasks/catalog/active/'+ wireframe.wireframeId, label: wireframe.name, counter: null}"></ng-container>
+            </ng-container>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #processingTasksMenuItemTemplate>
+    <div class="flex flex-column gap-2">
+        <app-catalog-menu-item [link]="'/tasks/catalog/processing'" [label]="'В работе'" [counter]="(cacheService.processingStatusCounter$ | async) ?? 0"></app-catalog-menu-item>
+        <div *ngIf="cacheService.wireframes$ | async as wireframes" class="pl-2 flex flex-column gap-2">
+            <ng-container *ngFor="let wireframe of wireframes">
+                <ng-container *ngTemplateOutlet="menuItemTemplate; context: {link: '/tasks/catalog/processing/'+ wireframe.wireframeId, label: wireframe.name, counter: null}"></ng-container>
+            </ng-container>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #menuItemTemplate let-link="link" let-label="label" let-counter="counter">
+    <div class="flex align-items-center p-2 text-bluegray-500 user-select-none cursor-pointer"
+         [routerLink]="link" routerLinkActive="text-primary">
+        <span [class]="expandClass(link)"></span>
+        <span class="flex-grow-1">{{label}}</span>
+        <span class="font-bold text-sm ml-2" *ngIf="counter">{{counter}}</span>
+    </div>
+</ng-template>

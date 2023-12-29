@@ -1,4 +1,4 @@
-<div [ngSwitch]="constructStage" appExtendPageHeight class="flexed vcenter column gap15" [style.padding-bottom]="'2rem'">
+<div [ngSwitch]="constructStage" appExtendPageHeight class="flex flex-column align-items-center gap-4" [style.padding-bottom]="'2rem'">
     <ng-container *ngSwitchCase="'FIELDS'">
         <div class="flexed column gap10 panel p10">
             <div class="flexed gap5">
@@ -73,7 +73,7 @@
         </div>
     </ng-container>
     <ng-container *ngSwitchCase="'STAGES'">
-        <div class="flexed column gap10">
+        <div class="flex flex-column gap-3">
             <div class="gap15 flexed hend panel p10">
                 <app-button (onClick)="this.constructStage = 'FIELDS'" [disabled]="!wireframe.name"
                             icon="arrow_back_ios" label="Назад"
@@ -82,19 +82,22 @@
                             label="Далее: Отображение и документация"></app-button>
             </div>
         </div>
-        <div class="flexed hcenter column stretched">
+        <div class="flex flex-column flex-grow-1 align-items-center">
             <p-panel class="stage-list-panel" header="Типы задачи">
-                <div class="flexed column gap10">
+                <div class="flex flex-column gap-3">
                     <app-button (onClick)="createStage()" icon="add" label="Добавить тип"
                                 model="p-button-success"></app-button>
                     <p-orderList (onReorder)="reorderStages()" [dragdrop]="true" [value]="this.wireframe.stages??[]">
                         <ng-template let-stage pTemplate="item">
-                            <div class="flexed hcenter gap5 caption">
+                            <div class="flex align-items-center gap-2 text-bluegray-500">
                                 <span class="material-icons-round drag-icon">drag_indicator</span>
                                 <span class="caption size-small f-color-500">{{stage.orderIndex+1}}.</span>
                                 <input #taskTypeInput (mousedown)="mouseDown($event)" (focus)="taskTypeInput.select()"
                                        [(ngModel)]="stage.label" class="inline-input">
                                 <div class="stretched"></div>
+                                <p-button icon="mdi-folder" styleClass="p-button-warning p-button-icon p-button-text"
+                                          (onClick)="openTaskTypeDirectoriesDialog(stage)" (mousedown)="$event.stopPropagation()"
+                                          pTooltip="Настроить директории"></p-button>
                                 <p-button icon="mdi-link" styleClass="p-button-warning p-button-icon p-button-text"
                                           (onClick)="openOldTrackerStageBind(stage)" (mousedown)="$event.stopPropagation()"
                                           pTooltip="Настроить интеграцию со старым трекером"></p-button>
@@ -326,6 +329,53 @@
             </div>
         </div>
     </ng-container>
+</ng-template>
+
+<p-dialog [(visible)]="taskTypeDirectoriesDialogVisible" [modal]="true" contentStyleClass="flex flex-column gap-3 pt-2"
+          [dismissableMask]="true" header="Настроить директории задач" appendTo="body" [autoZIndex]="false">
+    <ng-template pTemplate="content">
+        <div class="flex flex-column align-items-center justify-content-center text-bluegray-400 text-2xl w-full h-full p-8"
+             *ngIf="taskTypeDirectoriesFormArray.controls.length===0">
+            <span class="mds-folder_open"></span>
+            <span class="mb-3">Нет директорий в этом типе задач</span>
+            <ng-container *ngTemplateOutlet="appendDirectoryButtonTemplate"></ng-container>
+        </div>
+        <ng-container *ngIf="taskTypeDirectoriesFormArray.controls.length>0">
+            <ng-template *ngTemplateOutlet="appendDirectoryButtonTemplate"></ng-template>
+            <p-orderList (onReorder)="reorderTaskTypeDirectories()" [value]="taskTypeDirectoriesList" [dragdrop]="true"
+                         [trackBy]="trackByTaskTypeDirectories" [listStyle]="{'max-height':'35rem'}">
+                <ng-template pTemplate="item" let-formTemplate>
+                    <ng-container *ngTemplateOutlet="taskTypeDirectoryTemplate; context: { $implicit: formTemplate }"></ng-container>
+                </ng-template>
+            </p-orderList>
+        </ng-container>
+        <p-button (onClick)="saveTaskTypeDirectories()" label="Сохранить" icon="mdi-save" class="align-self-end"
+                  [disabled]="(taskTypeDirectoriesFormArray.invalid || !taskTypeDirectoriesFormArray.dirty)"></p-button>
+    </ng-template>
+</p-dialog>
+
+<ng-template #taskTypeDirectoryTemplate let-formGroup>
+    <div [formGroup]="formGroup" class="flex flex-column gap-2">
+        <div class="flex flex gap-2 align-items-end">
+            <div class="input-label-wrapper">
+                <label>Название директории</label>
+                <input type="text" pInputText formControlName="name" [size]="32" />
+            </div>
+            <ng-container *ngTemplateOutlet="removeDirectoryButtonTemplate; context: { $implicit: formGroup.value.taskTypeDirectoryId }"></ng-container>
+        </div>
+        <div class="input-label-wrapper">
+            <label>Описание</label>
+            <textarea pInputTextarea formControlName="description" [autoResize]="true" [rows]="3" [cols]=60></textarea>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #appendDirectoryButtonTemplate>
+    <p-button (onClick)="addTaskTypeDirectory()" icon="mdi-add" styleClass="p-button-success p-button-outlined" label="Добавить"></p-button>
+</ng-template>
+
+<ng-template #removeDirectoryButtonTemplate let-id>
+    <p-button (onClick)="removeTaskTypeDirectory(id)" (mousedown)="$event.stopPropagation()" icon="mdi-delete" styleClass="p-button-danger p-button-outlined" label="Удалить"></p-button>
 </ng-template>
 
 <p-dialog [(visible)]="oldTrackerIntegrationDialogVisible" [modal]="true" contentStyleClass="flex flex-column gap-3 pt-1"

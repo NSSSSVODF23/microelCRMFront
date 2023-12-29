@@ -36,7 +36,7 @@ export class IncomingPageCacheService {
 
     searchPhrase = new FormControl('');
 
-    pageChange$ = this.pageControl.valueChanges.pipe(startWith(0));
+    pageChange$ = this.pageControl.valueChanges.pipe(startWith(0), tap(()=>window.scrollTo({top:0})));
     filtersChange$ = this.filtersForm.valueChanges.pipe(tap(()=>this.pageControl.setValue(0)),startWith(this.filtersForm.value));
 
     filters$ = combineLatest([this.pageChange$, this.filtersChange$]).pipe(map(([page, filter])=>{
@@ -135,7 +135,7 @@ export class IncomingPageCacheService {
         [this.rt.taskCreated(),
             this.rt.taskUpdated(),
             this.rt.taskDeleted()]
-    ).pipe(tap(()=>window.scrollTo({top:0})),shareReplay(1))
+    ).pipe(shareReplay(1))
 
     constructor(private api: ApiService, private rt: RealTimeUpdateService, private personality: PersonalityService) {
         this.stageList$.subscribe(s=>this.stageList = [...s]);

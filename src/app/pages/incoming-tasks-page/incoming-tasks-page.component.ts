@@ -4,6 +4,7 @@ import {RealTimeUpdateService} from "../../services/real-time-update.service";
 import {Task} from "../../transport-interfaces";
 import {PersonalityService} from "../../services/personality.service";
 import {IncomingPageCacheService} from "../../services/incoming-page-cache.service";
+import {fromEvent, Subscription} from "rxjs";
 
 @Component({
     templateUrl: './incoming-tasks-page.component.html',
@@ -15,11 +16,10 @@ export class IncomingTasksPageComponent implements OnInit, OnDestroy, AfterViewI
     }
 
     ngOnInit(): void {
-
     }
 
     ngOnDestroy() {
-        this.ic.saveScrollPos(window.scrollY)
+        this.ic.saveScrollPos(window.scrollY);
     }
 
     ngAfterViewInit() {

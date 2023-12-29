@@ -70,6 +70,37 @@ export class WireframeConstructorPageComponent implements OnInit, OnDestroy {
         fieldDataBinds: new FormArray<FormGroup>([]),
     })
 
+    taskTypeDirectoriesDialogVisible = false;
+    taskTypeDirectoriesFormArray = new FormArray<FormGroup>([]);
+    taskTypeDirectoriesList = [] as FormGroup[];
+    getTaskTypeDirectoryFormTemplate(id?: number, name?: string, description?: string, orderIndex?: number | null){
+        return new FormGroup({
+            taskTypeDirectoryId: new FormControl<number | string>(id ? id : v4()),
+            name: new FormControl(name ?? '', [Validators.required, Validators.minLength(3)]),
+            description: new FormControl(description ?? ''),
+            orderIndex: new FormControl<number | null | undefined>(orderIndex),
+        })
+    }
+
+    addTaskTypeDirectory(){
+        this.taskTypeDirectoriesFormArray.push(this.getTaskTypeDirectoryFormTemplate(undefined, undefined, undefined, this.taskTypeDirectoriesFormArray.controls.length));
+        this.taskTypeDirectoriesList = [...this.taskTypeDirectoriesFormArray.controls]
+    }
+
+    removeTaskTypeDirectory(id: number | string){
+        this.taskTypeDirectoriesFormArray.removeAt(this.taskTypeDirectoriesFormArray.controls.findIndex(c=>c.value.taskTypeDirectoryId === id));
+        this.taskTypeDirectoriesList = [...this.taskTypeDirectoriesFormArray.controls]
+    }
+
+    reorderTaskTypeDirectories(){
+        this.taskTypeDirectoriesFormArray.markAsDirty();
+        this.taskTypeDirectoriesList.forEach((taskDir, orderIndex)=>taskDir.patchValue({orderIndex}))
+    }
+
+    trackByTaskTypeDirectories(index: number, taskDir: FormGroup){
+        return taskDir.value.taskTypeDirectoryId;
+    }
+
     selectedTaskClass$ = combineLatest([this.oldTrackerIntegrationForm.controls.classId.valueChanges, this.oldTrackerTaskClasses$]).pipe(
             tap(console.log),
             map(([classId, classList]:[number, TaskClassOT[]])=>classList?.find(cl=>cl.id === classId) ?? null),
@@ -115,6 +146,7 @@ export class WireframeConstructorPageComponent implements OnInit, OnDestroy {
         }
     ]
     selectedStageForIntegration?: TaskStage;
+    selectedStageForDirectoriesSetup?: TaskStage;
 
     simpleTextFieldFormGroup(){
         return new FormGroup({
@@ -238,7 +270,7 @@ export class WireframeConstructorPageComponent implements OnInit, OnDestroy {
         wireframeType: WireframeType.MODEL,
         steps: [defaultStep],
         defaultObservers: [],
-        stages: [{label: "Начальный", stageId: v4(), orderIndex: 0}],
+        stages: [{label: "Стандартный тип", stageId: v4(), orderIndex: 0, directories: []}],
         listViewType: 'SIMPLE'
     }
 
@@ -458,7 +490,8 @@ export class WireframeConstructorPageComponent implements OnInit, OnDestroy {
         this.wireframe.stages = [...this.wireframe.stages ?? [], {
             label: 'Название типа задачи',
             stageId: v4(),
-            orderIndex: this.wireframe.stages?.length ?? 0
+            orderIndex: this.wireframe.stages?.length ?? 0,
+            directories: []
         }]
     }
 
@@ -585,6 +618,28 @@ export class WireframeConstructorPageComponent implements OnInit, OnDestroy {
                 registrationAddressFieldId: new FormControl(bind.registrationAddressFieldId),
             })))
         }, 100)
+    }
+
+    openTaskTypeDirectoriesDialog(stage: TaskStage){
+        this.taskTypeDirectoriesDialogVisible = true;
+        this.selectedStageForDirectoriesSetup = stage;
+        this.taskTypeDirectoriesFormArray.clear();
+        stage.directories?.sort((a,b)=>(a.orderIndex??0)-(b.orderIndex??0)).forEach((dir, index)=>{
+            this.taskTypeDirectoriesFormArray.push(this.getTaskTypeDirectoryFormTemplate(dir.taskTypeDirectoryId, dir.name, dir.description, dir.orderIndex ?? index));
+        })
+        this.taskTypeDirectoriesList = [...this.taskTypeDirectoriesFormArray.controls];
+    }
+
+    saveTaskTypeDirectories(){
+        if(this.selectedStageForDirectoriesSetup && this.taskTypeDirectoriesFormArray.valid){
+            this.selectedStageForDirectoriesSetup.directories = this.taskTypeDirectoriesFormArray.controls.map(({value})=>{
+                if(typeof value['taskTypeDirectoryId'] === 'string'){
+                    value['taskTypeDirectoryId'] = null;
+                }
+                return value;
+            });
+            this.taskTypeDirectoriesDialogVisible = false;
+        }
     }
 
     appendBindToIntegration() {

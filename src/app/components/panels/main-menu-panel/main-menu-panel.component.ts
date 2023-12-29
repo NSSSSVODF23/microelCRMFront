@@ -2,7 +2,7 @@ import {Component, OnInit} from '@angular/core';
 import {ExtendedMenuModel} from "../../controls/extended-menu-item/extended-menu-item.component";
 import {ApiService} from "../../../services/api.service";
 import {ActivatedRoute} from "@angular/router";
-import {map} from "rxjs";
+import {map, shareReplay} from "rxjs";
 import {Wireframe} from "../../../transport-interfaces";
 
 @Component({
@@ -16,7 +16,7 @@ export class MainMenuPanelComponent implements OnInit {
     stagesLoaded = false;
 
     category: string = 'main';
-    incomingCount$ = this.api.getCountIncomingTasks().pipe(map(count => count.toString()));
+    incomingCount$ = this.api.getCountIncomingTasks().pipe(map(count => count.toString()), shareReplay(1));
 
     constructor(readonly api: ApiService, readonly route: ActivatedRoute) {
 
