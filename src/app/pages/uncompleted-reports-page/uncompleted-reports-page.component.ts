@@ -1,6 +1,6 @@
 import {Component, OnInit} from '@angular/core';
 import {ApiService} from "../../services/api.service";
-import {LoadingState, WorkLog} from "../../transport-interfaces";
+import {LoadingState, WorkLog} from "../../types/transport-interfaces";
 import {Subscription} from "rxjs";
 import {SubscriptionsHolder} from "../../util";
 import {RealTimeUpdateService} from "../../services/real-time-update.service";

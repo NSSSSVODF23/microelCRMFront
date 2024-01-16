@@ -1,5 +1,5 @@
 import {Pipe, PipeTransform} from '@angular/core';
-import {Comment, TaskEvent, TaskEventType} from "../transport-interfaces";
+import {Comment, TaskEvent, TaskEventType} from "../types/transport-interfaces";
 
 @Pipe({
     name: 'taskEventTranslate'
@@ -51,6 +51,8 @@ export class TaskEventTranslatePipe implements PipeTransform {
                 return "Информация в задаче отредактирована"
             case TaskEventType.REPORT_CREATED:
                 return "Завершил работы по задаче: "
+            case TaskEventType.MOVED_TO_DIRECTORY:
+                return "Перемещена в категорию: "
         }
     }
 

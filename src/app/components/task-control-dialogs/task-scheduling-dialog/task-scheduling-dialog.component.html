@@ -1,0 +1,28 @@
+<!--Диалог для установки даты и времени актуальности задачи-->
+<p-dialog [(visible)]="visible" (visibleChange)="visibleChange.emit($event)"
+          [dismissableMask]="true" (onShow)="initValues()"
+          [draggable]="false" [modal]="true" [resizable]="false"
+          contentStyleClass="flex flex-column gap-3 pt-1"
+          header="Планирование задачи">
+    <ng-template pTemplate="content">
+        <p-calendar [firstDayOfWeek]="1" [formControl]="dateControl"
+                    [inline]="true" [selectOtherMonths]="true" class="w-fit align-self-center"></p-calendar>
+        <div class="flex gap-3 align-self-center">
+            <div class="input-label-wrapper">
+                <label>Час</label>
+                <p-inputNumber (onFocus)="$event.target.select()"
+                               [formControl]="hourControl" [max]="23" [min]="0" [showButtons]="true"
+                               [size]="2"></p-inputNumber>
+            </div>
+            <div class="input-label-wrapper">
+                <label>Минута</label>
+                <p-inputNumber (onFocus)="$event.target.select()"
+                               [formControl]="minuteControl" [max]="59" [min]="0"
+                               [showButtons]="true" [size]="2" [step]="10"></p-inputNumber>
+            </div>
+        </div>
+        <app-button (onClick)="setDateTimeOfTaskRelevance()"
+                    [loading]="changingTaskDateTime"
+                    label="Установить"></app-button>
+    </ng-template>
+</p-dialog>

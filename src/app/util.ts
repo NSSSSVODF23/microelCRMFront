@@ -6,7 +6,7 @@ import {
     Page,
     Wireframe,
     WireframeFieldType
-} from "./transport-interfaces";
+} from "./types/transport-interfaces";
 import {
     combineLatest,
     fromEvent,
@@ -66,25 +66,6 @@ export class Utils {
             }
         }
         return false;
-    }
-
-    static dateArrayToRange(dateArray?: (Date | undefined)[] | null) {
-        if (!dateArray) return null;
-        const dateStrings = dateArray.map((date, index) => {
-            if (!date) return undefined;
-            if (index === 1) {
-                date.setHours(23, 59, 59, 999);
-                return Utils.dateFormat(date);
-            } else {
-                date.setHours(0, 0, 0, 0);
-                return Utils.dateFormat(date);
-            }
-        });
-        const rangeObject: DateRange = {
-            start: dateStrings[0],
-            end: dateStrings[1]
-        };
-        return rangeObject;
     }
 
     static dateFormat(date: Date) {

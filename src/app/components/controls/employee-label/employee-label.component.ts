@@ -1,5 +1,5 @@
 import {Component, Input, OnChanges, OnDestroy, OnInit, SimpleChanges, ViewChild} from '@angular/core';
-import {Employee, EmployeeStatus} from "../../../transport-interfaces";
+import {Employee, EmployeeStatus} from "../../../types/transport-interfaces";
 import {ApiService} from "../../../services/api.service";
 import {OverlayPanel} from "primeng/overlaypanel";
 import {RealTimeUpdateService} from "../../../services/real-time-update.service";

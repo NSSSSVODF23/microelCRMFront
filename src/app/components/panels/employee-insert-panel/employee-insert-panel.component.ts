@@ -2,7 +2,7 @@ import {Component, ElementRef, EventEmitter, OnInit, Output, ViewChild} from '@a
 import {ContentChange} from "ngx-quill";
 import {OverlayPanel} from "primeng/overlaypanel";
 import {ApiService} from "../../../services/api.service";
-import {Employee} from "../../../transport-interfaces";
+import {Employee} from "../../../types/transport-interfaces";
 import {Utils} from "../../../util";
 
 @Component({

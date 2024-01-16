@@ -84,7 +84,7 @@
                             <div class="stretched"></div>
                             <p-button icon="mdi-edit" styleClass="p-button-text p-button-warning"
                                       label="Редактировать"
-                                      (onClick)="openDepartmentEditor(department.name??'', department.description??'', department.departmentId)"
+                                      (onClick)="openDepartmentEditor(department.name, department.description??'', department.departmentId)"
                                       [disabled]="department.deleted ?? false"></p-button>
                             <p-button icon="mdi-delete" styleClass="p-button-text p-button-danger"
                                       (onClick)="departmentDeleteConfirm(department)"
@@ -120,7 +120,7 @@
                             <div class="stretched"></div>
                             <p-button icon="mdi-edit" styleClass="p-button-text p-button-warning"
                                       label="Редактировать"
-                                      (onClick)="openPositionEditor(position.name??'', position.description??'', position.access??0, position.positionId)"
+                                      (onClick)="openPositionEditor(position.name, position.description??'', position.access??0, position.positionId)"
                                       [disabled]="position.deleted ?? false"></p-button>
                             <p-button icon="mdi-delete" styleClass="p-button-text p-button-danger"
                                       (onClick)="positionDeleteConfirm(position)"

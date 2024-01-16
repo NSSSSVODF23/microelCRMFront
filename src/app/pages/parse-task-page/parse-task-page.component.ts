@@ -1,11 +1,11 @@
 import {Component, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {ApiService} from "../../services/api.service";
-import {AddressCorrecting, OldTracker, SimpleMessage} from "../../parsing-interfaces";
+import {AddressCorrecting, OldTracker, SimpleMessage} from "../../types/parsing-interfaces";
 import {FormControl, FormGroup, Validators} from "@angular/forms";
 import {SubscriptionsHolder} from "../../util";
 import {RealTimeUpdateService} from "../../services/real-time-update.service";
 import {VirtualScroller} from "primeng/virtualscroller";
-import {Address} from "../../transport-interfaces";
+import {Address} from "../../types/transport-interfaces";
 
 @Component({
     templateUrl: './parse-task-page.component.html',

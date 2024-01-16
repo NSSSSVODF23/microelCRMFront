@@ -1,6 +1,6 @@
 import {Component, OnInit} from '@angular/core';
 import {ControlValueAccessor, FormControl, NG_VALUE_ACCESSOR} from "@angular/forms";
-import {TaskStatus} from "../../../transport-interfaces";
+import {TaskStatus} from "../../../types/transport-interfaces";
 
 @Component({
     selector: 'app-task-status-chooser',

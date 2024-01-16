@@ -1,5 +1,5 @@
 import {AbstractControl, ValidationErrors, ValidatorFn} from "@angular/forms";
-import {WireframeFieldType} from "./transport-interfaces";
+import {WireframeFieldType} from "./types/transport-interfaces";
 
 export class CustomValidators {
 

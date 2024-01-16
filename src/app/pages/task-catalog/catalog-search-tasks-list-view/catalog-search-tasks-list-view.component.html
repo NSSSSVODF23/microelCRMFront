@@ -1,0 +1,54 @@
+<ng-container *ngIf="cacheService.tasks$ | async as tasksPage; else statesTemplate">
+    <ng-container *ngTemplateOutlet="statesTemplate"></ng-container>
+    <ng-container *ngIf="cacheService.taskLoadingState === 'READY'">
+        <div class="flex flex-column gap-1 border-round-md shadow-1 overflow-hidden bg-bluegray-100 h-fit mb-3">
+            <div *ngFor="let item of tasksPage.content" class="flex relative" [pDraggable]="item.currentStage?.stageId ?? ''">
+                <app-task-list-element [isCommentInput]="true" [item]="item"></app-task-list-element>
+            </div>
+        </div>
+    </ng-container>
+</ng-container>
+
+<div class="flex-grow-1"></div>
+
+<div class="sticky bottom1" *ngIf="cacheService.tasks$ | async as tasksPage" [hidden]="cacheService.taskLoadingState !== 'READY'">
+    <p-paginator #paginator (onPageChange)="cacheService.pageControl.setValue($event.page)" [alwaysShow]="true"
+                 [rows]="15" [showCurrentPageReport]="true"
+                 [totalRecords]="tasksPage.totalElements" [first]="(cacheService.pageControl.value ?? 0)*15"
+                 currentPageReportTemplate="Показано с {first} по {last} из {totalRecords} задач"
+                 styleClass="panel"></p-paginator>
+</div>
+
+<ng-template #statesTemplate>
+    <ng-container [ngSwitch]="cacheService.taskLoadingState">
+        <ng-container *ngSwitchCase="'LOADING'">
+            <ng-container *ngTemplateOutlet="loadingTemplate"></ng-container>
+        </ng-container>
+        <ng-container *ngSwitchCase="'EMPTY'">
+            <ng-container *ngTemplateOutlet="emptyTemplate"></ng-container>
+        </ng-container>
+        <ng-container *ngSwitchCase="'ERROR'">
+            <ng-container *ngTemplateOutlet="errorTemplate"></ng-container>
+        </ng-container>
+    </ng-container>
+</ng-template>
+
+<ng-template #loadingTemplate>
+    <div class="flex flex-grow-1 align-items-center justify-content-center">
+        <p-progressSpinner class="custom-spinner custom-spinner-8xl custom-spinner-primary" strokeWidth="1"></p-progressSpinner>
+    </div>
+</ng-template>
+
+<ng-template #emptyTemplate>
+    <div class="flex flex-column flex-grow-1 align-items-center justify-content-center text-bluegray-400 text-lg font-bold">
+        <i class="mds-search_off"></i>
+        <span>Задач не найдено</span>
+    </div>
+</ng-template>
+
+<ng-template #errorTemplate>
+    <div class="flex flex-column flex-grow-1 align-items-center justify-content-center text-red-400 text-lg font-bold">
+        <i class="mdi-error"></i>
+        <span>Произошла ошибка</span>
+    </div>
+</ng-template>

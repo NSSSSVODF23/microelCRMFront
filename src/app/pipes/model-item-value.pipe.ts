@@ -1,5 +1,5 @@
 import { Pipe, PipeTransform } from '@angular/core';
-import {ModelItem} from "../transport-interfaces";
+import {ModelItem} from "../types/transport-interfaces";
 import {Utils} from "../util";
 
 @Pipe({

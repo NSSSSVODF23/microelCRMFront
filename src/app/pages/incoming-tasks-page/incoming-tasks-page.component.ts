@@ -1,7 +1,7 @@
 import {AfterViewInit, Component, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {ApiService} from "../../services/api.service";
 import {RealTimeUpdateService} from "../../services/real-time-update.service";
-import {Task} from "../../transport-interfaces";
+import {Task} from "../../types/transport-interfaces";
 import {PersonalityService} from "../../services/personality.service";
 import {IncomingPageCacheService} from "../../services/incoming-page-cache.service";
 import {fromEvent, Subscription} from "rxjs";
@@ -19,11 +19,11 @@ export class IncomingTasksPageComponent implements OnInit, OnDestroy, AfterViewI
     }
 
     ngOnDestroy() {
-        this.ic.saveScrollPos(window.scrollY);
+        // this.ic.saveScrollPos(window.scrollY);
     }
 
     ngAfterViewInit() {
-        setTimeout(()=>window.scrollTo({top: this.ic.readScrollPos()}),10)
+        // setTimeout(()=>window.scrollTo({top: this.ic.readScrollPos()}),10)
     }
 
     taskTrack(index: number, task: Task) {

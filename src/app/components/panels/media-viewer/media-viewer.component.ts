@@ -1,6 +1,6 @@
 import {Component, OnInit} from '@angular/core';
 import {MediaViewerService} from "../../../services/media-viewer.service";
-import {Attachment, TFile} from "../../../transport-interfaces";
+import {Attachment, TFile} from "../../../types/transport-interfaces";
 import {fade, fadeAlt, fadeFullAlt} from "../../../animations";
 
 @Component({

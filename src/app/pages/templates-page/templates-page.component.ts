@@ -1,6 +1,6 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
 import {ApiService} from "../../services/api.service";
-import {ClientEquipment, LoadingState, TaskTag, Wireframe} from "../../transport-interfaces";
+import {ClientEquipment, LoadingState, TaskTag, Wireframe} from "../../types/transport-interfaces";
 import {RealTimeUpdateService} from "../../services/real-time-update.service";
 import {SubscriptionsHolder} from "../../util";
 import {ConfirmationService} from "primeng/api";

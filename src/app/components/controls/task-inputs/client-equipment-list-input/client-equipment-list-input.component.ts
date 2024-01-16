@@ -7,7 +7,7 @@ import {
     FormGroup,
     NG_VALUE_ACCESSOR
 } from "@angular/forms";
-import {ClientEquipment, ClientEquipmentRealization, LoadingState} from "../../../../transport-interfaces";
+import {ClientEquipment, ClientEquipmentRealization, LoadingState} from "../../../../types/transport-interfaces";
 import {ApiService} from "../../../../services/api.service";
 import {
     BehaviorSubject,

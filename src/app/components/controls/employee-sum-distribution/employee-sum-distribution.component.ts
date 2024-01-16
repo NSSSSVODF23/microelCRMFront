@@ -1,6 +1,6 @@
 import {Component, EventEmitter, forwardRef, Input, OnDestroy, OnInit, Output} from '@angular/core';
 import {ControlValueAccessor, FormControl, FormGroup, NG_VALUE_ACCESSOR} from "@angular/forms";
-import {Employee} from "../../../transport-interfaces";
+import {Employee} from "../../../types/transport-interfaces";
 import {SubscriptionsHolder} from "../../../util";
 import {TFactorAction, WorksPickerValue} from "../works-picker/works-picker.component";
 import {filter, Observable, Subscription} from "rxjs";

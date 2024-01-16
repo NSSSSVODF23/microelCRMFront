@@ -1,5 +1,5 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
-import {LoadingState, Page, PaidAction, PaidActionUnit} from "../../transport-interfaces";
+import {LoadingState, Page, PaidAction, PaidActionUnit} from "../../types/transport-interfaces";
 import {ApiService} from "../../services/api.service";
 import {RealTimeUpdateService} from "../../services/real-time-update.service";
 import {SubscriptionsHolder} from "../../util";

@@ -1,6 +1,6 @@
 import {Component, EventEmitter, Input, OnDestroy, OnInit, Output} from '@angular/core';
 import {ControlValueAccessor, FormControl, FormGroup, NG_VALUE_ACCESSOR} from "@angular/forms";
-import {Address} from "../../../../transport-interfaces";
+import {Address} from "../../../../types/transport-interfaces";
 import {Subscription} from "rxjs";
 
 @Component({

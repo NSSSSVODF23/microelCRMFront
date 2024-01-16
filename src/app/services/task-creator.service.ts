@@ -1,5 +1,5 @@
 import {Injectable} from '@angular/core';
-import {Address} from "../transport-interfaces";
+import {Address} from "../types/transport-interfaces";
 import {delay, filter, fromEvent, map, of, Subject, switchMap, tap} from "rxjs";
 
 export type TaskCreationMode = 'standard' | 'child' | 'parent' | 'billing';

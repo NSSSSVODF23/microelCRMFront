@@ -1,7 +1,7 @@
 import {Component, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {ActivatedRoute} from "@angular/router";
 import {ApiService} from "../../services/api.service";
-import {Task, Wireframe} from "../../transport-interfaces";
+import {Task, Wireframe} from "../../types/transport-interfaces";
 import {Utils} from "../../util";
 import {fade} from "../../animations";
 import {OverlayPanel} from "primeng/overlaypanel";

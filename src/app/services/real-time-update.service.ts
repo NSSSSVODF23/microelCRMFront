@@ -8,7 +8,7 @@ import {
     Chat,
     ChatUnreadCounter,
     City, ClientEquipment,
-    Comment,
+    Comment, DateRange,
     Department, DhcpBinding,
     Employee,
     House,
@@ -16,7 +16,7 @@ import {
     PaidAction,
     PaidWork,
     PingMonitoring,
-    Position, SalaryTable, SalaryTableCell,
+    Position, SalaryTable, SalaryTableCell, SchedulingType,
     Street,
     SuperMessage, Switch, SwitchBaseInfo,
     Task,
@@ -28,9 +28,10 @@ import {
     TreeNodeUpdateEvent,
     Wireframe, WireframeTaskCounter,
     WorkLog
-} from "../transport-interfaces";
+} from "../types/transport-interfaces";
 import {cyrb53} from "../util";
-import {OldTracker, SimpleMessage} from "../parsing-interfaces";
+import {OldTracker, SimpleMessage} from "../types/parsing-interfaces";
+import {PageType, TasksCatalogPageCacheService} from "./tasks-catalog-page-cache.service";
 
 @Injectable({
     providedIn: 'root'
@@ -122,6 +123,10 @@ export class RealTimeUpdateService {
 
     taskCreated() {
         return this.watch<Task>('task', 'create')
+    }
+
+    taskMoved() {
+        return this.watch<null>('task', 'moved')
     }
 
     incomingTaskCreated(login: string) {
@@ -418,6 +423,16 @@ export class RealTimeUpdateService {
 
     taskCountChange() {
         return this.watch<WireframeTaskCounter>('task', 'count', 'change')
+    }
+
+    updateTaskCount(status: string, cls?: number | null,  type?: string | null, pageType?: PageType | null,
+                    directory?: number | null, tag?: number | null, dateOfClose?: DateRange | null,
+                    actualFrom?: DateRange | null, actualTo?: DateRange | null, scheduling?: SchedulingType | null){
+
+        const PATH = TasksCatalogPageCacheService.convertToPath([status.toLowerCase(), cls??null, type??null, pageType??null,
+            directory??null, tag??null, dateOfClose?.timeFrame??null, actualFrom?.timeFrame??null, actualTo?.timeFrame??null, scheduling??null])
+
+        return this.watch<number>('task', 'counter', ...PATH);
     }
 
     incomingTagTaskCountChange(login: string){

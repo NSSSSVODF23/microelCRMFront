@@ -3,7 +3,7 @@ import {ControlValueAccessor, FormControl, NG_VALUE_ACCESSOR} from "@angular/for
 import {SubscriptionsHolder} from "../../../../util";
 import {debounceTime, distinctUntilChanged, Subject, switchMap} from "rxjs";
 import {ApiService} from "../../../../services/api.service";
-import {Address} from "../../../../transport-interfaces";
+import {Address} from "../../../../types/transport-interfaces";
 import {Overlay} from "primeng/overlay";
 
 @Component({

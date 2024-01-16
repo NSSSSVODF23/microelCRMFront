@@ -1,5 +1,5 @@
 import {Component, Input, OnInit} from '@angular/core';
-import {Attachment, AttachmentType} from "../../../transport-interfaces";
+import {Attachment, AttachmentType} from "../../../types/transport-interfaces";
 import {Router} from "@angular/router";
 
 @Component({

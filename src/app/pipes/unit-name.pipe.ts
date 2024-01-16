@@ -1,5 +1,5 @@
 import { Pipe, PipeTransform } from '@angular/core';
-import {PaidActionUnit} from "../transport-interfaces";
+import {PaidActionUnit} from "../types/transport-interfaces";
 
 @Pipe({
   name: 'unitName'

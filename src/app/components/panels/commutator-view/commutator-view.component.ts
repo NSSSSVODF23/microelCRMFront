@@ -1,5 +1,5 @@
 import {Component, Input, OnDestroy, OnInit, ViewChild} from '@angular/core';
-import {LoadingState, PortInfo, Switch} from "../../../transport-interfaces";
+import {LoadingState, PortInfo, Switch} from "../../../types/transport-interfaces";
 import {ApiService} from "../../../services/api.service";
 import {BehaviorSubject, debounceTime, mergeMap, of, retry, switchMap, tap} from "rxjs";
 import {SubscriptionsHolder} from "../../../util";

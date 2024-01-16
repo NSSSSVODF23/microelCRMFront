@@ -1,4 +1,4 @@
-<ng-container [ngSwitch]="field?.value.wireframeFieldType" *ngIf="field" [formGroup]="field">
+<ng-container [ngSwitch]="field.value.wireframeFieldType" *ngIf="field" [formGroup]="field">
 
     <div *ngSwitchCase="'BOOLEAN'" class="input-label-wrapper">
         <ng-container *ngTemplateOutlet="label"></ng-container>
@@ -34,7 +34,7 @@
 
     <div *ngSwitchCase="'ADDRESS'" class="input-label-wrapper">
         <ng-container *ngTemplateOutlet="label"></ng-container>
-        <app-address-input formControlName="value" (onBlur)="onTouched()"></app-address-input>
+        <app-address-input-alt formControlName="value" (onBlur)="onTouched()"></app-address-input-alt>
     </div>
 
     <div *ngSwitchCase="'LOGIN'" class="input-label-wrapper">

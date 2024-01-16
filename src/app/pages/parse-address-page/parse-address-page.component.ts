@@ -1,5 +1,5 @@
 import {Component, ElementRef, OnDestroy, OnInit, ViewChild} from '@angular/core';
-import {SimpleMessage} from "../../parsing-interfaces";
+import {SimpleMessage} from "../../types/parsing-interfaces";
 import {ApiService} from "../../services/api.service";
 import {RealTimeUpdateService} from "../../services/real-time-update.service";
 import {Subscription} from "rxjs";

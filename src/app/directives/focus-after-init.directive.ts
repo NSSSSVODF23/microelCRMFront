@@ -1,18 +1,19 @@
-import {AfterViewInit, Directive, ElementRef, Input} from '@angular/core';
+import {AfterViewInit, Directive, Input} from '@angular/core';
 import {InputMask} from "primeng/inputmask";
 
 @Directive({
-  selector: '[focusAfterInit]'
+    selector: '[focusAfterInit]'
 })
-export class FocusAfterInitDirective implements AfterViewInit{
+export class FocusAfterInitDirective implements AfterViewInit {
 
-  @Input() focusAfterInit = true;
+    @Input() focusAfterInit = true;
 
-  constructor(private hostElement: InputMask) { }
+    constructor(private hostElement: InputMask) {
+    }
 
-  ngAfterViewInit(): void {
-    if(this.focusAfterInit)
-      setTimeout(()=> this.hostElement.focus());
-  }
+    ngAfterViewInit(): void {
+        if (this.focusAfterInit)
+            setTimeout(() => this.hostElement.focus());
+    }
 
 }

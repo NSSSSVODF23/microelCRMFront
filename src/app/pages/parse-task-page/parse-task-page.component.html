@@ -37,19 +37,19 @@
             <div class="flexed column gap5" *ngIf="streetToCorrect[0]" [style.width]="'max-content'">
                 <div class="flexed hcenter vcenter caption size-big">{{streetToCorrect[0]}}</div>
                 <div class="flexed hcenter vcenter caption size-small wt-bold f-color-primary">{{streetToCorrect[1]?.streetRaw}} {{streetToCorrect[1]?.houseRaw}} {{streetToCorrect[1]?.apartRaw}}</div>
-                <app-address-input [ngModel]="streetToCorrect[1]?.address" (ngModelChange)="currentCorrectingStreetAddress=$event"></app-address-input>
+                <app-address-input-alt [ngModel]="streetToCorrect[1]?.address" (ngModelChange)="currentCorrectingStreetAddress=$event"></app-address-input-alt>
                 <p-button label="Откорректировать" (onClick)="correctStreet(streetToCorrect)"></p-button>
             </div>
             <div class="flexed column gap5" *ngIf="houseToCorrect[0]" [style.width]="'max-content'">
                 <div class="flexed hcenter vcenter caption size-big">{{houseToCorrect[0]}}</div>
                 <div class="flexed hcenter vcenter caption size-small wt-bold f-color-primary">{{houseToCorrect[1]?.streetRaw}} {{houseToCorrect[1]?.houseRaw}} {{houseToCorrect[1]?.apartRaw}}</div>
-                <app-address-input [ngModel]="houseToCorrect[1]?.address" (ngModelChange)="currentCorrectingHouseAddress=$event"></app-address-input>
+                <app-address-input-alt [ngModel]="houseToCorrect[1]?.address" (ngModelChange)="currentCorrectingHouseAddress=$event"></app-address-input-alt>
                 <p-button label="Откорректировать" (onClick)="correctHouse(houseToCorrect)"></p-button>
             </div>
             <div class="flexed column gap5" *ngIf="apartmentToCorrect[0]" [style.width]="'max-content'">
                 <div class="flexed hcenter vcenter caption size-big">{{apartmentToCorrect[0]}}</div>
                 <div class="flexed hcenter vcenter caption size-small wt-bold f-color-primary">{{apartmentToCorrect[1]?.streetRaw}} {{apartmentToCorrect[1]?.houseRaw}} {{apartmentToCorrect[1]?.apartRaw}}</div>
-                <app-address-input [ngModel]="apartmentToCorrect[1]?.address" (ngModelChange)="currentCorrectingApartAddress=$event"></app-address-input>
+                <app-address-input-alt [ngModel]="apartmentToCorrect[1]?.address" (ngModelChange)="currentCorrectingApartAddress=$event"></app-address-input-alt>
                 <p-button label="Откорректировать" (onClick)="correctApart(apartmentToCorrect)"></p-button>
             </div>
         </div>

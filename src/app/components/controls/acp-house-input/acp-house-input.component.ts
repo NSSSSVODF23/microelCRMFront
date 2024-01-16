@@ -2,7 +2,7 @@ import {Component, forwardRef, OnDestroy, OnInit} from '@angular/core';
 import {ControlValueAccessor, FormControl, NG_VALUE_ACCESSOR} from "@angular/forms";
 import {ApiService} from "../../../services/api.service";
 import {debounceTime, repeat, shareReplay, Subject, switchMap} from "rxjs";
-import {AcpHouse} from "../../../transport-interfaces";
+import {AcpHouse} from "../../../types/transport-interfaces";
 import {SubscriptionsHolder} from "../../../util";
 
 @Component({

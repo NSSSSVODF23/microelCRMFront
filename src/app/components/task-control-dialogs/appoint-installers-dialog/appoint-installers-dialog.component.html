@@ -1,0 +1,47 @@
+<p-dialog (onHide)="clearAppointInstallers()" [(visible)]="visible" (visibleChange)="visibleChange.emit($event)" [breakpoints]="{'960px': '75vw', '640px': '100vw'}"
+          [dismissableMask]="true" [draggable]="false" [modal]="true" [resizable]="false" (onShow)="loadAppointInstallers()"
+          [autoZIndex]="false" [baseZIndex]="2101" appendTo="body"
+          [style]="{width: '50vw'}" contentStyleClass="flex flex-column gap-3" header="Назначение монтажников">
+    <ng-template pTemplate="content">
+        <p-pickList (onMoveAllToSource)="updateGangLeaders()" (onMoveAllToTarget)="updateGangLeaders()" (onMoveToSource)="updateGangLeaders()"
+                    (onMoveToTarget)="updateGangLeaders()" [dragdrop]="true"
+                    [showSourceControls]="false" [showTargetControls]="false"
+                    [sourceStyle]="{height: '40vh', maxHeight: '15rem'}" [source]="sourceInstallers"
+                    [targetStyle]="{height:'40vh', maxHeight: '15rem'}"
+                    [target]="targetInstallers" sourceHeader="Доступные"
+                    targetHeader="Назначенные">
+            <ng-template let-installer pTemplate="item">
+                <div class="flex align-items-center gap-2">
+                    <app-employee-label [employee]="installer" [size]="1.9"></app-employee-label>
+                </div>
+            </ng-template>
+        </p-pickList>
+        <div [style]="{minHeight: '8rem'}" class="flex flex-column gap-2">
+            <div class="flex flex-column">
+                <div class="text-bluegray-500 text-sm">Текущая цель (необязательно)</div>
+                <textarea [(ngModel)]="targetDescription" [autoResize]="true" [rows]="3" class="stretched"
+                          pInputTextarea (paste)="fileInputComponent.appendFiles($event)"></textarea>
+            </div>
+            <div class="flex gap-2 align-items-center justify-content-end">
+                <app-server-documents-input [(ngModel)]="serverFiles"></app-server-documents-input>
+                <app-file-input #fileInputComponent [(files)]="loadingFiles"></app-file-input>
+            </div>
+        </div>
+        <div class="flex gap-3 align-items-end justify-content-end">
+            <div class="input-label-wrapper">
+                <label>Бригадир</label>
+                <p-dropdown [(ngModel)]="gangLeader" [options]="gangLeaders" appendTo="body"></p-dropdown>
+            </div>
+            <div class="flex gap-2 text-bluegray-500 font-bold align-items-center h-3rem">
+                <span>Отложенный отчет</span>
+                <p-checkbox [(ngModel)]="deferredReport" [binary]="true"></p-checkbox>
+            </div>
+            <app-button (onClick)="resetListAppointedInstallers()"
+                        [disabled]="targetInstallers.length === 0 || appointmentRequested"
+                        icon="delete" label="Сбросить" model="p-button-text p-button-secondary"></app-button>
+            <app-button (onClick)="sendListAppointedInstallers()" [disabled]="targetInstallers.length === 0"
+                        [loading]="appointmentRequested"
+                        icon="assignment" label="Назначить"></app-button>
+        </div>
+    </ng-template>
+</p-dialog>

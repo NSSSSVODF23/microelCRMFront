@@ -1,5 +1,5 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
-import {Employee} from "../../../transport-interfaces";
+import {Employee} from "../../../types/transport-interfaces";
 import {ApiService} from "../../../services/api.service";
 import {ControlValueAccessor, FormControl, NG_VALUE_ACCESSOR} from "@angular/forms";
 

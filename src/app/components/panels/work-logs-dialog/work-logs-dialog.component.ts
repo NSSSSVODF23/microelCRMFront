@@ -1,5 +1,5 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
-import {WorkLog} from "../../../transport-interfaces";
+import {WorkLog} from "../../../types/transport-interfaces";
 import {ApiService} from "../../../services/api.service";
 import {SubscriptionsHolder} from "../../../util";
 import {RealTimeUpdateService} from "../../../services/real-time-update.service";

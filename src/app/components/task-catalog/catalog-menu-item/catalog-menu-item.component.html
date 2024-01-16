@@ -1,6 +1,24 @@
-<div class="flex align-items-center p-2 text-bluegray-500 user-select-none">
-    <span class="hover:text-primary cursor-pointer" [ngClass]="{'mdi-expand_more': !expand, 'mdi-expand_less': expand}"></span>
-    <span class="flex-grow-1 hover:text-primary hover:bg-white px-2 py-1 border-round-sm cursor-pointer"
-          [routerLink]="link" routerLinkActive="text-write bg-primary pointer-events-none cursor-default">{{label}}</span>
-    <span class="font-bold text-sm ml-2" *ngIf="counter">{{counter}}</span>
+<div class="flex flex-column">
+    <div class="flex align-items-center p-2 text-bluegray-600 user-select-none">
+        <span class="hover:text-primary cursor-pointer" (click)="toggleExpand()" *ngIf="!isEmpty"
+              [ngClass]="{'mdi-expand_more': !expand, 'mdi-expand_less': expand}"></span>
+        <div *ngIf="isEmpty" [style]="{width:'20px'}"></div>
+        <span #dropEl class="flex-grow-1 px-2 py-1 border-round-sm cursor-pointer" [pDroppable]="droppable ?? ''" [pDroppableDisabled]="!droppable" (onDrop)="onDrop.emit({$event, dropEl})"
+              (click)="(autoExpand && setExpand(true)); onClick.emit()" [ngClass]="[rla.isActive ? 'hover:text-white hover:bg-primary-700' : 'hover:text-primary hover:bg-white', droppable? 'droppable' : '']"
+              [routerLink]="link" routerLinkActive="text-write bg-primary cursor-default" #rla="routerLinkActive">
+            {{label}}
+        </span>
+        <ng-container *ngIf="counter">
+            <ng-container *ngIf="!isCounterLoading; else loading">
+                <span class="font-bold text-sm ml-2" *ngIf="counter | async as c; else loading">{{c}}</span>
+            </ng-container>
+        </ng-container>
+    </div>
+    <div *ngIf="expand && contentTemplate" class="pl-4 flex flex-column">
+        <ng-container *ngTemplateOutlet="contentTemplate; context:contentTemplateData"></ng-container>
+    </div>
 </div>
+
+<ng-template #loading>
+    <p-skeleton width="1rem" height="1rem" borderRadius=".2rem" class="ml-3"></p-skeleton>
+</ng-template>

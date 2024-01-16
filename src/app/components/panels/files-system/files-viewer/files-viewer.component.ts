@@ -6,7 +6,7 @@ import {
     FileSystemItem,
     LoadingDirectoryWrapper,
     TFile
-} from "../../../../transport-interfaces";
+} from "../../../../types/transport-interfaces";
 import {ApiService} from "../../../../services/api.service";
 import {Storage, SubscriptionsHolder} from "../../../../util";
 import {FormControl, FormGroup, Validators} from "@angular/forms";

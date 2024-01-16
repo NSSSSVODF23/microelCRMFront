@@ -1,0 +1,36 @@
+<ng-container [ngSwitch]="cacheService.taskLoadingState">
+    <div *ngSwitchCase="'LOADING'"
+         class="flexed stretched hcenter vcenter caption size-big wt-bold f-color-500">
+        <p-progressSpinner class="custom-spinner custom-spinner-8xl custom-spinner-primary" strokeWidth="1"></p-progressSpinner>
+    </div>
+
+    <ng-container *ngSwitchCase="'READY'">
+        <ng-container *ngIf="cacheService.tasks$ | async as tasksPage">
+            <div class="flex flex-column gap-1 border-round-md shadow-1 overflow-hidden bg-bluegray-100 h-fit mb-3">
+                <div *ngFor="let item of tasksPage.content" class="flex relative" (onDragStart)="cacheService.taskMovingStart(item)"
+                     [pDraggable]="item.currentStage?.stageId ?? ''">
+                    <app-task-list-element [isCommentInput]="true" [item]="item"></app-task-list-element>
+                </div>
+            </div>
+        </ng-container>
+    </ng-container>
+
+    <div *ngSwitchCase="'EMPTY'" class="flexed column stretched hcenter vcenter caption size-big wt-bold f-color-500">
+        <i class="mds-search_off"></i>
+        <span>Задач не найдено</span>
+    </div>
+
+    <div *ngSwitchCase="'ERROR'"
+         class="flexed stretched hcenter vcenter caption size-big wt-bold f-color-danger">
+        <i class="mdi-error"></i>
+        <span>Произошла ошибка</span>
+    </div>
+</ng-container>
+<div class="flex-grow-1"></div>
+<div class="sticky bottom1" *ngIf="cacheService.tasks$ | async as tasksPage" [hidden]="cacheService.taskLoadingState !== 'READY'">
+    <p-paginator #paginator (onPageChange)="cacheService.pageControl.setValue($event.page)" [alwaysShow]="true"
+                 [rows]="15" [showCurrentPageReport]="true"
+                 [totalRecords]="tasksPage.totalElements" [first]="(cacheService.pageControl.value ?? 0)*15"
+                 currentPageReportTemplate="Показано с {first} по {last} из {totalRecords} задач"
+                 styleClass="panel"></p-paginator>
+</div>

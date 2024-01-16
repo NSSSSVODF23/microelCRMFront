@@ -3,27 +3,34 @@
         <ng-container *ngIf="isTemplateSelected; then selectedTemplatePanel else unselectedTemplatePanel"></ng-container>
     </ng-container>
     <div *ngIf="isTemplateSelected" @flow class="stage-view">
-        <div class="caption">Этап {{this.currentStep + 1}}
-            : {{this.selectedTemplate ? this.selectedTemplate.steps[currentStep].name : ""}}</div>
-        <div [@swipeChild]="currentStepFields.length" [formGroup]="currentStepForm" class="flexed column p10 gap10">
-            <app-task-template-input *ngFor="let field of currentStepFields" [formControlName]="field.id" [field]="field"
-                                     class="stretched"></app-task-template-input>
+<!--        <div class="caption">Этап {{this.currentStep + 1}}-->
+<!--            : {{this.selectedTemplate ? this.selectedTemplate.steps[currentStep].name : ""}}</div>-->
+        <div [@swipeChild]="currentStepFields.length" [formGroup]="currentStepForm" class="flex flex-column p-3 gap-3">
+            <app-task-template-input *ngFor="let field of currentStepFields; let i = index" [formControlName]="field.id" [field]="field"
+                                     class="flex-grow-1" (focusin)="currentFieldFocus = i" (focusout)="currentFieldFocus = undefined"></app-task-template-input>
         </div>
         <div class="flex flex-column gap-3 mt-3">
+            <div class="flex flex-wrap gap-3 align-items-end">
                 <div class="flex flex-column gap-1" *ngIf="types.length>0">
                     <span class="font-semibold text-lg text-bluegray-400">Тип задачи</span>
-                    <div class="flex gap-3 align-items-center">
-                        <p-dropdown [options]="types" [(ngModel)]="type" (ngModelChange)="changeTaskType($event)" optionValue="stageId"></p-dropdown>
-                        <p-toggleButton [(ngModel)]="isDuplicateInOldTracker" [disabled]="!isCurrentTypeHasBind || !isUserHasOldTrackerCredentials"
-                                onLabel="Дублировать в старый трекер" offLabel="Не дублировать в старый трекер" styleClass="white-space-nowrap"></p-toggleButton>
-                        <span class="font-bold text-sm text-orange-400 flex gap-2 align-items-center" *ngIf="!isUserHasOldTrackerCredentials">
-                            <span class="mdi-warning"></span>
-                            <span>
-                                Для дублирования у вас должны быть установлены реквизиты для входа в старый трекер
-                            </span>
-                        </span>
-                    </div>
+                    <p-dropdown [options]="types" [(ngModel)]="type"
+                                (ngModelChange)="changeTaskType($event)" optionValue="stageId"></p-dropdown>
                 </div>
+                <div class="flex flex-column gap-1" *ngIf="directories.length>0">
+                    <span class="font-semibold text-lg text-bluegray-400">Каталог</span>
+                    <p-dropdown [options]="directories" [(ngModel)]="directory" placeholder="Выбрать каталог"
+                                optionLabel="name" optionValue="taskTypeDirectoryId"></p-dropdown>
+                </div>
+                <p-toggleButton [(ngModel)]="isDuplicateInOldTracker" [disabled]="!isCurrentTypeHasBind || !isUserHasOldTrackerCredentials"
+                                onLabel="Дублировать в старый трекер" offLabel="Не дублировать в старый трекер" styleClass="white-space-nowrap"></p-toggleButton>
+                <span class="font-bold text-sm text-orange-400 flex gap-2 align-items-center" *ngIf="!isUserHasOldTrackerCredentials">
+                    <span class="mdi-warning"></span>
+                    <span>
+                        Для дублирования у вас должны быть установлены реквизиты для входа в старый трекер
+                    </span>
+                </span>
+            </div>
+
             <div class="flex flex-column gap-1">
                 <span class="font-semibold text-lg text-bluegray-400">Наблюдатели</span>
                 <app-observer-selector-input [(ngModel)]="initialObservers"></app-observer-selector-input>
@@ -35,12 +42,11 @@
             <div class="flex flex-column gap-1">
                 <span class="font-semibold text-lg text-bluegray-400">Начальный комментарий</span>
                 <div class="flex gap-2">
-                    <app-avatar *ngIf="personality.me" [name]="personality.me?.fullName" [src]="personality.me?.avatar" [size]="3"></app-avatar>
+                    <app-avatar *ngIf="personality.me" [name]="personality.me.fullName" [src]="personality.me.avatar" [size]="3"></app-avatar>
                     <textarea pInputTextarea placeholder="Комментарий..." [autoResize]="true" [rows]="5" [(ngModel)]="initialComment" class="flex-grow-1"></textarea>
                 </div>
             </div>
         </div>
-        <ng-container *ngTemplateOutlet="controls"></ng-container>
     </div>
 </div>
 
@@ -49,22 +55,22 @@
         <div *ngSwitchCase="'NEXT_ONLY'" class="flex gap-3">
             <div class="stretched"></div>
             <app-button (onClick)="changeCreationStep(1)" icon="navigate_next"
-                        iconPos="right" label="Далее"></app-button>
+                        iconPos="right" [label]="nextStepName??'Далее'"></app-button>
         </div>
         <div *ngSwitchCase="'BOTH'" class="flex gap-3">
             <app-button (onClick)="changeCreationStep(-1)" icon="navigate_before"
-                        label="Назад" model="p-button-text p-button-secondary"></app-button>
+                        [label]="prevStepName??'Назад'" model="p-button-text p-button-secondary"></app-button>
             <div class="stretched"></div>
             <app-button (onClick)="changeCreationStep(1)" icon="navigate_next"
-                        iconPos="right" label="Далее"></app-button>
+                        iconPos="right" [label]="nextStepName??'Далее'"></app-button>
         </div>
         <div *ngSwitchCase="'PREV_FIN'" class="flex gap-3">
             <app-button (onClick)="changeCreationStep(-1)" icon="navigate_before"
-                        label="Назад" model="p-button-text p-button-secondary"></app-button>
+                        [label]="prevStepName??'Назад'" model="p-button-text p-button-secondary"></app-button>
             <div class="stretched"></div>
             <p-button (onClick)="createTaskAndClose()" icon="mdi-add_circle_outline" styleClass="p-button-secondary p-button-outlined"
                         label="Создать и закрыть задачу"></p-button>
-            <p-button (onClick)="createTask()" icon="mdi_add_circle_outline"
+            <p-button (onClick)="createTask()" icon="mdi-add_circle_outline"
                         label="Создать"></p-button>
         </div>
         <div *ngSwitchCase="'FIN_ONLY'" class="flex gap-3">
@@ -79,11 +85,11 @@
 
 <ng-template #unselectedTemplatePanel>
     <div class="flexed gap10 column">
-        <span class="header400">Выбор шаблона задачи</span>
+        <span class="header400">Класс задачи</span>
         <div class="flexed gap5 hcenter">
             <p-dropdown [(ngModel)]="selectedTemplate" [disabled]="isTemplateSelected"
                         [options]="(templateOptionsList$ | async) ?? []" optionLabel="name"
-                        placeholder="Шаблоны задач"></p-dropdown>
+                        placeholder="Классы задач"></p-dropdown>
             <app-button (onClick)="selectTemplateForTask()" [disabled]="isTemplateSelected" icon="done"
                         label="Выбрать"
                         model="fit-content p-button-success"></app-button>
@@ -92,12 +98,16 @@
 </ng-template>
 
 <ng-template #selectedTemplatePanel>
-    <div class="flexed hcenter gap5">
-        <span class="header300">Выбранный шаблон:</span>
-        <span class="header400">{{selectedTemplate?.name}}</span>
+    <div class="flex align-items-center gap-2">
+        <div class="flex flex-column">
+            <span class="text-bluegray-500">Класс</span>
+            <span class="text-bluegray-500 text-lg font-bold">{{selectedTemplate?.name}}</span>
+        </div>
         <app-button (onClick)="unselectTemplateForTask()" [disabled]="!isTemplateSelected" icon="published_with_changes"
                     label="Изменить выбор"
                     model="p-button-text p-button-danger fit-content"></app-button>
+        <div class="flex-grow-1"></div>
+        <ng-container *ngTemplateOutlet="controls"></ng-container>
     </div>
 </ng-template>
 

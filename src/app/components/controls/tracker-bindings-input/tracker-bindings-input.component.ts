@@ -1,8 +1,8 @@
 import {Component, forwardRef, OnDestroy, OnInit} from '@angular/core';
 import {ControlValueAccessor, FormControl, FormGroup, NG_VALUE_ACCESSOR} from "@angular/forms";
-import {BindingsCollection} from "../../../parsing-interfaces";
+import {BindingsCollection} from "../../../types/parsing-interfaces";
 import {ApiService} from "../../../services/api.service";
-import {FieldItem, Wireframe} from "../../../transport-interfaces";
+import {FieldItem, Wireframe} from "../../../types/transport-interfaces";
 import {map, Subscription, tap} from "rxjs";
 
 @Component({

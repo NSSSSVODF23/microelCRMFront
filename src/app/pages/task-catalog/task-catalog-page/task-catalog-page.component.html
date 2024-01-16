@@ -1,0 +1,337 @@
+<div appExtendPageHeight class="flex px-3 gap-3">
+    <app-main-menu-panel></app-main-menu-panel>
+    <div class="flex flex-grow-1 gap-3 mb-3">
+        <div class="flex flex-column flex-grow-1 gap-3">
+            <div class="flex bg-white border-round border-1 border-bluegray-100 p-2 align-items-center">
+                <ng-container *ngIf="cacheService.breadCrumbsModel$ | async as breadCrumbs">
+                    <p-breadcrumb [model]="breadCrumbs" styleClass="border-0 py-0 px-2"></p-breadcrumb>
+                </ng-container>
+                <div class="flex-grow-1"></div>
+                <p-button label="Поиск задач" icon="mdi-search" [routerLink]="['/tasks','search']"
+                          styleClass="p-button-sm"></p-button>
+            </div>
+            <div class="flex flex-column flex-grow-1">
+                <router-outlet></router-outlet>
+            </div>
+        </div>
+        <div class="flex flex-column border-round border-1 bg-white border-bluegray-100 h-fit sticky-type-selector">
+            <span class="text-lg text-bluegray-600 font-bold p-3 bg-white sticky top-0 z-5">Каталог</span>
+            <div class="flex flex-column gap-1 relative px-3 pb-3">
+                <ng-container *ngTemplateOutlet="activeTasksMenuItemTemplate"></ng-container>
+                <ng-container *ngTemplateOutlet="processingTasksMenuItemTemplate"></ng-container>
+                <ng-container *ngTemplateOutlet="closeTasksMenuItemTemplate"></ng-container>
+                <ng-container *ngTemplateOutlet="scheduledTasksMenuItemTemplate"></ng-container>
+                <ng-container *ngTemplateOutlet="termTasksMenuItemTemplate"></ng-container>
+                <div *ngIf="cacheService.highlightCatalogs !== undefined"
+                     class="absolute top-0 left-0 w-full h-full bg-black-alpha-30">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<ng-template #activeTasksMenuItemTemplate>
+    <app-catalog-menu-item [contentTemplate]="activeTasksClassItemsTemplate" [(expand)]="cacheService.rootExpandMap['active']"
+                           [counter]="cacheService.getTasksCounter(null,{status:'ACTIVE', schedulingType: SchedulingType.EXCEPT_PLANNED})"
+                           [isEmpty]="false" (onClick)="cacheService.unExpandOtherCatalog('active')"
+                           [label]="'Активные'"
+                           [link]="'/tasks/catalog/active'"></app-catalog-menu-item>
+</ng-template>
+
+<ng-template #activeTasksClassItemsTemplate>
+    <ng-container *ngIf="cacheService.wireframes$ | async as wireframes">
+        <app-catalog-menu-item *ngFor="let wireframe of wireframes" [contentTemplateData]="{wireframe}"
+                               [contentTemplate]="activeTasksTypesItemsTemplate"
+                               [counter]="cacheService.getTasksCounter(null,{status:'ACTIVE', cls: wireframe.wireframeId, schedulingType: SchedulingType.EXCEPT_PLANNED})"
+                               [isEmpty]="(wireframe.stages?.length ?? 0) === 0" [label]="wireframe.name"
+                               [link]="'/tasks/catalog/active/' + wireframe.wireframeId">
+        </app-catalog-menu-item>
+    </ng-container>
+</ng-template>
+
+<ng-template #activeTasksTypesItemsTemplate let-wireframe="wireframe">
+    <app-catalog-menu-item *ngFor="let stage of wireframe.stages"
+                           [contentTemplateData]="{wireframe, stage}" [contentTemplate]="activeTasksDirectoryItemsTemplate"
+                           [counter]="cacheService.getTasksCounter(null,{status:'ACTIVE', cls:wireframe.wireframeId, type:stage.stageId, schedulingType: SchedulingType.EXCEPT_PLANNED})"
+                           [isEmpty]="false"
+                           [label]="stage.label"
+                           [link]="'/tasks/catalog/active/' + wireframe.wireframeId + '/' + stage.stageId">
+    </app-catalog-menu-item>
+</ng-template>
+
+<ng-template #activeTasksDirectoryItemsTemplate let-stage="stage" let-wireframe="wireframe">
+    <ng-container *ngIf="stage.directories && stage.directories.length > 0">
+        <ng-container *ngFor="let dir of stage.directories">
+            <app-catalog-menu-item
+                    (onDrop)="cacheService.moveToDirectory(dir)"
+                    [autoExpand]="false" [contentTemplateData]="{wireframe, stage, directory: dir}" [contentTemplate]="activeTasksTagsItemsTemplate"
+                    [counter]="cacheService.getTasksCounter('dir',{status: 'ACTIVE', cls: wireframe.wireframeId, type: stage.stageId, directory: dir.taskTypeDirectoryId, schedulingType: SchedulingType.EXCEPT_PLANNED})"
+                    [droppable]="stage.stageId"
+                    [isEmpty]="false"
+                    [label]="dir.name" [link]="'/tasks/catalog/active/' + wireframe.wireframeId + '/' + stage.stageId + '/dir/' + dir.taskTypeDirectoryId"
+                    [style]="cacheService.catalogHighlight(dir.taskTypeDirectoryId)">
+            </app-catalog-menu-item>
+        </ng-container>
+    </ng-container>
+    <ng-container *ngIf="!(stage.directories && stage.directories.length > 0)">
+        <ng-container *ngTemplateOutlet="emptyTasksDirectoriesItem; context:{wireframe, stage}"></ng-container>
+    </ng-container>
+</ng-template>
+
+<ng-template #activeTasksTagsItemsTemplate let-directory="directory" let-stage="stage" let-wireframe="wireframe">
+    <div *ngIf="cacheService.getTagsFromCatalog({status: 'ACTIVE', cls: wireframe.wireframeId, type: stage.stageId, directory: directory.taskTypeDirectoryId, schedulingType: SchedulingType.EXCEPT_PLANNED}) | async as tags"
+         class="flex flex-column gap-1 pl-3">
+        <ng-container *ngIf="tags !== null && tags.length > 0; else emptyTagsTemplate">
+            <ng-container *ngFor="let tag of tags">
+                <ng-container
+                        *ngTemplateOutlet="tagItemTemplate; context:{tag,wireframe,stage,dir:directory}"></ng-container>
+            </ng-container>
+        </ng-container>
+    </div>
+</ng-template>
+
+<ng-template #processingTasksMenuItemTemplate>
+    <app-catalog-menu-item [contentTemplate]="processingTasksClassItemsTemplate" [(expand)]="cacheService.rootExpandMap['processing']"
+                           [counter]="cacheService.getTasksCounter(null,{status: 'PROCESSING', schedulingType: SchedulingType.UNSCHEDULED})"
+                           [isEmpty]="false" (onClick)="cacheService.unExpandOtherCatalog('processing')"
+                           [label]="'У монтажников'"
+    [link]="'/tasks/catalog/processing'"></app-catalog-menu-item>
+</ng-template>
+
+<ng-template #processingTasksClassItemsTemplate>
+    <ng-container *ngIf="cacheService.wireframes$ | async as wireframes">
+        <app-catalog-menu-item *ngFor="let wireframe of wireframes" [contentTemplateData]="{wireframe}"
+                               [contentTemplate]="processingTasksTypesItemsTemplate" [counter]="cacheService.getTasksCounter(null,{status: 'PROCESSING', cls: wireframe.wireframeId, schedulingType: SchedulingType.UNSCHEDULED})"
+                               [isEmpty]="(wireframe.stages?.length ?? 0) === 0" [label]="wireframe.name"
+                               [link]="'/tasks/catalog/processing/' + wireframe.wireframeId">
+        </app-catalog-menu-item>
+    </ng-container>
+</ng-template>
+
+<ng-template #processingTasksTypesItemsTemplate let-wireframe="wireframe">
+    <app-catalog-menu-item *ngFor="let stage of wireframe.stages"
+                           [counter]="cacheService.getTasksCounter(null,{status: 'PROCESSING', cls: wireframe.wireframeId, type: stage.stageId, schedulingType: SchedulingType.UNSCHEDULED})" [isEmpty]="true" [label]="stage.label"
+                           [link]="'/tasks/catalog/processing/' + wireframe.wireframeId + '/' + stage.stageId">
+    </app-catalog-menu-item>
+</ng-template>
+
+<ng-template #closeTasksMenuItemTemplate>
+    <app-catalog-menu-item [contentTemplate]="closeTasksClassItemsTemplate" [counter]="cacheService.getTasksCounter(null, {status: 'CLOSE', schedulingType: SchedulingType.UNSCHEDULED})"
+                           [isEmpty]="false" (onClick)="cacheService.unExpandOtherCatalog('close')" [(expand)]="cacheService.rootExpandMap['close']"
+                           [label]="'Закрытые'" [link]="'/tasks/catalog/close'"></app-catalog-menu-item>
+</ng-template>
+
+<ng-template #closeTasksClassItemsTemplate>
+    <ng-container *ngIf="cacheService.wireframes$ | async as wireframes">
+        <app-catalog-menu-item *ngFor="let wireframe of wireframes" [contentTemplateData]="{wireframe}"
+                               [contentTemplate]="closeTasksTypesItemsTemplate" [counter]="cacheService.getTasksCounter(null,{status: 'CLOSE', cls: wireframe.wireframeId, schedulingType: SchedulingType.UNSCHEDULED})"
+                               [isEmpty]="(wireframe.stages?.length ?? 0) === 0" [label]="wireframe.name"
+                               [link]="'/tasks/catalog/close/' + wireframe.wireframeId">
+        </app-catalog-menu-item>
+    </ng-container>
+</ng-template>
+
+<ng-template #closeTasksTypesItemsTemplate let-wireframe="wireframe">
+    <app-catalog-menu-item *ngFor="let stage of wireframe.stages"
+                           [contentTemplateData]="{wireframe, stage}" [contentTemplate]="closeTasksTemporaryItemsTemplate"
+                           [counter]="cacheService.getTasksCounter(null, {status: 'CLOSE', cls: wireframe.wireframeId, type: stage.stageId, schedulingType: SchedulingType.UNSCHEDULED})"
+                           [isEmpty]="false"
+                           [label]="stage.label"
+                           [link]="'/tasks/catalog/close/' + wireframe.wireframeId + '/' + stage.stageId">
+    </app-catalog-menu-item>
+</ng-template>
+
+<ng-template #closeTasksTemporaryItemsTemplate let-stage="stage" let-wireframe="wireframe">
+    <app-catalog-menu-item
+            *ngFor="let timeFrame of cacheService.beforeTemporaryMap"
+            [counter]="cacheService.getTasksCounter('close-time',{status: 'CLOSE', cls: wireframe.wireframeId, type: stage.stageId, dateOfClose: {timeFrame: timeFrame.id}, schedulingType: SchedulingType.UNSCHEDULED})"
+            [isEmpty]="false" [label]="timeFrame.name" [autoExpand]="false"
+            [contentTemplate]="closeTasksTagsItemsTemplate" [contentTemplateData]="{wireframe, stage, timeFrame:timeFrame.id}"
+            [link]="'/tasks/catalog/close/' + wireframe.wireframeId + '/' + stage.stageId + '/close-time/' + timeFrame.id">
+    </app-catalog-menu-item>
+</ng-template>
+
+<ng-template #closeTasksTagsItemsTemplate let-stage="stage" let-wireframe="wireframe" let-timeFrame="timeFrame">
+    <div *ngIf="cacheService.getTagsFromCatalog({status: 'CLOSE', cls: wireframe.wireframeId, type: stage.stageId, dateOfClose: {timeFrame}, schedulingType: SchedulingType.UNSCHEDULED}) | async as tags"
+         class="flex flex-column gap-1 pl-3">
+        <ng-container *ngIf="tags !== null && tags.length > 0; else emptyTagsTemplate">
+            <ng-container *ngFor="let tag of tags">
+                <ng-container *ngTemplateOutlet="tagCloseTaskItemTemplate; context:{tag,wireframe,stage,timeFrame}"></ng-container>
+            </ng-container>
+        </ng-container>
+    </div>
+</ng-template>
+
+<ng-template #scheduledTasksMenuItemTemplate>
+    <app-catalog-menu-item [contentTemplate]="scheduledTasksClassItemsTemplate"
+                           [counter]="cacheService.getTasksCounter(null, {status: 'ACTIVE', schedulingType: SchedulingType.PLANNED})"
+                           [isEmpty]="false" (onClick)="cacheService.unExpandOtherCatalog('scheduled')" [(expand)]="cacheService.rootExpandMap['scheduled']"
+                           [label]="'Запланированные'" [link]="'/tasks/catalog/scheduled/active'"></app-catalog-menu-item>
+</ng-template>
+
+<ng-template #scheduledTasksClassItemsTemplate>
+    <ng-container *ngIf="cacheService.wireframes$ | async as wireframes">
+        <app-catalog-menu-item *ngFor="let wireframe of wireframes" [contentTemplateData]="{wireframe}"
+                               [contentTemplate]="scheduledTasksTypesItemsTemplate"
+                               [counter]="cacheService.getTasksCounter(null,{status: 'ACTIVE', schedulingType: SchedulingType.PLANNED, cls: wireframe.wireframeId})"
+                               [isEmpty]="(wireframe.stages?.length ?? 0) === 0" [label]="wireframe.name"
+                               [link]="'/tasks/catalog/scheduled/active/' + wireframe.wireframeId">
+        </app-catalog-menu-item>
+    </ng-container>
+</ng-template>
+
+<ng-template #scheduledTasksTypesItemsTemplate let-wireframe="wireframe">
+    <app-catalog-menu-item *ngFor="let stage of wireframe.stages"
+                           [contentTemplateData]="{wireframe, stage}" [contentTemplate]="scheduledTasksTemporaryItemsTemplate"
+                           [counter]="cacheService.getTasksCounter(null, {status: 'ACTIVE', schedulingType: SchedulingType.PLANNED, cls: wireframe.wireframeId, type: stage.stageId})"
+                           [isEmpty]="false"
+                           [label]="stage.label"
+                           [link]="'/tasks/catalog/scheduled/active/' + wireframe.wireframeId + '/' + stage.stageId">
+    </app-catalog-menu-item>
+</ng-template>
+
+<ng-template #scheduledTasksTemporaryItemsTemplate let-stage="stage" let-wireframe="wireframe">
+    <app-catalog-menu-item
+            *ngFor="let timeFrame of cacheService.afterTemporaryMap"
+            [counter]="cacheService.getTasksCounter('actual-time',{status: 'ACTIVE', schedulingType: SchedulingType.PLANNED, cls: wireframe.wireframeId, type: stage.stageId, actualFrom: {timeFrame: timeFrame.id}})"
+            [isEmpty]="false" [label]="timeFrame.name" [autoExpand]="false"
+            [contentTemplate]="scheduledTasksTagsItemsTemplate" [contentTemplateData]="{wireframe, stage, timeFrame:timeFrame.id}"
+            [link]="'/tasks/catalog/scheduled/active/' + wireframe.wireframeId + '/' + stage.stageId + '/actual-time/' + timeFrame.id">
+    </app-catalog-menu-item>
+</ng-template>
+
+<ng-template #scheduledTasksTagsItemsTemplate let-stage="stage" let-wireframe="wireframe" let-timeFrame="timeFrame">
+    <div *ngIf="cacheService.getTagsFromCatalog({status: 'ACTIVE', schedulingType: SchedulingType.PLANNED, cls: wireframe.wireframeId, type: stage.stageId, actualFrom: {timeFrame}}) | async as tags"
+         class="flex flex-column gap-1 pl-3">
+        <ng-container *ngIf="tags !== null && tags.length > 0; else emptyTagsTemplate">
+            <ng-container *ngFor="let tag of tags">
+                <ng-container *ngTemplateOutlet="tagScheduleTaskItemTemplate; context:{tag,wireframe,stage,timeFrame}"></ng-container>
+            </ng-container>
+        </ng-container>
+    </div>
+</ng-template>
+
+<ng-template #termTasksMenuItemTemplate>
+    <app-catalog-menu-item [contentTemplate]="termTasksClassItemsTemplate"
+                           [counter]="cacheService.getTasksCounter(null, {status: 'ACTIVE', schedulingType: SchedulingType.DEADLINE})"
+                           [isEmpty]="false" (onClick)="cacheService.unExpandOtherCatalog('term')" [(expand)]="cacheService.rootExpandMap['term']"
+                           [label]="'Срок'" [link]="'/tasks/catalog/term/active'"></app-catalog-menu-item>
+</ng-template>
+
+<ng-template #termTasksClassItemsTemplate>
+    <ng-container *ngIf="cacheService.wireframes$ | async as wireframes">
+        <app-catalog-menu-item *ngFor="let wireframe of wireframes" [contentTemplateData]="{wireframe}"
+                               [contentTemplate]="termTasksTypesItemsTemplate"
+                               [counter]="cacheService.getTasksCounter(null,{status: 'ACTIVE', schedulingType: SchedulingType.DEADLINE, cls: wireframe.wireframeId})"
+                               [isEmpty]="(wireframe.stages?.length ?? 0) === 0" [label]="wireframe.name"
+                               [link]="'/tasks/catalog/term/active/' + wireframe.wireframeId">
+        </app-catalog-menu-item>
+    </ng-container>
+</ng-template>
+
+<ng-template #termTasksTypesItemsTemplate let-wireframe="wireframe">
+    <app-catalog-menu-item *ngFor="let stage of wireframe.stages"
+                           [contentTemplateData]="{wireframe, stage}" [contentTemplate]="termTasksTemporaryItemsTemplate"
+                           [counter]="cacheService.getTasksCounter(null, {status: 'ACTIVE', schedulingType: SchedulingType.DEADLINE, cls: wireframe.wireframeId, type: stage.stageId})"
+                           [isEmpty]="false"
+                           [label]="stage.label"
+                           [link]="'/tasks/catalog/term/active/' + wireframe.wireframeId + '/' + stage.stageId">
+    </app-catalog-menu-item>
+</ng-template>
+
+<ng-template #termTasksTemporaryItemsTemplate let-stage="stage" let-wireframe="wireframe">
+    <app-catalog-menu-item
+            *ngFor="let timeFrame of cacheService.afterTemporaryMap"
+            [counter]="cacheService.getTasksCounter('term-time',{status: 'ACTIVE', schedulingType: SchedulingType.DEADLINE, cls: wireframe.wireframeId, type: stage.stageId, actualTo: {timeFrame: timeFrame.id}})"
+            [isEmpty]="false" [label]="timeFrame.name" [autoExpand]="false"
+            [contentTemplate]="termTasksTagsItemsTemplate" [contentTemplateData]="{wireframe, stage, timeFrame:timeFrame.id}"
+            [link]="'/tasks/catalog/term/active/' + wireframe.wireframeId + '/' + stage.stageId + '/term-time/' + timeFrame.id">
+    </app-catalog-menu-item>
+</ng-template>
+
+<ng-template #termTasksTagsItemsTemplate let-stage="stage" let-wireframe="wireframe" let-timeFrame="timeFrame">
+    <div *ngIf="cacheService.getTagsFromCatalog({status: 'ACTIVE', schedulingType: SchedulingType.DEADLINE, cls: wireframe.wireframeId, type: stage.stageId, actualTo: {timeFrame}}) | async as tags"
+         class="flex flex-column gap-1 pl-3">
+        <ng-container *ngIf="tags !== null && tags.length > 0; else emptyTagsTemplate">
+            <ng-container *ngFor="let tag of tags">
+                <ng-container *ngTemplateOutlet="tagTermTaskItemTemplate; context:{tag,wireframe,stage,timeFrame}"></ng-container>
+            </ng-container>
+        </ng-container>
+    </div>
+</ng-template>
+
+<ng-template #emptyTasksDirectoriesItem let-stage="stage" let-wireframe="wireframe">
+    <app-catalog-menu-item [autoExpand]="false"
+                           [counter]="cacheService.getTasksCounter(null,{status: 'ACTIVE', cls: wireframe.wireframeId, type: stage.stageId, schedulingType: SchedulingType.EXCEPT_PLANNED})"
+                           [link]="'/tasks/catalog/active/' + wireframe.wireframeId + '/' + stage.stageId"
+                           label="Без категории">
+    </app-catalog-menu-item>
+</ng-template>
+
+
+<ng-template #tagItemTemplate let-dir="dir" let-stage="stage" let-tag="tag" let-wireframe="wireframe">
+    <div #rla="routerLinkActive"
+         [ngStyle]="{border: rla.isActive ? null : 'solid 1px ' + tag.color, backgroundColor: rla.isActive ? tag.color : null, cursor: rla.isActive ? 'default' : 'pointer'}"
+         [routerLinkActive]="'active'" [routerLink]="'/tasks/catalog/active/' + wireframe.wireframeId + '/' + stage.stageId + '/dir/' + dir.taskTypeDirectoryId + '/' + tag.id"
+         class="border-round-3xl px-3 py-1 flex align-items-baseline font-semibold user-select-none gap-2">
+        <div [style]="{color: rla.isActive ? 'white' : tag.color}" class="flex-grow-1">
+            {{tag.name}}
+        </div>
+        <div [style]="{color: rla.isActive ? 'white' : tag.color}" class="text-sm">
+            {{tag.count}}
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #tagCloseTaskItemTemplate let-stage="stage" let-tag="tag" let-wireframe="wireframe" let-timeFrame="timeFrame">
+    <div #rla="routerLinkActive"
+         [ngStyle]="{border: rla.isActive ? null : 'solid 1px ' + tag.color, backgroundColor: rla.isActive ? tag.color : null, cursor: rla.isActive ? 'default' : 'pointer'}"
+         [routerLinkActive]="'active'" [routerLink]="'/tasks/catalog/close/' + wireframe.wireframeId + '/' + stage.stageId + '/close-time/' + timeFrame + '/' + tag.id"
+         class="border-round-3xl px-3 py-1 flex align-items-baseline font-semibold user-select-none gap-2">
+        <div [style]="{color: rla.isActive ? 'white' : tag.color}" class="flex-grow-1">
+            {{tag.name}}
+        </div>
+        <div [style]="{color: rla.isActive ? 'white' : tag.color}" class="text-sm">
+            {{tag.count}}
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #tagScheduleTaskItemTemplate let-stage="stage" let-tag="tag" let-wireframe="wireframe" let-timeFrame="timeFrame">
+    <div #rla="routerLinkActive"
+         [ngStyle]="{border: rla.isActive ? null : 'solid 1px ' + tag.color, backgroundColor: rla.isActive ? tag.color : null, cursor: rla.isActive ? 'default' : 'pointer'}"
+         [routerLinkActive]="'active'" [routerLink]="'/tasks/catalog/scheduled/active/' + wireframe.wireframeId + '/' + stage.stageId + '/actual-time/' + timeFrame + '/' + tag.id"
+         class="border-round-3xl px-3 py-1 flex align-items-baseline font-semibold user-select-none gap-2">
+        <div [style]="{color: rla.isActive ? 'white' : tag.color}" class="flex-grow-1">
+            {{tag.name}}
+        </div>
+        <div [style]="{color: rla.isActive ? 'white' : tag.color}" class="text-sm">
+            {{tag.count}}
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #tagTermTaskItemTemplate let-stage="stage" let-tag="tag" let-wireframe="wireframe" let-timeFrame="timeFrame">
+    <div #rla="routerLinkActive"
+         [ngStyle]="{border: rla.isActive ? null : 'solid 1px ' + tag.color, backgroundColor: rla.isActive ? tag.color : null, cursor: rla.isActive ? 'default' : 'pointer'}"
+         [routerLinkActive]="'active'" [routerLink]="'/tasks/catalog/term/active/' + wireframe.wireframeId + '/' + stage.stageId + '/term-time/' + timeFrame + '/' + tag.id"
+         class="border-round-3xl px-3 py-1 flex align-items-baseline font-semibold user-select-none gap-2">
+        <div [style]="{color: rla.isActive ? 'white' : tag.color}" class="flex-grow-1">
+            {{tag.name}}
+        </div>
+        <div [style]="{color: rla.isActive ? 'white' : tag.color}" class="text-sm">
+            {{tag.count}}
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #emptyTagsTemplate>
+    <div class="text-bluegray-300 text-sm font-bold">
+        Задач с тегами нет
+    </div>
+</ng-template>
+
+<p-blockUI [blocked]="cacheService.blockVisible">
+    <p-progressSpinner class="custom-spinner custom-spinner-gray custom-spinner-8xl"
+                       strokeWidth="1"></p-progressSpinner>
+</p-blockUI>

@@ -34,6 +34,8 @@ export interface TaskTypeDirectory{
     orderIndex?: number;
 }
 
+export type TagListItem = {id: number, name: string, count: number}
+
 export interface OldTrackerBind {
     oldTrackerBindId: number;
     classId: number;
@@ -269,7 +271,8 @@ export interface Task {
     taskId: number;
     created?: string;
     updated?: string;
-    lastComment?: Comment;
+    closed?: string;
+    lastComments?: Comment[];
     creator?: Employee;
     comments?: Comment[];
     taskEvents?: TaskEvent[];
@@ -284,6 +287,7 @@ export interface Task {
     tags?: TaskTag[];
     modelWireframe?: Wireframe;
     currentStage?: TaskStage;
+    currentDirectory?: TaskTypeDirectory;
     fields?: ModelItem[];
     pipelineWireframes?: Wireframe[];
     pipelines?: Pipeline[];
@@ -303,18 +307,68 @@ export interface TaskFiltrationConditions {
     status?: string[] | null;
     template?: number[] | null;
     templateFilter?: FilterModelItem[] | null;
+    fieldFilters?: TaskFieldFilter[] | null;
     searchPhrase?: string | null;
     author?: string | null;
-    dateOfCreation?: string[] | null;
+    assignedEmployee?: string | null;
+    dateOfCreation?: DateRange | null;
     exclusionIds?: number[] | null;
     tags?: number[] | null;
     onlyMy?: boolean | null;
+    limit?: number | null;
+    page?: number | null;
+    stage?: string | null;
+    directory?: number | null;
+    schedulingType?: 'ALL' | 'SCHEDULED' | 'UNSCHEDULED' | 'PLANNED' | 'DEADLINE' | 'EXCEPT_PLANNED' | null;
+    dateOfClose?: DateRange | null;
+    actualFrom?: DateRange | null;
+    actualTo?: DateRange | null;
+}
+
+export interface TaskFieldFilter{
+    type: FilteringType;
+    textValue?: string;
+    addressValue?: Address;
+    adSourceValue?: AdvertisingSource;
+    connectionTypeValue?: ConnectionType;
+    connectionServiceValue?: number;
+}
+
+export enum FilteringType{
+    TEXT = "TEXT",
+    LOGIN = "LOGIN",
+    ADDRESS = "ADDRESS",
+    PHONE = "PHONE",
+    AD_SOURCE = "AD_SOURCE",
+    CONNECTION_TYPE = "CONNECTION_TYPE",
+    CONNECTION_SERVICE = "CONNECTION_SERVICE"
+}
+
+export enum AdvertisingSource {
+    RESUMPTION = "RESUMPTION",
+    LOSS = "LOSS",
+    MAIL = "MAIL",
+    LEAFLET = "LEAFLET",
+    SOUND = "SOUND",
+    RADIO = "RADIO",
+    SOCIALNET = "SOCIALNET",
+    BANNER = "BANNER",
+    KITH = "KITH",
+    SMS = "SMS",
+    INTERNET = "INTERNET",
+    MANAGER = "MANAGER",
+    EARLYUSED = "EARLYUSED"
+}
+
+export enum ConnectionType{
+    NEW = "NEW",
+    RESUMPTION = "RESUMPTION",
+    TRANSFER = "TRANSFER"
 }
 
 /**
  * Интерфейс для создания задачи
  */
-
 export interface TaskCreationBody {
     wireframeId: number;
     fields: ModelItem[];
@@ -324,6 +378,7 @@ export interface TaskCreationBody {
     tags?: TaskTag[];
     observers?: DefaultObservers[];
     type?: string;
+    directory?: number;
     isDuplicateInOldTracker?: boolean;
 }
 
@@ -427,6 +482,12 @@ export interface Street {
     deleted?: boolean;
     nameWithPrefix: string;
     streetName: string;
+}
+
+export interface StreetSuggestion {
+    cityId: number;
+    streetId: number;
+    name: string;
 }
 
 export interface House {
@@ -539,6 +600,7 @@ export enum TaskEventType {
     REOPEN_TASK = "REOPEN_TASK",
     EDIT_FIELDS = "EDIT_FIELDS",
     REPORT_CREATED = "REPORT_CREATED",
+    MOVED_TO_DIRECTORY = "MOVED_TO_DIRECTORY"
 }
 
 export interface TaskEvent {
@@ -570,8 +632,18 @@ export interface FilterModelItem {
 }
 
 export interface DateRange {
-    start: Date | string | undefined;
-    end: Date | string | undefined;
+    timeFrame?: TimeFrame | null;
+    start?: Date | null;
+    end?: Date | null;
+}
+
+export enum SchedulingType{
+    ALL = "ALL",
+    SCHEDULED = "SCHEDULED",
+    UNSCHEDULED = "UNSCHEDULED",
+    PLANNED = "PLANNED",
+    DEADLINE = "DEADLINE",
+    EXCEPT_PLANNED = "EXCEPT_PLANNED",
 }
 
 export interface FileData {
@@ -1495,6 +1567,18 @@ export enum PortType {
     PON = "PON"
 }
 
+export enum TimeFrame {
+    NEXT_MONTH = "NEXT_MONTH",
+    NEXT_WEEK = "NEXT_WEEK",
+    TOMORROW = "TOMORROW",
+    TODAY = "TODAY",
+    YESTERDAY = "YESTERDAY",
+    THIS_WEEK = "THIS_WEEK",
+    LAST_WEEK = "LAST_WEEK",
+    THIS_MONTH = "THIS_MONTH",
+    LAST_MONTH = "LAST_MONTH"
+}
+
 export interface SwitchWithAddress {
     commutator: Switch;
     address: AcpHouse;
@@ -1573,6 +1657,13 @@ export interface TFile extends FileSystemItem{
     mimeType: string | null;
     sizeMbyte: number;
     type: AttachmentType;
+}
+
+export interface FileSuggestion {
+    id: number;
+    name: string;
+    type: AttachmentType;
+    path: string;
 }
 
 export interface FilesLoadFileEvent {

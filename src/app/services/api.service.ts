@@ -14,14 +14,14 @@ import {
     ChatMessage,
     City,
     ClientEquipment,
-    Comment,
+    Comment, DateRange,
     DefaultObservers,
     Department,
     DhcpBinding, DhcpLogsRequest,
     Employee,
     EmployeeStatus, FdbItem,
     FieldItem,
-    FileData, FilesLoadFileEvent, FileSystemItem, FilterModelItem,
+    FileData, FilesLoadFileEvent, FileSuggestion, FileSystemItem, FilterModelItem,
     House,
     INotification, LoadingDirectoryWrapper,
     MessageData,
@@ -35,27 +35,27 @@ import {
     PaidWorkForm,
     PaidWorkGroupForm, PhyPhoneInfo, PhyPhoneInfoForm,
     Position,
-    SalaryTable,
+    SalaryTable, SchedulingType, StreetSuggestion,
     SuperMessage,
-    Switch, SwitchBaseInfo, SwitchEditingPreset, SwitchModel, SwitchWithAddress,
+    Switch, SwitchBaseInfo, SwitchEditingPreset, SwitchModel, SwitchWithAddress, TagListItem,
     Task, TaskClassOT,
     TaskCreationBody,
     TaskEvent,
     TaskFieldsSnapshot,
     TaskFiltrationConditions, TaskJournalSortingTypes, TaskStage,
-    TaskTag,
-    TelegramConf,
+    TaskTag, TaskTypeDirectory,
+    TelegramConf, TimeFrame,
     TokenChain, TokenChainWithUserInfo,
     TreeDragDropEvent,
     TreeElementPosition, UserEvents,
     Wireframe, WireframeDashboardStatistic,
     WorkingDay,
     WorkLog
-} from "../transport-interfaces";
+} from "../types/transport-interfaces";
 import {MessageService, TreeNode} from "primeng/api";
 import {cyrb53, Storage, Utils} from "../util";
 import {Duration} from "@fullcalendar/core";
-import {AddressCorrecting, OldTracker} from "../parsing-interfaces";
+import {AddressCorrecting, OldTracker} from "../types/parsing-interfaces";
 
 
 @Injectable({
@@ -186,6 +186,10 @@ export class ApiService {
     getStreets(cityId: number, filter?: string): Observable<any> {
         if (filter) return this.sendGet('api/private/streets/' + cityId, {filter});
         return this.sendGet('api/private/streets/' + cityId);
+    }
+
+    getStreetSuggestions(query?: string|null){
+        return this.sendGet<StreetSuggestion[]>('api/private/suggestions/street', {query});
     }
 
     getCities(): Observable<City[]> {
@@ -360,7 +364,8 @@ export class ApiService {
         return this.sendGet<Employee[]>("api/private/employees/installers");
     }
 
-    assignInstallersToTask(taskId: number, targetInstallers: { installers: Employee[], gangLeader?: string, deferredReport: boolean, description: string }) {
+    assignInstallersToTask(taskId: number, targetInstallers: { installers: Employee[], gangLeader?: string,
+        deferredReport: boolean, description: string, files?: FileData[], serverFiles?: FileSuggestion[] }) {
         return this.sendPost("api/private/task/" + taskId + "/assign-installers", targetInstallers);
     }
 
@@ -389,6 +394,10 @@ export class ApiService {
 
     appendLinksToChildrenTasks(taskId: number, childIds: number[]) {
         return this.sendPatch<Task>("api/private/task/" + taskId + "/append-links-to-children", childIds);
+    }
+
+    getTaskTag(id:number) {
+        return this.sendGet<TaskTag>("api/private/task-tag/"+id);
     }
 
     getTaskTags(queryName?:string | null, includingRemove?: boolean | null) {
@@ -450,6 +459,10 @@ export class ApiService {
         return this.sendPatch<Task>("api/private/task/" + taskId + "/edit-fields", modelItems);
     }
 
+    moveTaskToDirectory(taskIds: number[], directoryId: number) {
+        return this.sendPatch("api/private/task/move-to-directory", {taskIds, directoryId});
+    }
+
     getEditTaskSnapshots(taskId: number) {
         return this.sendGet<TaskFieldsSnapshot[]>("api/private/task/" + taskId + "/edit-snapshots");
     }
@@ -460,6 +473,14 @@ export class ApiService {
 
     getCountOfUnreadNotifications() {
         return this.sendGet<number>("api/private/notifications/unread-count");
+    }
+
+    getAvailableTaskTypesToChange(taskId: number) {
+        return this.sendGet<TaskStage[]>("api/private/task/" + taskId + "/type-list/available-to-change");
+    }
+
+    getAvailableDirectoriesToChange(taskId: number) {
+        return this.sendGet<TaskTypeDirectory[]>("api/private/task/" + taskId + "/directory-list/available-to-change");
     }
 
     getDepartment(id: number, silent: boolean = false) {
@@ -576,8 +597,19 @@ export class ApiService {
         return this.sendGet<{[key:string]:number}>(`api/private/tasks/wireframe/${wireframeId}/by-stages/count`, {});
     }
 
-    getCountTasks(status: string[], cls: number[] | null, type: string | null, tags: number[] | null, filters: any) {
-        return this.sendPost<number>("api/private/tasks/count", {...filters, status, template: cls, stage: type, tags});
+    // getCountTasks(status: string[], cls: number[] | null, type: string | null, directory:  number | null,
+    //               tags: number[] | null, schedulingType: SchedulingType | null, dateOfClose: DateRange | null,
+    //               actualFrom: DateRange | null, actualTo: DateRange | null, filters: any) {
+    //     return this.sendPost<number>("api/private/tasks/count", {...filters, status, template: cls,
+    //         stage: type, tags, directory, schedulingType, dateOfClose, actualFrom, actualTo});
+    // }
+
+    getCountTasks(filters: TaskFiltrationConditions = {}) {
+        return this.sendPost<number>("api/private/tasks/count", filters);
+    }
+
+    getTagsListFromCatalog(filters: TaskFiltrationConditions = {}) {
+        return this.sendPost<TagListItem[]>("api/private/tags/catalog/list", filters);
     }
 
     getScheduledTask(start: string, end: string) {
@@ -628,6 +660,10 @@ export class ApiService {
 
     getAddressSuggestions(query: string, isAcpConnected: boolean|null, isHouseOnly: boolean) {
         return this.sendGet<Address[]>("api/private/suggestions/address", {query, isAcpConnected, isHouseOnly});
+    }
+
+    getAddressSuggestionsAlt(streetId: number, query: string, isAcpConnected: boolean|null, isHouseOnly: boolean) {
+        return this.sendGet<Address[]>("api/private/suggestions/address/alt", {streetId, query, isAcpConnected, isHouseOnly});
     }
 
     getCountOfUnreadMessages(chatId: number) {
@@ -783,7 +819,7 @@ export class ApiService {
     }
 
     createHouse(streetId: number, houseForm: any) {
-        return this.sendPost(`api/private/street/${streetId}/house`, houseForm);
+        return this.sendPost<Address>(`api/private/street/${streetId}/house`, houseForm);
     }
 
     editHouse(houseId: number, houseForm: any) {
@@ -993,6 +1029,10 @@ export class ApiService {
 
     attachToTask(superMessageId: number, chatId: number, description: string) {
         return this.sendPost(`api/private/chat/${chatId}/message/${superMessageId}/attach-to-task`, {description});
+    }
+
+    getFilesSuggestions(query?: string | null){
+        return this.sendGet<FileSuggestion[]>('api/private/files/suggestions', {query});
     }
 
     getFilesRoot(sortingType?: string | null){

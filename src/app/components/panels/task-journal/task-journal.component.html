@@ -7,7 +7,7 @@
                 <ng-container *ngTemplateOutlet="eventIcon; context:{$implicit:entry}"></ng-container>
                 <div class="vertical-line" *ngIf="i<displayedEntries.length-1"></div>
                 <div class="employee-avatar-wrapper">
-                    <app-avatar [src]="entry.creator?.avatar" [name]="entry.creator?.fullName" [size]="2.8"></app-avatar>
+                    <app-avatar [src]="entry.creator.avatar" [name]="entry.creator.fullName" [size]="2.8"></app-avatar>
                 </div>
                 <ng-container *ngTemplateOutlet="eventHeader; context:{$implicit:entry,reply:false}"></ng-container>
                 <div [ngClass]="{event:!isComment(entry), reply:isHasReply(entry)}" class="journal-event-body">

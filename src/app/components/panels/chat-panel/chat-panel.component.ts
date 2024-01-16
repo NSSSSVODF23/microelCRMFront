@@ -1,5 +1,5 @@
 import {AfterViewInit, Component, ElementRef, EventEmitter, OnDestroy, OnInit, ViewChild} from '@angular/core';
-import {Attachment, Chat, Employee, FileData, SuperMessage} from "../../../transport-interfaces";
+import {Attachment, Chat, Employee, FileData, SuperMessage} from "../../../types/transport-interfaces";
 import {PersonalityService} from "../../../services/personality.service";
 import {ApiService} from "../../../services/api.service";
 import {SubscriptionsHolder} from "../../../util";
@@ -233,18 +233,18 @@ export class ChatPanelComponent implements OnInit, OnDestroy, AfterViewInit {
         this.chatService.currentOpenChat = undefined;
         this.subscriptions.unsubscribeAll();
     }
-
-    readMessage(event: IntersectionObserverEntry[]) {
-        event.forEach(entry => {
-            if (entry.isIntersecting) {
-                const msgIds = JSON.parse(entry.target.attributes.getNamedItem('data-msg')?.value ?? 'null');
-                const superMessages = this.messages.filter(msg => JSON.stringify(msg.includedMessages) === JSON.stringify(msgIds) && !this.readOut(msg));
-                if (superMessages.length === 1) {
-                    this.api.setMessagesAsRead(msgIds).subscribe();
-                }
-            }
-        })
-    }
+    //
+    // readMessage(event: IntersectionObserverEntry[]) {
+    //     event.forEach(entry => {
+    //         if (entry.isIntersecting) {
+    //             const msgIds = JSON.parse(entry.target.attributes.getNamedItem('data-msg')?.value ?? 'null');
+    //             const superMessages = this.messages.filter(msg => JSON.stringify(msg.includedMessages) === JSON.stringify(msgIds) && !this.readOut(msg));
+    //             if (superMessages.length === 1) {
+    //                 this.api.setMessagesAsRead(msgIds).subscribe();
+    //             }
+    //         }
+    //     })
+    // }
 
     getMessagesIds(message: SuperMessage) {
         if (message.includedMessages) {
@@ -254,14 +254,14 @@ export class ChatPanelComponent implements OnInit, OnDestroy, AfterViewInit {
         }
     }
 
-    readOut(message: SuperMessage) {
-        const me = this.personality.me;
-        if (!me) return true;
-        if (this.currentChat?.members.map(e => e.login).includes(me.login))
-            return message.readByEmployees?.map(e => e.login).includes(me.login);
-        else
-            return true;
-    }
+    // readOut(message: SuperMessage) {
+    //     const me = this.personality.me;
+    //     if (!me) return true;
+    //     if (this.currentChat?.members.map(e => e.login).includes(me.login))
+    //         return message.readByEmployees?.map(e => e.login).includes(me.login);
+    //     else
+    //         return true;
+    // }
 
     showContext(event: MouseEvent, message: SuperMessage) {
         if (!this.contextMenu) return;

@@ -1,6 +1,6 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
 import {ControlValueAccessor, FormControl, NG_VALUE_ACCESSOR} from "@angular/forms";
-import {DefaultObservers} from "../../../transport-interfaces";
+import {DefaultObservers} from "../../../types/transport-interfaces";
 import {ApiService} from "../../../services/api.service";
 import {Subscription} from "rxjs";
 

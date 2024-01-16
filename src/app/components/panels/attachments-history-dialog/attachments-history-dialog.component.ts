@@ -1,5 +1,5 @@
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
-import {Attachment, AttachmentType} from "../../../transport-interfaces";
+import {Attachment, AttachmentType} from "../../../types/transport-interfaces";
 import {ApiService} from "../../../services/api.service";
 import {MediaViewerService} from "../../../services/media-viewer.service";
 

@@ -24,7 +24,7 @@ import {
     SwitchBaseInfo,
     SwitchModel,
     SwitchWithAddress
-} from "../../transport-interfaces";
+} from "../../types/transport-interfaces";
 import {flowInChild} from "../../animations";
 import {DynamicPageContent, DynamicValueFactory, SubscriptionsHolder} from "../../util";
 import {ConfirmationService, MenuItem} from "primeng/api";

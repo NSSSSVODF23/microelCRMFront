@@ -7,7 +7,7 @@ import {
     TreeNodeMoveEvent,
     TreeNodeUpdateEvent,
     WorkLog
-} from "../../../transport-interfaces";
+} from "../../../types/transport-interfaces";
 import {TreeDragDropService, TreeNode} from "primeng/api";
 import {SubscriptionsHolder} from "../../../util";
 import {v4} from "uuid";

@@ -1,5 +1,5 @@
 import {Component, Input, OnInit} from '@angular/core';
-import {ModelItem} from "../../../transport-interfaces";
+import {ModelItem} from "../../../types/transport-interfaces";
 import {fade} from "../../../animations";
 
 @Component({

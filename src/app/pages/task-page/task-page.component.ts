@@ -2,7 +2,7 @@ import {Component, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {ApiService} from "../../services/api.service";
 import {ActivatedRoute} from "@angular/router";
 import {
-    Comment,
+    Comment, DateRange,
     Department,
     Employee,
     FieldItem,
@@ -16,7 +16,7 @@ import {
     TaskStatus,
     TaskTag,
     WorkLog
-} from "../../transport-interfaces";
+} from "../../types/transport-interfaces";
 import {FileInputComponent} from "../../components/controls/file-input/file-input.component";
 import {ConfirmationService, MenuItem, MessageService, TreeNode} from "primeng/api";
 import {RealTimeUpdateService} from "../../services/real-time-update.service";
@@ -68,14 +68,6 @@ export class TaskPageComponent implements OnInit, OnDestroy {
     editComment?: Comment;
     replyComment?: Comment;
 
-    sourceInstallers: Employee[] = [];
-    targetInstallers: Employee[] = [];
-    targetDescription: string = "";
-    gangLeader?: string;
-    deferredReport = false;
-    gangLeaders: {label:string, value: string|undefined|null}[] = [{label:"Без бригадира", value:null}];
-
-    appointmentRequested = false;
     showAppointInstallersMenu = false;
     showChangeObserversDialog = false;
     showTaskLinkingDialog = false;
@@ -108,25 +100,22 @@ export class TaskPageComponent implements OnInit, OnDestroy {
     selectedEmployeeAsResponsible?: Employee;
     selectingResponsible = false;
 
-    setDateTimeToTaskType: "from" | "to" = "from";
-    selectedTaskDateTime = new FormControl(new Date());
-    changingTaskDateTime = false;
+    schedulingTaskDialogVisible = false;
+    schedulingTaskType: 'from' | 'to' = 'from';
+
     @ViewChild('taskActualDateSetPanel') taskActualDateSetPanel?: OverlayPanel;
 
     showChatHistory = false;
     isShowEditTaskDialog = false;
 
-    // Форма для редактирования задачи
-    editTaskForm = new FormGroup({});
-    // Флаг происходящего изменения задачи
-    editBlocked = false;
+
     // Отображается ли окно просмотра истории изменений задачи
     isShowEditHistoryDialog = false;
     // Снимки истории изменений задачи
     editTaskSnapshots: TaskFieldsSnapshot[] = [];
     indexEditSnapshot = 0;
     managementMenu: MenuItem[] = [];
-    isShowSchedulingDialog = false;
+
     @ViewChild('commentEditor') commentEditor?: QuillEditorComponent;
     @ViewChild('taskLinkingDialog') taskLinkingDialog?: TaskSelectingDialogComponent;
     @ViewChild('workLogsDialogEl') workLogsDialogEl?: WorkLogsDialogComponent;
@@ -258,12 +247,6 @@ export class TaskPageComponent implements OnInit, OnDestroy {
         });
     }
 
-    // Получаем поля текущей задачи из её шаблона
-    get taskFields(): ModelItem[] {
-        if (!this.isShowEditTaskDialog) return [];
-        return this.currentTask?.fields ?? [];
-    }
-
     // Возвращает идентификаторы уже связанных с этой задачей задач
     get excludedTasks(): number[] {
         if (!this.currentTask) return [];
@@ -311,30 +294,7 @@ export class TaskPageComponent implements OnInit, OnDestroy {
         })
         this.subscriptions.addSubscription("wlCrd", this.rt.workLogCreated().subscribe(this.workLogCreated.bind(this)));
         this.subscriptions.addSubscription("wlCls", this.rt.workLogClosed().subscribe(this.workLogClosed.bind(this)));
-        this.subscriptions.addSubscription('dateSchCh', this.selectedTaskDateTime.valueChanges.subscribe(value => {
-            if(value) {
-                this.hourScheduledControl.setValue(value.getHours());
-                this.minuteScheduledControl.setValue(value.getMinutes());
-            }
-        }))
-        this.subscriptions.addSubscription('hrSchCh', this.hourScheduledControl.valueChanges.subscribe(value => {
-            if(value) {
-                const selectedDate = this.selectedTaskDateTime.value;
-                if(selectedDate) {
-                    selectedDate.setHours(value);
-                    this.selectedTaskDateTime.setValue(selectedDate, {emitEvent:false});
-                }
-            }
-        }))
-        this.subscriptions.addSubscription('mnSchCh', this.minuteScheduledControl.valueChanges.subscribe(value => {
-            if(value){
-                const selectedDate = this.selectedTaskDateTime.value;
-                if(selectedDate) {
-                    selectedDate.setMinutes(value);
-                    this.selectedTaskDateTime.setValue(selectedDate, {emitEvent:false});
-                }
-            }
-        }))
+
     }
 
     updateObservableList() {
@@ -444,44 +404,6 @@ export class TaskPageComponent implements OnInit, OnDestroy {
         this.subscriptions.unsubscribeAll()
     }
 
-    appointInstallers() {
-        this.api.getInstallersEmployees().subscribe(employees => {
-            this.sourceInstallers = employees;
-            this.targetInstallers = [];
-            this.showAppointInstallersMenu = true;
-        })
-    }
-
-    sendListAppointedInstallers() {
-        this.appointmentRequested = true;
-        this.api.assignInstallersToTask(this._taskId, {
-            installers: this.targetInstallers,
-            description: this.targetDescription,
-            gangLeader: this.gangLeader,
-            deferredReport: this.deferredReport
-        }).subscribe(
-            {
-                next: () => {
-                    this.appointmentRequested = false;
-                    this.showAppointInstallersMenu = false;
-                },
-                error: () => this.appointmentRequested = false
-            }
-        )
-    }
-
-    clearAppointInstallers() {
-        this.targetDescription = "";
-        this.targetInstallers = [];
-        this.gangLeader = undefined;
-        this.deferredReport = false;
-    }
-
-    resetListAppointedInstallers() {
-        this.sourceInstallers = [...this.sourceInstallers, ...this.targetInstallers];
-        this.targetInstallers = [];
-    }
-
     forceCloseWorkLog() {
         this.api.forceCloseWorkLog(this._taskId, this.forceCloseWorkLogReason)
             .subscribe({
@@ -547,7 +469,8 @@ export class TaskPageComponent implements OnInit, OnDestroy {
             status: [TaskStatus.ACTIVE, TaskStatus.PROCESSING, TaskStatus.CLOSE],
             searchPhrase: this.globalTaskSearchString,
             author: this.taskAuthorEmployeeFilter,
-            dateOfCreation: this.taskCreationDateFilterForLinking,
+            // dateOfCreation: this.taskCreationDateFilterForLinking ?
+            //     {start: this.taskCreationDateFilterForLinking[0], end: this.taskCreationDateFilterForLinking[1]} as DateRange : undefined,
             exclusionIds: excludeIds
         }).subscribe({
                 next: page => {
@@ -608,53 +531,6 @@ export class TaskPageComponent implements OnInit, OnDestroy {
         this.updateObservableList();
     }
 
-    openChangeDateDialog(type: "from" | "to") {
-        this.isShowSchedulingDialog = true;
-        this.setDateTimeToTaskType = type;
-        const currentDate = new Date();
-        const minutes = currentDate.getMinutes();
-        if (minutes > 45) {
-            currentDate.setHours(currentDate.getHours() + 1, 0, 0, 0);
-        } else if (minutes > 30) {
-            currentDate.setMinutes(45, 0, 0);
-        } else if (minutes > 15) {
-            currentDate.setMinutes(30, 0, 0);
-        } else if (minutes > 0) {
-            currentDate.setMinutes(15, 0, 0);
-        }
-        this.selectedTaskDateTime.setValue(currentDate);
-        this.hourScheduledControl.setValue(currentDate.getHours());
-        this.minuteScheduledControl.setValue(currentDate.getMinutes());
-    }
-
-    setDateTimeOfTaskRelevance() {
-        if(this.selectedTaskDateTime.value == null) return;
-        this.changingTaskDateTime = true;
-        if (this.setDateTimeToTaskType === 'from') {
-            this.api.changeTaskActualFrom(this._taskId, this.selectedTaskDateTime.value).subscribe({
-                next: () => {
-                    this.changingTaskDateTime = false;
-                    this.isShowSchedulingDialog = false;
-                },
-                error: () => {
-                    this.changingTaskDateTime = false;
-                }
-            });
-        } else if (this.setDateTimeToTaskType === 'to') {
-            this.api.changeTaskActualTo(this._taskId, this.selectedTaskDateTime.value).subscribe(
-                {
-                    next: () => {
-                        this.changingTaskDateTime = false;
-                        this.isShowSchedulingDialog = false;
-                    },
-                    error: () => {
-                        this.changingTaskDateTime = false;
-                    }
-                }
-            );
-        }
-    }
-
     removeActualFromDate() {
         this.confirmation.confirm({
             header: "Подтверждение",
@@ -712,42 +588,6 @@ export class TaskPageComponent implements OnInit, OnDestroy {
             message: 'Вновь открыть данную задачу?',
             accept: () => {
                 this.api.reopenTask(this._taskId).subscribe()
-            }
-        })
-    }
-
-    showEditTaskDialog() {
-        // Устанавливаем элементы управления в форму редактирования задачи
-        this.editTaskForm = new FormGroup(
-            this.currentTask?.fields ?
-                this.currentTask?.fields.reduce((acc, field) => {
-                    return {
-                        ...acc,
-                        [field.modelItemId]: new FormControl(Utils.getValueFromModelItem(field), CustomValidators.taskInput(field.wireframeFieldType, field.variation))
-                    };
-                }, {}) : {});
-
-        // Показываем диалог редактирования задачи
-        this.isShowEditTaskDialog = true;
-    }
-
-    doEditTask() {
-        if (!this.currentTask?.modelWireframe) return;
-        if(!this.editTaskForm.valid) {
-            this.editTaskForm.markAllAsTouched();
-            return;
-        }
-        this.editBlocked = true;
-        this.api.editTask(this._taskId,
-            FormToModelItemConverter
-                .editExisting(this.editTaskForm.getRawValue(), this.currentTask?.fields ?? [])
-        ).subscribe({
-            next: () => {
-                this.editBlocked = false;
-                this.isShowEditTaskDialog = false;
-            },
-            error: () => {
-                this.editBlocked = false;
             }
         })
     }
@@ -951,7 +791,10 @@ export class TaskPageComponent implements OnInit, OnDestroy {
                                 items: [
                                     {
                                         label: "Назначить",
-                                        command: () => this.openChangeDateDialog("from")
+                                        command: () => {
+                                            this.schedulingTaskDialogVisible = true;
+                                            this.schedulingTaskType = 'from';
+                                        }
                                     },
                                     {
                                         label: "Удалить",
@@ -965,7 +808,10 @@ export class TaskPageComponent implements OnInit, OnDestroy {
                                 items: [
                                     {
                                         label: "Назначить",
-                                        command: () => this.openChangeDateDialog("to")
+                                        command: () => {
+                                            this.schedulingTaskDialogVisible = true;
+                                            this.schedulingTaskType = 'to';
+                                        }
                                     },
                                     {
                                         label: "Удалить",
@@ -999,7 +845,7 @@ export class TaskPageComponent implements OnInit, OnDestroy {
             {
                 label: "Редактировать задачу",
                 icon: 'mdi-edit',
-                command: this.showEditTaskDialog.bind(this),
+                command: ()=>this.isShowEditTaskDialog=true,
                 disabled: this.isTaskClose()
             },
             {
@@ -1009,7 +855,7 @@ export class TaskPageComponent implements OnInit, OnDestroy {
                     {
                         label: "Отдать в работу",
                         icon: 'mdi-how_to_reg',
-                        command: this.appointInstallers.bind(this),
+                        command: ()=>this.showAppointInstallersMenu = true,
                         visible: this.isTaskActive()
                     },
                     {
@@ -1070,9 +916,6 @@ export class TaskPageComponent implements OnInit, OnDestroy {
         // 'video'
     ];
 
-    hourScheduledControl = new FormControl(0);
-    minuteScheduledControl = new FormControl(0);
-
     taskJournalSorting = Storage.loadOrDefault("taskJournalSortingType", TaskJournalSortingTypes.CREATE_DATE_DESC);
     taskJournalSortingOptions = [
         {label:"Сначала новые", value: TaskJournalSortingTypes.CREATE_DATE_DESC},
@@ -1117,16 +960,6 @@ export class TaskPageComponent implements OnInit, OnDestroy {
 
     pasteFiles(event: ClipboardEvent) {
         this.fileInput?.appendFiles(event);
-    }
-
-    updateGangLeaders(){
-        setTimeout(()=>{
-            if(this.targetInstallers.length > 1){
-                this.gangLeaders = [{label: "Без бригадира", value: null}, ...this.targetInstallers.map(installers=>({label: installers.fullName ?? installers.login, value: installers.login}))];
-            }else{
-                this.gangLeaders = [{label: "Без бригадира", value: null}];
-            }
-        })
     }
 
     openOldTrackerDialog(event: Event){

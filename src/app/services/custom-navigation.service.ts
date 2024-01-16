@@ -7,7 +7,9 @@ import {Router} from "@angular/router";
 })
 export class CustomNavigationService {
 
-  constructor(readonly location: Location, readonly router: Router) { }
+  constructor(private location: Location, private router: Router) {
+
+  }
 
   backOrDefault(defaultRoute: string[]){
     const navId: {navigationId: number} = this.location.getState() as any;

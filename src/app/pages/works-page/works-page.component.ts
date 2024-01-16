@@ -12,7 +12,7 @@ import {
     TreeElementPosition,
     TreeNodeMoveEvent,
     TreeNodeUpdateEvent
-} from "../../transport-interfaces";
+} from "../../types/transport-interfaces";
 import {FormArray, FormControl, FormGroup, Validators} from "@angular/forms";
 import {Tree} from "primeng/tree";
 import {SubscriptionsHolder} from "../../util";

@@ -10,9 +10,9 @@
         </div>
     </ng-template>
     <ng-template pTemplate="content">
-        <div #list (intersection)="readMessage($event)" (onScrollToBottom)="loadMessages()"
+        <div #list (onScrollToBottom)="loadMessages()"
              (scroll)="startButtonVisibleEmitter.emit()" [ngClass]="{unread: unreadCount>0}" *ngIf="isLoading || messages.length>0"
-             [style.overflow]="shaderVisible ? 'hidden' : ''" appIntersectionObserver appScrollToBottomEmitter
+             [style.overflow]="shaderVisible ? 'hidden' : ''" appScrollToBottomEmitter
              class="chat-view">
             <div (contextmenu)="showContext($event, message)" *ngFor="let message of messages; trackBy: trackMessages"
                  @fade
@@ -104,7 +104,7 @@
 
 <ng-template #messageBody let-message>
     <ng-container *ngIf="message.attachments.length>1">
-        <div [ngClass]="{my:isMy(message.author), unread: !readOut(message), reply: message.replyTo}"
+        <div [ngClass]="{my:isMy(message.author), reply: message.replyTo}"
              class="chat-message media-group">
             <ng-container *ngIf="message.replyTo">
                 <ng-container *ngTemplateOutlet="replyMessageTemp; context: {$implicit: message.replyTo}"></ng-container>
@@ -146,7 +146,7 @@
         </div>
     </ng-container>
     <ng-container *ngIf="message.attachments.length===1">
-        <div [ngClass]="{my:isMy(message.author), unread: !readOut(message), reply: message.replyTo}"
+        <div [ngClass]="{my:isMy(message.author), reply: message.replyTo}"
              class="chat-message single-media">
             <ng-container *ngIf="message.replyTo">
                 <ng-container *ngTemplateOutlet="replyMessageTemp; context: {$implicit: message.replyTo}"></ng-container>
@@ -182,7 +182,7 @@
         </div>
     </ng-container>
     <ng-container *ngIf="message.attachments.length===0">
-        <div [ngClass]="{my:isMy(message.author), unread: !readOut(message), reply: message.replyTo}"
+        <div [ngClass]="{my:isMy(message.author), reply: message.replyTo}"
              class="chat-message">
             <ng-container *ngIf="message.replyTo">
                 <ng-container *ngTemplateOutlet="replyMessageTemp; context: {$implicit: message.replyTo}"></ng-container>

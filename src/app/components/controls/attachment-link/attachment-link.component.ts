@@ -1,5 +1,5 @@
 import {Component, Input, OnInit} from '@angular/core';
-import {Attachment} from "../../../transport-interfaces";
+import {Attachment} from "../../../types/transport-interfaces";
 import {MediaViewerService} from "../../../services/media-viewer.service";
 
 @Component({

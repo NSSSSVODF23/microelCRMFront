@@ -1,5 +1,5 @@
 import {Injectable} from '@angular/core';
-import {BillingUserItemData, LoadingState} from "../transport-interfaces";
+import {BillingUserItemData, LoadingState} from "../types/transport-interfaces";
 import {FormControl, FormGroup} from "@angular/forms";
 import {
     catchError,

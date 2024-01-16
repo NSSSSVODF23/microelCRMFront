@@ -2,7 +2,7 @@ import {Injectable} from '@angular/core';
 import {FormControl, FormGroup} from "@angular/forms";
 import {SubscriptionsHolder} from "../util";
 import {first, map, merge, mergeMap, Observable, of, pairwise, shareReplay, Subject, switchMap, tap} from "rxjs";
-import {LoadingState, SalaryTableCell, WorkReport} from "../transport-interfaces";
+import {LoadingState, SalaryTableCell, WorkReport} from "../types/transport-interfaces";
 import {ApiService} from "./api.service";
 import {RealTimeUpdateService} from "./real-time-update.service";
 import {MenuItem} from "primeng/api";

@@ -1,5 +1,5 @@
 import {Component, Input, OnInit, ViewChild} from '@angular/core';
-import {Task, TaskTag} from "../../../transport-interfaces";
+import {Task, TaskTag} from "../../../types/transport-interfaces";
 import {OverlayPanel} from "primeng/overlaypanel";
 import {ApiService} from "../../../services/api.service";
 

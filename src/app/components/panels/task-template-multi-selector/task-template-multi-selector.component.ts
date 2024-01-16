@@ -1,5 +1,5 @@
 import {Component, Input, OnDestroy, OnInit} from '@angular/core';
-import {Wireframe, WireframeTaskCounter} from "../../../transport-interfaces";
+import {Wireframe, WireframeTaskCounter} from "../../../types/transport-interfaces";
 import {ApiService} from "../../../services/api.service";
 import {ControlValueAccessor, NG_VALUE_ACCESSOR} from "@angular/forms";
 import {delay, filter, first, from, lastValueFrom, map, mergeMap} from "rxjs";

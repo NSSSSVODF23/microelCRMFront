@@ -7,7 +7,7 @@ import {
     TaskEvent,
     TaskEventType,
     TaskJournalSortingTypes
-} from "../../../transport-interfaces";
+} from "../../../types/transport-interfaces";
 import {PersonalityService} from "../../../services/personality.service";
 import {ConfirmationService} from "primeng/api";
 import {RealTimeUpdateService} from "../../../services/real-time-update.service";
@@ -243,6 +243,8 @@ export class TaskJournalComponent implements OnInit, OnDestroy{
                     return "edit";
                 case TaskEventType.REPORT_CREATED:
                     return "history_edu";
+                case TaskEventType.MOVED_TO_DIRECTORY:
+                    return "double_arrow";
                 default:
                     return "adjust";
             }
@@ -296,6 +298,8 @@ export class TaskJournalComponent implements OnInit, OnDestroy{
                     return "#61d78d";
                 case TaskEventType.REPORT_CREATED:
                     return "#ff9f3b";
+                case TaskEventType.MOVED_TO_DIRECTORY:
+                    return "#95e31c";
                 default:
                     return "#ff0000";
             }

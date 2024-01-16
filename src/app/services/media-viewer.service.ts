@@ -1,5 +1,5 @@
 import {EventEmitter, Injectable, Output} from '@angular/core';
-import {Attachment, TFile} from "../transport-interfaces";
+import {Attachment, TFile} from "../types/transport-interfaces";
 import {Subject} from "rxjs";
 
 export interface AttachmentAlbum{

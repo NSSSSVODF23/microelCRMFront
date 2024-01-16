@@ -1,5 +1,5 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
-import {TaskTag} from "../../../transport-interfaces";
+import {TaskTag} from "../../../types/transport-interfaces";
 import {ApiService} from "../../../services/api.service";
 import {ControlValueAccessor, FormControl, NG_VALUE_ACCESSOR} from "@angular/forms";
 import {SubscriptionsHolder} from "../../../util";

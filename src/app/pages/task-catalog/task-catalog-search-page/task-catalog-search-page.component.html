@@ -1,0 +1,204 @@
+<div appExtendPageHeight class="flex px-3 gap-3">
+    <app-main-menu-panel></app-main-menu-panel>
+    <div class="flex flex-grow-1 gap-3 mb-3">
+        <div class="flex flex-column flex-grow-1 gap-3">
+            <div #searchPanelElement class="flex bg-white border-round border-1 py-2 pr-2 pl-3 gap-2 align-items-center"
+                 [formGroup]="cacheService.filterForm"
+                 [ngClass]="isSearchInputFocused ? 'border-primary' : 'border-bluegray-100'">
+                <input #searchPhraseInput placeholder="Поиск..." class="border-0 flex-grow-1 h-full outline-none" formControlName="searchPhrase"
+                       (focus)="isSearchInputFocused = true; searchPhraseInput.select()" (blur)="isSearchInputFocused = false" (keydown.enter)="cacheService.search()"/>
+                <p-button icon="mdi-close" *ngIf="cacheService.filterForm.controls.searchPhrase.value"
+                          (onClick)="cacheService.filterForm.controls.searchPhrase.setValue('')"
+                          styleClass="p-button-secondary p-button-icon p-button-text p-button-sm"></p-button>
+                <p-button label="Найти" icon="mdi-search" styleClass="p-button-sm"
+                          (onClick)="cacheService.search()"></p-button>
+                <p-button label="Фильтры" icon="mdi-filter_alt" styleClass="p-button-sm p-button-help"
+                          (onClick)="allFiltersPanel.toggle($event, searchPanelElement)"></p-button>
+                <p-button label="Закрыть" icon="mdi-close"
+                          [routerLink]="(catalogCachedRoute$ | async) ?? ['/tasks', 'catalog', 'active']"
+                          styleClass="p-button-sm p-button-secondary"></p-button>
+            </div>
+            <ng-container *ngIf="cacheService.applyingAllFilters$ | async as applyingFilters">
+                <div *ngIf="applyingFilters.length > 0" class="flex flex-wrap gap-2 align-items-center">
+                    <span class="text-sm text-bluegray-400 font-bold">Примененные фильтры:</span>
+                    <p-chip *ngFor="let filter of applyingFilters" [label]="filter.label" [removable]="true" (onRemove)="cacheService.clearFilter(filter.value, filter.type)"></p-chip>
+                </div>
+            </ng-container>
+            <div class="flex flex-column flex-grow-1">
+                <router-outlet></router-outlet>
+            </div>
+        </div>
+        <div class="flex flex-column border-round border-1 bg-white border-bluegray-100 h-fit sticky-type-selector">
+            <span class="text-lg text-bluegray-600 font-bold p-3 bg-white sticky top-0 z-5">Каталог</span>
+            <div class="flex flex-column gap-1 relative px-3 pb-3">
+                <app-catalog-menu-item label="Все задачи" [contentTemplate]="tasksStatusItemsTemplate" [isEmpty]="false"
+                                       [counter]="cacheService.getTasksCounter()"
+                                       [isCounterLoading]="cacheService.getTasksLoadingCounter()" link="/tasks/search"></app-catalog-menu-item>
+            </div>
+        </div>
+    </div>
+</div>
+
+<ng-template #tasksStatusItemsTemplate>
+    <app-catalog-menu-item [contentTemplate]="activeTasksClassItemsTemplate"
+                           [isEmpty]="false" label="Активные" [counter]="cacheService.getTasksCounter('active')"
+                           [isCounterLoading]="cacheService.getTasksLoadingCounter('active')"
+                           [link]="'/tasks/search/active'">
+    </app-catalog-menu-item>
+    <app-catalog-menu-item [contentTemplate]="processingTasksClassItemsTemplate"
+                           [isEmpty]="false" label="У монтажников" [counter]="cacheService.getTasksCounter('processing')"
+                           [isCounterLoading]="cacheService.getTasksLoadingCounter('processing')"
+                           [link]="'/tasks/search/processing'">
+    </app-catalog-menu-item>
+    <app-catalog-menu-item [contentTemplate]="closeTasksClassItemsTemplate"
+                           [isEmpty]="false" label="Закрытые" [counter]="cacheService.getTasksCounter('close')"
+                           [isCounterLoading]="cacheService.getTasksLoadingCounter('close')"
+                           [link]="'/tasks/search/close'">
+    </app-catalog-menu-item>
+</ng-template>
+
+<ng-template #activeTasksClassItemsTemplate>
+    <ng-container *ngIf="cacheService.wireframes$ | async as wireframes">
+        <app-catalog-menu-item *ngFor="let wireframe of wireframes" [counter]="cacheService.getTasksCounter('active', wireframe.wireframeId)"
+                               [isCounterLoading]="cacheService.getTasksLoadingCounter('active', wireframe.wireframeId)"
+                               [contentTemplate]="activeTasksTypeItemsTemplate" [contentTemplateData]="{wireframe}"
+                               [isEmpty]="(wireframe.stages?.length ?? 0) === 0" [label]="wireframe.name"
+                               [link]="'/tasks/search/active/' + wireframe.wireframeId">
+        </app-catalog-menu-item>
+    </ng-container>
+</ng-template>
+
+<ng-template #activeTasksTypeItemsTemplate let-wireframe="wireframe">
+    <app-catalog-menu-item *ngFor="let stage of wireframe.stages" [counter]="cacheService.getTasksCounter('active', wireframe.wireframeId, stage.stageId)"
+                           [isCounterLoading]="cacheService.getTasksLoadingCounter('active', wireframe.wireframeId, stage.stageId)"
+                           [isEmpty]="true" [label]="stage.label"
+                           [link]="'/tasks/search/active/' + wireframe.wireframeId + '/' + stage.stageId">
+    </app-catalog-menu-item>
+</ng-template>
+
+<ng-template #processingTasksClassItemsTemplate>
+    <ng-container *ngIf="cacheService.wireframes$ | async as wireframes">
+        <app-catalog-menu-item *ngFor="let wireframe of wireframes" [counter]="cacheService.getTasksCounter('processing', wireframe.wireframeId)"
+                               [isCounterLoading]="cacheService.getTasksLoadingCounter('processing', wireframe.wireframeId)"
+                               [contentTemplate]="processingTasksTypeItemsTemplate" [contentTemplateData]="{wireframe}"
+                               [isEmpty]="(wireframe.stages?.length ?? 0) === 0" [label]="wireframe.name"
+                               [link]="'/tasks/search/processing/' + wireframe.wireframeId">
+        </app-catalog-menu-item>
+    </ng-container>
+</ng-template>
+
+<ng-template #processingTasksTypeItemsTemplate let-wireframe="wireframe">
+    <app-catalog-menu-item *ngFor="let stage of wireframe.stages" [counter]="cacheService.getTasksCounter('processing', wireframe.wireframeId, stage.stageId)"
+                           [isCounterLoading]="cacheService.getTasksLoadingCounter('processing', wireframe.wireframeId, stage.stageId)"
+                           [isEmpty]="true" [label]="stage.label"
+                           [link]="'/tasks/search/processing/' + wireframe.wireframeId + '/' + stage.stageId">
+    </app-catalog-menu-item>
+</ng-template>
+
+<ng-template #closeTasksClassItemsTemplate>
+    <ng-container *ngIf="cacheService.wireframes$ | async as wireframes">
+        <app-catalog-menu-item *ngFor="let wireframe of wireframes" [counter]="cacheService.getTasksCounter('close', wireframe.wireframeId)"
+                               [isCounterLoading]="cacheService.getTasksLoadingCounter('close', wireframe.wireframeId)"
+                               [contentTemplate]="closeTasksTypeItemsTemplate" [contentTemplateData]="{wireframe}"
+                               [isEmpty]="(wireframe.stages?.length ?? 0) === 0" [label]="wireframe.name"
+                               [link]="'/tasks/search/close/' + wireframe.wireframeId">
+        </app-catalog-menu-item>
+    </ng-container>
+</ng-template>
+
+<ng-template #closeTasksTypeItemsTemplate let-wireframe="wireframe">
+    <app-catalog-menu-item *ngFor="let stage of wireframe.stages" [counter]="cacheService.getTasksCounter('close', wireframe.wireframeId, stage.stageId)"
+                           [isCounterLoading]="cacheService.getTasksLoadingCounter('close', wireframe.wireframeId, stage.stageId)"
+                           [isEmpty]="true" [label]="stage.label"
+                           [link]="'/tasks/search/close/' + wireframe.wireframeId + '/' + stage.stageId">
+    </app-catalog-menu-item>
+</ng-template>
+
+<p-overlayPanel #allFiltersPanel [dismissable]="false" appendTo="body" (onShow)="resizeFilterPanel(searchPanelElement.offsetWidth+'px', allFiltersPanel)" [style]="{width: allFiltersPanelWidth}">
+    <div class="flex flex-column gap-3" [formGroup]="cacheService.filterForm">
+        <div class="flex align-items-center gap-3">
+            <span class="text-bluegray-500 text-xl">
+                Фильтры
+            </span>
+            <div class="flex-grow-1"></div>
+            <p-button icon="mdi-done" label="Применить" styleClass="p-button-sm"
+                      (onClick)="cacheService.search(); allFiltersPanel.hide()"></p-button>
+            <p-button icon="mdi-close" label="Закрыть" styleClass="p-button-outlined p-button-sm p-button-secondary"
+                      (onClick)="allFiltersPanel.hide()"></p-button>
+        </div>
+        <div class="flex flex-column gap-2 pl-2">
+            <span class="text-bluegray-500 text-lg">
+                Создание/Закрытие
+            </span>
+            <div class="flex flex-wrap column-gap-3 row-gap-1">
+                <app-w-input label="Дата создания">
+                    <app-data-range-input formControlName="dateOfCreation"></app-data-range-input>
+                </app-w-input>
+                <app-w-input label="Дата закрытия">
+                    <app-data-range-input formControlName="dateOfClose"></app-data-range-input>
+                </app-w-input>
+            </div>
+        </div>
+        <div class="flex flex-column gap-2 pl-2">
+            <span class="text-bluegray-500 text-lg">
+                Автор/Исполнитель
+            </span>
+            <div class="flex flex-wrap column-gap-3 row-gap-1">
+                <app-w-input label="Автор задачи">
+                    <app-employee-selector formControlName="author"></app-employee-selector>
+                </app-w-input>
+                <app-w-input label="Исполнитель задачи">
+                    <app-employee-selector formControlName="assignedEmployee"></app-employee-selector>
+                </app-w-input>
+            </div>
+        </div>
+        <div class="flex flex-column gap-2 pl-2">
+            <span class="text-bluegray-500 text-lg">
+                Теги
+            </span>
+            <app-task-tag-filter-input formControlName="tags"></app-task-tag-filter-input>
+        </div>
+        <div class="flex flex-column gap-2 pl-2">
+            <span class="text-bluegray-500 text-lg">
+                Информация в задаче
+            </span>
+            <div class="flex flex-wrap column-gap-3 row-gap-1" formArrayName="fieldFilters">
+                <ng-container *ngFor="let control of cacheService.filterForm.controls.fieldFilters.controls">
+                    <ng-container *ngTemplateOutlet="filterFieldTemplate; context: {$implicit: control}"></ng-container>
+                </ng-container>
+            </div>
+        </div>
+    </div>
+</p-overlayPanel>
+
+<ng-template #filterFieldTemplate let-control>
+    <ng-container [ngSwitch]="control.value.type" [formGroup]="control">
+        <app-w-input *ngSwitchCase="'TEXT'" label="Текст в задаче">
+            <input pInputText [formControl]="control.controls.textValue"/>
+        </app-w-input>
+        <app-w-input *ngSwitchCase="'LOGIN'" label="Логин">
+            <input pInputText [formControl]="control.controls.textValue"/>
+        </app-w-input>
+        <app-w-input *ngSwitchCase="'ADDRESS'" label="Адрес">
+            <app-address-input-alt [formControl]="control.controls.addressValue"></app-address-input-alt>
+        </app-w-input>
+        <app-w-input *ngSwitchCase="'PHONE'" label="Телефон">
+            <input pInputText [formControl]="control.controls.textValue"/>
+        </app-w-input>
+        <app-w-input *ngSwitchCase="'AD_SOURCE'" label="Рекламный источник">
+            <p-dropdown placeholder="Выбрать" appendTo="body" [showClear]="true"
+                        [options]="(cacheService.adSources$ | async) ?? []"
+                        [formControl]="control.controls.adSourceValue"></p-dropdown>
+        </app-w-input>
+        <app-w-input *ngSwitchCase="'CONNECTION_TYPE'" label="Тип подключения">
+            <p-dropdown placeholder="Выбрать" appendTo="body" [showClear]="true"
+                        [options]="(cacheService.connectionTypes$ | async) ?? []"
+                        [formControl]="control.controls.connectionTypeValue"></p-dropdown>
+        </app-w-input>
+        <app-w-input *ngSwitchCase="'CONNECTION_SERVICE'" label="Подключаемая услуги">
+            <p-dropdown placeholder="Выбрать" appendTo="body" [showClear]="true"
+                        [options]="(cacheService.connectionServices$ | async) ?? []"
+                        [formControl]="control.controls.connectionServiceValue"></p-dropdown>
+        </app-w-input>
+    </ng-container>
+</ng-template>

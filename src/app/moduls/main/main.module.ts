@@ -100,7 +100,18 @@ import {AutoCompleteModule} from "primeng/autocomplete";
 import {KeyFilterModule} from "primeng/keyfilter";
 import {FilesPageComponent} from "../../pages/files-page/files-page.component";
 import {AnimateModule} from "primeng/animate";
-import {TaskCatalogPageComponent} from "../../pages/task-catalog-page/task-catalog-page.component";
+import {TaskCatalogPageComponent} from "../../pages/task-catalog/task-catalog-page/task-catalog-page.component";
+import {
+    CatalogTasksListViewComponent
+} from "../../pages/task-catalog/catalog-tasks-list-view/catalog-tasks-list-view.component";
+import {BlockUIModule} from "primeng/blockui";
+import {
+    TaskCatalogSearchPageComponent
+} from "../../pages/task-catalog/task-catalog-search-page/task-catalog-search-page.component";
+import {
+    CatalogSearchTasksListViewComponent
+} from "../../pages/task-catalog/catalog-search-tasks-list-view/catalog-search-tasks-list-view.component";
+import {ChipModule} from "primeng/chip";
 
 const mapConfig: YaConfig = {
     apikey: '008574e5-f34b-4270-b3d5-91aaabd036e8',
@@ -135,7 +146,10 @@ const mapConfig: YaConfig = {
         AcpSessionsPageComponent,
         CommutatorListPageComponent,
         FilesPageComponent,
-        TaskCatalogPageComponent
+        TaskCatalogPageComponent,
+        TaskCatalogSearchPageComponent,
+        CatalogTasksListViewComponent,
+        CatalogSearchTasksListViewComponent
     ],
     imports: [
         CommonComponentsModule,
@@ -214,7 +228,9 @@ const mapConfig: YaConfig = {
         AngularYandexMapsModule.forRoot(mapConfig),
         AutoCompleteModule,
         KeyFilterModule,
-        AnimateModule
+        AnimateModule,
+        BlockUIModule,
+        ChipModule
     ],
     providers: [MessageService, {provide: LOCALE_ID, useValue: 'ru'}, ConfirmationService]
 })

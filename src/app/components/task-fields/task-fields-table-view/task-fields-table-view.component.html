@@ -2,7 +2,8 @@
     <ng-container *ngIf="taskFields.inline.length>0">
         <div class="flex flex-wrap gap-4">
             <div class="flex flex-column gap-1" *ngFor="let field of taskFields.inline; let i = index; trackBy: trackByField">
-                <span class="text-bluegray-500 font-bold">{{field?.name}}</span>
+                <span class="text-bluegray-500 font-bold hover:text-primary w-fit" [pTooltip]="'Скопировать '+field.name"
+                      tooltipPosition="bottom" (click)="$event.stopPropagation(); copyField(field)">{{field.name}}</span>
                 <span class="text-bluegray-600 text-xl">
                     <ng-container [ngSwitch]="field.wireframeFieldType">
                         <app-billing-login *ngSwitchCase="'LOGIN'" [loginData]="field.stringData"></app-billing-login>
@@ -16,19 +17,14 @@
         </div>
     </ng-container>
     <ng-container *ngIf="taskFields.block.length>0">
-        <table class="w-full" *ngFor="let field of taskFields.block; let i = index; trackBy: trackByField">
-            <thead>
-                <tr class="text-bluegray-500">
-                    <th>{{field?.name}}</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td class="text-bluegray-600 text-xl">
-                        <span>{{field?.textRepresentation}}</span>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
+        <div class="flex flex-column gap-2">
+            <div class="flex flex-column gap-1" *ngFor="let field of taskFields.block; let i = index; trackBy: trackByField">
+                <span class="text-bluegray-500 font-bold hover:text-primary w-fit" [pTooltip]="'Скопировать '+field.name"
+                      tooltipPosition="bottom" (click)="$event.stopPropagation(); copyField(field)">{{field.name}}</span>
+                <span class="text-bluegray-600 text-xl">
+                    <span>{{field?.textRepresentation}}</span>
+                </span>
+            </div>
+        </div>
     </ng-container>
 </div>

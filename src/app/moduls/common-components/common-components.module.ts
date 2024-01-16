@@ -205,6 +205,25 @@ import {
 import {FocusAfterInitDirective} from "../../directives/focus-after-init.directive";
 import {ListElementLazyScrollDirective} from "../../directives/list-element-lazy-scroll.directive";
 import {CatalogMenuItemComponent} from "../../components/task-catalog/catalog-menu-item/catalog-menu-item.component";
+import {
+    TaskTagInlineSelectorComponent
+} from "../../components/controls/task-tag-inline-selector/task-tag-inline-selector.component";
+import {
+    AppointInstallersDialogComponent
+} from "../../components/task-control-dialogs/appoint-installers-dialog/appoint-installers-dialog.component";
+import {PickListModule} from "primeng/picklist";
+import {
+    EditTaskDialogComponent
+} from "../../components/task-control-dialogs/edit-task-dialog/edit-task-dialog.component";
+import {
+    TaskSchedulingDialogComponent
+} from "../../components/task-control-dialogs/task-scheduling-dialog/task-scheduling-dialog.component";
+import {WInputComponent} from "../../components/controls/w-input/w-input.component";
+import {
+    ServerDocumentsInputComponent
+} from "../../components/controls/server-documents-input/server-documents-input.component";
+import {AddressInputAltComponent} from "../../components/controls/address-input-alt/address-input-alt.component";
+import {InputSwitchModule} from "primeng/inputswitch";
 
 
 @NgModule({
@@ -310,7 +329,14 @@ import {CatalogMenuItemComponent} from "../../components/task-catalog/catalog-me
         PassportDetailsInputComponent,
         FocusAfterInitDirective,
         ListElementLazyScrollDirective,
-        CatalogMenuItemComponent
+        CatalogMenuItemComponent,
+        TaskTagInlineSelectorComponent,
+        AppointInstallersDialogComponent,
+        EditTaskDialogComponent,
+        TaskSchedulingDialogComponent,
+        WInputComponent,
+        ServerDocumentsInputComponent,
+        AddressInputAltComponent
     ],
     exports: [
         AccountPanelComponent,
@@ -414,7 +440,14 @@ import {CatalogMenuItemComponent} from "../../components/task-catalog/catalog-me
         PassportDetailsInputComponent,
         FocusAfterInitDirective,
         ListElementLazyScrollDirective,
-        CatalogMenuItemComponent
+        CatalogMenuItemComponent,
+        TaskTagInlineSelectorComponent,
+        AppointInstallersDialogComponent,
+        EditTaskDialogComponent,
+        TaskSchedulingDialogComponent,
+        WInputComponent,
+        ServerDocumentsInputComponent,
+        AddressInputAltComponent
     ],
     imports: [
         CommonPipesModule,
@@ -467,6 +500,8 @@ import {CatalogMenuItemComponent} from "../../components/task-catalog/catalog-me
         TreeModule,
         BreadcrumbModule,
         MenubarModule,
+        PickListModule,
+        InputSwitchModule,
     ],
     providers: [
         {

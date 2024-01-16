@@ -1,6 +1,6 @@
 import {EventEmitter, Injectable} from '@angular/core';
 import {ApiService} from "./api.service";
-import {Employee, EmployeeStatus, INotification} from "../transport-interfaces";
+import {Employee, EmployeeStatus, INotification} from "../types/transport-interfaces";
 import {RealTimeUpdateService} from "./real-time-update.service";
 import {fromEvent, shareReplay, Subscription, tap} from "rxjs";
 import jwtDecode from "jwt-decode";

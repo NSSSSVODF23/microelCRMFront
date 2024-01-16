@@ -1,0 +1,19 @@
+<!--Диалог редактирования информации в задаче-->
+<p-dialog [(visible)]="visible" (visibleChange)="visibleChange.emit($event)"
+          [breakpoints]="{'960px': '75vw', '640px': '100vw'}" appendTo="body"
+          [autoZIndex]="false" [baseZIndex]="2101"
+          [dismissableMask]="true" [draggable]="false" [modal]="true" [resizable]="false"
+          [style]="{width: '50vw', maxHeight: '70vh'}" header="Редактирование информации в задаче">
+    <div class="flex flex-column gap-3">
+        <div [formGroup]="editTaskForm" class="flex flex-column gap-2">
+            <app-task-template-input *ngFor="let field of taskFields"
+                                     [field]="field" [formControlName]="field.modelItemId"
+                                     class="flex-grow-1"></app-task-template-input>
+        </div>
+        <div class="flex-grow-1"></div>
+        <div class="flexed vend hcenter sticky bottom0">
+            <app-button (onClick)="doEditTask()" [loading]="editBlocked" icon="save"
+                        label="Сохранить" model="p-button-success"></app-button>
+        </div>
+    </div>
+</p-dialog>

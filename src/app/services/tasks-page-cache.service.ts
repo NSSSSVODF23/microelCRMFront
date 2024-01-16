@@ -8,7 +8,7 @@ import {
     Task,
     TaskStatus,
     TaskTag
-} from "../transport-interfaces";
+} from "../types/transport-interfaces";
 import {ApiService} from "./api.service";
 import {RealTimeUpdateService} from "./real-time-update.service";
 import {

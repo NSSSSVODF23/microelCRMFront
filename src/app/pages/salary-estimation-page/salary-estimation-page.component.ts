@@ -1,6 +1,6 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
 import {ApiService} from "../../services/api.service";
-import {LoadingState, WorkLog} from "../../transport-interfaces";
+import {LoadingState, WorkLog} from "../../types/transport-interfaces";
 import {ConfirmationService, TreeDragDropService} from "primeng/api";
 import {FormControl, FormGroup, Validators} from "@angular/forms";
 import {SubscriptionsHolder} from "../../util";

@@ -1,7 +1,7 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
 import {ApiService} from "../../services/api.service";
 import {map, of, Subject, switchMap, tap} from "rxjs";
-import {Employee, FieldItem, LoadingState, Wireframe} from "../../transport-interfaces";
+import {Employee, FieldItem, LoadingState, Wireframe} from "../../types/transport-interfaces";
 import {AbstractControl, FormControl, FormGroup, ValidationErrors, Validators} from "@angular/forms";
 import {FormToModelItemConverter, SubscriptionsHolder} from "../../util";
 import {TFactorAction, WorksPickerValue} from "../../components/controls/works-picker/works-picker.component";

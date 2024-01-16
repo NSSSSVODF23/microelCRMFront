@@ -1,5 +1,5 @@
 import {EventEmitter, Injectable} from '@angular/core';
-import {Chat} from "../transport-interfaces";
+import {Chat} from "../types/transport-interfaces";
 import {ApiService} from "./api.service";
 import {RealTimeUpdateService} from "./real-time-update.service";
 import {PersonalityService} from "./personality.service";
@@ -11,7 +11,7 @@ import {MessageService} from "primeng/api";
 export class ChatService {
 
     chats: Chat[] = [];
-    unreadMessagesCount: { [chatId: number]: number } = {};
+    // unreadMessagesCount: { [chatId: number]: number } = {};
     open: EventEmitter<number> = new EventEmitter<number>();
     currentOpenChat?: number;
 
@@ -21,7 +21,7 @@ export class ChatService {
     };
 
     constructor(private api: ApiService, private rt: RealTimeUpdateService, private personality: PersonalityService, private messageService: MessageService) {
-        this.getChats();
+        // this.getChats();
         personality.onGettingUserData.subscribe(emp => {
             if (!emp.login) return;
             this.rt.chatCreated(emp.login).subscribe(this.createChat.bind(this))
@@ -38,24 +38,24 @@ export class ChatService {
                     if(this.notificationAudios.quiet.paused) this.notificationAudios.quiet.play().then();
                 }
             })
-            this.rt.updateCountUnreadMessages(emp.login).subscribe(c => this.unreadMessagesCount[c.chatId] = c.count)
+            // this.rt.updateCountUnreadMessages(emp.login).subscribe(c => this.unreadMessagesCount[c.chatId] = c.count)
         })
         this.rt.chatUpdated().subscribe(this.updateChat.bind(this));
         this.rt.chatClosed().subscribe(this.closeChat.bind(this));
         this.open.subscribe(()=>this.messageService.clear("chatMessage"));
     }
 
-    get isHasUnreadMessages(): boolean {
-        return Object.keys(this.unreadMessagesCount).length > 0;
-    }
-
-    get allUnreadCount(): number {
-        return Object.values(this.unreadMessagesCount).reduce((a, b) => a + b, 0);
-    }
+    // get isHasUnreadMessages(): boolean {
+    //     // return Object.keys(this.unreadMessagesCount).length > 0;
+    // }
+    //
+    // get allUnreadCount(): number {
+    //     // return Object.values(this.unreadMessagesCount).reduce((a, b) => a + b, 0);
+    // }
 
     createChat(chat: Chat): void {
         this.chats.push(chat);
-        this.api.getCountOfUnreadMessages(chat.chatId).subscribe(c => this.unreadMessagesCount[chat.chatId] = c);
+        // this.api.getCountOfUnreadMessages(chat.chatId).subscribe(c => this.unreadMessagesCount[chat.chatId] = c);
     }
 
     updateChat(chat: Chat): void {
@@ -69,7 +69,7 @@ export class ChatService {
         const index = this.chats.findIndex(c => c.chatId === chat.chatId);
         if (index != -1) {
             this.chats.splice(index, 1);
-            delete this.unreadMessagesCount[chat.chatId];
+            // delete this.unreadMessagesCount[chat.chatId];
         }
     }
 
@@ -77,7 +77,7 @@ export class ChatService {
         this.api.getMyActiveChats().subscribe(chats => {
             this.chats = chats;
             for (const chat of chats) {
-                this.api.getCountOfUnreadMessages(chat.chatId).subscribe(c => this.unreadMessagesCount[chat.chatId] = c);
+                // this.api.getCountOfUnreadMessages(chat.chatId).subscribe(c => this.unreadMessagesCount[chat.chatId] = c);
             }
         });
     }

@@ -1,5 +1,5 @@
 import {Component, Input, OnInit} from '@angular/core';
-import {WorkLog} from "../../../transport-interfaces";
+import {WorkLog} from "../../../types/transport-interfaces";
 import {ApiService} from "../../../services/api.service";
 
 @Component({

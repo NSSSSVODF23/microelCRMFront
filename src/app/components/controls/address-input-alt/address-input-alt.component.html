@@ -1,0 +1,52 @@
+<div class="flex align-items-center gap-1" (focusin)="onTouched()">
+    <p-autoComplete appendTo="body" placeholder="Улица" [(ngModel)]="selectedStreet" [ngClass]="inputClasses"
+                    [suggestions]="(streetSuggestions$ | async) ?? []" (onSelect)="focusHouseControl()" (ngModelChange)="streetChange()" [size]="30"
+                    (completeMethod)="streetSearch($event.query)" field="name" [showClear]="true" [showEmptyMessage]="true"
+                    emptyMessage="Улиц не найдено"
+                    [forceSelection]="true" [autoHighlight]="true">
+    </p-autoComplete>
+    <p-autoComplete #houseControl class="flipleft animation-duration-150" *ngIf="selectedStreet" [ngClass]="inputClasses"
+                    [(ngModel)]="selectedAddress" (ngModelChange)="onChange($event)" appendTo="body"
+                    placeholder="Дом Кв." [suggestions]="(addressSuggestions$ | async) ?? []" [showClear]="true"
+                    (completeMethod)="addressSearch($event.query)" field="tailPart" [size]="16"
+                    [forceSelection]="true" [autoHighlight]="true"></p-autoComplete>
+    <p-overlay appendTo="body" [visible]="(isEmptyAddressSuggestions$ | async) ?? false">
+        <div class="bg-white border-round flex flex-column gap-1 shadow-1 p-3 w-fit">
+            <span class="text-orange-500 font-bold">Дом не найден</span>
+            <p-button label="Добавить" (onClick)="showCreateHouseDialog()" styleClass="p-button-success p-button-sm w-full"></p-button>
+        </div>
+    </p-overlay>
+</div>
+
+<p-dialog appendTo="body" header="Создать дом" [modal]="true" [resizable]="false" [draggable]="false" [dismissableMask]="true" [(visible)]="createHouseVisible">
+    <div class="flex flex-column gap-3" [formGroup]="createHouseForm">
+        <div class="input-label-wrapper">
+            <label class="caption size-small wt-bold f-color-500">Номер дома</label>
+            <p-inputNumber formControlName="houseNum"></p-inputNumber>
+        </div>
+        <div class="input-label-wrapper">
+            <label class="caption size-small wt-bold f-color-500">Дробь (если есть)</label>
+            <p-inputNumber formControlName="fraction" [min]="1" [max]="999"></p-inputNumber>
+        </div>
+        <div class="input-label-wrapper">
+            <label class="caption size-small wt-bold f-color-500">Литера (если есть)</label>
+            <p-inputMask  formControlName="letter" mask="a" characterPattern="[а-я]"></p-inputMask>
+        </div>
+        <div class="input-label-wrapper">
+            <label class="caption size-small wt-bold f-color-500">Строение (если есть)</label>
+            <p-inputNumber formControlName="build" [min]="1" [max]="99"></p-inputNumber>
+        </div>
+        <div class="input-label-wrapper">
+            <label class="caption size-small wt-bold f-color-500">Многоквартирный дом?</label>
+            <p-inputSwitch formControlName="isApartmentHouse"></p-inputSwitch>
+        </div>
+        <div class="flex gap-1 flex-column">
+            <label class="caption size-small wt-bold f-color-500">Привязка к ACP</label>
+            <app-acp-house-input formControlName="acpHouseBind"></app-acp-house-input>
+        </div>
+        <!--        <ya-map (yaclick)="onMapClick($event)" [center]="centerOfMap" [zoom]="zoom" [options]="mapOptions" class="flex-grow-1">-->
+        <!--            <ya-placemark *ngIf="housePlace" [geometry]="[housePlace.latitude,housePlace.longitude]"></ya-placemark>-->
+        <!--        </ya-map>-->
+        <p-button label="Создать" (onClick)="createHouse()" class="align-self-end" styleClass="p-button-success" icon="mdi-add" [disabled]="!createHouseForm.valid"></p-button>
+    </div>
+</p-dialog>

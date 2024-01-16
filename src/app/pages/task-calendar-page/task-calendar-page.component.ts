@@ -6,7 +6,7 @@ import listPlugin from '@fullcalendar/list';
 import interactionPlugin, {EventResizeDoneArg} from '@fullcalendar/interaction';
 import {ApiService} from "../../services/api.service";
 import {fromEvent, map} from "rxjs";
-import {Task} from "../../transport-interfaces";
+import {Task} from "../../types/transport-interfaces";
 import {SubscriptionsHolder, Utils} from "../../util";
 import {OverlayPanel} from "primeng/overlaypanel";
 import {RealTimeUpdateService} from "../../services/real-time-update.service";

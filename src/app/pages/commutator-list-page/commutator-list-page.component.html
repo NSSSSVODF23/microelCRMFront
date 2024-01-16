@@ -54,9 +54,9 @@
                            placeholder="Имя" type="text"/>
                     <input [appPreventInput]="commutatorPage.loadingState === 'LOADING'" formControlName="ip" pInputText
                            placeholder="IP-адрес" type="text"/>
-                    <app-address-input [appPreventInput]="commutatorPage.loadingState === 'LOADING'"
+                    <app-address-input-alt [appPreventInput]="commutatorPage.loadingState === 'LOADING'"
                                        [isAcpConnected]="true" [isHouseOnly]="true"
-                                       formControlName="address"></app-address-input>
+                                       formControlName="address"></app-address-input-alt>
                 </div>
                 <p-button (onClick)="commutatorFilterForm.reset()" icon="mdi-filter_alt_off"
                           label="Сбросить"
@@ -161,8 +161,8 @@
                 <div class="flex gap-4 align-items-end">
                     <div class="input-label-wrapper">
                         <label>Адрес</label>
-                        <app-address-input [isAcpConnected]="true" [isHouseOnly]="true"
-                                           formControlName="address"></app-address-input>
+                        <app-address-input-alt [isAcpConnected]="true" [isHouseOnly]="true"
+                                           formControlName="address"></app-address-input-alt>
                     </div>
                     <div class="input-label-wrapper">
                         <label>Подъезд</label>

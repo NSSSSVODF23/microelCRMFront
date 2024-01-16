@@ -1,5 +1,5 @@
 import {Component, Input, OnInit, ViewChild} from '@angular/core';
-import {Department} from "../../../transport-interfaces";
+import {Department} from "../../../types/transport-interfaces";
 import {ApiService} from "../../../services/api.service";
 import {OverlayPanel} from "primeng/overlaypanel";
 

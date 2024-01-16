@@ -2,8 +2,9 @@ import {Component, OnInit} from '@angular/core';
 import {ExtendedMenuModel} from "../../controls/extended-menu-item/extended-menu-item.component";
 import {ApiService} from "../../../services/api.service";
 import {ActivatedRoute} from "@angular/router";
-import {map, shareReplay} from "rxjs";
-import {Wireframe} from "../../../transport-interfaces";
+import {map, Observable, shareReplay} from "rxjs";
+import {Wireframe} from "../../../types/transport-interfaces";
+import {TasksCatalogPageCacheService} from "../../../services/tasks-catalog-page-cache.service";
 
 @Component({
     selector: 'app-main-menu-panel',
@@ -18,7 +19,13 @@ export class MainMenuPanelComponent implements OnInit {
     category: string = 'main';
     incomingCount$ = this.api.getCountIncomingTasks().pipe(map(count => count.toString()), shareReplay(1));
 
-    constructor(readonly api: ApiService, readonly route: ActivatedRoute) {
+    lastCatalogRoute$ = <Observable<string[]>> this.taskCatalogCache.lastRoute$
+        .pipe(
+            map(route=>TasksCatalogPageCacheService.convertToPath(route, true)),
+            map(path => ['/tasks','catalog',...path])
+        );
+
+    constructor(readonly api: ApiService, readonly route: ActivatedRoute, private taskCatalogCache: TasksCatalogPageCacheService) {
 
     }
 

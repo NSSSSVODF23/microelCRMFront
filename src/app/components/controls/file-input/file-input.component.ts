@@ -1,6 +1,6 @@
 import {Component, ElementRef, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild} from '@angular/core';
 import {MenuItem, MessageService} from "primeng/api";
-import {FileData} from "../../../transport-interfaces";
+import {FileData} from "../../../types/transport-interfaces";
 import {ControlValueAccessor, NG_VALUE_ACCESSOR} from "@angular/forms";
 
 const FILE_SIZE_LIMIT = 1048576 * 20;

@@ -1,5 +1,5 @@
 import {Injectable} from '@angular/core';
-import {INotification, NotificationType, Page} from "../transport-interfaces";
+import {INotification, NotificationType, Page} from "../types/transport-interfaces";
 import {ApiService} from "./api.service";
 import {RealTimeUpdateService} from "./real-time-update.service";
 import {FocusStatus, PersonalityService} from "./personality.service";

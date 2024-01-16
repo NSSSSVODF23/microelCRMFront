@@ -1,6 +1,6 @@
 import {Component, OnInit} from '@angular/core';
 import {ChatService} from "../../../services/chat.service";
-import {Chat} from "../../../transport-interfaces";
+import {Chat} from "../../../types/transport-interfaces";
 import {Overlay} from "primeng/overlay";
 
 @Component({

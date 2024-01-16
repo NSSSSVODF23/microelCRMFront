@@ -1,5 +1,5 @@
 import {Component, EventEmitter, Input, OnInit, Output, ViewChild} from '@angular/core';
-import {TaskTag} from "../../../transport-interfaces";
+import {TaskTag} from "../../../types/transport-interfaces";
 import {ConfirmPopup} from "primeng/confirmpopup";
 import {ConfirmationService} from "primeng/api";
 import {ApiService} from "../../../services/api.service";

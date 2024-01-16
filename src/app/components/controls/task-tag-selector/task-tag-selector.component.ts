@@ -1,6 +1,6 @@
 import {Component, Input, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {ControlValueAccessor, FormControl, NG_VALUE_ACCESSOR} from "@angular/forms";
-import {TaskTag} from "../../../transport-interfaces";
+import {TaskTag} from "../../../types/transport-interfaces";
 import {ApiService} from "../../../services/api.service";
 import {AutoComplete} from "primeng/autocomplete";
 import {Subscription} from "rxjs";

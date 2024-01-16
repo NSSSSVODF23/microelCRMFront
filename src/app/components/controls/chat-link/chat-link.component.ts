@@ -1,6 +1,6 @@
 import {Component, Input, OnInit} from '@angular/core';
 import {ApiService} from "../../../services/api.service";
-import {Chat, LoadingState} from "../../../transport-interfaces";
+import {Chat, LoadingState} from "../../../types/transport-interfaces";
 import {ChatService} from "../../../services/chat.service";
 
 @Component({

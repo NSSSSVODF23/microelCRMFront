@@ -33,7 +33,7 @@
                     <ng-container *ngSwitchCase="'ERROR'">
                     </ng-container>
                     <ng-container *ngSwitchCase="'READY'">
-                        <ng-container *ngIf="selectedNodeInTree" [ngSwitch]="selectedNodeInTree?.type">
+                        <ng-container *ngIf="selectedNodeInTree" [ngSwitch]="selectedNodeInTree.type">
                             <div *ngSwitchCase="'group'" class="flexed column gap10 stretched">
                                 <ng-container *ngTemplateOutlet="nodeTitleRef; context: {$implicit: selectedNodeInTree}"></ng-container>
                                 <div class="flexed wrapped gap10 stretched" [style]="{alignContent: 'flex-start'}" @flowInChild>
@@ -48,7 +48,7 @@
                                         Описание:
                                     </span>
                                     <span class="caption">
-                                        {{selectedNodeInTree?.data.description}}
+                                        {{selectedNodeInTree.data.description}}
                                     </span>
                                 </div>
                             </div>

@@ -1616,7 +1616,6 @@ markdown > p:last-child {
   top: calc(var(--top-panel-height) + 1.5rem);
   max-height: calc(100vh - (var(--top-panel-height) + 1.5rem + 1rem));
   overflow: auto;
-  padding: 0 0.5rem 1rem 0.5rem;
   min-width: fit-content;
 }
 
@@ -1749,4 +1748,8 @@ markdown > p:last-child {
 
 .simple-list .p-listbox-list > .p-listbox-item:hover {
   background-color: white !important;
+}
+
+.overlay-panel-unpadding>.p-overlaypanel-content{
+  padding: 0 !important;
 }

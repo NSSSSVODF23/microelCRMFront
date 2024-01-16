@@ -1,5 +1,5 @@
 import {Component, Input, OnInit} from '@angular/core';
-import {DhcpBinding} from "../../../transport-interfaces";
+import {DhcpBinding} from "../../../types/transport-interfaces";
 import {BehaviorSubject, debounceTime, tap} from "rxjs";
 import {ApiService} from "../../../services/api.service";
 import {RealTimeUpdateService} from "../../../services/real-time-update.service";

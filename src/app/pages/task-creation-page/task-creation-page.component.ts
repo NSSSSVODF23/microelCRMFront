@@ -5,9 +5,9 @@ import {
     DefaultObservers,
     FieldItem,
     TaskCreationBody, TaskStage,
-    TaskTag,
+    TaskTag, TaskTypeDirectory,
     Wireframe
-} from "../../transport-interfaces";
+} from "../../types/transport-interfaces";
 import {ActivatedRoute} from "@angular/router";
 import {FormArray, FormControl, FormGroup} from "@angular/forms";
 import {FormToModelItemConverter, SubscriptionsHolder} from "../../util";
@@ -15,7 +15,7 @@ import {PersonalityService} from "../../services/personality.service";
 import {CustomValidators} from "../../custom-validators";
 import {MessageService} from "primeng/api";
 import {TaskCreationMode, TaskCreatorService} from "../../services/task-creator.service";
-import {switchMap} from "rxjs";
+import {filter, fromEvent, Subject, switchMap} from "rxjs";
 
 enum ControlsType {
     NEXT_ONLY = "NEXT_ONLY", BOTH = "BOTH", PREV_FIN = "PREV_FIN", FIN_ONLY = "FIN_ONLY", NONE = "NONE"
@@ -58,7 +58,20 @@ export class TaskCreationPageComponent implements OnInit, OnDestroy {
     types: TaskStage[] = [];
     type?: string;
 
+    directories: TaskTypeDirectory[] = [];
+    directory?: number;
+
     isDuplicateInOldTracker = true;
+
+    currentFieldFocus?: number;
+
+    enterPressed$ = fromEvent(document.body, 'keydown')
+        .pipe(
+            filter((e:any) => e.key === 'Tab'),
+            filter(() => this.controlsType() === ControlsType.NEXT_ONLY || this.controlsType() === ControlsType.BOTH),
+            filter(() => this.isValidCurrentStep),
+            filter(() => this.currentStepFields.length-1 === this.currentFieldFocus)
+        )
 
     constructor(readonly api: ApiService, readonly route: ActivatedRoute, readonly personality: PersonalityService, readonly toast: MessageService, private taskCreation: TaskCreatorService) {
         document.body.classList.add("whited");
@@ -76,12 +89,24 @@ export class TaskCreationPageComponent implements OnInit, OnDestroy {
         if(wireframe?.stages){
             this.types = wireframe.stages.sort((a, b)=>a.orderIndex-b.orderIndex) ?? [];
             this.type = this.types[0].stageId;
+            this.directories = this.types[0].directories ? this.types[0].directories : [];
+            this.directory = this.directories[0]?.taskTypeDirectoryId;
             this.isDuplicateInOldTracker = (!!this.types[0].oldTrackerBind && this.isUserHasOldTrackerCredentials);
         }else{
             this.types = [];
             this.type = undefined;
+            this.directories = [];
+            this.directory = undefined;
             this.isDuplicateInOldTracker = false;
         }
+    }
+
+    get nextStepName(){
+        return this.selectedTemplate?.steps[this.currentStep+1]?.name;
+    }
+
+    get prevStepName(){
+        return this.selectedTemplate?.steps[this.currentStep-1]?.name;
     }
 
     changeTaskType(type: string){
@@ -89,8 +114,10 @@ export class TaskCreationPageComponent implements OnInit, OnDestroy {
         const currentStage = this.types.find(t=>t.stageId===type);
         if(currentStage) {
             this.isDuplicateInOldTracker = (!!currentStage.oldTrackerBind && this.isUserHasOldTrackerCredentials);
+            this.directories = currentStage.directories;
             return;
         }
+        this.directories = [];
         this.isDuplicateInOldTracker = false;
     }
 
@@ -128,11 +155,13 @@ export class TaskCreationPageComponent implements OnInit, OnDestroy {
             tags: this.initialTags,
             observers: this.initialObservers,
             type: this.type,
+            directory: this.directory,
             isDuplicateInOldTracker: this.isDuplicateInOldTracker,
         };
     }
 
     ngOnInit(): void {
+        this.subscriptions.addSubscription('nextStep', this.enterPressed$.subscribe(()=>this.changeCreationStep(1)));
         window.addEventListener('message', (event) => {
             const data = event.data;
             this.openMode = data.mode;
@@ -180,7 +209,6 @@ export class TaskCreationPageComponent implements OnInit, OnDestroy {
 
         this.taskCreationForm = new FormArray(
             this.selectedTemplate.steps.map(step => {
-                console.log(this.defaultValues);
                 return new FormGroup(
                 step.fields.reduce(
                     (prev, field) => {

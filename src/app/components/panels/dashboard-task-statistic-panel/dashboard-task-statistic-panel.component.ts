@@ -1,5 +1,5 @@
 import {Component, Input, OnDestroy, OnInit} from '@angular/core';
-import {Wireframe, WireframeDashboardStatistic} from "../../../transport-interfaces";
+import {Wireframe, WireframeDashboardStatistic} from "../../../types/transport-interfaces";
 import {ApiService} from "../../../services/api.service";
 import {RealTimeUpdateService} from "../../../services/real-time-update.service";
 import {merge, mergeMap, of, startWith} from "rxjs";

@@ -9,7 +9,7 @@ import {
     LoadingState,
     NCLHistoryWrapper,
     UserEvents
-} from "../../transport-interfaces";
+} from "../../types/transport-interfaces";
 import {DynamicValueFactory, SubscriptionsHolder, Utils} from "../../util";
 import {CustomNavigationService} from "../../services/custom-navigation.service";
 import {

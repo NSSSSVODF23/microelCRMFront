@@ -2,7 +2,7 @@ import {Component, Input, OnDestroy, OnInit} from '@angular/core';
 import {ApiService} from "../../../services/api.service";
 import {RealTimeUpdateService} from "../../../services/real-time-update.service";
 import {BehaviorSubject, debounceTime, delay, map, merge, Observable, of, share} from "rxjs";
-import {PingMonitoring} from "../../../transport-interfaces";
+import {PingMonitoring} from "../../../types/transport-interfaces";
 import "chartjs-adapter-moment";
 import {MessageService} from "primeng/api";
 import {SubscriptionsHolder, Utils} from "../../../util";

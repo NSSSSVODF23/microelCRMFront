@@ -1,5 +1,5 @@
 import {AfterViewInit, Component, Input, OnDestroy, OnInit} from '@angular/core';
-import {Employee} from "../../../transport-interfaces";
+import {Employee} from "../../../types/transport-interfaces";
 import {SubscriptionsHolder} from "../../../util";
 
 @Component({

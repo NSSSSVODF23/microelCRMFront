@@ -1,5 +1,5 @@
 import {Component, Input, OnInit} from '@angular/core';
-import {INotification, NotificationType} from "../../../transport-interfaces";
+import {INotification, NotificationType} from "../../../types/transport-interfaces";
 import {NotificationsService} from "../../../services/notifications.service";
 
 @Component({

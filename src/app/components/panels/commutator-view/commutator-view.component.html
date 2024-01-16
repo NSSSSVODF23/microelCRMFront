@@ -7,16 +7,16 @@
                 <span>
                     Обновлен:
                 </span>
-                    <app-time-elapsed [startTime]="commutator.additionalInfo.systemInfo?.lastUpdate"></app-time-elapsed>
+                    <app-time-elapsed [startTime]="commutator.additionalInfo.systemInfo.lastUpdate"></app-time-elapsed>
                     <app-tiny-button (onClick)="refresh()" [disabled]="isUpdating" icon="refresh"></app-tiny-button>
                 </div>
                 <div class="flex gap-3">
                     <div class="flex flex-column text-bluegray-400">
                     <span>
-                        {{commutator.additionalInfo.systemInfo?.device}} {{commutator.additionalInfo.systemInfo?.hwVersion}}
+                        {{commutator.additionalInfo.systemInfo.device}} {{commutator.additionalInfo.systemInfo.hwVersion}}
                     </span>
                         <span class="text-sm">
-                        FW: {{commutator.additionalInfo.systemInfo?.fwVersion}}
+                        FW: {{commutator.additionalInfo.systemInfo.fwVersion}}
                     </span>
                         <span class="text-xs font-bold text-bluegray-300">
                         <span>Аптайм</span>

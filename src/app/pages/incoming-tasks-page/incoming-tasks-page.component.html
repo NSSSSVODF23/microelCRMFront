@@ -2,7 +2,7 @@
     <app-main-menu-panel></app-main-menu-panel>
     <div class="flex flex-grow-1 gap-3">
         <ng-container *ngTemplateOutlet="taskList"></ng-container>
-        <div class="flex flex-column gap-3 h-fit sticky-type-selector" [formGroup]="ic.filtersForm">
+        <div class="flex flex-column gap-3 h-fit sticky-type-selector px-2 pb-3" [formGroup]="ic.filtersForm">
             <div class="flex flex-column bg-white shadow-1 border-round p-3 gap-2">
                 <span class="text-bluegray-400 text-lg font-bold">Поиск задач</span>
                 <div class="p-inputgroup">

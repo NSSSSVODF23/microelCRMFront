@@ -1,5 +1,5 @@
 import {Pipe, PipeTransform} from '@angular/core';
-import {Task, TaskStatus} from "../transport-interfaces";
+import {Task, TaskStatus} from "../types/transport-interfaces";
 
 @Pipe({
     name: 'taskStatus'

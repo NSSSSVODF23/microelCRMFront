@@ -1,5 +1,5 @@
 import {Component, ElementRef, forwardRef, Input, OnInit} from '@angular/core';
-import {FieldItem, ModelItem, WireframeFieldType} from "../../../transport-interfaces";
+import {FieldItem, ModelItem, WireframeFieldType} from "../../../types/transport-interfaces";
 import {ApiService} from "../../../services/api.service";
 import {ControlValueAccessor, NG_VALUE_ACCESSOR} from "@angular/forms";
 

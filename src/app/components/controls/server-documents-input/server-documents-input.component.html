@@ -1,0 +1,46 @@
+<p-autoComplete [formControl]="control" [multiple]="true" placeholder="Название файла..." appendTo="body"
+                [suggestions]="(suggestions$ | async) ?? []" (completeMethod)="querySubject.next($event.query)">
+    <ng-template let-document pTemplate="selectedItem">
+        <ng-container *ngTemplateOutlet="documentTemplate; context:{$implicit: document}"></ng-container>
+    </ng-template>
+    <ng-template let-document pTemplate="item">
+        <ng-container *ngTemplateOutlet="suggestionTemplate; context:{$implicit: document}"></ng-container>
+    </ng-template>
+</p-autoComplete>
+
+<ng-template #documentTemplate let-document pTemplate="item">
+    <div class="flex gap-1 align-items-center text-bluegray-500" (mouseenter)="preview(document, $event)" (mouseleave)="hidePreview()">
+        <ng-container *ngTemplateOutlet="fileIcon; context:{$implicit: document.type}"></ng-container>
+        <span class="text-sm">
+            {{document.name}}
+        </span>
+    </div>
+</ng-template>
+
+<ng-template #suggestionTemplate let-document pTemplate="item">
+    <div class="flex gap-1 align-items-center text-bluegray-500" (mouseenter)="preview(document, $event)" (mouseleave)="hidePreview()">
+        <ng-container *ngTemplateOutlet="fileIcon; context:{$implicit: document.type}"></ng-container>
+        <div class="flex">
+            <span class="text-sm" *ngIf="document.path">
+                {{document.path}}
+            </span>
+            <span class="text-sm">
+                {{document.name}}
+            </span>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #fileIcon let-type>
+    <ng-container [ngSwitch]="type">
+        <span class="mdi-image" *ngSwitchCase="'PHOTO'"></span>
+        <span class="mdi-videocam" *ngSwitchCase="'VIDEO'"></span>
+        <span class="mdi-audiotrack" *ngSwitchCase="'AUDIO'"></span>
+        <span class="mdi-picture_as_pdf" *ngSwitchCase="'DOCUMENT'"></span>
+        <span class="mdi-insert_drive_file" *ngSwitchDefault></span>
+    </ng-container>
+</ng-template>
+
+<p-overlayPanel #photoPreviewPanel appendTo="body" styleClass="overlay-panel-unpadding">
+    <img [src]="previewUrl" class="max-w-20rem border-round absolute" alt=""/>
+</p-overlayPanel>

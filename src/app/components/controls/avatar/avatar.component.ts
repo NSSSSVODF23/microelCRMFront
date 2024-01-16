@@ -1,6 +1,6 @@
 import {Component, ElementRef, Input, OnChanges, OnInit, SimpleChanges, ViewChild} from '@angular/core';
 import {Utils} from "../../../util";
-import {EmployeeStatus} from "../../../transport-interfaces";
+import {EmployeeStatus} from "../../../types/transport-interfaces";
 import {RealTimeUpdateService} from "../../../services/real-time-update.service";
 
 @Component({

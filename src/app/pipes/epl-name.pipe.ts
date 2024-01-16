@@ -1,5 +1,5 @@
 import {Pipe, PipeTransform} from '@angular/core';
-import {Employee} from "../transport-interfaces";
+import {Employee} from "../types/transport-interfaces";
 
 @Pipe({
     name: 'eplName'

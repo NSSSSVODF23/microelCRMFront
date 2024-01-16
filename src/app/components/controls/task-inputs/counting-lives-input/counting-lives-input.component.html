@@ -1,6 +1,6 @@
 <div class="flex flex-column gap-1" >
     <div class="flex gap-1" [formGroup]="addressCounterLivesForm">
-        <app-address-input formControlName="address" [isHouseOnly]="true"></app-address-input>
+        <app-address-input-alt formControlName="address" [isHouseOnly]="true"></app-address-input-alt>
         <p-inputNumber (keyup.enter)="!isLoading && getCalculation()" placeholder="С кв." formControlName="startApart" [useGrouping]="false" [min]="0" [max]="999" [size]="4"></p-inputNumber>
         <p-inputNumber (keyup.enter)="!isLoading && getCalculation()" placeholder="По кв." formControlName="endApart" [useGrouping]="false" [min]="0" [max]="999" [size]="4"></p-inputNumber>
         <p-button icon="mdi-people" styleClass="p-button-icon" [disabled]="isDisabled" [loading]="isLoading" (onClick)="getCalculation()"></p-button>

@@ -1,7 +1,7 @@
 import {Component, EventEmitter, Input, OnDestroy, OnInit, Output} from '@angular/core';
-import {LoadingState, Page, Task, TaskStatus, TaskTag} from "../../../transport-interfaces";
+import {DateRange, LoadingState, Page, Task, TaskStatus, TaskTag} from "../../../types/transport-interfaces";
 import {ApiService} from "../../../services/api.service";
-import {debounceTime, distinctUntilChanged, map, tap} from "rxjs";
+import {debounceTime, distinctUntilChanged, first, lastValueFrom, map, shareReplay, tap} from "rxjs";
 import {FormControl, FormGroup} from "@angular/forms";
 import {CustomValidators} from "../../../custom-validators";
 import {SubscriptionsHolder, Utils} from "../../../util";
@@ -39,9 +39,24 @@ export class TaskSelectingDialogComponent implements OnInit, OnDestroy {
         template: new FormControl<number[]|null>([], [CustomValidators.notEmpty]),
         status: new FormControl<TaskStatus[]>([TaskStatus.ACTIVE, TaskStatus.PROCESSING, TaskStatus.CLOSE], [CustomValidators.notEmpty]),
         author: new FormControl<string|null>(null),
-        dateOfCreation: new FormControl<string[]|null>(null),
+        dateOfCreation: new FormControl<DateRange|null>(null),
         tags: new FormControl<number[]>([]),
     })
+
+    filters$ = this.mainFilterForm.valueChanges.pipe(
+        debounceTime(1000),
+        distinctUntilChanged(),
+        map(({searchPhrase, template, status, author, dateOfCreation, tags}) => ({
+            searchPhrase,
+            template,
+            status,
+            author,
+            dateOfCreation,
+            tags
+        })),
+        shareReplay(1)
+    );
+
     subscriptions = new SubscriptionsHolder();
 
 
@@ -49,17 +64,15 @@ export class TaskSelectingDialogComponent implements OnInit, OnDestroy {
     }
 
     ngOnInit(): void {
-        const filters$ = this.mainFilterForm.valueChanges.pipe(
-            debounceTime(1000),
-            distinctUntilChanged(),
-        );
 
-        this.subscriptions.addSubscription("filter", filters$.subscribe(filters => {
+
+        this.subscriptions.addSubscription("filter", this.filters$.subscribe(filters => {
             this.loadingState = LoadingState.LOADING;
             this.mainFilterForm.disable({emitEvent: false});
-            if(Array.isArray(filters.dateOfCreation) && filters.dateOfCreation.length !== 2){
-                filters.dateOfCreation = null;
-            }
+            // if(Array.isArray(filters.dateOfCreation) && filters.dateOfCreation.length !== 2){
+            //
+            //     filters.dateOfCreation = null;
+            // }
             this.api.getPageOfTasks(0, {...filters, exclusionIds: this.excludedTasks, onlyMy: this.onlyMy}).subscribe(this.loadHandler())
         }));
     }
@@ -77,11 +90,9 @@ export class TaskSelectingDialogComponent implements OnInit, OnDestroy {
     changePage(event: any) {
         this.loadingState = LoadingState.LOADING;
         this.mainFilterForm.disable({emitEvent: false});
-        const filters = this.mainFilterForm.value;
-        if(Array.isArray(filters.dateOfCreation) && filters.dateOfCreation.length !== 2){
-            filters.dateOfCreation = null;
-        }
-        this.api.getPageOfTasks(event.page, {...filters, exclusionIds: this.excludedTasks, onlyMy: this.onlyMy}).subscribe(this.loadHandler())
+        lastValueFrom(this.filters$.pipe(first())).then(
+            filters=>this.api.getPageOfTasks(event.page, {...filters, exclusionIds: this.excludedTasks, onlyMy: this.onlyMy}).subscribe(this.loadHandler())
+        )
     }
 
     loadHandler() {
@@ -120,7 +131,7 @@ export class TaskSelectingDialogComponent implements OnInit, OnDestroy {
         this.mainFilterForm.setValue({
             template: [],
             status: [TaskStatus.ACTIVE, TaskStatus.PROCESSING, TaskStatus.CLOSE],
-            dateOfCreation: [],
+            dateOfCreation: null,
             tags: [],
             author: "",
             searchPhrase: ""

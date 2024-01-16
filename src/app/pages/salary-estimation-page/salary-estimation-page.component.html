@@ -22,7 +22,7 @@
                         </div>
                         <app-employee-sum-distribution #sumDistr (onRemoveFactorAction)="onRemoveFactorAction($event)"
                                                        [actionPicker]="worksPickerForm$"
-                                                       [employees]="selectedWorkLog?.employees"
+                                                       [employees]="selectedWorkLog.employees"
                                                        [formControl]="employeeRatioForm"></app-employee-sum-distribution>
                     </ng-container>
                     <div class="flex gap-3 align-items-center align-self-end">

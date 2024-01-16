@@ -13,7 +13,7 @@ import {
     Wireframe,
     WireframeFieldType,
     WireframeType
-} from "../../transport-interfaces";
+} from "../../types/transport-interfaces";
 import {CustomNavigationService} from "../../services/custom-navigation.service";
 import {AbstractControl, FormArray, FormControl, FormGroup, Validators} from "@angular/forms";
 import {delay, delayWhen, find, map, mergeMap, shareReplay, startWith, switchMap, tap, combineLatest, of} from "rxjs";

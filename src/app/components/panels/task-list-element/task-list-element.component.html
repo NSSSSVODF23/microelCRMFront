@@ -1,41 +1,42 @@
-<div (click)="onClick.emit(item)" [ngClass]="{processing: item?.taskStatus === 'PROCESSING', inlined, hovered: isHover}"
+<div #taskWrapper (click)="onClick.emit(item)" [ngClass]="{processing: item?.taskStatus === 'PROCESSING', inlined, hovered: isHover}"
      [routerLink]="!viewExample && !customClickHandler ? ['/task', item?.taskId] : null"
+     (contextmenu)="positioningContextMenuTarget($event); contextMenuPanel.toggle($event, contextMenuTarget)"
      class="flex flex-column bg-white outline-none cursor-pointer hover:bg-gray-50 relative pl-1">
     <div class="absolute top-0 left-0 h-full opacity-50" [ngClass]="statusBgColor" [style.width]="'.3rem'"></div>
-    <div class="flex gap-3 p-3 border-bottom-1 border-bluegray-50">
+    <div class="flex gap-3 p-3 border-bottom-1 border-bluegray-50 align-items-center">
         <p-checkbox (click)="$event.stopPropagation()" (ngModelChange)="checkChange.emit($event)" [(ngModel)]="check"
                     [name]="checkGroup" *ngIf="check"
                     [value]="item?.taskId"></p-checkbox>
         <ng-container *ngTemplateOutlet="headerItem; context:{label: 'Класс', value: item?.modelWireframe?.name}"></ng-container>
-        <ng-container *ngTemplateOutlet="headerItem; context:{label: 'Тип', value: item?.currentStage?.label}"></ng-container>
+        <div (click)="$event.stopPropagation(); item?.taskStatus !== 'CLOSE' && typeChangePanel.toggle($event); categoryChangePanel.hide()"
+             [class]="item?.taskStatus !== 'CLOSE' ? 'hover:text-orange-500' : null">
+            <ng-container *ngTemplateOutlet="headerItem; context:{label: 'Тип', value: item?.currentStage?.label}"></ng-container>
+        </div>
+        <div (click)="$event.stopPropagation(); categoryChangePanel.toggle($event); typeChangePanel.hide()" *ngIf="item?.taskStatus === 'ACTIVE'"
+             class="hover:text-orange-500">
+            <ng-container *ngTemplateOutlet="headerItem; context:{label: 'Категория', value: item?.currentDirectory?.name ?? 'Без категории'}"></ng-container>
+        </div>
         <ng-container *ngIf="item?.actualFrom || item?.actualTo">
             <ng-container *ngIf="item?.actualFrom">
                 <ng-container *ngTemplateOutlet="headerItem; context:{label: 'Запланирована', value: item?.actualFrom | date:'dd/MM/yyyy HH:mm'}"></ng-container>
             </ng-container>
             <ng-container *ngIf="item?.actualTo && !item?.actualFrom">
-                <ng-container *ngTemplateOutlet="headerItem; context:{label: 'Срок', value: item?.actualTo | date:'dd/MM/yyyy HH:mm'}"></ng-container>
+                <ng-container *ngTemplateOutlet="headerItem; context:{label: isExpired ? 'Просрочена' : 'Срок', value: item?.actualTo | date:'dd/MM/yyyy HH:mm'}"></ng-container>
             </ng-container>
         </ng-container>
-        <ng-container *ngTemplateOutlet="statusTags"></ng-container>
+        <app-task-tag-inline-selector [formControl]="tagsControl"></app-task-tag-inline-selector>
         <div class="stretched"></div>
         <ng-container *ngIf="item?.taskStatus === 'PROCESSING'; then workersEmployee; else responsibleEmployee"></ng-container>
     </div>
-<!--    <ng-container *ngTemplateOutlet="(isWide$ | async) ? tableBodyView : bodyView; context: {$implicit: taskFields}"></ng-container>-->
     <app-task-fields-table-view [task]="item" [isTaskBody]="false"></app-task-fields-table-view>
-    <div *ngIf="item?.lastComment" class="flex gap-2 border-top-1 border-bottom-1 border-bluegray-100 p-3">
-        <span class="text-sm white-space-nowrap text-bluegray-400 line-height-4">
-            {{item?.lastComment?.created | date:'dd-MM-yyyy HH:mm'}}
-        </span>
-        <span class="text-sm white-space-nowrap text-primary-600 line-height-4">
-            {{item?.lastComment?.creator?.fullName}}:
-        </span>
-        <div class="text-bluegray-500" [style]="{whiteSpace:'pre-wrap', wordWrap:'break-word', textAlign:'left'}">
-            {{item?.lastComment?.simpleText}}
-        </div>
+    <div class="border-top-1 border-bottom-1 border-bluegray-100 p-3 gap-1 flex flex-column" *ngIf="item && item.lastComments && item.lastComments.length > 0">
+        <ng-container *ngFor="let comment of item.lastComments">
+            <ng-container *ngTemplateOutlet="lastCommentTemplate; context:{$implicit: comment}"></ng-container>
+        </ng-container>
     </div>
-    <div class="flex relative" *ngIf="isCommentInput">
+    <div class="flex relative" *ngIf="isCommentInput && item?.taskStatus !== 'CLOSE'">
         <textarea pInputTextarea [autoResize]="true" placeholder="Новый комментарий" [rows]="1" (keydown.control.enter)="sendComment()"
-                  (click)="$event.stopPropagation()" class="mt-2 mx-3 flex-grow-1" [formControl]="commentInputControl" [disabled]="commentSending"></textarea>
+                  (click)="$event.stopPropagation()" class="mt-2 mx-3 flex-grow-1" [formControl]="commentInputControl" [readonly]="commentSending"></textarea>
         <p-button icon="mdi-send" class="absolute bottom-0 right-0 mr-3" (onClick)="$event.stopPropagation(); sendComment()"
                   styleClass="p-button-text p-button-icon" [loading]="commentSending"></p-button>
     </div>
@@ -52,13 +53,27 @@
     </div>
 </div>
 
+<ng-template #lastCommentTemplate let-comment>
+    <div class="flex gap-2">
+        <span class="text-sm white-space-nowrap text-bluegray-400 line-height-4">
+            {{comment.created | date:'dd-MM-yyyy HH:mm'}}
+        </span>
+        <span class="text-sm white-space-nowrap text-primary-600 line-height-4">
+            {{comment.creator?.fullName}}:
+        </span>
+        <div class="text-bluegray-500" [style]="{whiteSpace:'pre-wrap', wordWrap:'break-word', textAlign:'left'}">
+            {{comment.simpleText}}
+        </div>
+    </div>
+</ng-template>
+
 
 <!--Дополнительная информация о статусе и тегах задачи-->
 <ng-template #statusTags>
     <div class="tags-view">
-        <div *ngFor="let tag of item?.tags|slice:0:2; trackBy: trackByTag" [style.background-color]="tag.color"
+        <div *ngFor="let tag of item?.tags|slice:0:4; trackBy: trackByTag" [style.background-color]="tag.color"
              class="tags-view-item small">{{tag.name}}</div>
-        <div (mouseenter)="tagsPreviewShow($event)" (mouseleave)="tagsPreviewHide()" *ngIf="isMoreTwoTags"
+        <div (mouseenter)="tagsPreviewShow($event)" (mouseleave)="tagsPreviewHide()" *ngIf="isMoreTags"
              class="tags-view-item small">{{remainingNumberOfTags}}+
         </div>
     </div>
@@ -107,3 +122,54 @@
         <ng-container *ngTemplateOutlet="headerItem; context:{label:'Монтажники', value: actualWorkLogWorkers}"></ng-container>
     </ng-container>
 </ng-template>
+
+<p-overlayPanel #typeChangePanel appendTo="body" styleClass="overlay-panel-unpadding"
+                (onShow)="isBlockBackground=true" (onHide)="isBlockBackground=false">
+    <ng-template pTemplate="content">
+        <ng-container *ngIf="typesMenuModel$ | async as types; else loadingTemplate">
+            <ng-container *ngIf="types && types.length > 0">
+                <p-menu [model]="types"></p-menu>
+            </ng-container>
+            <ng-container *ngIf="types && types.length === 0">
+                <div class="p-4 text-bluegray-300 font-bold">Нет доступных типов</div>
+            </ng-container>
+        </ng-container>
+    </ng-template>
+</p-overlayPanel>
+
+<p-overlayPanel #categoryChangePanel appendTo="body" styleClass="overlay-panel-unpadding"
+                (onShow)="isBlockBackground=true" (onHide)="isBlockBackground=false">
+    <ng-template pTemplate="content">
+        <ng-container *ngIf="categoryMenuModel$ | async as categories; else loadingTemplate">
+            <ng-container *ngIf="categories && categories.length > 0">
+                <p-menu [model]="categories"></p-menu>
+            </ng-container>
+            <ng-container *ngIf="categories && categories.length === 0">
+                <div class="p-4 text-bluegray-300 font-bold">Нет доступных категорий</div>
+            </ng-container>
+        </ng-container>
+    </ng-template>
+</p-overlayPanel>
+
+
+<div #contextMenuTarget class="fixed max-w-0 max-h-0 pointer-events-none" [style]="contextMenuTargetStyle"></div>
+
+<app-appoint-installers-dialog [(visible)]="isAppointInstallersDialogVisible" [taskId]="item?.taskId"></app-appoint-installers-dialog>
+<app-edit-task-dialog [(visible)]="isShowEditTaskDialogVisible" [task]="item"></app-edit-task-dialog>
+<app-task-scheduling-dialog [(visible)]="isShowTaskSchedulingDialogVisible" [schedulingType]="taskSchedulingType" [taskId]="item?.taskId"></app-task-scheduling-dialog>
+
+<p-overlayPanel #contextMenuPanel appendTo="body" styleClass="overlay-panel-unpadding"
+                (onShow)="isBlockBackground=true" (onHide)="isBlockBackground=false">
+    <ng-template pTemplate="content">
+        <p-menu [model]="contextMenuModel"></p-menu>
+    </ng-template>
+</p-overlayPanel>
+
+<ng-template #loadingTemplate>
+    <p-progressSpinner class="custom-spinner custom-spinner-8xl custom-spinner-primary" strokeWidth="1"></p-progressSpinner>
+</ng-template>
+
+<p-blockUI [blocked]="isBlockBackground" [baseZIndex]="1101" [autoZIndex]="false" >
+    <div class="w-full h-full" (contextmenu)="$event.stopPropagation(); $event.preventDefault()">
+    </div>
+</p-blockUI>

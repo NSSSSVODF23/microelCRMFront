@@ -1,6 +1,6 @@
 import {Component, forwardRef, Input, OnInit} from '@angular/core';
 import {ControlValueAccessor, FormGroup, NG_VALUE_ACCESSOR} from "@angular/forms";
-import {FieldItem, FilterModelItem} from "../../../transport-interfaces";
+import {FieldItem, FilterModelItem} from "../../../types/transport-interfaces";
 import {ApiService} from "../../../services/api.service";
 
 @Component({

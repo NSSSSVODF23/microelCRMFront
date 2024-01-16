@@ -57,9 +57,9 @@
 
     <div *ngSwitchCase="'ADDRESS'" class="input-label-wrapper">
         <ng-container *ngTemplateOutlet="label"></ng-container>
-        <app-address-input (ngModelChange)="onChange($event)" (onBlur)="onTouched()"
-                           [disabled]="disable" [inputClasses]="classes"
-                           [(ngModel)]="controlValue"></app-address-input>
+        <app-address-input-alt (ngModelChange)="onChange($event)" [inputClasses]="classes"
+                           [disabled]="disable" (focusin)="onTouched()"
+                           [(ngModel)]="controlValue"></app-address-input-alt>
     </div>
 
     <div *ngSwitchCase="'LOGIN'" class="input-label-wrapper">

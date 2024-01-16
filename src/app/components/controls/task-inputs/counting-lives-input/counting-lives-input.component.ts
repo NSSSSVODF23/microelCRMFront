@@ -2,7 +2,7 @@ import {Component, EventEmitter, forwardRef, Input, OnDestroy, OnInit, Output} f
 import {ControlValueAccessor, FormControl, FormGroup, NG_VALUE_ACCESSOR, Validators} from "@angular/forms";
 import {fromEvent, Subscription} from "rxjs";
 import {ApiService} from "../../../../services/api.service";
-import {Address} from "../../../../transport-interfaces";
+import {Address} from "../../../../types/transport-interfaces";
 import {SubscriptionsHolder} from "../../../../util";
 
 @Component({

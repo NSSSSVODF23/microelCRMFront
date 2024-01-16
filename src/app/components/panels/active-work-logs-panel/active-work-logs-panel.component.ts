@@ -2,7 +2,7 @@ import {Component, OnDestroy, OnInit} from '@angular/core';
 import {ApiService} from "../../../services/api.service";
 import {RealTimeUpdateService} from "../../../services/real-time-update.service";
 import {SubscriptionsHolder} from "../../../util";
-import {WorkLog} from "../../../transport-interfaces";
+import {WorkLog} from "../../../types/transport-interfaces";
 
 @Component({
     selector: 'app-active-work-logs-panel',

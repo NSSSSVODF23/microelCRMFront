@@ -2,7 +2,7 @@ import {Component, OnDestroy, OnInit} from '@angular/core';
 import {ApiService} from "../../services/api.service";
 import {FormControl, FormGroup, Validators} from "@angular/forms";
 import {ConfirmationService} from 'primeng/api';
-import {Department, Employee, PhyPhoneInfo, PhyPhoneModel, Position} from "../../transport-interfaces";
+import {Department, Employee, PhyPhoneInfo, PhyPhoneModel, Position} from "../../types/transport-interfaces";
 import {SubscriptionsHolder} from "../../util";
 import {RealTimeUpdateService} from "../../services/real-time-update.service";
 import {debounceTime, distinctUntilChanged} from "rxjs";

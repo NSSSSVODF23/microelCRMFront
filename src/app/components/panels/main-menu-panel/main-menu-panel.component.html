@@ -25,7 +25,7 @@
 </div>
 
 <ng-template #main>
-    <app-extended-menu-item [link]="['/tasks','incoming']" caption="Задачи" icon="mdi-task"></app-extended-menu-item>
+    <app-extended-menu-item [link]="(lastCatalogRoute$ | async)??['/tasks','catalog']" caption="Задачи" icon="mdi-task"></app-extended-menu-item>
     <app-extended-menu-item [link]="['/clients','billing','search']" caption="Абоненты" icon="mdi-group"></app-extended-menu-item>
     <app-extended-menu-item [link]="['/addresses','list']" caption="Адреса" icon="mdi-home_work"></app-extended-menu-item>
     <app-extended-menu-item [link]="['/commutators','list']" caption="Коммутаторы" icon="mdi-dns"></app-extended-menu-item>
@@ -38,9 +38,9 @@
 
 <ng-template #tasks>
     <ng-container *ngTemplateOutlet="backButton; context:{name:'Задачи'}"></ng-container>
-    <app-extended-menu-item [link]="['/tasks','incoming']" caption="Входящие" icon="mdi-inbox" [badge]="(incomingCount$ | async)??''"></app-extended-menu-item>
-<!--    <app-extended-menu-item [link]="['/tasks','catalog']" caption="Каталог" icon="mdi-inventory_2"></app-extended-menu-item>-->
-    <app-extended-menu-item [link]="['/tasks','list']" caption="Все задачи" icon="mdi-format_list_bulleted"></app-extended-menu-item>
+<!--    <app-extended-menu-item [link]="['/tasks','incoming']" caption="Входящие" icon="mdi-inbox" [badge]="(incomingCount$ | async)??''"></app-extended-menu-item>-->
+    <app-extended-menu-item [link]="(lastCatalogRoute$ | async)??['/tasks','catalog']" caption="Каталог" icon="mdi-inventory_2"></app-extended-menu-item>
+<!--    <app-extended-menu-item [link]="['/tasks','list']" caption="Все задачи" icon="mdi-format_list_bulleted"></app-extended-menu-item>-->
     <app-extended-menu-item [link]="['/tasks','calendar']" caption="Календарь" icon="mdi-calendar_month"></app-extended-menu-item>
 <!--    <app-extended-menu-item [elements]="stagesMenuItems" [isExtended]="stageMenuExtended" [extendable]="true" caption="Доска"-->
 <!--                            icon="mdi-checklist"></app-extended-menu-item>-->

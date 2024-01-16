@@ -2,7 +2,7 @@ import {Component, EventEmitter, forwardRef, Input, OnDestroy, OnInit, Output} f
 import {ControlValueAccessor, FormControl, NG_VALUE_ACCESSOR} from "@angular/forms";
 import {debounceTime, map, mergeMap, Subject, Subscription} from "rxjs";
 import {ApiService} from "../../../services/api.service";
-import {ClientEquipment} from "../../../transport-interfaces";
+import {ClientEquipment} from "../../../types/transport-interfaces";
 
 @Component({
   selector: 'app-equipments-field-filter',

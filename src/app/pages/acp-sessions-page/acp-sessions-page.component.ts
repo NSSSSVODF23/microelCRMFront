@@ -2,7 +2,7 @@ import {Component, OnInit} from '@angular/core';
 import {BehaviorSubject, combineLatest, debounceTime, map, shareReplay, startWith, Subject, switchMap, tap} from "rxjs";
 import {FormControl, FormGroup} from "@angular/forms";
 import {ApiService} from "../../services/api.service";
-import {DhcpBinding, SwitchWithAddress} from "../../transport-interfaces";
+import {DhcpBinding, SwitchWithAddress} from "../../types/transport-interfaces";
 import {ConfirmationService} from "primeng/api";
 import {flowInChild} from "../../animations";
 import {DynamicValueFactory} from "../../util";

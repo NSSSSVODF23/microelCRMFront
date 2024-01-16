@@ -18,18 +18,18 @@
 <p-overlay [visible]="(overlayVisible | async) ?? false" appendTo="body" contentStyleClass="overlay">
         <div *ngIf="binding && binding.lastConnectionLocation; else notFindedOverlay" class="p-3 flex flex-column gap-2 text-sm text-bluegray-400 fit-content">
             <div class="flex align-items-center gap-2">
-                <span class="font-bold">{{binding?.lastConnectionLocation?.commutatorName}}</span>
-                <span class="font-bold">{{binding?.lastConnectionLocation?.portName}} порт</span>
-                <span [ngClass]="binding?.lastConnectionLocation?.isHasLink ? 'text-green-400' : 'text-red-400'"
-                      class="font-bold">{{binding?.lastConnectionLocation?.isHasLink ? 'Есть линк' : 'Нет линка'}}</span>
+                <span class="font-bold">{{binding.lastConnectionLocation.commutatorName}}</span>
+                <span class="font-bold">{{binding.lastConnectionLocation.portName}} порт</span>
+                <span [ngClass]="binding.lastConnectionLocation.isHasLink ? 'text-green-400' : 'text-red-400'"
+                      class="font-bold">{{binding.lastConnectionLocation.isHasLink ? 'Есть линк' : 'Нет линка'}}</span>
             </div>
             <div class="flex align-items-center gap-2">
-                <span>IP: {{binding?.lastConnectionLocation?.commutatorIp}}</span>
-                <span>Скорость: {{binding?.lastConnectionLocation?.portSpeed ?? '-'}}</span>
+                <span>IP: {{binding.lastConnectionLocation.commutatorIp}}</span>
+                <span>Скорость: {{binding.lastConnectionLocation.portSpeed ?? '-'}}</span>
             </div>
             <div class="flex align-items-center gap-1 justify-content-end text-xs text-bluegray-300">
                 <span>Обновлен:</span>
-                <app-time-elapsed [startTime]="binding?.lastConnectionLocation?.lastPortCheck"
+                <app-time-elapsed [startTime]="binding.lastConnectionLocation.lastPortCheck"
                                   type="short"></app-time-elapsed>
                 <span>назад</span>
             </div>

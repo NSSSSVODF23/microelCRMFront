@@ -1,2 +1,9 @@
-<p-calendar [formControl]="control" placeholder="Дата" appendTo="body" [showClear]="true" styleClass="full-width" [selectOtherMonths]="true"
-            [selectionMode]="'range'" [readonlyInput]="true" (onBlur)="onTouched()" [firstDayOfWeek]="1"></p-calendar>
+<div class="flex w-fit" (focusin)="onTouched()">
+    <p-dropdown  placeholder="Выбрать" [options]="rangeOptions" [showClear]="true"
+                 appendTo="body" [formControl]="dropDownControl"></p-dropdown>
+</div>
+<p-overlay [(visible)]="calendarVisible" appendTo="body" styleClass="w-30rem" (onHide)="clearIsUnselect()">
+    <p-calendar [inline]="true" [formControl]="calendarControl"
+                styleClass="full-width" [selectOtherMonths]="true"
+                [selectionMode]="'range'" [firstDayOfWeek]="1"></p-calendar>
+</p-overlay>
