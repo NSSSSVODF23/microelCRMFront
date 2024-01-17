@@ -9,7 +9,10 @@
             <div class="flex flex-column gap-1 border-round-md shadow-1 overflow-hidden bg-bluegray-100 h-fit mb-3">
                 <div *ngFor="let item of tasksPage.content" class="flex relative" (onDragStart)="cacheService.taskMovingStart(item)"
                      [pDraggable]="item.currentStage?.stageId ?? ''">
-                    <app-task-list-element [isCommentInput]="true" [item]="item"></app-task-list-element>
+                    <app-task-list-element (onStartEdit)="cacheService.taskEditStart($event)"
+                                           (onStopEdit)="cacheService.taskEditStop($event)"
+                                           [externalUpdater]="cacheService.getTaskUpdater(item.taskId)"
+                                           [isCommentInput]="true" [item]="item"></app-task-list-element>
                 </div>
             </div>
         </ng-container>

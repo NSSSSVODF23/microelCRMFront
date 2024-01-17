@@ -24,7 +24,7 @@
                 <ng-container *ngTemplateOutlet="headerItem; context:{label: isExpired ? 'Просрочена' : 'Срок', value: item?.actualTo | date:'dd/MM/yyyy HH:mm'}"></ng-container>
             </ng-container>
         </ng-container>
-        <app-task-tag-inline-selector [formControl]="tagsControl"></app-task-tag-inline-selector>
+        <app-task-tag-inline-selector [formControl]="tagsControl" (onShow)="onStartEdit.emit(item)" (onHide)="onStopEdit.emit(item)"></app-task-tag-inline-selector>
         <div class="stretched"></div>
         <ng-container *ngIf="item?.taskStatus === 'PROCESSING'; then workersEmployee; else responsibleEmployee"></ng-container>
     </div>
@@ -35,8 +35,10 @@
         </ng-container>
     </div>
     <div class="flex relative" *ngIf="isCommentInput && item?.taskStatus !== 'CLOSE'">
-        <textarea pInputTextarea [autoResize]="true" placeholder="Новый комментарий" [rows]="1" (keydown.control.enter)="sendComment()"
-                  (click)="$event.stopPropagation()" class="mt-2 mx-3 flex-grow-1" [formControl]="commentInputControl" [readonly]="commentSending"></textarea>
+        <textarea pInputTextarea [autoResize]="true" placeholder="Новый комментарий" [rows]="1"
+                  (keydown.control.enter)="sendComment()" (focus)="onStartEdit.emit(item)" (blur)="onStopEdit.emit(item)"
+                  (click)="$event.stopPropagation()" class="mt-2 mx-3 flex-grow-1"
+                  [formControl]="commentInputControl" [readonly]="commentSending"></textarea>
         <p-button icon="mdi-send" class="absolute bottom-0 right-0 mr-3" (onClick)="$event.stopPropagation(); sendComment()"
                   styleClass="p-button-text p-button-icon" [loading]="commentSending"></p-button>
     </div>
@@ -124,7 +126,7 @@
 </ng-template>
 
 <p-overlayPanel #typeChangePanel appendTo="body" styleClass="overlay-panel-unpadding"
-                (onShow)="isBlockBackground=true" (onHide)="isBlockBackground=false">
+                (onShow)="startEdit()" (onHide)="stopEdit()">
     <ng-template pTemplate="content">
         <ng-container *ngIf="typesMenuModel$ | async as types; else loadingTemplate">
             <ng-container *ngIf="types && types.length > 0">
@@ -138,7 +140,7 @@
 </p-overlayPanel>
 
 <p-overlayPanel #categoryChangePanel appendTo="body" styleClass="overlay-panel-unpadding"
-                (onShow)="isBlockBackground=true" (onHide)="isBlockBackground=false">
+                (onShow)="startEdit()" (onHide)="stopEdit()">
     <ng-template pTemplate="content">
         <ng-container *ngIf="categoryMenuModel$ | async as categories; else loadingTemplate">
             <ng-container *ngIf="categories && categories.length > 0">
@@ -154,12 +156,12 @@
 
 <div #contextMenuTarget class="fixed max-w-0 max-h-0 pointer-events-none" [style]="contextMenuTargetStyle"></div>
 
-<app-appoint-installers-dialog [(visible)]="isAppointInstallersDialogVisible" [taskId]="item?.taskId"></app-appoint-installers-dialog>
-<app-edit-task-dialog [(visible)]="isShowEditTaskDialogVisible" [task]="item"></app-edit-task-dialog>
-<app-task-scheduling-dialog [(visible)]="isShowTaskSchedulingDialogVisible" [schedulingType]="taskSchedulingType" [taskId]="item?.taskId"></app-task-scheduling-dialog>
+<app-appoint-installers-dialog [(visible)]="isAppointInstallersDialogVisible" (visibleChange)="!$event && this.stopEdit()" [taskId]="item?.taskId"></app-appoint-installers-dialog>
+<app-edit-task-dialog [(visible)]="isShowEditTaskDialogVisible" (visibleChange)="!$event && this.stopEdit()" [task]="item"></app-edit-task-dialog>
+<app-task-scheduling-dialog [(visible)]="isShowTaskSchedulingDialogVisible" (visibleChange)="!$event && this.stopEdit()" [schedulingType]="taskSchedulingType" [taskId]="item?.taskId"></app-task-scheduling-dialog>
 
 <p-overlayPanel #contextMenuPanel appendTo="body" styleClass="overlay-panel-unpadding"
-                (onShow)="isBlockBackground=true" (onHide)="isBlockBackground=false">
+                (onShow)="startEdit()" (onHide)="stopEdit()">
     <ng-template pTemplate="content">
         <p-menu [model]="contextMenuModel"></p-menu>
     </ng-template>

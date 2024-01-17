@@ -1,10 +1,8 @@
 <div appExtendPageHeight class="flexed gap10 column" [style.padding]="'0 2rem 2rem 2rem'">
-    <ng-container *ngIf="openMode != 'billing'">
+    <ng-container *ngIf="openMode != 'billing' else selectedTemplatePanel">
         <ng-container *ngIf="isTemplateSelected; then selectedTemplatePanel else unselectedTemplatePanel"></ng-container>
     </ng-container>
     <div *ngIf="isTemplateSelected" @flow class="stage-view">
-<!--        <div class="caption">Этап {{this.currentStep + 1}}-->
-<!--            : {{this.selectedTemplate ? this.selectedTemplate.steps[currentStep].name : ""}}</div>-->
         <div [@swipeChild]="currentStepFields.length" [formGroup]="currentStepForm" class="flex flex-column p-3 gap-3">
             <app-task-template-input *ngFor="let field of currentStepFields; let i = index" [formControlName]="field.id" [field]="field"
                                      class="flex-grow-1" (focusin)="currentFieldFocus = i" (focusout)="currentFieldFocus = undefined"></app-task-template-input>

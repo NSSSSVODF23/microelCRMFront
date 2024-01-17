@@ -44,6 +44,10 @@ export class TaskListElementComponent implements OnInit, OnChanges, OnDestroy {
     @Input() customClickHandler = false;
 
     @Input() isCommentInput = false;
+    @Input() externalUpdater?: Observable<Task>;
+
+    @Output() onStartEdit = new EventEmitter();
+    @Output() onStopEdit = new EventEmitter();
 
     @ViewChild('tagsPreview') tagsPreview?: OverlayPanel;
     @ViewChild('typeChangePanel') typeChangePanel?: OverlayPanel;
@@ -213,7 +217,7 @@ export class TaskListElementComponent implements OnInit, OnChanges, OnDestroy {
     }
 
     ngOnChanges(changes: SimpleChanges): void {
-        const {item} = changes;
+        const {item, externalUpdater} = changes;
         if (item && item.currentValue) {
             this.tagsControl.setValue(item.currentValue.tags, {emitEvent: false});
             this.typesMenuModel$ = this.api.getAvailableTaskTypesToChange(item.currentValue.taskId)
@@ -272,7 +276,12 @@ export class TaskListElementComponent implements OnInit, OnChanges, OnDestroy {
             ]
             this.updateActualWorkLog();
             this.updateSubscribe?.unsubscribe();
-            this.updateSubscribe = this.rt.taskUpdated(item.currentValue.taskId).subscribe(updatedTask => this.item = updatedTask);
+            if(externalUpdater && externalUpdater.currentValue){
+                const UPDATE_OBSERVABLE = externalUpdater.currentValue as Observable<Task>;
+                this.updateSubscribe = UPDATE_OBSERVABLE.subscribe(updatedTask => this.item = updatedTask);
+            } else {
+                this.updateSubscribe = this.rt.taskUpdated(item.currentValue.taskId).subscribe(updatedTask => this.item = updatedTask);
+            }
             this.changeTagsSubscribe = this.tagsControl.valueChanges.subscribe(tags => this.api.setTaskTags(item.currentValue.taskId, tags ?? []).subscribe())
         }
     }
@@ -316,5 +325,16 @@ export class TaskListElementComponent implements OnInit, OnChanges, OnDestroy {
                 }
             })
         }
+    }
+
+    startEdit() {
+        this.isBlockBackground=true;
+        this.onStartEdit.emit(this.item);
+    }
+
+    stopEdit() {
+        this.isBlockBackground=false;
+        if(!this.isAppointInstallersDialogVisible && !this.isShowEditTaskDialogVisible && !this.isShowTaskSchedulingDialogVisible)
+            this.onStopEdit.emit(this.item);
     }
 }

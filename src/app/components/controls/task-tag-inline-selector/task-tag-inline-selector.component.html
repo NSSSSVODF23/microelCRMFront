@@ -11,7 +11,7 @@
     <div class="text-bluegray-300 font-bold px-2 py-1" *ngIf="tags.length === 0">
         Нет тегов
     </div>
-    <div *ngIf="!isEdit && isWrapperHovered" (click)="isEdit = true; initializeTags(); appendTagPanel.toggle($event, element.nativeElement)"
+    <div *ngIf="!isEdit && isWrapperHovered" (click)="editTags($event, appendTagPanel, element.nativeElement)"
          class="absolute flex min-w-max w-full h-full align-items-center justify-content-center cursor-pointer
           border-round-xl py-2 px-4 back-blured border-1 border-orange-500">
         <span class="text-orange-500">Редактировать</span>
@@ -20,12 +20,12 @@
 
 <ng-template #emptyTagsTemplate>
     <div class="text-primary px-3 py-2 border-round-3xl border-1 border-primary w-fit hover:bg-primary hover:text-white cursor-pointer"
-         (click)="$event.stopPropagation(); isEdit = true; initializeTags(); appendTagPanel.toggle($event, element.nativeElement)">
+         (click)="editTags($event, appendTagPanel, element.nativeElement)">
         Добавить теги
     </div>
 </ng-template>
 
-<p-overlayPanel #appendTagPanel appendTo="body" (onHide)="isEdit=false; changeTags()" styleClass="overlay-panel-unpadding">
+<p-overlayPanel #appendTagPanel appendTo="body" (onHide)="changeTags()" styleClass="overlay-panel-unpadding">
     <ng-template pTemplate="content">
         <p-listbox [options]="(loadedTags$ | async) ?? []" [filter]="true" filterBy="name"
                    (onChange)="appendTag($event.value)" [listStyle]="{'max-height':'35vh'}">

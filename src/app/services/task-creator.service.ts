@@ -14,7 +14,7 @@ export type BillingInfo = {
 export class TaskCreatorService {
 
     private creationMode: TaskCreationMode = 'standard';
-    private _dimensions: { width: number, height: number } = {width: 800, height: 800};
+    private _dimensions: { width: number, height: number } = {width: 1000, height: 800};
     private _openSubject = new Subject<undefined>();
 
     constructor() {

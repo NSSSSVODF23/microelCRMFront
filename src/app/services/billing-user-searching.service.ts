@@ -18,6 +18,8 @@ import {
 } from "rxjs";
 import {ApiService} from "./api.service";
 
+type FiltrationValue = {mode: string | null, isActive: boolean | null, query: string | null};
+
 @Injectable({
     providedIn: 'root'
 })
@@ -34,8 +36,17 @@ export class BillingUserSearchingService {
     changeUsersSubject = new Subject<BillingUserItemData[]>();
     changeUsers$ = this.changeUsersSubject.asObservable();
     enterSearch = new Subject<null>();
-    enterSearch$ = this.enterSearch.pipe(map(()=>this.filtrationForm.value));
-    modeChange$ = this.filtrationForm.controls.mode.valueChanges.pipe(map(value => ({mode: value, isActive: false, query: null})));
+    enterSearch$ = this.enterSearch
+        .pipe(
+            map(()=>this.filtrationForm.value),
+            map((value)=>{
+                if(value.query){
+                    value.query = value.query.trim();
+                }
+                return value;
+            })
+        );
+    modeChange$ = this.filtrationForm.controls.mode.valueChanges.pipe(map(value => ({mode: value, query: null, isActive: false})));
 
     users$ = merge(this.enterSearch$, this.modeChange$).pipe(
             tap(() => {

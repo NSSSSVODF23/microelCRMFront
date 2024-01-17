@@ -1,8 +1,9 @@
-import {Component, ElementRef, OnDestroy, OnInit} from '@angular/core';
+import {Component, ElementRef, EventEmitter, OnDestroy, OnInit, Output} from '@angular/core';
 import {ControlValueAccessor, FormControl, NG_VALUE_ACCESSOR} from "@angular/forms";
 import {TaskTag} from "../../../types/transport-interfaces";
 import {BehaviorSubject, combineLatest, distinctUntilChanged, map, shareReplay, startWith, tap} from "rxjs";
 import {ApiService} from "../../../services/api.service";
+import {OverlayPanel} from "primeng/overlaypanel";
 
 @Component({
     selector: 'app-task-tag-inline-selector',
@@ -29,6 +30,9 @@ export class TaskTagInlineSelectorComponent implements OnInit, OnDestroy, Contro
     }))
 
     initialTags = [] as TaskTag[];
+
+    @Output() onShow = new EventEmitter();
+    @Output() onHide = new EventEmitter();
 
     constructor(private api: ApiService, readonly element: ElementRef) {
     }
@@ -90,9 +94,18 @@ export class TaskTagInlineSelectorComponent implements OnInit, OnDestroy, Contro
         return false;
     }
 
-
     changeTags(){
+        this.isEdit=false;
+        this.onHide.emit();
         if(!this.isHasChanges()) return;
         this.onChange(this.tags)
+    }
+
+    editTags(event: MouseEvent, appendTagPanel: OverlayPanel, nativeElement: HTMLElement) {
+        event.stopPropagation();
+        this.isEdit = true;
+        this.initializeTags();
+        appendTagPanel.toggle(event, nativeElement)
+        this.onShow.emit();
     }
 }
