@@ -646,6 +646,14 @@ export enum SchedulingType{
     EXCEPT_PLANNED = "EXCEPT_PLANNED",
 }
 
+export interface UserTariff{
+    id: number;
+    name: string;
+    cost: number;
+    description: string;
+    disabled?: boolean;
+}
+
 export interface FileData {
     name: string;
     modified: number;
@@ -1696,4 +1704,16 @@ export interface PhyPhoneInfoForm{
 export enum PhyPhoneModel{
     NEW = "NEW",
     OLD = "OLD"
+}
+
+export interface CreateUserForm{
+    address: Address;
+    fullName: string;
+    phone: string;
+    userType: UserType;
+}
+
+export enum UserType {
+    PHY = "обычн.",
+    ORG = "орг."
 }

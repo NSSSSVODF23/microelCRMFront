@@ -8,18 +8,15 @@
                     <div class="flex gap-3 align-items-end">
                         <div class="input-label-wrapper">
                             <label>Режим поиска</label>
-                            <p-selectButton [disabled]="busService.userLoadingState==='LOADING'"
-                                            [options]="filterModeItems"
-                                            formControlName="mode"></p-selectButton>
+                            <p-selectButton [options]="filterModeItems" formControlName="mode"></p-selectButton>
                         </div>
-                        <p-toggleButton [disabled]="busService.userLoadingState==='LOADING'" formControlName="isActive"
-                                        offLabel="Только активные" onLabel="Все"></p-toggleButton>
+                        <p-toggleButton formControlName="isActive" offLabel="Только активные" onLabel="Все"></p-toggleButton>
                     </div>
                     <div class="flex gap-3 align-items-end">
                         <div class="input-label-wrapper stretched">
                             <label>Запрос</label>
                             <div class="p-inputgroup">
-                                <input (keydown.enter)="busService.enterSearch.next(null)"
+                                <input #mainInput (keydown.enter)="busService.enterSearch.next(null)" (focus)="mainInput.select()"
                                        [appPreventInput]="busService.userLoadingState === 'LOADING'"
                                        formControlName="query" pInputText type="text"/>
                                 <button (click)="busService.enterSearch.next(null)" icon="mdi-search" pButton pRipple

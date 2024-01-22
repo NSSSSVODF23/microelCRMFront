@@ -356,7 +356,7 @@ export class TasksCatalogPageCacheService {
 
     getTagsFromCatalog(filter: TaskFilterOptions) {
         const {status, cls, type, directory, dateOfClose, actualFrom, actualTo, schedulingType} = filter;
-        const key = '' + status + cls + type + directory + dateOfClose + actualFrom + actualTo + schedulingType;
+        const key = '' + status + cls + type + directory + JSON.stringify(dateOfClose) + JSON.stringify(actualFrom) + JSON.stringify(actualTo) + schedulingType;
         if (this.tagsMap.has(key))
             return this.tagsMap.get(key);
         const observable = this.tasksMoved$.pipe(

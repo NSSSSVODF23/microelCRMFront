@@ -2,6 +2,7 @@ import {Component, ElementRef, forwardRef, Input, OnInit} from '@angular/core';
 import {FieldItem, ModelItem, WireframeFieldType} from "../../../types/transport-interfaces";
 import {ApiService} from "../../../services/api.service";
 import {ControlValueAccessor, NG_VALUE_ACCESSOR} from "@angular/forms";
+import {MenuItem} from "primeng/api";
 
 /**
  * Элемент списка вариаций поля ввода. Нужен для добавления бизнес-логики для одинаковых типов данных.
@@ -129,6 +130,22 @@ export class TaskTemplateInputComponent implements OnInit, ControlValueAccessor 
 
     onTouched = () => {
     };
+    loginInputContextMenuModel: MenuItem[] = [
+        {
+            label: "Создать логин",
+            command: ()=>{
+                if(this.field && 'modelItemId' in this.field)
+                    this.api.createUserInBilling(this.field.modelItemId).subscribe(console.log)
+            }
+        },
+        {
+            label: "Создать BIZ логин",
+            command: ()=>{
+                if(this.field && 'modelItemId' in this.field)
+                    this.api.createUserInBilling(this.field.modelItemId, true).subscribe(console.log)
+            }
+        }
+    ];
 
     ngOnInit(): void {
     }

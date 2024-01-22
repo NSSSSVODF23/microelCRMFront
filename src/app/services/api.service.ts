@@ -47,7 +47,7 @@ import {
     TelegramConf, TimeFrame,
     TokenChain, TokenChainWithUserInfo,
     TreeDragDropEvent,
-    TreeElementPosition, UserEvents,
+    TreeElementPosition, UserEvents, UserTariff,
     Wireframe, WireframeDashboardStatistic,
     WorkingDay,
     WorkLog
@@ -762,7 +762,7 @@ export class ApiService {
         return this.sendGet<BillingUserItemData[]>(`api/private/billing/users/by-fio`, {query, isActive});
     }
 
-    getBillingUsersByAddress(address: Address, isActive: boolean) {
+    getBillingUsersByAddress(address: string, isActive: boolean) {
         return this.sendGet<BillingUserItemData[]>(`api/private/billing/users/by-address`, {address, isActive});
     }
 
@@ -952,7 +952,7 @@ export class ApiService {
     }
 
     getBillingConfiguration() {
-        return this.sendGet<BillingConf>('api/private/configuration/billing');
+        return this.sendGet<BillingConf>('api/private/billing/configuration');
     }
 
     getTelegramConfiguration() {
@@ -964,7 +964,7 @@ export class ApiService {
     }
 
     setBillingConfiguration(billingConf: BillingConf) {
-        return this.sendPost('api/private/configuration/billing', billingConf);
+        return this.sendPost('api/private/billing/configuration', billingConf);
     }
 
     setTelegramConfiguration(telegramConf: TelegramConf) {
@@ -1104,6 +1104,30 @@ export class ApiService {
         return this.sendPatch(`api/private/task/${taskId}/old-tracker-stage/${taskStageId}/change`, {});
     }
 
+    createUserInBilling(modelItemId: number, isOrg = false){
+        return this.sendPost(`api/private/billing/user/create`, {modelItemId, isOrg});
+    }
+
+    getBillingUserTariffs(login: string){
+        return this.sendGet<UserTariff[]>(`api/private/billing/user/${login}/tariffs`);
+    }
+
+    getBillingUserServices(login: string){
+        return this.sendGet<UserTariff[]>(`api/private/billing/user/${login}/services`);
+    }
+
+    appendServiceToBillingUser(id: number, login: string) {
+        return this.sendPatch(`api/private/billing/user/${login}/service/${id}/append`, {});
+    }
+
+    removeServiceFromBillingUser(name: string, login: string) {
+        return this.sendPatch(`api/private/billing/user/${login}/service/${name}/remove`, {});
+    }
+
+    changeTariffInBillingUser(id: number, login: string) {
+        return this.sendPatch(`api/private/billing/user/${login}/tariff/${id}`, {});
+    }
+
     // Результаты запросов на сервер кэшируются по таймауту, чтобы не было доп нагрузки на сервер
 
     private sendGet<T>(uri: string, query?: any) {
@@ -1182,8 +1206,9 @@ export class ApiService {
             }));
     }
 
-
     private generateHash(uri: string, query: any) {
         return cyrb53(uri + JSON.stringify(query), 0);
     }
+
+
 }

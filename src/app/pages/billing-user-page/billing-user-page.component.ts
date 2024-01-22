@@ -8,7 +8,7 @@ import {
     DhcpLogsRequest,
     LoadingState,
     NCLHistoryWrapper,
-    UserEvents
+    UserEvents, UserTariff
 } from "../../types/transport-interfaces";
 import {DynamicValueFactory, SubscriptionsHolder, Utils} from "../../util";
 import {CustomNavigationService} from "../../services/custom-navigation.service";
@@ -31,6 +31,7 @@ import {ConfirmationService, MenuItem, MessageService} from "primeng/api";
 import {Menu} from "primeng/menu";
 import {RealTimeUpdateService} from "../../services/real-time-update.service";
 import {FormControl, FormGroup, Validators} from "@angular/forms";
+import {OverlayPanel} from "primeng/overlaypanel";
 
 @Component({
     templateUrl: './billing-user-page.component.html',
@@ -244,6 +245,12 @@ export class BillingUserPageComponent implements OnInit, OnDestroy {
     dhcpLogsLoadingState = LoadingState.READY;
     dhcpLogsIsLastPage = false;
 
+    tariffList: UserTariff[] = [];
+    selectedTariff?: number;
+    serviceList: UserTariff[] = [];
+    selectedServices: number[] = [];
+    blockUi = false;
+
     constructor(private api: ApiService, private rt: RealTimeUpdateService, private route: ActivatedRoute, readonly customNav: CustomNavigationService,
                 readonly taskCreation: TaskCreatorService, readonly toast: MessageService, private confirm: ConfirmationService) {
     }
@@ -449,6 +456,7 @@ export class BillingUserPageComponent implements OnInit, OnDestroy {
         }
     }
 
+
     copyMacAddress(event:any){
         if(event.value){
             Utils.copyToClipboard(event.value.state.macAddresses, this.toast, 'MAC адреса скопированы', 'Не удалось скопировать MAC адреса');
@@ -589,5 +597,88 @@ export class BillingUserPageComponent implements OnInit, OnDestroy {
                 error: () => this.nclHistoryLoadingState = LoadingState.ERROR
             }
         );
+    }
+
+    getTariffList(event: any, panel: OverlayPanel) {
+        if(this.currentLogin) {
+            panel.toggle(event);
+            this.api.getBillingUserTariffs(this.currentLogin).subscribe((tariffs) => {
+                this.tariffList = tariffs;
+                tariffs.filter(tariff => this.mainTariff?.service === tariff.name).forEach(s => s.disabled = true);
+            })
+        }
+    }
+
+    getServiceList(event: any, panel: OverlayPanel) {
+        if(this.currentLogin) {
+            panel.toggle(event);
+            this.api.getBillingUserServices(this.currentLogin).subscribe((services) => {
+                this.serviceList = services;
+                services.filter(service => this.services.some(s => s.service === service.name)).forEach(s => s.disabled = true);
+            })
+        }
+    }
+
+    appendService(event: any) {
+        if(this.currentLogin)
+            this.confirm.confirm({
+                header: 'Добавление сервиса',
+                message: 'Добавить сервис ' + event.option.name + ' абоненту?',
+                accept: () => {
+                    if(this.currentLogin) {
+                        this.blockUi = true;
+                        this.api.appendServiceToBillingUser(event.value, this.currentLogin).subscribe({
+                            next: () => {
+                                this.blockUi = false;
+                            },
+                            error: () => {
+                                this.blockUi = false;
+                            }
+                        });
+                    }
+                }
+            })
+    }
+
+    removeService(name: string) {
+        if(this.currentLogin)
+            this.confirm.confirm({
+                header: 'Отключение сервиса',
+                message: 'Отключить сервис ' + name + '?',
+                accept: () => {
+                    if(this.currentLogin) {
+                        this.blockUi = true;
+                        this.api.removeServiceFromBillingUser(name, this.currentLogin).subscribe({
+                            next: () => {
+                                this.blockUi = false;
+                            },
+                            error: () => {
+                                this.blockUi = false;
+                            }
+                        });
+                    }
+                }
+            })
+    }
+
+    changeTariff(event: any) {
+        if(this.currentLogin)
+            this.confirm.confirm({
+                header: 'Изменение тарифа',
+                message: 'Изменить тариф абонента на ' + event.option.name + '?',
+                accept: () => {
+                    if(this.currentLogin) {
+                        this.blockUi = true;
+                        this.api.changeTariffInBillingUser(event.value, this.currentLogin).subscribe({
+                            next: () => {
+                                this.blockUi = false;
+                            },
+                            error: () => {
+                                this.blockUi = false;
+                            }
+                        });
+                    }
+                }
+            })
     }
 }

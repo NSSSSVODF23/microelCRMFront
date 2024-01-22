@@ -289,6 +289,32 @@ export class Utils {
             {} as { [key: string]: T[] },
         );
     }
+
+    static arrayEquals(a: any[], b: any[]){
+        if(!a || !b) return false;
+        if(a.length !== b.length) return false;
+        const occurrenceCountMap= new Map<any, { aCount: number, bCount: number }>();
+        a.forEach(value => {
+            const count = occurrenceCountMap.get(value);
+            if(count){
+                occurrenceCountMap.set(value, {aCount: count.aCount+1, bCount: 0});
+                return;
+            }
+            occurrenceCountMap.set(value, {aCount: 1, bCount: 0});
+        })
+        b.forEach(value => {
+            const count = occurrenceCountMap.get(value);
+            if(count){
+                occurrenceCountMap.set(value, {aCount: count.aCount, bCount: count.bCount+1});
+                return;
+            }
+            occurrenceCountMap.set(value, {aCount: 0, bCount: 1});
+        })
+        for(let [key, {aCount, bCount}] of occurrenceCountMap){
+            if(aCount !== bCount) return false;
+        }
+        return true;
+    }
 }
 
 export class FormToModelItemConverter {

@@ -224,6 +224,7 @@ import {
 } from "../../components/controls/server-documents-input/server-documents-input.component";
 import {AddressInputAltComponent} from "../../components/controls/address-input-alt/address-input-alt.component";
 import {InputSwitchModule} from "primeng/inputswitch";
+import {ContextMenuModule} from "primeng/contextmenu";
 
 
 @NgModule({
@@ -502,6 +503,7 @@ import {InputSwitchModule} from "primeng/inputswitch";
         MenubarModule,
         PickListModule,
         InputSwitchModule,
+        ContextMenuModule,
     ],
     providers: [
         {

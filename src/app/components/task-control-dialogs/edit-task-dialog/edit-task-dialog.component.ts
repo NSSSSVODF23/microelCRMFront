@@ -39,8 +39,8 @@ export class EditTaskDialogComponent implements OnInit, OnChanges {
     }
 
     ngOnChanges(changes: SimpleChanges) {
-        const visible = changes['visible'];
-        if (visible && visible.currentValue) {
+        const TASK = changes['task'];
+        if (TASK && TASK.currentValue) {
             this.showEditTaskDialog()
         }
     }

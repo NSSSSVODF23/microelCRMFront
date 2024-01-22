@@ -1,4 +1,4 @@
-<div appExtendPageHeight class="flexed vcenter">
+<div appExtendPageHeight class="flex justify-content-center">
     <div class="responsive-wrapper flex flex-column gap-3 mb-3">
         <ng-container [ngSwitch]="loadingState">
             <ng-container *ngSwitchCase="'LOADING'">
@@ -153,46 +153,10 @@
             Пользователь
         </span>
         <div class="flex flex-column gap-2 p-3">
-            <span>
-                <span class="text-bluegray-400 text-sm font-bold">
-                    Адрес:
-                </span>
-                <span class="text-bluegray-500">
-                    {{userInfo?.ibase?.addr}}
-                </span>
-            </span>
-            <span>
-                <span class="text-bluegray-400 text-sm font-bold">
-                    ФИО:
-                </span>
-                <span class="text-bluegray-500">
-                    {{userInfo?.ibase?.fio}}
-                </span>
-            </span>
-            <span>
-                <span class="text-bluegray-400 text-sm font-bold">
-                    Телефон:
-                </span>
-                <span class="text-bluegray-500">
-                    {{userInfo?.ibase?.phone}}
-                </span>
-            </span>
-            <span>
-                <span class="text-bluegray-400 text-sm font-bold">
-                    Договор заключен:
-                </span>
-                <span class="text-bluegray-500">
-                    {{userInfo?.ibase?.ddog | date: 'EEEE dd MMMM yyyy' | titlecase}}г.
-                </span>
-            </span>
-            <span *ngIf="userInfo?.ibase?.coment">
-                <span class="text-bluegray-400 text-sm font-bold">
-                    Комментарий:
-                </span>
-                <div class="caption ml-2" [style]="{maxWidth:'30rem'}">
-                    {{userInfo?.ibase?.coment}}
-                </div>
-            </span>
+            <ng-container *ngTemplateOutlet="infoRowTemplate; context: {label: 'Адрес', value: userInfo?.ibase?.addr}"></ng-container>
+            <ng-container *ngTemplateOutlet="infoRowTemplate; context: {label: 'ФИО', value: userInfo?.ibase?.fio}"></ng-container>
+            <ng-container *ngTemplateOutlet="infoRowTemplate; context: {label: 'Телефон', value: userInfo?.ibase?.phone}"></ng-container>
+            <ng-container *ngTemplateOutlet="infoRowTemplate; context: {label: 'Договор заключен', value: userInfo?.ibase?.ddog | date: 'EEEE dd MMMM yyyy' | titlecase}"></ng-container>
         </div>
     </div>
 </ng-template>
@@ -209,46 +173,10 @@
             </span>
         </span>
         <div class="flex flex-column gap-2 p-3" *ngIf="activeClientHardware$ | async as activeClientHardware">
-            <span>
-                <span class="text-bluegray-400 text-sm font-bold">
-                    Статус:
-                </span>
-                <span class="font-bold" [ngClass]="(activeClientHardware.onlineStatus === 'ONLINE' ? 'text-green-400' : 'text-red-400')">
-                    {{activeClientHardware.onlineStatus === 'ONLINE' ? 'Онлайн' : 'Офлайн'}}
-                </span>
-            </span>
-            <span>
-                <span class="text-bluegray-400 text-sm font-bold">
-                    Оборудование:
-                </span>
-                <span>
-                    <span *ngIf="activeClientHardware.dhcpClient">
-                        {{activeClientHardware.dhcpClient}}
-                    </span>
-                    <span *ngIf="activeClientHardware.dhcpHostname">
-                        {{activeClientHardware.dhcpHostname}}
-                    </span>
-                </span>
-            </span>
-            <span>
-                <span class="text-bluegray-400 text-sm font-bold">
-                    IP:
-                </span>
-                <span class="text-bluegray-500">
-                    {{activeClientHardware.ipaddr}}
-                </span>
-            </span>
-            <span>
-                <span class="text-bluegray-400 text-sm font-bold">
-                    Активность:
-                </span>
-                <span class="text-bluegray-500">
-                    {{activeClientHardware.leaseStart | date: 'dd MMMM yyyy HH:mm:ss' | titlecase}}
-                    ({{activeClientHardware.leaseStart | elapsedTime:'':' назад':false:true}})
-                </span>
-                <span class="mdi-help_outline caption size-big f-color-300"
-                      pTooltip="Момент времени, когда оборудование отправило запрос серверу."></span>
-            </span>
+            <ng-container *ngTemplateOutlet="infoRowTemplate; context: {label: 'Статус', value: (activeClientHardware.onlineStatus === 'ONLINE' ? 'Онлайн' : 'Офлайн'), valueClass: activeClientHardware.onlineStatus === 'ONLINE' ? 'text-green-400' : 'text-red-400'}"></ng-container>
+            <ng-container *ngTemplateOutlet="infoRowTemplate; context: {label: 'Оборудование', value: activeClientHardware.dhcpClient ?? '' + activeClientHardware.dhcpHostname ?? ''}"></ng-container>
+            <ng-container *ngTemplateOutlet="infoRowTemplate; context: {label: 'IP', value: activeClientHardware.ipaddr}"></ng-container>
+            <ng-container *ngTemplateOutlet="infoRowTemplate; context: {label: 'Активность', value: activeClientHardware.leaseStart | date: 'dd MMMM yyyy HH:mm:ss' | titlecase, help: 'Момент времени, когда оборудование отправило запрос серверу.'}"></ng-container>
         </div>
     </div>
 </ng-template>
@@ -259,98 +187,111 @@
             Тарифы
         </span>
         <div class="flex flex-column gap-2 p-3">
-            <span>
-                <span class="text-bluegray-400 text-sm font-bold">
-                    Основной:
-                </span>
-                <span class="text-bluegray-500">
-                    <span>
-                        {{mainTariff?.service ? mainTariff?.service : 'Нет тарифа'}}
-                    </span>
-                    <span *ngIf="mainTariff?.service" class="caption wt-bold size-small f-color-primary">
-                        {{mainTariff?.price}} руб/период
-                    </span>
-                </span>
-            </span>
-            <span *ngIf="services.length>0" class="flexed gap5 hstart">
-                <span class="text-bluegray-400 text-sm font-bold">
-                    Сервисы:
-                </span>
-                <div class="flexed column gap5">
-                    <span *ngFor="let service of services">
-                        <span>
-                            {{service?.service}}
-                        </span>
-                        <span class="caption wt-bold size-small f-color-primary">
-                            {{service?.price}} руб/период
-                        </span>
-                    </span>
-                </div>
-            </span>
-            <span>
-                <span class="text-bluegray-400 text-sm font-bold">
-                    Общая стоймость:
-                </span>
-                <span class="text-bluegray-500">
-                    {{totalCost}} руб/период
-                </span>
-            </span>
-            <span class="flexed gap5 hstart">
-                <span class="text-bluegray-400 text-sm font-bold">
-                    Скорость:
-                </span>
-                <div class="flexed column gap5">
-                    <span>
-                        <span>
-                            По тарифу
-                        </span>
-                        <span class="caption wt-bold size-small f-color-primary">
-                            {{userInfo?.newTarif?.tspeed}} Мбит/с
-                        </span>
-                    </span>
-                    <span>
-                        <span>
-                            Фактическая
-                        </span>
-                        <span class="caption wt-bold size-small f-color-primary">
-                            {{userInfo?.newTarif?.speed}} Мбит/с
-                        </span>
-                    </span>
-                </div>
-            </span>
-            <span *ngIf="userInfo?.newTarif?.hdate">
-                <span class="text-bluegray-400 text-sm font-bold">
-                    Период тарифа:
-                </span>
-                <span class="text-bluegray-500">
-                    {{userInfo?.newTarif?.hdate | date: 'dd MMMM yyyy HH:mm' | titlecase}}
-                </span>
-                -
-                <span class="text-bluegray-500">
-                    {{userInfo?.newTarif?.edate | date: 'dd MMMM yyyy HH:mm' | titlecase}}
-                </span>
-                <span class="mdi-help_outline caption size-big f-color-300"
-                      pTooltip="Дата начала и окончания действия основного тарифа. (Дата списания)"></span>
-            </span>
-            <span *ngIf="isEndTariffDateAfter">
-                <span class="text-bluegray-400 text-sm font-bold">
-                    Списание через:
-                </span>
-                <span class="text-bluegray-500">
-                    {{userInfo?.newTarif?.edate | elapsedTime:'':'':false:true}}
-                </span>
-            </span>
-            <span *ngIf="userInfo?.newTarif?.endstate">
-                <span class="text-bluegray-400 text-sm font-bold">
-                    Изм. состояния:
-                </span>
-                <span class="text-bluegray-500">
-                    {{userInfo?.newTarif?.endstate | date: 'dd MMMM yyyy HH:mm' | titlecase}}
-                </span>
-                <span class="mdi-help_outline caption size-big f-color-300"
-                      pTooltip="Момент времени, когда произойдет изменение состояния абонента. (Прим. закончится отл. платеж)"></span>
-            </span>
+            <ng-container *ngTemplateOutlet="infoRowTemplatedTemplate; context:{label:'Основной', template: mainTariffTemplate}"></ng-container>
+            <ng-container *ngIf="services.length>0 else emptyServicesTemplate">
+                <ng-container *ngTemplateOutlet="infoRowTemplatedTemplate; context:{label:'Сервисы', template: serviceListTemplate}"></ng-container>
+            </ng-container>
+            <ng-container *ngTemplateOutlet="infoRowTemplate; context: {label: 'Общая стоимость', value: (totalCost+' руб/период')}"></ng-container>
+            <ng-container *ngTemplateOutlet="infoRowTemplatedTemplate; context:{label:'Скорость', template: speedViewTemplate}"></ng-container>
+            <ng-container *ngTemplateOutlet="infoRowTemplate; context: {label: 'Период тарифа', value: (userInfo?.newTarif?.hdate | date: 'dd MMMM yyyy HH:mm' | titlecase) + ' - ' + (userInfo?.newTarif?.edate | date: 'dd MMMM yyyy HH:mm' | titlecase)}"></ng-container>
+            <ng-container *ngTemplateOutlet="infoRowTemplate; context: {label: 'Списание через', value: userInfo?.newTarif?.edate | elapsedTime:'':'':false:true}"></ng-container>
+            <ng-container *ngTemplateOutlet="infoRowTemplate; context: {label: 'Изм. состояния', value: userInfo?.newTarif?.endstate | date: 'dd MMMM yyyy HH:mm' | titlecase, help: 'Момент времени, когда произойдет изменение состояния абонента. (Прим. закончится отл. платеж)'}"></ng-container>
         </div>
+    </div>
+</ng-template>
+
+<ng-template #infoRowTemplate let-label="label" let-value="value" let-help="help" let-valueClass="valueClass">
+    <span class="flex align-items-center gap-1">
+        <span class="text-bluegray-400 font-bold">
+            {{label}}:
+        </span>
+        <span class="text-bluegray-500 text-lg" [ngClass]="valueClass">
+            {{value}}
+        </span>
+        <span class="mdi-help_outline caption size-big f-color-300" *ngIf="help"
+              [pTooltip]="help"></span>
+    </span>
+</ng-template>
+
+<ng-template #infoRowTemplatedTemplate let-label="label" let-template="template">
+    <span class="flex gap-2 align-items-start">
+        <span class="text-bluegray-400 font-bold">
+            {{label}}:
+        </span>
+        <span class="flex flex-column gap-2">
+            <ng-container *ngTemplateOutlet="template;"></ng-container>
+        </span>
+    </span>
+</ng-template>
+
+<ng-template #mainTariffTemplate>
+    <span class="text-bluegray-500 text-lg flex gap-2 align-items-center">
+        <span>
+            {{mainTariff?.service ? mainTariff?.service : 'Нет тарифа'}}
+        </span>
+        <span *ngIf="mainTariff?.service" class="text-primary text-sm">
+            {{mainTariff?.price}} руб/период
+        </span>
+        <span (click)="getTariffList($event, tariffsOverlayPanel)">
+            <ng-container *ngTemplateOutlet="inlineButtonTemplate; context: {icon: 'mdi-edit', label: 'Изменить', btnClass: ['text-bluegray-400','hover:text-green-400']}"></ng-container>
+        </span>
+    </span>
+</ng-template>
+
+<ng-template #serviceListTemplate>
+    <div class="flex flex-column gap-1">
+        <ng-container *ngFor="let service of services">
+            <ng-container *ngTemplateOutlet="serviceItemTemplate; context: {service}"></ng-container>
+        </ng-container>
+        <ng-container *ngTemplateOutlet="emptyServicesTemplate"></ng-container>
+    </div>
+</ng-template>
+
+<ng-template #serviceItemTemplate let-service="service">
+    <div class="text-bluegray-500 text-lg flex align-items-center gap-2">
+        <div>
+            {{service.service}}
+        </div>
+        <div class="text-primary text-sm">
+            {{service.price}} руб/период
+        </div>
+        <div class="mdi-close text-bluegray-500 hover:text-red-400 text-sm cursor-pointer" (click)="removeService(service.service)"></div>
+    </div>
+</ng-template>
+
+<ng-template #emptyServicesTemplate>
+    <span (click)="getServiceList($event, servicesOverlayPanel)" *ngIf="!!mainTariff?.service">
+        <ng-container *ngTemplateOutlet="inlineButtonTemplate; context: {icon: 'mdi-add', label: 'Добавить сервис', btnClass: ['text-bluegray-400','hover:text-green-400']}"></ng-container>
+    </span>
+</ng-template>
+
+<ng-template #inlineButtonTemplate let-icon="icon" let-label="label" let-btnClass="btnClass" let-onClick="onClick" let-clickHandleAttr="clickHandleAttr">
+    <span class="flex align-items-center gap-1 cursor-pointer w-fit" [ngClass]="btnClass">
+        <span [ngClass]="icon" class="text-sm"></span>
+        <span>
+            {{label}}
+        </span>
+    </span>
+</ng-template>
+
+<ng-template #speedViewTemplate>
+    <div class="flex flex-column gap-2 text-bluegray-500 text-lg">
+        <span>
+            <span>
+                По тарифу
+            </span>
+            <span class="text-primary text-sm">
+                {{userInfo?.newTarif?.tspeed}} Мбит/с
+            </span>
+        </span>
+        <span>
+            <span>
+                Фактическая
+            </span>
+            <span class="text-primary text-sm">
+                {{userInfo?.newTarif?.speed}} Мбит/с
+            </span>
+        </span>
     </div>
 </ng-template>
 
@@ -745,3 +686,41 @@
                            strokeWidth="1"></p-progressSpinner>
     </div>
 </ng-template>
+
+<p-overlayPanel #tariffsOverlayPanel appendTo="body" styleClass="overlay-panel-unpadding">
+    <p-listbox [listStyle]="{'max-height':'250px'}" filterBy="name" emptyFilterMessage="Тарифа не найдено" emptyMessage="Загрузка..." [filter]="true"
+               [options]="tariffList" optionLabel="name" optionValue="id" (onClick)="changeTariff($event)">
+        <ng-template let-tariff pTemplate="item">
+            <div class="flex align-items-center justify-content-between w-full h-full" [pTooltip]="tariff.description" [showDelay]="500">
+                <span>
+                    {{tariff.name}}
+                </span>
+                <span>
+                    {{tariff.cost | currency:'RUB'}}
+                </span>
+            </div>
+        </ng-template>
+    </p-listbox>
+</p-overlayPanel>
+
+<p-overlayPanel #servicesOverlayPanel appendTo="body" styleClass="overlay-panel-unpadding">
+    <p-listbox [listStyle]="{'max-height':'250px'}" filterBy="name" optionDisabled="disabled"
+               emptyFilterMessage="Доп. сервиса не найдено" emptyMessage="Загрузка..." [filter]="true" (onClick)="appendService($event)"
+               [options]="serviceList" optionLabel="name" optionValue="id" [(ngModel)]="selectedServices">
+        <ng-template let-service pTemplate="item">
+            <div class="flex align-items-center justify-content-between w-full h-full" [pTooltip]="service.description" [showDelay]="500">
+                <span>
+                    {{service.name}}
+                </span>
+                <span>
+                    {{service.cost | currency:'RUB'}}
+                </span>
+            </div>
+        </ng-template>
+    </p-listbox>
+</p-overlayPanel>
+
+<p-blockUI [blocked]="blockUi">
+    <p-progressSpinner class="custom-spinner custom-spinner-gray custom-spinner-8xl"
+                       strokeWidth="1"></p-progressSpinner>
+</p-blockUI>

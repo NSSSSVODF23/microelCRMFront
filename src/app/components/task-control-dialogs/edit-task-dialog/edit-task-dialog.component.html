@@ -2,7 +2,7 @@
 <p-dialog [(visible)]="visible" (visibleChange)="visibleChange.emit($event)"
           [breakpoints]="{'960px': '75vw', '640px': '100vw'}" appendTo="body"
           [autoZIndex]="false" [baseZIndex]="2101"
-          [dismissableMask]="true" [draggable]="false" [modal]="true" [resizable]="false"
+          [dismissableMask]="true" [draggable]="true" [modal]="true" [resizable]="false"
           [style]="{width: '50vw', maxHeight: '70vh'}" header="Редактирование информации в задаче">
     <div class="flex flex-column gap-3">
         <div [formGroup]="editTaskForm" class="flex flex-column gap-2">

@@ -14,7 +14,7 @@ import {
     tap,
     first,
     map,
-    mergeMap
+    mergeMap, combineLatest, debounceTime
 } from "rxjs";
 import {ApiService} from "./api.service";
 
@@ -33,12 +33,15 @@ export class BillingUserSearchingService {
     filtrationForm = new FormGroup({
         mode: new FormControl('address'), query: new FormControl(''), isActive: new FormControl(false)
     })
+    filtrationFormChanges$ = this.filtrationForm.valueChanges.pipe(startWith(this.filtrationForm.value));
     changeUsersSubject = new Subject<BillingUserItemData[]>();
     changeUsers$ = this.changeUsersSubject.asObservable();
     enterSearch = new Subject<null>();
-    enterSearch$ = this.enterSearch
+    modeChange$ = this.filtrationForm.controls.mode.valueChanges.pipe(startWith(this.filtrationForm.value.mode));
+    enterSearch$ = combineLatest([this.filtrationFormChanges$, this.enterSearch, this.modeChange$])
         .pipe(
-            map(()=>this.filtrationForm.value),
+            debounceTime(100),
+            map(([form])=>form),
             map((value)=>{
                 if(value.query){
                     value.query = value.query.trim();
@@ -46,13 +49,12 @@ export class BillingUserSearchingService {
                 return value;
             })
         );
-    modeChange$ = this.filtrationForm.controls.mode.valueChanges.pipe(map(value => ({mode: value, query: null, isActive: false})));
 
-    users$ = merge(this.enterSearch$, this.modeChange$).pipe(
-            tap(() => {
+    users$ = this.enterSearch$.pipe(
+            tap((data) => {
                 this.userLoadingState = LoadingState.LOADING
             }),
-            switchMap((value: any) => {
+            switchMap((value) => {
                 if (!value.query) return of([] as BillingUserItemData[]);
                 switch (value.mode) {
                     case 'login':
@@ -91,9 +93,9 @@ export class BillingUserSearchingService {
 
     constructor(private api: ApiService) {
         this.users$.subscribe((users) => this.changeUsersSubject.next(users))
-        this.modeChange$.subscribe(() => {
-            this.filtrationForm.patchValue({query: ''})
-        })
+        // this.modeChange$.subscribe(() => {
+        //     this.filtrationForm.patchValue({query: ''})
+        // })
         this.changeUsers$.subscribe(this.usersHandler)
     }
 }

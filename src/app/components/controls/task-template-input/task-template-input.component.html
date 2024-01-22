@@ -64,9 +64,10 @@
 
     <div *ngSwitchCase="'LOGIN'" class="input-label-wrapper">
         <ng-container *ngTemplateOutlet="label"></ng-container>
-        <input (blur)="onTouched()" (ngModelChange)="onChange($event)" [(ngModel)]="controlValue"
+        <input #loginInput (blur)="onTouched()" (ngModelChange)="onChange($event)" [(ngModel)]="controlValue"
                [disabled]="disable" [ngClass]="classes"
                appRegexPatternChecker pInputText patternRx="^[\dA-z_]+$">
+        <p-contextMenu appendTo="body" [target]="loginInput" [model]="loginInputContextMenuModel"></p-contextMenu>
     </div>
 
     <div *ngSwitchCase="'AD_SOURCE'" class="input-label-wrapper">
