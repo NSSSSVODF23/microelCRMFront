@@ -16,10 +16,10 @@
                         <div class="input-label-wrapper stretched">
                             <label>Запрос</label>
                             <div class="p-inputgroup">
-                                <input #mainInput (keydown.enter)="busService.enterSearch.next(null)" (focus)="mainInput.select()"
+                                <input #mainInput (keydown.enter)="busService.enterSearch.next(true)" (focus)="mainInput.select()"
                                        [appPreventInput]="busService.userLoadingState === 'LOADING'"
                                        formControlName="query" pInputText type="text"/>
-                                <button (click)="busService.enterSearch.next(null)" icon="mdi-search" pButton pRipple
+                                <button (click)="busService.enterSearch.next(true)" icon="mdi-search" pButton pRipple
                                         type="button"></button>
                             </div>
                         </div>

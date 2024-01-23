@@ -204,11 +204,16 @@ export interface Employee {
     lastSeen?: string;
     phyPhoneInfo?: PhyPhoneInfo;
     oldTrackerCredentials?: OldTrackerCredentials;
+    base781Credentials?: Credentials;
+    base1785Credentials?: Credentials;
 }
 
-export interface OldTrackerCredentials {
+export interface Credentials {
     username: string;
     password: string;
+}
+
+export interface OldTrackerCredentials extends Credentials{
     installerId: string;
 }
 

@@ -774,8 +774,8 @@ export class ApiService {
         return this.sendGet<UserEvents>(`api/private/billing/user/${encodeURIComponent(login)}/events`);
     }
 
-    makePayment(login: string, paymentForm: any) {
-        return this.sendPost(`api/private/billing/user/${encodeURIComponent(login)}/make-payment`, paymentForm);
+    updateBalance(login: string, updateBalanceForm: any) {
+        return this.sendPost(`api/private/billing/user/${encodeURIComponent(login)}/update-balance`, updateBalanceForm);
     }
 
     setDeferredPayment(login: string) {
@@ -1126,6 +1126,10 @@ export class ApiService {
 
     changeTariffInBillingUser(id: number, login: string) {
         return this.sendPatch(`api/private/billing/user/${login}/tariff/${id}`, {});
+    }
+
+    makePayment(login: string, paymentForm: any) {
+        return this.sendPost(`api/private/billing/user/${login}/make-payment`, paymentForm);
     }
 
     // Результаты запросов на сервер кэшируются по таймауту, чтобы не было доп нагрузки на сервер

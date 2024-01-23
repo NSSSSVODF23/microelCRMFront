@@ -82,14 +82,14 @@
                       styleClass="p-button-success p-button-text"></p-button>
             <p-button (onClick)="controlMenu.toggle($event)" icon="mdi-menu" label="Управление"
                       styleClass="p-button-info p-button-text"></p-button>
-            <p-menu #controlMenu [popup]="true" appendTo="body" [model]="controlMenuItems"></p-menu>
+            <p-button (onClick)="openPaymentDialog()" icon="mdi-currency_ruble" label="Оплата" styleClass="p-button-warning p-button-text"></p-button>
             <div class="stretched"></div>
-            <span *ngIf="creditAmount" class="caption wt-tiny size-huge f-color-danger">
+            <span *ngIf="creditAmount" class="text-red-400 text-xl font-bold" [style.letter-spacing]="'2px'">
                 Кредит:
                 {{creditAmount | currency: 'RUB'}}
             </span>
             <span [ngClass]="{'f-color-primary': moneyAmount>=0, 'f-color-danger': moneyAmount<0}"
-                  class="caption wt-tiny size-huge f-color-primary">
+                  class="text-primary text-xl font-bold" [style.letter-spacing]="'2px'">
                 Баланс:
                 {{moneyAmount | currency: 'RUB'}}
             </span>
@@ -265,7 +265,7 @@
     </span>
 </ng-template>
 
-<ng-template #inlineButtonTemplate let-icon="icon" let-label="label" let-btnClass="btnClass" let-onClick="onClick" let-clickHandleAttr="clickHandleAttr">
+<ng-template #inlineButtonTemplate let-icon="icon" let-label="label" let-btnClass="btnClass">
     <span class="flex align-items-center gap-1 cursor-pointer w-fit" [ngClass]="btnClass">
         <span [ngClass]="icon" class="text-sm"></span>
         <span>
@@ -662,11 +662,11 @@
         </div>
 </p-dialog>
 
-<p-dialog [(visible)]="isPaymentDialogVisible" [dismissableMask]="true"
+<p-dialog [(visible)]="isBalanceDialogVisible" [dismissableMask]="true"
           [modal]="true" [resizable]="false" appendTo="body" header="Менеджер баланса">
     <ng-template pTemplate="content">
         <div class="flex flex-column gap-4 mt-1">
-            <form class="flex flex-column gap-2" [formGroup]="paymentForm">
+            <form class="flex flex-column gap-2" [formGroup]="balanceForm">
                 <p-dropdown [options]="(billingPaymentTypes$ | async) ?? []" appendTo="body"
                             placeholder="Тип платежа" formControlName="payType"></p-dropdown>
 <!--                <p-inputNumber placeholder="Сумма" mode="currency" currency="RUB" formControlName="sum"></p-inputNumber>-->
@@ -674,9 +674,21 @@
                 <textarea [autoResize]="true" pInputTextarea placeholder="Комментарий"
                           formControlName="comment" [rows]="3" [cols]="40"></textarea>
             </form>
-            <p-button label="Оплата" icon="mdi-attach_money" (onClick)="sendPayment()" [disabled]="!paymentForm.valid"
+            <p-button label="Оплата" icon="mdi-attach_money" (onClick)="sendBalance()" [disabled]="!balanceForm.valid"
                       styleClass="p-button-primary" class="align-self-end"></p-button>
         </div>
+    </ng-template>
+</p-dialog>
+
+<p-dialog [(visible)]="isPaymentDialogVisible" [dismissableMask]="true" contentStyleClass="flex flex-column gap-3 pt-2"
+          [modal]="true" [resizable]="false" appendTo="body" header="Оплата">
+    <ng-template pTemplate="content" [formGroup]="paymentForm">
+        <div class="flex gap-3 align-items-center">
+            <p-selectButton [options]="paymentModeOptions" formControlName="paymentType"></p-selectButton>
+            <input pInputText formControlName="sum" pKeyFilter="pint" [size]="10" placeholder="Сумма"/>
+        </div>
+        <textarea [autoResize]="true" pInputTextarea placeholder="Комментарий" formControlName="comment" [rows]="3" [cols]="30"></textarea>
+        <p-button label="Оплатить" icon="mdi-attach_money" (onClick)="sendPayment()" [disabled]="!paymentForm.valid" class="mt-3 align-self-end"></p-button>
     </ng-template>
 </p-dialog>
 
@@ -720,7 +732,12 @@
     </p-listbox>
 </p-overlayPanel>
 
+<p-menu #controlMenu [popup]="true" appendTo="body" [model]="controlMenuItems"></p-menu>
+
 <p-blockUI [blocked]="blockUi">
-    <p-progressSpinner class="custom-spinner custom-spinner-gray custom-spinner-8xl"
-                       strokeWidth="1"></p-progressSpinner>
+    <div class="flex flex-column gap-2 align-items-center justify-content-center bg-white border-round shadow-2 p-3">
+        <span *ngIf="blockMessage" class="text-lg text-primary">{{blockMessage}}</span>
+        <p-progressSpinner class="custom-spinner custom-spinner-primary custom-spinner-8xl"
+                           strokeWidth="1"></p-progressSpinner>
+    </div>
 </p-blockUI>

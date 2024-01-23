@@ -129,9 +129,19 @@ export class BillingUserPageComponent implements OnInit, OnDestroy {
     userEvents?: UserEvents;
     userEventsLoadingState = LoadingState.LOADING;
     billingPaymentTypes$ = this.api.getBillingPaymentTypesList();
+    isBalanceDialogVisible = false;
     isPaymentDialogVisible = false;
-    paymentForm = new FormGroup({
+    paymentModeOptions = [
+        {label: 'Наличные', value: 1, icon: 'mdi-money'},
+        {label: 'Карта', value: 25, icon: 'mdi-credit_card'},
+    ];
+    balanceForm = new FormGroup({
         payType: new FormControl(null, [Validators.required]),
+        sum: new FormControl(null, [Validators.required]),
+        comment: new FormControl(null, [Validators.required]),
+    });
+    paymentForm = new FormGroup({
+        paymentType: new FormControl(1, [Validators.required]),
         sum: new FormControl(null, [Validators.required]),
         comment: new FormControl(null, [Validators.required]),
     });
@@ -250,6 +260,7 @@ export class BillingUserPageComponent implements OnInit, OnDestroy {
     serviceList: UserTariff[] = [];
     selectedServices: number[] = [];
     blockUi = false;
+    blockMessage = '';
 
     constructor(private api: ApiService, private rt: RealTimeUpdateService, private route: ActivatedRoute, readonly customNav: CustomNavigationService,
                 readonly taskCreation: TaskCreatorService, readonly toast: MessageService, private confirm: ConfirmationService) {
@@ -299,6 +310,16 @@ export class BillingUserPageComponent implements OnInit, OnDestroy {
         return this.userInfo?.ibase?.money ?? 0;
     }
 
+    get paymentTypeName() {
+        switch (this.paymentForm.value.paymentType){
+            case 1:
+                return "наличных";
+            case 25:
+                return "карты";
+        }
+        return null;
+    }
+
     initControlMenuItems() {
 
         this.controlMenuItems = [
@@ -317,7 +338,7 @@ export class BillingUserPageComponent implements OnInit, OnDestroy {
             {
                 label: 'Менеджер баланса',
                 icon: 'mdi-account_balance',
-                command: () => this.openPaymentDialog()
+                command: () => this.openBalanceDialog()
             },
             {
                 label: this.userInfo?.newTarif?.isServiceSuspended ? 'Возобновить обслуживание' : 'Приостановить обслуживание',
@@ -566,13 +587,44 @@ export class BillingUserPageComponent implements OnInit, OnDestroy {
         this.isHistoryDialogVisible = true;
     }
 
+    openBalanceDialog() {
+        this.isBalanceDialogVisible = true;
+    }
+
     openPaymentDialog() {
+        this.paymentForm.reset({
+            paymentType: 1
+        })
         this.isPaymentDialogVisible = true;
+    }
+
+    sendBalance() {
+        if (!this.currentLogin) return;
+        this.api.updateBalance(this.currentLogin, this.balanceForm.value).subscribe();
     }
 
     sendPayment() {
         if (!this.currentLogin) return;
-        this.api.makePayment(this.currentLogin, this.paymentForm.value).subscribe();
+        this.confirm.confirm({
+            header: 'Подтверждение оплаты на логин ' + this.currentLogin,
+            message: 'Провести оплату с помощью ' + this.paymentTypeName + ' на ' + this.paymentForm.value.sum + ' рублей, на логин ' + this.currentLogin + '?',
+            accept: () => {
+                if (!this.currentLogin) return;
+                this.blockUi = true;
+                this.blockMessage = 'Производится оплата'
+                this.api.makePayment(this.currentLogin, this.paymentForm.value).subscribe({
+                    next: () => {
+                        this.blockUi = false;
+                        this.blockMessage = '';
+                        this.isPaymentDialogVisible = false;
+                    },
+                    error: () => {
+                        this.blockUi = false;
+                        this.blockMessage = '';
+                    }
+                });
+            }
+        })
     }
 
     refreshCommutators() {

@@ -241,25 +241,25 @@
 </p-dialog>
 
 <ng-template #employeeFormTemplate>
-    <form [formGroup]="employeeForm" class="flexed column gap5">
-        <div class="flexed gap10 hcenter">
-                <span class="input-label-wrapper full-width">
-                    <label>Фамилия</label>
-                    <input appRegexPatternChecker patternRx="^[А-я]+$" formControlName="lastName" pInputText
-                           [disabled]="isBeingCreatingEmployee || isBeingEditingEmployee" type="text">
-                </span>
+    <form [formGroup]="employeeForm" class="flex flex-column gap-2">
+        <div class="flex gap-3 align-items-center">
             <span class="input-label-wrapper full-width">
-                    <label>Имя</label>
-                    <input appRegexPatternChecker formControlName="firstName" pInputText patternRx="^[А-я]+$"
-                           [disabled]="isBeingCreatingEmployee || isBeingEditingEmployee" type="text">
-                </span>
+                <label>Фамилия</label>
+                <input appRegexPatternChecker patternRx="^[А-я]+$" formControlName="lastName" pInputText
+                       [disabled]="isBeingCreatingEmployee || isBeingEditingEmployee" type="text">
+            </span>
             <span class="input-label-wrapper full-width">
-                    <label>Отчество</label>
-                    <input appRegexPatternChecker formControlName="secondName" pInputText patternRx="^[А-я]+$"
-                           [disabled]="isBeingCreatingEmployee || isBeingEditingEmployee" type="text">
-                </span>
+                <label>Имя</label>
+                <input appRegexPatternChecker formControlName="firstName" pInputText patternRx="^[А-я]+$"
+                       [disabled]="isBeingCreatingEmployee || isBeingEditingEmployee" type="text">
+            </span>
+            <span class="input-label-wrapper full-width">
+                <label>Отчество</label>
+                <input appRegexPatternChecker formControlName="secondName" pInputText patternRx="^[А-я]+$"
+                       [disabled]="isBeingCreatingEmployee || isBeingEditingEmployee" type="text">
+            </span>
         </div>
-        <div class="flexed gap10 hcenter">
+        <div class="flex gap-3 align-items-center">
             <span class="input-label-wrapper full-width">
                 <label>Логин</label>
                 <input appRegexPatternChecker formControlName="login" pInputText patternRx="^[\w\.]+$$"
@@ -271,7 +271,7 @@
                        [disabled]="isBeingCreatingEmployee || isBeingEditingEmployee" type="password">
             </span>
         </div>
-        <div class="flexed gap10 hcenter">
+        <div class="flex gap-3 align-items-center">
                 <span class="input-label-wrapper full-width">
                     <label>Внутренний номер телефона</label>
                     <input appRegexPatternChecker formControlName="internalPhoneNumber" pInputText patternRx="^\d+$"
@@ -324,31 +324,58 @@
                            [disabled]="isBeingCreatingEmployee || isBeingEditingEmployee" type="text">
                 </span>
         </div>
-        <div class="flex flex-column mt-3">
-            <span class="text-bluegray-400 font-bold">Реквизиты от старого трекера</span>
-            <div class="flex gap-3 align-items-center" formGroupName="oldTrackerCredentials">
-                <ng-container *ngIf="!employeeForm.value.offsite">
-                    <span class="input-label-wrapper">
-                        <label>Логин</label>
-                        <input appRegexPatternChecker formControlName="username" pInputText patternRx="^[\w\.]+$"
-                               [disabled]="isBeingCreatingEmployee || isBeingEditingEmployee" type="text">
-                    </span>
-                    <span class="input-label-wrapper">
-                        <label>Пароль</label>
-                        <input appRegexPatternChecker formControlName="password" pInputText patternRx="^[\w\.]+$"
-                               [disabled]="isBeingCreatingEmployee || isBeingEditingEmployee" type="text">
-                    </span>
-                </ng-container>
-                <ng-container *ngIf="employeeForm.value.offsite">
-                    <span class="input-label-wrapper">
-                        <label>ID Монтажника в трекере</label>
-                        <input appRegexPatternChecker formControlName="installerId" pInputText patternRx="^[\d]+$"
-                               [disabled]="isBeingCreatingEmployee || isBeingEditingEmployee" type="text">
-                    </span>
-                </ng-container>
+        <p-panel header="Реквизиты авторизации" [toggleable]="true" [collapsed]="true">
+            <div class="flex flex-column gap-2">
+                <div class="flex flex-column">
+                    <span class="text-bluegray-400 font-bold">Реквизиты от старого трекера</span>
+                    <div class="flex gap-3 align-items-center" formGroupName="oldTrackerCredentials">
+                        <ng-container *ngIf="!employeeForm.value.offsite">
+                            <app-w-input label="Логин">
+                                <input appRegexPatternChecker formControlName="username" pInputText patternRx="^[\w\.]+$"
+                                       [disabled]="isBeingCreatingEmployee || isBeingEditingEmployee" type="text">
+                            </app-w-input>
+                            <app-w-input label="Пароль">
+                                <input appRegexPatternChecker formControlName="password" pInputText patternRx="^[\w\.]+$"
+                                       [disabled]="isBeingCreatingEmployee || isBeingEditingEmployee" type="text">
+                            </app-w-input>
+                        </ng-container>
+                        <ng-container *ngIf="employeeForm.value.offsite">
+                            <app-w-input label="ID Монтажника в трекере">
+                                <input appRegexPatternChecker formControlName="installerId" pInputText patternRx="^[\d]+$"
+                                       [disabled]="isBeingCreatingEmployee || isBeingEditingEmployee" type="text">
+                            </app-w-input>
+                        </ng-container>
+                    </div>
+                </div>
+                <div class="flex flex-column">
+                    <span class="text-bluegray-400 font-bold">Реквизиты биллинга 1785</span>
+                    <div class="flex gap-3 align-items-center" formGroupName="base1785Credentials">
+                        <app-w-input label="Логин">
+                            <input appRegexPatternChecker formControlName="username" pInputText patternRx="^[\w\.]+$"
+                                   [disabled]="isBeingCreatingEmployee || isBeingEditingEmployee" type="text">
+                        </app-w-input>
+                        <app-w-input label="Пароль">
+                            <input appRegexPatternChecker formControlName="password" pInputText patternRx="^[\w\.]+$"
+                                   [disabled]="isBeingCreatingEmployee || isBeingEditingEmployee" type="text">
+                        </app-w-input>
+                    </div>
+                </div>
+                <div class="flex flex-column">
+                    <span class="text-bluegray-400 font-bold">Реквизиты биллинга 781</span>
+                    <div class="flex gap-3 align-items-center" formGroupName="base781Credentials">
+                        <app-w-input label="Логин">
+                            <input appRegexPatternChecker formControlName="username" pInputText patternRx="^[\w\.]+$"
+                                   [disabled]="isBeingCreatingEmployee || isBeingEditingEmployee" type="text">
+                        </app-w-input>
+                        <app-w-input label="Пароль">
+                            <input appRegexPatternChecker formControlName="password" pInputText patternRx="^[\w\.]+$"
+                                   [disabled]="isBeingCreatingEmployee || isBeingEditingEmployee" type="text">
+                        </app-w-input>
+                    </div>
+                </div>
             </div>
-        </div>
-        <p-panel header="Параметры доступа">
+        </p-panel>
+        <p-panel header="Параметры доступа" [toggleable]="true" [collapsed]="true">
             <div class="flexed gap10 column">
                 <div class="flexed gap10 hcenter">
                     <p-toggleButton (onChange)="checkAllAccess($event)"

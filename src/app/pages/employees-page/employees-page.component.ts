@@ -97,6 +97,14 @@ export class EmployeesPageComponent implements OnInit, OnDestroy {
             username: new FormControl(''),
             password: new FormControl(''),
             installerId: new FormControl('')
+        }),
+        base1785Credentials: new FormGroup({
+            username: new FormControl(''),
+            password: new FormControl(''),
+        }),
+        base781Credentials: new FormGroup({
+            username: new FormControl(''),
+            password: new FormControl(''),
         })
     });
     isAccessOverride = false;
@@ -449,6 +457,14 @@ export class EmployeesPageComponent implements OnInit, OnDestroy {
                         username: employee.oldTrackerCredentials?.username ?? "",
                         password: employee.oldTrackerCredentials?.password ?? "",
                         installerId: employee.oldTrackerCredentials?.installerId ?? "",
+                    },
+                    base1785Credentials: {
+                        username: employee.base1785Credentials?.username ?? "",
+                        password: employee.base1785Credentials?.password ?? "",
+                    },
+                    base781Credentials: {
+                        username: employee.base781Credentials?.username ?? "",
+                        password: employee.base781Credentials?.password ?? "",
                     }
                 })
                 this.positionSelecting({value: employee.position?.positionId})

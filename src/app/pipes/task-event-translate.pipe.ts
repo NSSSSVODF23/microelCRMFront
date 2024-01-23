@@ -10,7 +10,7 @@ export class TaskEventTranslatePipe implements PipeTransform {
         if (!('type' in value)) return "";
         switch (value.type) {
             case TaskEventType.CHANGE_STAGE:
-                return "Задача переведена на этап: ";
+                return "Изменен тип задачи: ";
             case TaskEventType.CREATE_WORK_LOG:
                 return "Назначены монтажники по задаче";
             case TaskEventType.FORCE_CLOSE_WORK_LOG:

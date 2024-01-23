@@ -33,15 +33,18 @@ export class BillingUserSearchingService {
     filtrationForm = new FormGroup({
         mode: new FormControl('address'), query: new FormControl(''), isActive: new FormControl(false)
     })
-    filtrationFormChanges$ = this.filtrationForm.valueChanges.pipe(startWith(this.filtrationForm.value));
     changeUsersSubject = new Subject<BillingUserItemData[]>();
     changeUsers$ = this.changeUsersSubject.asObservable();
-    enterSearch = new Subject<null>();
-    modeChange$ = this.filtrationForm.controls.mode.valueChanges.pipe(startWith(this.filtrationForm.value.mode));
-    enterSearch$ = combineLatest([this.filtrationFormChanges$, this.enterSearch, this.modeChange$])
+    enterSearch = new Subject<boolean>();
+
+    enterDown$ = this.enterSearch.pipe(startWith(true));
+    modeChange$ = this.filtrationForm.controls.mode.valueChanges.pipe(startWith('address'));
+    activeChange$ = this.filtrationForm.controls.isActive.valueChanges.pipe(startWith(false));
+
+    enterSearch$ = combineLatest([this.enterDown$, this.modeChange$, this.activeChange$])
         .pipe(
             debounceTime(100),
-            map(([form])=>form),
+            map(()=>this.filtrationForm.value),
             map((value)=>{
                 if(value.query){
                     value.query = value.query.trim();

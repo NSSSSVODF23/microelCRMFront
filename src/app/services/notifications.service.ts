@@ -36,7 +36,7 @@ export class NotificationsService {
         [NotificationType.TASK_CLOSED]: 'Задача закрыта',
         [NotificationType.TASK_REOPENED]: 'Задача возобновлена',
         [NotificationType.TASK_PROCESSED]: 'Задача назначена',
-        [NotificationType.TASK_STAGE_CHANGED]: 'Стадия задачи изменена',
+        [NotificationType.TASK_STAGE_CHANGED]: 'Тип задачи изменен',
         [NotificationType.YOU_OBSERVER]: 'Вы наблюдатель',
         [NotificationType.YOU_RESPONSIBLE]: 'Вы ответственный',
         [NotificationType.TASK_HAS_BECOME_ACTUAL]: 'Актуальная',
