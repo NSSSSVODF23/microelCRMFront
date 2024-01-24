@@ -6,6 +6,7 @@ import {ChatPanelComponent} from "../../components/panels/chat-panel/chat-panel.
 import {map, Subscription, tap} from "rxjs";
 import {TaskCreatorService} from "../../services/task-creator.service";
 import {RealTimeUpdateService} from "../../services/real-time-update.service";
+import {BlockUiService} from "../../services/block-ui.service";
 
 @Component({
     templateUrl: './main-bootstrap.component.html',
@@ -21,8 +22,8 @@ export class MainBootstrapComponent implements OnInit, OnDestroy {
     openChatSub?:Subscription;
     commutatorRemoteUpdatePoolVisible = false;
 
-    constructor(readonly router: Router, readonly notifyService: NotificationsService, private rt: RealTimeUpdateService,
-                readonly chatService: ChatService, readonly taskCreator: TaskCreatorService) {
+    constructor(private router: Router, readonly notifyService: NotificationsService, private rt: RealTimeUpdateService,
+                private chatService: ChatService, readonly taskCreator: TaskCreatorService, readonly blockUiService: BlockUiService) {
     }
 
     ngOnInit(): void {

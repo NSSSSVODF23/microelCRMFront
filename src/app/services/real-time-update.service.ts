@@ -1,24 +1,32 @@
 import {Injectable} from '@angular/core';
 import {StompClientService} from "./stomp-client.service";
-import {finalize, map, Observable, share} from "rxjs";
+import {finalize, map, Observable, retry, share} from "rxjs";
 import {
     AcpCommutator,
     AcpConf,
-    BillingConf, BillingTotalUserInfo,
+    BillingConf,
+    BillingTotalUserInfo,
     Chat,
     ChatUnreadCounter,
-    City, ClientEquipment,
-    Comment, DateRange,
-    Department, DhcpBinding,
+    City,
+    ClientEquipment,
+    Comment,
+    DateRange,
+    Department,
+    DhcpBinding,
     Employee,
     House,
     INotification,
     PaidAction,
     PaidWork,
     PingMonitoring,
-    Position, SalaryTable, SalaryTableCell, SchedulingType,
+    Position,
+    SalaryTable,
+    SchedulingType,
     Street,
-    SuperMessage, Switch, SwitchBaseInfo,
+    SuperMessage,
+    Switch,
+    SwitchBaseInfo,
     Task,
     TaskEvent,
     TaskTag,
@@ -26,12 +34,15 @@ import {
     TreeElementPosition,
     TreeNodeMoveEvent,
     TreeNodeUpdateEvent,
-    Wireframe, WireframeTaskCounter,
+    Wireframe,
+    WireframeTaskCounter,
     WorkLog
 } from "../types/transport-interfaces";
 import {cyrb53} from "../util";
 import {OldTracker, SimpleMessage} from "../types/parsing-interfaces";
 import {PageType, TasksCatalogPageCacheService} from "./tasks-catalog-page-cache.service";
+import {RxStompState} from "@stomp/rx-stomp";
+import {BlockIcon, BlockMessage, BlockUiService, BlockZIndex} from "./block-ui.service";
 
 @Injectable({
     providedIn: 'root'
@@ -40,8 +51,19 @@ export class RealTimeUpdateService {
 
     // Коллекция действующих observable
     watchCacheMap: { [hash: string]: Observable<any> } = {}
+    connectionState$ = this.stomp.connectionState$;
 
-    constructor(readonly stomp: StompClientService) {
+    constructor(private stomp: StompClientService, private blockUiService: BlockUiService) {
+        const LOST_CONNECTION_MESSAGE: BlockMessage & BlockZIndex & BlockIcon = {message:'Потеряно соединение с сервером', styleClass:'text-red-400', icon: 'mds-error', pos: 'bottom'};
+        this.connectionState$.subscribe({
+            next:(state)=> {
+                if(state === RxStompState.OPEN)
+                    this.blockUiService.unblock()
+                else
+                    this.blockUiService.block(LOST_CONNECTION_MESSAGE)
+            },
+            error:()=>this.blockUiService.block(LOST_CONNECTION_MESSAGE),
+        })
     }
 
     commentCreated(taskId: number) {

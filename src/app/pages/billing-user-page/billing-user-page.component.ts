@@ -32,6 +32,7 @@ import {Menu} from "primeng/menu";
 import {RealTimeUpdateService} from "../../services/real-time-update.service";
 import {FormControl, FormGroup, Validators} from "@angular/forms";
 import {OverlayPanel} from "primeng/overlaypanel";
+import {BlockUiService} from "../../services/block-ui.service";
 
 @Component({
     templateUrl: './billing-user-page.component.html',
@@ -269,11 +270,9 @@ export class BillingUserPageComponent implements OnInit, OnDestroy {
     selectedTariff?: number;
     serviceList: UserTariff[] = [];
     selectedServices: number[] = [];
-    blockUi = false;
-    blockMessage = '';
 
     constructor(private api: ApiService, private rt: RealTimeUpdateService, private route: ActivatedRoute, readonly customNav: CustomNavigationService,
-                readonly taskCreation: TaskCreatorService, readonly toast: MessageService, private confirm: ConfirmationService) {
+                readonly taskCreation: TaskCreatorService, readonly toast: MessageService, private confirm: ConfirmationService, private blockUiService: BlockUiService) {
     }
 
     get isEndTariffDateAfter() {
@@ -779,12 +778,10 @@ export class BillingUserPageComponent implements OnInit, OnDestroy {
     }
 
     private block(message: string = '') {
-        this.blockUi = true;
-        this.blockMessage = message;
+        this.blockUiService.wait({message});
     }
 
     private unblock() {
-        this.blockUi = false;
-        this.blockMessage = '';
+        this.blockUiService.unblock();
     }
 }

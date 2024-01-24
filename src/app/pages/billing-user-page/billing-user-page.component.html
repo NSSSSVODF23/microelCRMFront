@@ -747,11 +747,3 @@
 </p-overlayPanel>
 
 <p-menu #controlMenu [popup]="true" appendTo="body" [model]="controlMenuItems"></p-menu>
-
-<p-blockUI [blocked]="blockUi">
-    <div class="flex flex-column gap-2 align-items-center justify-content-center bg-white border-round shadow-2 p-3">
-        <p-progressSpinner class="custom-spinner custom-spinner-primary custom-spinner-8xl"
-                           strokeWidth="2"></p-progressSpinner>
-        <span *ngIf="blockMessage" class="text-lg text-primary-400 font-semibold">{{blockMessage}}</span>
-    </div>
-</p-blockUI>

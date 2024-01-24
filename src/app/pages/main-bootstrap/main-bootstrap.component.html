@@ -67,8 +67,11 @@
 </p-sidebar>
 
 <p-confirmDialog></p-confirmDialog>
+
 <app-media-viewer></app-media-viewer>
+
 <app-chat-panel #chatPanelEl></app-chat-panel>
+
 <p-toast key="darktoast" position="bottom-center">
     <ng-template let-message pTemplate="message">
         <div class="flex gap-3 flex-grow-1 h-full align-items-center">
@@ -79,6 +82,7 @@
         </div>
     </ng-template>
 </p-toast>
+
 <p-toast key="redtoast" position="bottom-center">
     <ng-template let-message pTemplate="message">
         <div class="flex gap-3 flex-grow-1 h-full align-items-center">
@@ -89,3 +93,15 @@
         </div>
     </ng-template>
 </p-toast>
+
+<p-blockUI [blocked]="blockUiService.blocked" [autoZIndex]="!blockUiService.zIndex" [baseZIndex]="blockUiService.zIndex">
+    <div class="flex p-4 w-full h-full" [style]="{alignItems: blockUiService.align, justifyContent: blockUiService.justify}">
+        <div class="flex flex-column gap-2 align-items-center justify-content-center bg-white border-round shadow-6 p-4 text-lg text-primary-400 font-semibold"
+             *ngIf="blockUiService.isWait || blockUiService.message || blockUiService.icon" >
+            <p-progressSpinner *ngIf="blockUiService.isWait" class="custom-spinner custom-spinner-primary custom-spinner-8xl"
+                               strokeWidth="2"></p-progressSpinner>
+            <span [ngClass]="blockUiService.styleClass" [class]="blockUiService.icon" *ngIf="!!blockUiService.icon"></span>
+            <span [ngClass]="blockUiService.styleClass" *ngIf="blockUiService.message">{{blockUiService.message}}</span>
+        </div>
+    </div>
+</p-blockUI>
