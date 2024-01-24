@@ -109,6 +109,10 @@ export class TaskTemplateInputComponent implements OnInit, ControlValueAccessor 
         if ('displayType' in this.field) this.field.displayType = value;
     }
 
+    get isHasModelItemId(){
+        return this.field && 'modelItemId' in this.field && this.field.modelItemId;
+    }
+
     registerOnChange(fn: any): void {
         this.onChange = fn;
     }
@@ -130,18 +134,19 @@ export class TaskTemplateInputComponent implements OnInit, ControlValueAccessor 
 
     onTouched = () => {
     };
+
     loginInputContextMenuModel: MenuItem[] = [
         {
             label: "Создать логин",
             command: ()=>{
-                if(this.field && 'modelItemId' in this.field)
+                if(this.field && 'modelItemId' in this.field && this.field.modelItemId)
                     this.api.createUserInBilling(this.field.modelItemId).subscribe(console.log)
             }
         },
         {
             label: "Создать BIZ логин",
             command: ()=>{
-                if(this.field && 'modelItemId' in this.field)
+                if(this.field && 'modelItemId' in this.field && this.field.modelItemId)
                     this.api.createUserInBilling(this.field.modelItemId, true).subscribe(console.log)
             }
         }

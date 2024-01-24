@@ -67,7 +67,7 @@
         <input #loginInput (blur)="onTouched()" (ngModelChange)="onChange($event)" [(ngModel)]="controlValue"
                [disabled]="disable" [ngClass]="classes"
                appRegexPatternChecker pInputText patternRx="^[\dA-z_]+$">
-        <p-contextMenu appendTo="body" [target]="loginInput" [model]="loginInputContextMenuModel"></p-contextMenu>
+        <p-contextMenu appendTo="body" [target]="loginInput" [model]="loginInputContextMenuModel" *ngIf="isHasModelItemId && !controlValue"></p-contextMenu>
     </div>
 
     <div *ngSwitchCase="'AD_SOURCE'" class="input-label-wrapper">
