@@ -1132,6 +1132,10 @@ export class ApiService {
         return this.sendPost(`api/private/billing/user/${login}/make-payment`, paymentForm);
     }
 
+    makeRecalculation(login: string, recalculationForm: any) {
+        return this.sendPost(`api/private/billing/user/${login}/make-recalculation`, recalculationForm);
+    }
+
     // Результаты запросов на сервер кэшируются по таймауту, чтобы не было доп нагрузки на сервер
 
     private sendGet<T>(uri: string, query?: any) {
@@ -1210,9 +1214,8 @@ export class ApiService {
             }));
     }
 
+
     private generateHash(uri: string, query: any) {
         return cyrb53(uri + JSON.stringify(query), 0);
     }
-
-
 }

@@ -135,6 +135,16 @@ export class BillingUserPageComponent implements OnInit, OnDestroy {
         {label: 'Наличные', value: 1, icon: 'mdi-money'},
         {label: 'Карта', value: 25, icon: 'mdi-credit_card'},
     ];
+    isRecalculationDialogVisible = false;
+    recalculationModeOptions = [
+        {label: 'В днях', value: 'DAYS', icon: 'mdi-today'},
+        {label: 'В рублях', value: 'MONEY', icon: 'mdi-money'},
+    ]
+    recalculationForm = new FormGroup({
+        mode: new FormControl('DAYS', [Validators.required]),
+        count: new FormControl(null, [Validators.required]),
+        comment: new FormControl(null, [Validators.required]),
+    });
     balanceForm = new FormGroup({
         payType: new FormControl(null, [Validators.required]),
         sum: new FormControl(null, [Validators.required]),
@@ -320,6 +330,16 @@ export class BillingUserPageComponent implements OnInit, OnDestroy {
         return null;
     }
 
+    get recalculationModeName() {
+        switch (this.recalculationForm.value.mode){
+            case 'DAYS':
+                return "в днях";
+            case 'MONEY':
+                return "в рублях";
+        }
+        return null;
+    }
+
     initControlMenuItems() {
 
         this.controlMenuItems = [
@@ -477,7 +497,6 @@ export class BillingUserPageComponent implements OnInit, OnDestroy {
         }
     }
 
-
     copyMacAddress(event:any){
         if(event.value){
             Utils.copyToClipboard(event.value.state.macAddresses, this.toast, 'MAC адреса скопированы', 'Не удалось скопировать MAC адреса');
@@ -598,6 +617,13 @@ export class BillingUserPageComponent implements OnInit, OnDestroy {
         this.isPaymentDialogVisible = true;
     }
 
+    openRecalculationDialog() {
+        this.recalculationForm.reset({
+            mode: 'DAYS'
+        })
+        this.isRecalculationDialogVisible = true;
+    }
+
     sendBalance() {
         if (!this.currentLogin) return;
         this.api.updateBalance(this.currentLogin, this.balanceForm.value).subscribe();
@@ -610,17 +636,35 @@ export class BillingUserPageComponent implements OnInit, OnDestroy {
             message: 'Провести оплату с помощью ' + this.paymentTypeName + ' на ' + this.paymentForm.value.sum + ' рублей, на логин ' + this.currentLogin + '?',
             accept: () => {
                 if (!this.currentLogin) return;
-                this.blockUi = true;
-                this.blockMessage = 'Производится оплата'
+                this.block('Производится оплата');
                 this.api.makePayment(this.currentLogin, this.paymentForm.value).subscribe({
                     next: () => {
-                        this.blockUi = false;
-                        this.blockMessage = '';
+                        this.unblock()
                         this.isPaymentDialogVisible = false;
                     },
                     error: () => {
-                        this.blockUi = false;
-                        this.blockMessage = '';
+                        this.unblock()
+                    }
+                });
+            }
+        })
+    }
+
+    sendRecalculation() {
+        if (!this.currentLogin) return;
+        this.confirm.confirm({
+            header: 'Подтверждение перерасчета ' + this.currentLogin,
+            message: 'Произвести перерасчет ' + this.recalculationModeName + '. Кол-во: ' + this.recalculationForm.value.count + ', на логин ' + this.currentLogin + '?',
+            accept: () => {
+                if (!this.currentLogin) return;
+                this.block('Производится перерасчет');
+                this.api.makeRecalculation(this.currentLogin, this.recalculationForm.value).subscribe({
+                    next: () => {
+                        this.unblock()
+                        this.isRecalculationDialogVisible = false;
+                    },
+                    error: () => {
+                        this.unblock()
                     }
                 });
             }
@@ -678,13 +722,13 @@ export class BillingUserPageComponent implements OnInit, OnDestroy {
                 message: 'Добавить сервис ' + event.option.name + ' абоненту?',
                 accept: () => {
                     if(this.currentLogin) {
-                        this.blockUi = true;
+                        this.block('Добавление сервиса')
                         this.api.appendServiceToBillingUser(event.value, this.currentLogin).subscribe({
                             next: () => {
-                                this.blockUi = false;
+                                this.unblock()
                             },
                             error: () => {
-                                this.blockUi = false;
+                                this.unblock()
                             }
                         });
                     }
@@ -699,13 +743,13 @@ export class BillingUserPageComponent implements OnInit, OnDestroy {
                 message: 'Отключить сервис ' + name + '?',
                 accept: () => {
                     if(this.currentLogin) {
-                        this.blockUi = true;
+                        this.block('Отключение сервиса')
                         this.api.removeServiceFromBillingUser(name, this.currentLogin).subscribe({
                             next: () => {
-                                this.blockUi = false;
+                                this.unblock()
                             },
                             error: () => {
-                                this.blockUi = false;
+                                this.unblock()
                             }
                         });
                     }
@@ -720,17 +764,27 @@ export class BillingUserPageComponent implements OnInit, OnDestroy {
                 message: 'Изменить тариф абонента на ' + event.option.name + '?',
                 accept: () => {
                     if(this.currentLogin) {
-                        this.blockUi = true;
+                        this.block('Изменение тарифа')
                         this.api.changeTariffInBillingUser(event.value, this.currentLogin).subscribe({
                             next: () => {
-                                this.blockUi = false;
+                                this.unblock();
                             },
                             error: () => {
-                                this.blockUi = false;
+                                this.unblock();
                             }
                         });
                     }
                 }
             })
+    }
+
+    private block(message: string = '') {
+        this.blockUi = true;
+        this.blockMessage = message;
+    }
+
+    private unblock() {
+        this.blockUi = false;
+        this.blockMessage = '';
     }
 }

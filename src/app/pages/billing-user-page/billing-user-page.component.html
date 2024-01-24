@@ -83,6 +83,7 @@
             <p-button (onClick)="controlMenu.toggle($event)" icon="mdi-menu" label="Управление"
                       styleClass="p-button-info p-button-text"></p-button>
             <p-button (onClick)="openPaymentDialog()" icon="mdi-currency_ruble" label="Оплата" styleClass="p-button-warning p-button-text"></p-button>
+            <p-button (onClick)="openRecalculationDialog()" icon="mdi-restore" label="Перерасчет" styleClass="p-button-help p-button-text"></p-button>
             <div class="stretched"></div>
             <span *ngIf="creditAmount" class="text-red-400 text-xl font-bold" [style.letter-spacing]="'2px'">
                 Кредит:
@@ -156,7 +157,7 @@
             <ng-container *ngTemplateOutlet="infoRowTemplate; context: {label: 'Адрес', value: userInfo?.ibase?.addr}"></ng-container>
             <ng-container *ngTemplateOutlet="infoRowTemplate; context: {label: 'ФИО', value: userInfo?.ibase?.fio}"></ng-container>
             <ng-container *ngTemplateOutlet="infoRowTemplate; context: {label: 'Телефон', value: userInfo?.ibase?.phone}"></ng-container>
-            <ng-container *ngTemplateOutlet="infoRowTemplate; context: {label: 'Договор заключен', value: userInfo?.ibase?.ddog | date: 'EEEE dd MMMM yyyy' | titlecase}"></ng-container>
+            <ng-container *ngTemplateOutlet="infoRowTemplate; context: {label: 'Договор заключен', value: userInfo?.ibase?.ddog | date: 'EEEE dd-MM-yyyy' | titlecase}"></ng-container>
         </div>
     </div>
 </ng-template>
@@ -176,7 +177,7 @@
             <ng-container *ngTemplateOutlet="infoRowTemplate; context: {label: 'Статус', value: (activeClientHardware.onlineStatus === 'ONLINE' ? 'Онлайн' : 'Офлайн'), valueClass: activeClientHardware.onlineStatus === 'ONLINE' ? 'text-green-400' : 'text-red-400'}"></ng-container>
             <ng-container *ngTemplateOutlet="infoRowTemplate; context: {label: 'Оборудование', value: activeClientHardware.dhcpClient ?? '' + activeClientHardware.dhcpHostname ?? ''}"></ng-container>
             <ng-container *ngTemplateOutlet="infoRowTemplate; context: {label: 'IP', value: activeClientHardware.ipaddr}"></ng-container>
-            <ng-container *ngTemplateOutlet="infoRowTemplate; context: {label: 'Активность', value: activeClientHardware.leaseStart | date: 'dd MMMM yyyy HH:mm:ss' | titlecase, help: 'Момент времени, когда оборудование отправило запрос серверу.'}"></ng-container>
+            <ng-container *ngTemplateOutlet="infoRowTemplate; context: {label: 'Активность', value: activeClientHardware.leaseStart | date: 'dd-MM-yyyy HH:mm:ss' | titlecase, help: 'Момент времени, когда оборудование отправило запрос серверу.'}"></ng-container>
         </div>
     </div>
 </ng-template>
@@ -193,9 +194,9 @@
             </ng-container>
             <ng-container *ngTemplateOutlet="infoRowTemplate; context: {label: 'Общая стоимость', value: (totalCost+' руб/период')}"></ng-container>
             <ng-container *ngTemplateOutlet="infoRowTemplatedTemplate; context:{label:'Скорость', template: speedViewTemplate}"></ng-container>
-            <ng-container *ngTemplateOutlet="infoRowTemplate; context: {label: 'Период тарифа', value: (userInfo?.newTarif?.hdate | date: 'dd MMMM yyyy HH:mm' | titlecase) + ' - ' + (userInfo?.newTarif?.edate | date: 'dd MMMM yyyy HH:mm' | titlecase)}"></ng-container>
+            <ng-container *ngTemplateOutlet="infoRowTemplate; context: {label: 'Период тарифа', value: (userInfo?.newTarif?.hdate | date: 'dd-MM-yyyy HH:mm' | titlecase) + ' до ' + (userInfo?.newTarif?.edate | date: 'dd-MM-yyyy HH:mm' | titlecase)}"></ng-container>
             <ng-container *ngTemplateOutlet="infoRowTemplate; context: {label: 'Списание через', value: userInfo?.newTarif?.edate | elapsedTime:'':'':false:true}"></ng-container>
-            <ng-container *ngTemplateOutlet="infoRowTemplate; context: {label: 'Изм. состояния', value: userInfo?.newTarif?.endstate | date: 'dd MMMM yyyy HH:mm' | titlecase, help: 'Момент времени, когда произойдет изменение состояния абонента. (Прим. закончится отл. платеж)'}"></ng-container>
+            <ng-container *ngTemplateOutlet="infoRowTemplate; context: {label: 'Изм. состояния', value: userInfo?.newTarif?.endstate | date: 'dd-MM-yyyy HH:mm' | titlecase, help: 'Момент времени, когда произойдет изменение состояния абонента. (Прим. закончится отл. платеж)'}"></ng-container>
         </div>
     </div>
 </ng-template>
@@ -692,6 +693,19 @@
     </ng-template>
 </p-dialog>
 
+<p-dialog [(visible)]="isRecalculationDialogVisible" [dismissableMask]="true" contentStyleClass="flex flex-column gap-3 pt-2"
+          [modal]="true" [resizable]="false" appendTo="body" header="Перерасчет">
+    <ng-template pTemplate="content" [formGroup]="recalculationForm">
+        <div class="flex gap-3 align-items-center">
+            <p-selectButton [options]="recalculationModeOptions" formControlName="mode"></p-selectButton>
+            <input pInputText formControlName="count" pKeyFilter="int" [size]="12"
+                   [placeholder]="recalculationForm.value.mode === 'DAYS' ? 'Кол-во дней' : 'Кол-во рублей'"/>
+        </div>
+        <textarea [autoResize]="true" pInputTextarea placeholder="Комментарий" formControlName="comment" [rows]="3" [cols]="30"></textarea>
+        <p-button label="Применить" icon="mdi-restore" (onClick)="sendRecalculation()" [disabled]="!recalculationForm.valid" class="mt-3 align-self-end"></p-button>
+    </ng-template>
+</p-dialog>
+
 <ng-template #loading>
     <div class="flex align-items-center justify-content-center flex-grow-1 py-5">
         <p-progressSpinner class="custom-spinner custom-spinner-gray custom-spinner-8xl"
@@ -736,8 +750,8 @@
 
 <p-blockUI [blocked]="blockUi">
     <div class="flex flex-column gap-2 align-items-center justify-content-center bg-white border-round shadow-2 p-3">
-        <span *ngIf="blockMessage" class="text-lg text-primary">{{blockMessage}}</span>
         <p-progressSpinner class="custom-spinner custom-spinner-primary custom-spinner-8xl"
-                           strokeWidth="1"></p-progressSpinner>
+                           strokeWidth="2"></p-progressSpinner>
+        <span *ngIf="blockMessage" class="text-lg text-primary-400 font-semibold">{{blockMessage}}</span>
     </div>
 </p-blockUI>
