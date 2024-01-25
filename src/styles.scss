@@ -95,13 +95,18 @@ html{
   scroll-behavior: auto !important;
 }
 
-html:not(.whited), body:not(.whited) {
+html, body {
   padding: 0 !important;
   margin: 0 !important;
-  background-color: var(--bgc-001) !important;
   font-size: 13px !important;
   font-family: var(--font-family) !important;
-  color: var(--tc-700) !important;
+  background-color: white !important;
+  color: var(--text-color) !important;
+}
+
+html:not(.whited), body:not(.whited) {
+  background-color: var(--bgc-001) !important;
+  color: var(--text-color) !important;
   //line-height: 1 !important;
   //overflow-x: hidden;
 }
@@ -1402,7 +1407,7 @@ markdown > p:last-child {
 
 .h-divider {
   margin: 0;
-  color: var(--tc-400);
+  color: var(--bluegray-100);
 }
 
 .tags-view {

@@ -121,15 +121,15 @@ export class ApiService {
     }
 
     getWorkLogsByTaskId(taskId: number): Observable<WorkLog[]> {
-        return this.sendGet(`api/private/task/${taskId}/work-logs`);
+        return this.sendGet(`api/private/work-log/task/${taskId}/list`);
     }
 
     getActiveWorkLogs() {
-        return this.sendGet<WorkLog[]>('api/private/work-logs/active');
+        return this.sendGet<WorkLog[]>('api/private/work-log/active/list');
     }
 
     getCountOfActiveWorkLogs() {
-        return this.sendGet<number>('api/private/work-logs/active/count');
+        return this.sendGet<number>('api/private/work-log/active/count');
     }
 
     getRootTask(taskId: number): Observable<Task> {
@@ -500,7 +500,7 @@ export class ApiService {
     }
 
     getActiveWorkLogByTaskId(taskId: number) {
-        return this.sendGetSilent<WorkLog>("api/private/task/" + taskId + "/work-log/active");
+        return this.sendGetSilent<WorkLog>("api/private/work-log/task/" + taskId + "/active/list");
     }
 
     readAllNotifications() {
@@ -735,7 +735,11 @@ export class ApiService {
     }
 
     getUncalculatedWorkLogs() {
-        return this.sendGet<WorkLog[]>('api/private/work-logs/uncalculated');
+        return this.sendGet<WorkLog[]>('api/private/work-log/uncalculated/list');
+    }
+
+    getAfterWorkList(){
+        return this.sendGet<WorkLog[]>('api/private/work-log/after-work/list');
     }
 
     getUncompletedReports(){

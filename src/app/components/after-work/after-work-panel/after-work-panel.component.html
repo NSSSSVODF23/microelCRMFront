@@ -1,0 +1,16 @@
+<div pRipple (click)="toggle()"
+     class="bg-white text-primary border-circle shadow-3 p-3 flex relative cursor-pointer transition-colors transition-duration-150 hover:bg-primary hover:text-white">
+    <span class="mds-work text-4xl"></span>
+</div>
+<p-overlay appendTo="body" [(visible)]="panelVisible" contentStyleClass="p-4 surface-overlay shadow-2 border-round">
+    <div class="flex flex-column gap-2 overflow-y-auto max-h-20rem w-fit" [style.max-width]="'60vw'">
+        <ng-container *ngFor="let workLog of (afterWorkService.afterWorks$ | async) ?? []">
+            <app-task-link [task]="workLog.task"></app-task-link>
+        </ng-container>
+    </div>
+</p-overlay>
+<ng-container *ngIf="afterWorkService.afterWorks$ | async as afterWorks">
+    <div *ngIf="afterWorks.length > 0" class="absolute flex bg-primary border-round-3xl p-2 line-height-1 text-xs font-semibold top-0 left-100 pointer-events-none" [style.translate]="'-100% -25%'">
+        {{afterWorks.length}}
+    </div>
+</ng-container>

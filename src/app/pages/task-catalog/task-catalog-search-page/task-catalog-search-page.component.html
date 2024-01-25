@@ -5,7 +5,7 @@
             <div #searchPanelElement class="flex bg-white border-round border-1 py-2 pr-2 pl-3 gap-2 align-items-center"
                  [formGroup]="cacheService.filterForm"
                  [ngClass]="isSearchInputFocused ? 'border-primary' : 'border-bluegray-100'">
-                <input #searchPhraseInput placeholder="Поиск..." class="border-0 flex-grow-1 h-full outline-none" formControlName="searchPhrase"
+                <input #searchPhraseInput placeholder="Поиск..." class="border-0 flex-grow-1 h-full outline-none border-none" formControlName="searchPhrase"
                        (focus)="isSearchInputFocused = true; searchPhraseInput.select()" (blur)="isSearchInputFocused = false" (keydown.enter)="cacheService.search()"/>
                 <p-button icon="mdi-close" *ngIf="cacheService.filterForm.controls.searchPhrase.value"
                           (onClick)="cacheService.filterForm.controls.searchPhrase.setValue('')"

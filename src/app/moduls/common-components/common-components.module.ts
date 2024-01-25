@@ -12,9 +12,7 @@ import {
     SubExtendedMenuItemComponent
 } from "../../components/controls/sub-extended-menu-item/sub-extended-menu-item.component";
 import {TaskFieldViewComponent} from "../../components/controls/task-field-view/task-field-view.component";
-import {
-    TaskTemplateInputComponent
-} from "../../components/controls/task-template-input/task-template-input.component";
+import {TaskTemplateInputComponent} from "../../components/controls/task-template-input/task-template-input.component";
 import {TextSearchInputComponent} from "../../components/controls/text-search-input/text-search-input.component";
 import {
     AttachmentsHistoryDialogComponent
@@ -84,13 +82,14 @@ import {
     TaskTemplateFilterInputComponent
 } from "../../components/controls/task-template-filter-input/task-template-filter-input.component";
 import {AddressInputComponent} from "../../components/controls/task-inputs/address-input/address-input.component";
-import {PhoneListInputComponent} from "../../components/controls/task-inputs/phone-list-input/phone-list-input.component";
+import {
+    PhoneListInputComponent
+} from "../../components/controls/task-inputs/phone-list-input/phone-list-input.component";
 import {EmployeeLabelComponent} from "../../components/controls/employee-label/employee-label.component";
 import {MessagesModule} from "primeng/messages";
 import {TimestampChipsComponent} from "../../components/panels/timestamp-chips/timestamp-chips.component";
 import {NotificationItemComponent} from "../../components/panels/notification-item/notification-item.component";
 import {QuillViewHTMLComponent} from "ngx-quill";
-import {AppModule} from "../../app.module";
 import {CloseIfScrollDirective} from "../../directives/close-if-scroll.directive";
 import {TextRevivalDirective} from "../../directives/text-revival.directive";
 import {SplitButtonModule} from "primeng/splitbutton";
@@ -101,7 +100,9 @@ import {DepartmentLabelComponent} from "../../components/controls/department-lab
 import {
     AppointedInstallersComponent
 } from "../../components/controls/appointed-installers/appointed-installers.component";
-import {TaskSelectingDialogComponent} from "../../components/panels/task-linking-dialog/task-selecting-dialog.component";
+import {
+    TaskSelectingDialogComponent
+} from "../../components/panels/task-linking-dialog/task-selecting-dialog.component";
 import {PaginatorModule} from "primeng/paginator";
 import {ListboxModule} from "primeng/listbox";
 import {CalendarModule} from "primeng/calendar";
@@ -112,7 +113,6 @@ import {
     NotificationsPopupPanelComponent
 } from "../../components/panels/notifications-popup-panel/notifications-popup-panel.component";
 import {ChatPanelComponent} from "../../components/panels/chat-panel/chat-panel.component";
-import {FullCalendarModule} from "@fullcalendar/angular";
 import {ConfirmDialogModule} from "primeng/confirmdialog";
 import {
     TrackerBindingsInputComponent
@@ -225,6 +225,7 @@ import {
 import {AddressInputAltComponent} from "../../components/controls/address-input-alt/address-input-alt.component";
 import {InputSwitchModule} from "primeng/inputswitch";
 import {ContextMenuModule} from "primeng/contextmenu";
+import {AfterWorkPanelComponent} from "../../components/after-work/after-work-panel/after-work-panel.component";
 
 
 @NgModule({
@@ -337,7 +338,8 @@ import {ContextMenuModule} from "primeng/contextmenu";
         TaskSchedulingDialogComponent,
         WInputComponent,
         ServerDocumentsInputComponent,
-        AddressInputAltComponent
+        AddressInputAltComponent,
+        AfterWorkPanelComponent
     ],
     exports: [
         AccountPanelComponent,
@@ -448,7 +450,8 @@ import {ContextMenuModule} from "primeng/contextmenu";
         TaskSchedulingDialogComponent,
         WInputComponent,
         ServerDocumentsInputComponent,
-        AddressInputAltComponent
+        AddressInputAltComponent,
+        AfterWorkPanelComponent
     ],
     imports: [
         CommonPipesModule,

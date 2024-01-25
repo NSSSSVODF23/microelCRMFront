@@ -22,6 +22,8 @@ export class MainBootstrapComponent implements OnInit, OnDestroy {
     openChatSub?:Subscription;
     commutatorRemoteUpdatePoolVisible = false;
 
+    dockPanelHovered = false;
+
     constructor(private router: Router, readonly notifyService: NotificationsService, private rt: RealTimeUpdateService,
                 private chatService: ChatService, readonly taskCreator: TaskCreatorService, readonly blockUiService: BlockUiService) {
     }
@@ -35,5 +37,13 @@ export class MainBootstrapComponent implements OnInit, OnDestroy {
 
     ngOnDestroy() {
         this.openChatSub?.unsubscribe();
+    }
+
+    dockPanelHover() {
+        this.dockPanelHovered = true;
+    }
+
+    dockPanelUnhover() {
+        this.dockPanelHovered = false;
     }
 }

@@ -8852,11 +8852,15 @@
 
 .mds {
 
+  &-work {
+    @include mds("work");
+  }
+
   &-folder_open {
     @include mds("folder_open");
   }
 
-  &-summarize{
+  &-summarize {
     @include mds("summarize");
   }
 
@@ -8864,7 +8868,7 @@
     @include mds("frame_source");
   }
 
-  &-stream{
+  &-stream {
     @include mds("stream");
   }
 
@@ -12808,7 +12812,7 @@
     @include mds("equalizer");
   }
 
-  &-radar{
+  &-radar {
     @include mds("radar");
   }
 

@@ -33,7 +33,7 @@
     <app-extended-menu-item [link]="['/employees']" caption="Сотрудники" icon="mdi-account_circle"></app-extended-menu-item>
     <app-extended-menu-item [link]="['/salary','table']" caption="Зарплата" icon="mdi-currency_ruble"></app-extended-menu-item>
     <app-extended-menu-item [link]="['/files']" caption="Файлы" icon="mdi-insert_drive_file"></app-extended-menu-item>
-    <app-extended-menu-item [link]="['/system','billing']" caption="Система" icon="mdi-settings"></app-extended-menu-item>
+<!--    <app-extended-menu-item [link]="['/system','billing']" caption="Система" icon="mdi-settings"></app-extended-menu-item>-->
 </ng-template>
 
 <ng-template #tasks>
@@ -78,9 +78,9 @@
 <ng-template #backButton let-name="name">
     <div>
         <div [routerLink]="['/']" class="back-button">
-            <span class="material-icons-round parent-inherit">navigate_before</span>
+            <span class="mdi-navigate_before"></span>
             <span>{{name}}</span>
         </div>
-        <hr [style.margin]="'.7rem 1rem 1rem 1rem'" class="h-divider">
+        <div [style.margin]="'.7rem 1rem 1rem 1rem'" class="border-bottom-1 border-bluegray-100"></div>
     </div>
 </ng-template>

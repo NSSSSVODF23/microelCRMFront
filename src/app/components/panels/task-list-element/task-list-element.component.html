@@ -29,7 +29,7 @@
         <ng-container *ngIf="item?.taskStatus === 'PROCESSING'; then workersEmployee; else responsibleEmployee"></ng-container>
     </div>
     <app-task-fields-table-view [task]="item" [isTaskBody]="false"></app-task-fields-table-view>
-    <div class="border-top-1 border-bottom-1 border-bluegray-100 p-3 gap-1 flex flex-column" *ngIf="item && item.lastComments && item.lastComments.length > 0">
+    <div class="border-top-1 border-bottom-1 border-bluegray-100 p-3 gap-1 flex flex-column" *ngIf="item && item.lastComments && item.lastComments.length > 0 && !inlined">
         <ng-container *ngFor="let comment of item.lastComments">
             <ng-container *ngTemplateOutlet="lastCommentTemplate; context:{$implicit: comment}"></ng-container>
         </ng-container>
