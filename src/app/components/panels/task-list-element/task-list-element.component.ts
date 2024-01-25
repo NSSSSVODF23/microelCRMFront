@@ -13,11 +13,12 @@ import {FieldItem, ModelItem, Task, TaskStatus, TaskTag, WorkLog} from "../../..
 import {TasksPageCacheService} from "../../../services/tasks-page-cache.service";
 import {OverlayPanel} from "primeng/overlaypanel";
 import {ApiService} from "../../../services/api.service";
-import {dotAnimation, mediaQuery} from "../../../util";
+import {dotAnimation, mediaQuery, SubscriptionsHolder} from "../../../util";
 import {FormControl} from "@angular/forms";
 import {map, Observable, Subscription} from "rxjs";
 import {RealTimeUpdateService} from "../../../services/real-time-update.service";
 import {MenuItem} from "primeng/api";
+import {CommentCachingService} from "../../../services/comment-caching.service";
 
 @Component({
     selector: 'app-task-list-element',
@@ -83,7 +84,9 @@ export class TaskListElementComponent implements OnInit, OnChanges, OnDestroy {
     isShowTaskSchedulingDialogVisible = false;
     taskSchedulingType: 'from' | 'to' = 'from';
 
-    constructor(readonly taskService: TasksPageCacheService, readonly api: ApiService, private rt: RealTimeUpdateService) {
+    subscription = new SubscriptionsHolder();
+
+    constructor(readonly taskService: TasksPageCacheService, readonly api: ApiService, private rt: RealTimeUpdateService, private commentCachingService: CommentCachingService) {
     }
 
     get contextMenuTargetStyle() {
@@ -114,16 +117,16 @@ export class TaskListElementComponent implements OnInit, OnChanges, OnDestroy {
         }
     };
 
-    get isExpired(){
+    get isExpired() {
         let expiredFlag = false;
-        if(this.item && this.item.actualTo){
+        if (this.item && this.item.actualTo) {
             expiredFlag = new Date(this.item.actualTo).getTime() < new Date().getTime();
         }
         return expiredFlag;
     }
 
     get statusBgColor() {
-        if(this.item){
+        if (this.item) {
             const {taskStatus} = this.item;
             const IS_EXPIRED = taskStatus === TaskStatus.ACTIVE && this.isExpired;
             const IS_ACTIVE = taskStatus === TaskStatus.ACTIVE && !this.isExpired;
@@ -196,7 +199,11 @@ export class TaskListElementComponent implements OnInit, OnChanges, OnDestroy {
             'hovered': this.isHover,
             'selected': this.check, ...this.statusClass
         }
-
+        if (this.item?.taskId)
+            this.commentInputControl.setValue(this.commentCachingService.read(this.item?.taskId));
+        this.subscription.addSubscription('comInp', this.commentInputControl.valueChanges.subscribe(value => {
+            if (this.item?.taskId) this.commentCachingService.write(this.item.taskId, value ?? '');
+        }))
     }
 
     tagsPreviewShow(event: MouseEvent) {
@@ -275,20 +282,20 @@ export class TaskListElementComponent implements OnInit, OnChanges, OnDestroy {
                 },
             ]
             this.updateActualWorkLog();
-            this.updateSubscribe?.unsubscribe();
-            if(externalUpdater && externalUpdater.currentValue){
+            if (externalUpdater && externalUpdater.currentValue) {
                 const UPDATE_OBSERVABLE = externalUpdater.currentValue as Observable<Task>;
-                this.updateSubscribe = UPDATE_OBSERVABLE.subscribe(updatedTask => this.item = updatedTask);
+                this.subscription.addSubscription('updateObs', UPDATE_OBSERVABLE.subscribe(updatedTask => this.item = updatedTask));
             } else {
-                this.updateSubscribe = this.rt.taskUpdated(item.currentValue.taskId).subscribe(updatedTask => this.item = updatedTask);
+                this.subscription.addSubscription('updateObs', this.rt.taskUpdated(item.currentValue.taskId).subscribe(updatedTask => this.item = updatedTask));
             }
-            this.changeTagsSubscribe = this.tagsControl.valueChanges.subscribe(tags => this.api.setTaskTags(item.currentValue.taskId, tags ?? []).subscribe())
+            this.subscription.addSubscription('chTags',
+                this.tagsControl.valueChanges.subscribe(tags => this.api.setTaskTags(item.currentValue.taskId, tags ?? []).subscribe())
+            );
         }
     }
 
     ngOnDestroy() {
-        this.updateSubscribe?.unsubscribe();
-        this.changeTagsSubscribe?.unsubscribe();
+        this.subscription.unsubscribeAll();
     }
 
     sendComment() {
@@ -298,6 +305,7 @@ export class TaskListElementComponent implements OnInit, OnChanges, OnDestroy {
             next: () => {
                 this.commentSending = false
                 this.commentInputControl.setValue("");
+                if (this.item?.taskId) this.commentCachingService.flush(this.item?.taskId)
             },
             error: () => this.commentSending = false,
         });
@@ -317,6 +325,17 @@ export class TaskListElementComponent implements OnInit, OnChanges, OnDestroy {
         this.contextMenuTargetY = event.clientY;
     }
 
+    startEdit() {
+        this.isBlockBackground = true;
+        this.onStartEdit.emit(this.item);
+    }
+
+    stopEdit() {
+        this.isBlockBackground = false;
+        if (!this.isAppointInstallersDialogVisible && !this.isShowEditTaskDialogVisible && !this.isShowTaskSchedulingDialogVisible)
+            this.onStopEdit.emit(this.item);
+    }
+
     private updateActualWorkLog() {
         if (this.item?.taskStatus === TaskStatus.PROCESSING) {
             this.api.getActiveWorkLogByTaskId(this.item.taskId).subscribe({
@@ -325,16 +344,5 @@ export class TaskListElementComponent implements OnInit, OnChanges, OnDestroy {
                 }
             })
         }
-    }
-
-    startEdit() {
-        this.isBlockBackground=true;
-        this.onStartEdit.emit(this.item);
-    }
-
-    stopEdit() {
-        this.isBlockBackground=false;
-        if(!this.isAppointInstallersDialogVisible && !this.isShowEditTaskDialogVisible && !this.isShowTaskSchedulingDialogVisible)
-            this.onStopEdit.emit(this.item);
     }
 }

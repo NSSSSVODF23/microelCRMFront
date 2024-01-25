@@ -34,7 +34,8 @@
             <ng-container *ngTemplateOutlet="lastCommentTemplate; context:{$implicit: comment}"></ng-container>
         </ng-container>
     </div>
-    <div class="flex relative" *ngIf="isCommentInput && item?.taskStatus !== 'CLOSE'">
+    <div class="flex relative" *ngIf="isCommentInput && item?.taskStatus !== 'CLOSE'"
+         [draggable]="true" (dragstart)="$event.stopPropagation(); $event.preventDefault()">
         <textarea pInputTextarea [autoResize]="true" placeholder="Новый комментарий" [rows]="1"
                   (keydown.control.enter)="sendComment()" (focus)="onStartEdit.emit(item)" (blur)="onStopEdit.emit(item)"
                   (click)="$event.stopPropagation()" class="mt-2 mx-3 flex-grow-1"

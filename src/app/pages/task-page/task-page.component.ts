@@ -41,6 +41,7 @@ import {
 import {ChatService} from "../../services/chat.service";
 import {WorkLogsDialogComponent} from "../../components/panels/work-logs-dialog/work-logs-dialog.component";
 import {TaskCreatorService} from "../../services/task-creator.service";
+import {CommentCachingService} from "../../services/comment-caching.service";
 
 @Component({
     templateUrl: './task-page.component.html',
@@ -190,7 +191,8 @@ export class TaskPageComponent implements OnInit, OnDestroy {
                 readonly toast: MessageService,
                 readonly customNav: CustomNavigationService,
                 readonly rt: RealTimeUpdateService,
-                readonly taskCreator: TaskCreatorService) {
+                readonly taskCreator: TaskCreatorService,
+                private commentCachingService: CommentCachingService) {
     }
 
     _taskId: number = 0;
@@ -292,9 +294,14 @@ export class TaskPageComponent implements OnInit, OnDestroy {
             this.api.getCountAllTaskAttachments(this._taskId).subscribe(count => this.countAllAttachments = count);
             this.updateObservableList();
         })
+        this.commentInputForm.patchValue({
+            text: this.commentCachingService.read(this.taskId)
+        })
         this.subscriptions.addSubscription("wlCrd", this.rt.workLogCreated().subscribe(this.workLogCreated.bind(this)));
         this.subscriptions.addSubscription("wlCls", this.rt.workLogClosed().subscribe(this.workLogClosed.bind(this)));
-
+        this.subscriptions.addSubscription('comCh', this.commentInputForm.controls.text.valueChanges.subscribe(value => {
+            this.commentCachingService.write(this.taskId, value ?? '');
+        }))
     }
 
     updateObservableList() {
@@ -340,6 +347,7 @@ export class TaskPageComponent implements OnInit, OnDestroy {
                 this.commentInputForm.enable({emitEvent: false});
                 this.commentInputForm.reset({text: '', files: []});
                 this.replyComment = undefined;
+                this.commentCachingService.flush(this.taskId);
             }, error: () => this.commentInputForm.enable({emitEvent: false})
         });
     }
