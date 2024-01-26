@@ -24,7 +24,7 @@
                 <ng-container *ngTemplateOutlet="headerItem; context:{label: isExpired ? 'Просрочена' : 'Срок', value: item?.actualTo | date:'dd/MM/yyyy HH:mm'}"></ng-container>
             </ng-container>
         </ng-container>
-        <app-task-tag-inline-selector [formControl]="tagsControl" (onShow)="onStartEdit.emit(item)" (onHide)="onStopEdit.emit(item)"></app-task-tag-inline-selector>
+        <app-task-tag-inline-selector *ngIf="!inlined" [formControl]="tagsControl" (onShow)="onStartEdit.emit(item)" (onHide)="onStopEdit.emit(item)"></app-task-tag-inline-selector>
         <div class="stretched"></div>
         <ng-container *ngIf="item?.taskStatus === 'PROCESSING'; then workersEmployee; else responsibleEmployee"></ng-container>
     </div>

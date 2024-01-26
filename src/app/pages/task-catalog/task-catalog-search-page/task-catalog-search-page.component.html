@@ -131,12 +131,12 @@
                 Создание/Закрытие
             </span>
             <div class="flex flex-wrap column-gap-3 row-gap-1">
-                <app-w-input label="Дата создания">
+                <app-label label="Дата создания">
                     <app-data-range-input formControlName="dateOfCreation"></app-data-range-input>
-                </app-w-input>
-                <app-w-input label="Дата закрытия">
+                </app-label>
+                <app-label label="Дата закрытия">
                     <app-data-range-input formControlName="dateOfClose"></app-data-range-input>
-                </app-w-input>
+                </app-label>
             </div>
         </div>
         <div class="flex flex-column gap-2 pl-2">
@@ -144,12 +144,12 @@
                 Автор/Исполнитель
             </span>
             <div class="flex flex-wrap column-gap-3 row-gap-1">
-                <app-w-input label="Автор задачи">
+                <app-label label="Автор задачи">
                     <app-employee-selector formControlName="author"></app-employee-selector>
-                </app-w-input>
-                <app-w-input label="Исполнитель задачи">
+                </app-label>
+                <app-label label="Исполнитель задачи">
                     <app-employee-selector formControlName="assignedEmployee"></app-employee-selector>
-                </app-w-input>
+                </app-label>
             </div>
         </div>
         <div class="flex flex-column gap-2 pl-2">
@@ -173,32 +173,32 @@
 
 <ng-template #filterFieldTemplate let-control>
     <ng-container [ngSwitch]="control.value.type" [formGroup]="control">
-        <app-w-input *ngSwitchCase="'TEXT'" label="Текст в задаче">
+        <app-label *ngSwitchCase="'TEXT'" label="Текст в задаче">
             <input pInputText [formControl]="control.controls.textValue"/>
-        </app-w-input>
-        <app-w-input *ngSwitchCase="'LOGIN'" label="Логин">
+        </app-label>
+        <app-label *ngSwitchCase="'LOGIN'" label="Логин">
             <input pInputText [formControl]="control.controls.textValue"/>
-        </app-w-input>
-        <app-w-input *ngSwitchCase="'ADDRESS'" label="Адрес">
+        </app-label>
+        <app-label *ngSwitchCase="'ADDRESS'" label="Адрес">
             <app-address-input-alt [formControl]="control.controls.addressValue"></app-address-input-alt>
-        </app-w-input>
-        <app-w-input *ngSwitchCase="'PHONE'" label="Телефон">
+        </app-label>
+        <app-label *ngSwitchCase="'PHONE'" label="Телефон">
             <input pInputText [formControl]="control.controls.textValue"/>
-        </app-w-input>
-        <app-w-input *ngSwitchCase="'AD_SOURCE'" label="Рекламный источник">
+        </app-label>
+        <app-label *ngSwitchCase="'AD_SOURCE'" label="Рекламный источник">
             <p-dropdown placeholder="Выбрать" appendTo="body" [showClear]="true"
                         [options]="(cacheService.adSources$ | async) ?? []"
                         [formControl]="control.controls.adSourceValue"></p-dropdown>
-        </app-w-input>
-        <app-w-input *ngSwitchCase="'CONNECTION_TYPE'" label="Тип подключения">
+        </app-label>
+        <app-label *ngSwitchCase="'CONNECTION_TYPE'" label="Тип подключения">
             <p-dropdown placeholder="Выбрать" appendTo="body" [showClear]="true"
                         [options]="(cacheService.connectionTypes$ | async) ?? []"
                         [formControl]="control.controls.connectionTypeValue"></p-dropdown>
-        </app-w-input>
-        <app-w-input *ngSwitchCase="'CONNECTION_SERVICE'" label="Подключаемая услуги">
+        </app-label>
+        <app-label *ngSwitchCase="'CONNECTION_SERVICE'" label="Подключаемая услуги">
             <p-dropdown placeholder="Выбрать" appendTo="body" [showClear]="true"
                         [options]="(cacheService.connectionServices$ | async) ?? []"
                         [formControl]="control.controls.connectionServiceValue"></p-dropdown>
-        </app-w-input>
+        </app-label>
     </ng-container>
 </ng-template>

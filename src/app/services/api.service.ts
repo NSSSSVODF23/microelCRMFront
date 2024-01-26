@@ -19,7 +19,7 @@ import {
     Department,
     DhcpBinding, DhcpLogsRequest,
     Employee,
-    EmployeeStatus, FdbItem,
+    EmployeeStatus, EmployeeWorkLogs, FdbItem,
     FieldItem,
     FileData, FilesLoadFileEvent, FileSuggestion, FileSystemItem, FilterModelItem,
     House,
@@ -1140,6 +1140,22 @@ export class ApiService {
         return this.sendPost(`api/private/billing/user/${login}/make-recalculation`, recalculationForm);
     }
 
+    markWorkLogAsCompleted(workLogId: number) {
+        return this.sendPatch(`api/private/work-log/${workLogId}/mark-as-completed`, {});
+    }
+
+    markWorkLogAsUncompleted(workLogId: number) {
+        return this.sendPatch(`api/private/work-log/${workLogId}/mark-as-uncompleted`, {});
+    }
+
+    markWorkLogAsUncompletedAndClose(workLogId: number) {
+        return this.sendPatch(`api/private/work-log/${workLogId}/mark-as-uncompleted-and-close`, {});
+    }
+
+    getEmployeeWorkLogs() {
+        return this.sendGet<EmployeeWorkLogs[]>('api/private/work-log/employee-work-log/list');
+    }
+
     // Результаты запросов на сервер кэшируются по таймауту, чтобы не было доп нагрузки на сервер
 
     private sendGet<T>(uri: string, query?: any) {
@@ -1210,6 +1226,7 @@ export class ApiService {
             }));
     }
 
+
     private sendDelete(uri: string) {
         return this.client.delete(uri)
             .pipe(catchError(async (err, caught) => {
@@ -1217,7 +1234,6 @@ export class ApiService {
                 throw err;
             }));
     }
-
 
     private generateHash(uri: string, query: any) {
         return cyrb53(uri + JSON.stringify(query), 0);

@@ -1,18 +1,23 @@
-import {Component, Input, OnInit, ViewChild} from '@angular/core';
+import {Component, Input, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {Task} from "../../../types/transport-interfaces";
 import {OverlayPanel} from "primeng/overlaypanel";
 import {ApiService} from "../../../services/api.service";
+import {BehaviorSubject, debounceTime, Subscription} from "rxjs";
 
 @Component({
     selector: 'app-task-link',
     templateUrl: './task-link.component.html',
     styleUrls: ['./task-link.component.scss']
 })
-export class TaskLinkComponent implements OnInit {
+export class TaskLinkComponent implements OnInit, OnDestroy {
 
     @Input() task?: Task;
     failed = false;
     @ViewChild('previewConnectedTask') previewConnectedTask?: OverlayPanel;
+    panelShowSubject = new BehaviorSubject<MouseEvent | null>(null);
+    panelShow$ = this.panelShowSubject.pipe(debounceTime(500));
+    panelShowSub?: Subscription;
+
 
     constructor(readonly api: ApiService) {
     }
@@ -35,6 +40,14 @@ export class TaskLinkComponent implements OnInit {
     }
 
     ngOnInit(): void {
+        this.panelShowSub = this.panelShow$.subscribe(event => {
+            if (event) this.showPreview(event);
+            else this.hidePreview();
+        });;
+    }
+
+    ngOnDestroy() {
+        this.panelShowSub?.unsubscribe();
     }
 
     showPreview(event: MouseEvent) {

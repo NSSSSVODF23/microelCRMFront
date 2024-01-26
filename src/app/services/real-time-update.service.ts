@@ -468,4 +468,11 @@ export class RealTimeUpdateService {
     updateFilesDirectory() {
         return this.watch<number>('files', 'directory', 'update')
     }
+
+    afterWorksAppend() {
+        return this.watch<WorkLog>('after-work', 'append');
+    }
+    afterWorksRemoved() {
+        return this.watch<number>('after-work', 'remove');
+    }
 }

@@ -1,8 +1,15 @@
-<span *ngIf="countOfActive" class="relative flexed">
-    <p-button (onClick)="overlayPanelEl.toggle($event)"
-              icon="mdi-engineering" styleClass="p-button-secondary p-button-icon p-button-rounded p-button-outlined"></p-button>
-    <p-badge [value]="countOfActive.toString()" class="ur-badge"></p-badge>
-</span>
+<!--<span *ngIf="countOfActive" class="relative flexed">-->
+<!--    <p-button (onClick)="overlayPanelEl.toggle($event)"-->
+<!--              icon="mdi-engineering" styleClass="p-button-secondary p-button-icon p-button-rounded p-button-outlined"></p-button>-->
+<!--    <p-badge [value]="countOfActive.toString()" class="ur-badge"></p-badge>-->
+<!--</span>-->
+<!--<div pRipple (click)="overlayPanelEl.toggle($event)"-->
+<!--     class="bg-white text-primary border-circle shadow-3 p-3 flex relative cursor-pointer transition-colors transition-duration-150 hover:bg-primary hover:text-white">-->
+<!--    <span class="mds-engineering text-4xl"></span>-->
+<!--</div>-->
+<div class="flex flex-column gap-3">
+    <app-avatar-list [employees]="empWlItem.employees" *ngFor="let empWlItem of service.employeeWorkLogs" [size]="4" (click)="overlayPanelEl.toggle($event)"></app-avatar-list>
+</div>
 
 <p-overlayPanel #overlayPanelEl [baseZIndex]="2000" appendTo="body">
     <ng-template pTemplate="content">

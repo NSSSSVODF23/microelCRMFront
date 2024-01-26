@@ -91,7 +91,7 @@
   --br-900: 100%;
 }
 
-html{
+html {
   scroll-behavior: auto !important;
 }
 
@@ -230,7 +230,7 @@ html:not(.whited), body:not(.whited) {
   pointer-events: none;
 }
 
-.line-height-0{
+.line-height-0 {
   line-height: 0 !important;
 }
 
@@ -712,6 +712,14 @@ html:not(.whited), body:not(.whited) {
   }
 }
 
+.terminated:not(:last-child) {
+  border-bottom: 1px solid var(--bluegray-100);
+}
+
+.overscroll-none{
+  overscroll-behavior: none;
+}
+
 .overlay {
   background-color: white;
   box-shadow: 0px 0px 0.4px rgba(0, 0, 0, 0.02),
@@ -787,7 +795,7 @@ html:not(.whited), body:not(.whited) {
   label {
     font-size: 0.9rem;
     font-weight: 500;
-    color: var(--tc-500);
+    color: var(--bluegray-300);
     transform: translateX(.3rem);
   }
 }
@@ -852,54 +860,71 @@ fieldset.node {
 p-autocomplete.ng-touched.touched-error.ng-invalid > .p-autocomplete > .p-inputtext {
   border-color: #e24c4c !important;
 }
+
 p-calendar.ng-touched.touched-error.ng-invalid > .p-calendar > .p-inputtext {
   border-color: #e24c4c !important;
 }
+
 p-cascadeselect.ng-touched.touched-error.ng-invalid > .p-cascadeselect {
   border-color: #e24c4c !important;
 }
+
 p-checkbox.ng-touched.touched-error.ng-invalid > .p-checkbox > .p-checkbox-box {
   border-color: #e24c4c !important;
 }
+
 p-chips.ng-touched.touched-error.ng-invalid > .p-chips > .p-inputtext {
   border-color: #e24c4c !important;
 }
+
 p-dropdown.ng-touched.touched-error.ng-invalid > .p-dropdown {
   border-color: #e24c4c !important;
 }
+
 p-inputmask.ng-touched.touched-error.ng-invalid > .p-inputtext {
   border-color: #e24c4c !important;
 }
+
 p-inputnumber.ng-touched.touched-error.ng-invalid > .p-inputnumber > .p-inputtext {
   border-color: #e24c4c !important;
 }
+
 p-inputswitch.ng-touched.touched-error.ng-invalid > .p-inputswitch {
   border-color: #e24c4c !important;
 }
+
 .p-inputtext.ng-touched.touched-error.ng-invalid {
   border-color: #e24c4c !important;
 }
+
 .p-float-label > .ng-invalid.ng-touched.touched-error + label {
   color: #e24c4c !important;
 }
+
 p-listbox.ng-touched.touched-error.ng-invalid > .p-listbox {
   border-color: #e24c4c !important;
 }
+
 p-multiselect.ng-touched.touched-error.ng-invalid > .p-multiselect {
   border-color: #e24c4c !important;
 }
+
 p-password.ng-invalid.ng-touched.touched-error > .p-password > .p-inputtext {
   border-color: #e24c4c !important;
 }
+
 p-radiobutton.ng-touched.touched-error.ng-invalid > .p-radiobutton > .p-radiobutton-box {
   border-color: #e24c4c !important;
 }
+
 p-selectbutton.ng-touched.touched-error.ng-invalid > .p-selectbutton > .p-button {
   border-color: #e24c4c !important;
 }
+
 p-togglebutton.ng-touched.touched-error.ng-invalid > .p-togglebutton.p-button {
   border-color: #e24c4c !important;
 }
+
 p-treeselect.ng-invalid.ng-touched.touched-error > .p-treeselect {
   border-color: #e24c4c !important;
 }
@@ -907,7 +932,8 @@ p-treeselect.ng-invalid.ng-touched.touched-error > .p-treeselect {
 p-listbox.ng-touched.ng-invalid > .p-listbox {
   border-color: #e24c4c !important;
 }
-textarea.ng-touched.ng-invalid{
+
+textarea.ng-touched.ng-invalid {
   border-color: #e24c4c !important;
 }
 
@@ -1577,6 +1603,7 @@ markdown > p:last-child {
   color: var(--bluegray-50);
   border: solid 1px var(--bluegray-500);
   border-radius: .75rem !important;
+
   .p-toast-icon-close {
     color: var(--bluegray-50);
   }
@@ -1587,6 +1614,7 @@ markdown > p:last-child {
   color: var(--bluegray-50);
   border: solid 1px var(--red-700);
   border-radius: .75rem !important;
+
   .p-toast-icon-close {
     color: var(--bluegray-50);
   }
@@ -1728,19 +1756,19 @@ markdown > p:last-child {
   }
 }
 
-.danger-menu-button > a span{
+.danger-menu-button > a span {
   color: var(--red-400) !important;
 }
 
-.warning-menu-button > a span{
+.warning-menu-button > a span {
   color: var(--orange-400) !important;
 }
 
-.success-menu-button > a span{
+.success-menu-button > a span {
   color: var(--green-400) !important;
 }
 
-.simple-list{
+.simple-list {
   overscroll-behavior: contain !important;
 }
 
@@ -1755,6 +1783,6 @@ markdown > p:last-child {
   background-color: white !important;
 }
 
-.overlay-panel-unpadding>.p-overlaypanel-content{
+.overlay-panel-unpadding > .p-overlaypanel-content {
   padding: 0 !important;
 }

@@ -218,7 +218,7 @@ import {
 import {
     TaskSchedulingDialogComponent
 } from "../../components/task-control-dialogs/task-scheduling-dialog/task-scheduling-dialog.component";
-import {WInputComponent} from "../../components/controls/w-input/w-input.component";
+import {LabelComponent} from "../../components/controls/label/label.component";
 import {
     ServerDocumentsInputComponent
 } from "../../components/controls/server-documents-input/server-documents-input.component";
@@ -226,6 +226,7 @@ import {AddressInputAltComponent} from "../../components/controls/address-input-
 import {InputSwitchModule} from "primeng/inputswitch";
 import {ContextMenuModule} from "primeng/contextmenu";
 import {AfterWorkPanelComponent} from "../../components/after-work/after-work-panel/after-work-panel.component";
+import {FloatDockPanelComponent} from "../../components/float-dock-panel/float-dock-panel.component";
 
 
 @NgModule({
@@ -336,10 +337,11 @@ import {AfterWorkPanelComponent} from "../../components/after-work/after-work-pa
         AppointInstallersDialogComponent,
         EditTaskDialogComponent,
         TaskSchedulingDialogComponent,
-        WInputComponent,
+        LabelComponent,
         ServerDocumentsInputComponent,
         AddressInputAltComponent,
-        AfterWorkPanelComponent
+        AfterWorkPanelComponent,
+        FloatDockPanelComponent
     ],
     exports: [
         AccountPanelComponent,
@@ -448,7 +450,7 @@ import {AfterWorkPanelComponent} from "../../components/after-work/after-work-pa
         AppointInstallersDialogComponent,
         EditTaskDialogComponent,
         TaskSchedulingDialogComponent,
-        WInputComponent,
+        LabelComponent,
         ServerDocumentsInputComponent,
         AddressInputAltComponent,
         AfterWorkPanelComponent

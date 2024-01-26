@@ -2,7 +2,7 @@
     <div class="flex flex-column flex-grow-1">
         <div *ngFor="let realization of equipmentsList.controls; let i = index" [formGroup]="realization" class="flex align-items-center gap-2 p-3 split-line">
             <span class="flex-grow-1">{{realization.value.equipment?.name}}</span>
-            <app-count-input formControlName="count" (onZero)="equipmentsList.removeAt(i); onTouch(); onBlur.emit()"></app-count-input>
+            <app-count-input formControlName="count" (onZero)="removeEquipment.next(i)"></app-count-input>
         </div>
     </div>
     <div class="flex p-3">
@@ -19,34 +19,35 @@
                 <i class="mdi-search"></i>
                 <input [formControl]="queryFilterControl" pInputText placeholder="Поиск...">
             </span>
-            <div [style.max-height]="'20rem'"
+            <div [style.max-height]="'20rem'" *ngIf="equipments$ | async as equipments" [ngSwitch]="equipments.loadingState"
                  class="flex flex-column border-1 border-bluegray-50 border-round-md overflow-y-auto overflow-x-hidden">
-                <div class="flex flex-column py-8 align-items-center text-bluegray-600" [hidden]="availableEquipmentsLoadingState !== 'EMPTY'">
+                <div class="flex flex-column py-8 align-items-center text-bluegray-600" *ngSwitchCase="LoadingState.EMPTY">
                     <span class="mds-router"></span>
                     <span>Пусто</span>
                 </div>
-                <div class="flex flex-column py-8 align-items-center text-red-600" [hidden]="availableEquipmentsLoadingState !== 'ERROR'">
+                <div class="flex flex-column py-8 align-items-center text-red-600" *ngSwitchCase="LoadingState.ERROR">
                     <span class="mds-error"></span>
                     <span>Ошибка</span>
                 </div>
-                <div class="flex py-8 justify-content-center" [hidden]="availableEquipmentsLoadingState !== 'LOADING'">
+                <div class="flex py-8 justify-content-center" *ngSwitchCase="LoadingState.LOADING">
                     <p-progressSpinner class="custom-spinner custom-spinner-gray custom-spinner-6xl" strokeWidth="1"></p-progressSpinner>
                 </div>
-                <div (mouseenter)="selectedAvailableEquipmentsIndex.next(i)"
-                     (mouseleave)="selectedAvailableEquipmentsIndex.next(-1)"
-                     (click)="selectAvailableEquipment.next(i)"
-                     [hidden]="availableEquipmentsLoadingState !== 'READY'"
-                     *ngFor="let equipment of equipments$ | async; let i = index"
-                     [ngClass]="{'bg-primary-50':(selectedAvailableEquipments$ | async) === i}"
-                     class="flex align-items-baseline gap-2 p-2 split-line cursor-pointer user-select-none">
-                    <span [ngClass]="(selectedAvailableEquipments$ | async) === i ? 'text-primary-400' : 'text-bluegray-600'">
-                        {{equipment.name}}
-                    </span>
-                    <span [ngClass]="(selectedAvailableEquipments$ | async) === i ? 'text-primary-400' : 'text-bluegray-400'"
-                          class="text-xs font-bold">
-                        {{equipment.price}} руб.
-                    </span>
-                </div>
+                <ng-container *ngSwitchCase="LoadingState.READY">
+                    <div (mouseenter)="selectedAvailableEquipmentsIndex.next(i)"
+                         (mouseleave)="selectedAvailableEquipmentsIndex.next(-1)"
+                         (click)="selectAvailableEquipment.next(i)"
+                         *ngFor="let equipment of equipments.value; let i = index"
+                         [ngClass]="{'bg-primary-50':(selectedAvailableEquipments$ | async) === i}"
+                         class="flex align-items-baseline gap-2 p-2 split-line cursor-pointer user-select-none">
+                        <span [ngClass]="(selectedAvailableEquipments$ | async) === i ? 'text-primary-400' : 'text-bluegray-600'">
+                            {{equipment.name}}
+                        </span>
+                        <span [ngClass]="(selectedAvailableEquipments$ | async) === i ? 'text-primary-400' : 'text-bluegray-400'"
+                              class="text-xs font-bold">
+                            {{equipment.price}} руб.
+                        </span>
+                    </div>
+                </ng-container>
             </div>
         </div>
     </ng-template>

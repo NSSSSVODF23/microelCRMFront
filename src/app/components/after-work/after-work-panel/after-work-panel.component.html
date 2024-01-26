@@ -2,15 +2,62 @@
      class="bg-white text-primary border-circle shadow-3 p-3 flex relative cursor-pointer transition-colors transition-duration-150 hover:bg-primary hover:text-white">
     <span class="mds-work text-4xl"></span>
 </div>
-<p-overlay appendTo="body" [(visible)]="panelVisible" contentStyleClass="p-4 surface-overlay shadow-2 border-round">
-    <div class="flex flex-column gap-2 overflow-y-auto max-h-20rem w-fit" [style.max-width]="'60vw'">
-        <ng-container *ngFor="let workLog of (afterWorkService.afterWorks$ | async) ?? []">
-            <app-task-link [task]="workLog.task"></app-task-link>
+<p-overlay #workPanel appendTo="body" [(visible)]="panelVisible" appCloseIfScroll [isVisible]="workPanel.visible" [alignFn]="workPanel.alignOverlay.bind(workPanel)"
+           contentStyleClass="p-4 surface-overlay shadow-2 border-round flex flex-column gap-3">
+    <span class="text-bluegray-500 font-bold">Подтверждение завершения работ</span>
+    <div class="flex flex-column overflow-y-auto overflow-x-hidden max-h-30rem w-fit overscroll-none" [style.max-width]="'60vw'">
+        <ng-container *ngFor="let workLog of (afterWorkService.afterWorks$ | async)?.value ?? []">
+            <ng-container *ngTemplateOutlet="workLogItemTemplate; context:{workLog}"></ng-container>
         </ng-container>
     </div>
 </p-overlay>
 <ng-container *ngIf="afterWorkService.afterWorks$ | async as afterWorks">
-    <div *ngIf="afterWorks.length > 0" class="absolute flex bg-primary border-round-3xl p-2 line-height-1 text-xs font-semibold top-0 left-100 pointer-events-none" [style.translate]="'-100% -25%'">
-        {{afterWorks.length}}
+    <div *ngIf="afterWorks.value.length > 0" class="absolute flex justify-content-center bg-primary border-round-3xl p-2 line-height-1 text-xs font-semibold top-0 left-100 pointer-events-none"
+         [style.translate]="'-100% -25%'" [style.min-width]="'1.8rem'">
+        {{afterWorks.value.length}}
     </div>
 </ng-container>
+
+<ng-template #workLogItemTemplate let-workLog="workLog">
+    <div class="flex align-items-center gap-3 terminated p-3">
+        <div class="flex flex-column gap-2 w-min">
+            <div class="flex justify-content-between align-items-center gap-3">
+                <app-task-link [task]="workLog.task"></app-task-link>
+                <app-avatar-list [employees]="workLog.employees"></app-avatar-list>
+                <app-label label="Отдана/Завершена" styleClass="font-bold translate-x-0">
+                    <div class="flex align-items-center gap-1 white-space-nowrap">
+                        <span class="white-space-nowrap">{{workLog.created | date:'dd-MM-yyyy HH:mm'}}</span>
+                        <span>-</span>
+                        <span class="white-space-nowrap">{{workLog.closed | date:'dd-MM-yyyy HH:mm'}}</span>
+                    </div>
+                </app-label>
+            </div>
+            <div class="flex align-items-center gap-1 text-orange-400 font-bold" *ngIf="workLog.isForceClosed">
+                <span class="mdi-warning"></span>
+                <span>Завершена принудительно</span>
+            </div>
+            <app-label label="Завершена с отчетом" styleClass="font-bold translate-x-0">
+                <span>{{workLog.report}}</span>
+            </app-label>
+        </div>
+        <div class="flex flex-column gap-3">
+            <ng-container *ngIf="workLog.isForceClosed">
+                <ng-container *ngTemplateOutlet="forceClosedButtonsTemplate; context:{workLog}"></ng-container>
+            </ng-container>
+            <ng-container *ngIf="!workLog.isForceClosed">
+                <ng-container *ngTemplateOutlet="normalButtonsTemplate; context:{workLog}"></ng-container>
+            </ng-container>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #normalButtonsTemplate let-workLog="workLog">
+    <p-button label="Отметить как завершенную" styleClass="p-button-sm" (onClick)="afterWorkService.markAsCompleted(workLog)"></p-button>
+    <p-button label="Переоткрыть и перейти" styleClass="p-button-sm p-button-secondary p-button-outlined" (onClick)="afterWorkService.markAsUncompleted(workLog, true)"></p-button>
+</ng-template>
+
+<ng-template #forceClosedButtonsTemplate let-workLog="workLog">
+    <p-button label="Отметить как незавершенную" styleClass="p-button-sm" (onClick)="afterWorkService.markAsUncompleted(workLog)"></p-button>
+    <p-button label="Закрыть как завершенную" styleClass="p-button-sm p-button-warning p-button-outlined" (onClick)="afterWorkService.markAsCompleted(workLog)"></p-button>
+    <p-button label="Закрыть как незавершенную" styleClass="p-button-sm p-button-secondary p-button-outlined" (onClick)="afterWorkService.closeAndMarkAsUncompleted(workLog)"></p-button>
+</ng-template>

@@ -330,47 +330,47 @@
                     <span class="text-bluegray-400 font-bold">Реквизиты от старого трекера</span>
                     <div class="flex gap-3 align-items-center" formGroupName="oldTrackerCredentials">
                         <ng-container *ngIf="!employeeForm.value.offsite">
-                            <app-w-input label="Логин">
+                            <app-label label="Логин">
                                 <input appRegexPatternChecker formControlName="username" pInputText patternRx="^[\w\.]+$"
                                        [disabled]="isBeingCreatingEmployee || isBeingEditingEmployee" type="text">
-                            </app-w-input>
-                            <app-w-input label="Пароль">
+                            </app-label>
+                            <app-label label="Пароль">
                                 <input appRegexPatternChecker formControlName="password" pInputText patternRx="^[\w\.]+$"
                                        [disabled]="isBeingCreatingEmployee || isBeingEditingEmployee" type="text">
-                            </app-w-input>
+                            </app-label>
                         </ng-container>
                         <ng-container *ngIf="employeeForm.value.offsite">
-                            <app-w-input label="ID Монтажника в трекере">
+                            <app-label label="ID Монтажника в трекере">
                                 <input appRegexPatternChecker formControlName="installerId" pInputText patternRx="^[\d]+$"
                                        [disabled]="isBeingCreatingEmployee || isBeingEditingEmployee" type="text">
-                            </app-w-input>
+                            </app-label>
                         </ng-container>
                     </div>
                 </div>
                 <div class="flex flex-column">
                     <span class="text-bluegray-400 font-bold">Реквизиты биллинга 1785</span>
                     <div class="flex gap-3 align-items-center" formGroupName="base1785Credentials">
-                        <app-w-input label="Логин">
+                        <app-label label="Логин">
                             <input appRegexPatternChecker formControlName="username" pInputText patternRx="^[\w\.]+$"
                                    [disabled]="isBeingCreatingEmployee || isBeingEditingEmployee" type="text">
-                        </app-w-input>
-                        <app-w-input label="Пароль">
+                        </app-label>
+                        <app-label label="Пароль">
                             <input appRegexPatternChecker formControlName="password" pInputText patternRx="^[\w\.]+$"
                                    [disabled]="isBeingCreatingEmployee || isBeingEditingEmployee" type="text">
-                        </app-w-input>
+                        </app-label>
                     </div>
                 </div>
                 <div class="flex flex-column">
                     <span class="text-bluegray-400 font-bold">Реквизиты биллинга 781</span>
                     <div class="flex gap-3 align-items-center" formGroupName="base781Credentials">
-                        <app-w-input label="Логин">
+                        <app-label label="Логин">
                             <input appRegexPatternChecker formControlName="username" pInputText patternRx="^[\w\.]+$"
                                    [disabled]="isBeingCreatingEmployee || isBeingEditingEmployee" type="text">
-                        </app-w-input>
-                        <app-w-input label="Пароль">
+                        </app-label>
+                        <app-label label="Пароль">
                             <input appRegexPatternChecker formControlName="password" pInputText patternRx="^[\w\.]+$"
                                    [disabled]="isBeingCreatingEmployee || isBeingEditingEmployee" type="text">
-                        </app-w-input>
+                        </app-label>
                     </div>
                 </div>
             </div>

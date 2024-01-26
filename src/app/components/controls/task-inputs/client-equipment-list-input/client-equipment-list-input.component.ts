@@ -10,7 +10,7 @@ import {
 import {ClientEquipment, ClientEquipmentRealization, LoadingState} from "../../../../types/transport-interfaces";
 import {ApiService} from "../../../../services/api.service";
 import {
-    BehaviorSubject,
+    BehaviorSubject, combineLatest,
     debounceTime,
     distinctUntilChanged,
     filter,
@@ -20,13 +20,13 @@ import {
     merge, mergeMap,
     repeat,
     shareReplay,
-    skipUntil,
+    skipUntil, startWith,
     Subject,
     switchMap,
     takeUntil,
     tap
 } from "rxjs";
-import {SubscriptionsHolder} from "../../../../util";
+import {DynamicValueFactory, SubscriptionsHolder} from "../../../../util";
 import {OverlayPanel} from "primeng/overlaypanel";
 
 @Component({
@@ -61,18 +61,33 @@ export class ClientEquipmentListInputComponent implements OnInit, OnDestroy, Con
     );
     closeAvailableEquipmentsView$ = new Subject();
     filterChange$ = this.queryFilterControl.valueChanges.pipe(
+        startWith(''),
         debounceTime(500),
         distinctUntilChanged(),
-        tap(() => this.availableEquipmentsLoadingState = LoadingState.LOADING),
+        map(value => [value]),
     )
 
-    equipments$ = merge(this.openAvailableEquipmentsView$, this.filterChange$).pipe(
-        switchMap(() => this.api.getClientEquipments(this.queryFilterControl.value, false).pipe(
-            map(response=>response.filter(eq=>this.equipmentsList.value.map(v=>v.equipment).every(exeq=>exeq?.clientEquipmentId!==eq.clientEquipmentId))),
-        )),
-        tap({
-            next: (value) => this.availableEquipmentsLoadingState = value.length > 0 ? LoadingState.READY : LoadingState.EMPTY,
-            error: () => this.availableEquipmentsLoadingState = LoadingState.ERROR
+    // equipments$ = merge(this.openAvailableEquipmentsView$, this.filterChange$).pipe(
+    //     switchMap(() => this.api.getClientEquipments(this.queryFilterControl.value, false).pipe(
+    //         map(response=>response.filter(eq=>this.equipmentsList.value.map(v=>v.equipment).every(exeq=>exeq?.clientEquipmentId!==eq.clientEquipmentId))),
+    //     )),
+    //     tap({
+    //         next: (value) => this.availableEquipmentsLoadingState = value.length > 0 ? LoadingState.READY : LoadingState.EMPTY,
+    //         error: () => this.availableEquipmentsLoadingState = LoadingState.ERROR
+    //     }),
+    //     shareReplay(1),
+    // )
+
+    LoadingState = LoadingState;
+
+    selectAvailableEquipment = new Subject<number>();
+    removeEquipment = new Subject<number>();
+
+    equipments$ = DynamicValueFactory.ofAltAll(this.filterChange$, this.api.getClientEquipments.bind(this.api),
+        'clientEquipmentId',[this.selectAvailableEquipment.asObservable(), this.removeEquipment.asObservable()]).pipe(
+        map(response=> {
+            response.value = response.value.filter(eq => this.equipmentsList.value.map(v => v.equipment).every(exeq => exeq?.clientEquipmentId !== eq.clientEquipmentId));
+            return response;
         }),
         shareReplay(1),
     )
@@ -92,17 +107,16 @@ export class ClientEquipmentListInputComponent implements OnInit, OnDestroy, Con
     selectedAvailableEquipmentsIndex = new BehaviorSubject(-1);
     selectedAvailableEquipments$ = this.selectedAvailableEquipmentsIndex.pipe(
         switchMap(index => this.equipments$.pipe(map(equipments => {
-            if (index === -2) return equipments.length - 1;
-            if (index > equipments.length - 1) return -1;
-            return Math.min(equipments.length - 1, Math.max(-1, index));
+            if (index === -2) return equipments.value.length - 1;
+            if (index > equipments.value.length - 1) return -1;
+            return Math.min(equipments.value.length - 1, Math.max(-1, index));
         }))),
         shareReplay(1)
     )
-    selectAvailableEquipment = new Subject<number>();
     selectAvailableEquipment$ = this.selectAvailableEquipment.pipe(
         switchMap(index => this.equipments$.pipe(first(), map(equipments => {
             if (index === -1) return null;
-            return equipments[index];
+            return equipments.value[index];
         }))),
         filter(equipment => equipment !== null),
         map(equipment => new FormGroup({equipment: new FormControl(equipment), count: new FormControl(1)})),
@@ -144,6 +158,11 @@ export class ClientEquipmentListInputComponent implements OnInit, OnDestroy, Con
             }))
         this.subscriptions.addSubscription('slctrl',this.selectAvailableEquipment$.subscribe((control:any) => this.equipmentsList.push(control)))
         this.subscriptions.addSubscription('chng', this.equipmentsList.valueChanges.subscribe(value => this.onChange(value as ClientEquipmentRealization[])))
+        this.subscriptions.addSubscription('removeEq', this.removeEquipment.subscribe(value => {
+            this.equipmentsList.removeAt(value);
+            this.onTouch();
+            this.onBlur.emit();
+        }));
     }
 
     ngOnDestroy(): void {

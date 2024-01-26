@@ -1722,3 +1722,9 @@ export enum UserType {
     PHY = "обычн.",
     ORG = "орг."
 }
+
+export interface EmployeeWorkLogs{
+    employees: Employee[];
+    active: WorkLog | null;
+    unactive: WorkLog[];
+}

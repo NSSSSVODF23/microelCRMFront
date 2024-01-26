@@ -3,6 +3,7 @@ import {ApiService} from "../../../services/api.service";
 import {RealTimeUpdateService} from "../../../services/real-time-update.service";
 import {SubscriptionsHolder} from "../../../util";
 import {WorkLog} from "../../../types/transport-interfaces";
+import {ActiveWorkLogService} from "../../../services/active-work-log.service";
 
 @Component({
     selector: 'app-active-work-logs-panel',
@@ -16,7 +17,7 @@ export class ActiveWorkLogsPanelComponent implements OnInit, OnDestroy {
     countOfActive = 0;
     subscriptions: SubscriptionsHolder = new SubscriptionsHolder();
 
-    constructor(readonly api: ApiService, readonly rt: RealTimeUpdateService) {
+    constructor(readonly api: ApiService, readonly rt: RealTimeUpdateService, readonly service: ActiveWorkLogService) {
     }
 
     ngOnInit(): void {

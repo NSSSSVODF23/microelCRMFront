@@ -925,6 +925,40 @@ export class DynamicValueFactory {
             startWith(content),
         );
     }
+
+    static ofAltAll<T>(filterObservable: Observable<any[]>, loadingObservable: (..._: any) => Observable<T[]>, id: keyof T, reloadObservables?: Observable<any>[] | null): Observable<DynamicContent<T[]>> {
+        const content = new DynamicContent<T[]>([]);
+
+        const loadingStateChange = new Subject<LoadingState>();
+        const loadingStateChange$ = loadingStateChange.pipe(map(state => {
+            content.loadingState = state;
+            return content;
+        }));
+
+        const ob = merge(filterObservable, merge(...(reloadObservables || [])).pipe(switchMap(() => filterObservable.pipe(shareReplay(1))), map(filter=>({
+            filter,
+            update: true
+        })))).pipe(
+                    tap({
+                        next: (f: any) => {
+                            if (!('update' in f)) loadingStateChange.next(LoadingState.LOADING)
+                        }
+                    }),
+                    switchMap((filter: any[] | { filter: any[], update: boolean }) => {
+                        return loadingObservable(...('update' in filter ? filter.filter : filter)).pipe(
+                            map(response => {
+                                content.loadingState = response == null || response.length === 0 ? LoadingState.EMPTY : LoadingState.READY;
+                                content.value = response || [];
+                                return content;
+                            })
+                        )
+                    })
+                )
+
+        return merge(ob, loadingStateChange$).pipe(
+            startWith(content),
+        );
+    }
 }
 
 export const dotAnimation = new Observable((subscribe)=>{
