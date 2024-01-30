@@ -90,7 +90,7 @@ export class ServerDocumentsInputComponent implements OnInit, OnDestroy, Control
 
     preview(file: FileSuggestion, event: any) {
         if(file.type === 'PHOTO') {
-            this.previewUrl = '/api/private/file/' + file.id;
+            this.previewUrl = '/api/private/file-thumbnail/' + file.id;
             this.imageLoaded = false;
             this.previewVisibleSubject.next(event);
         } else {

@@ -1,4 +1,5 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, Input, OnInit} from '@angular/core';
+import {WorkLog} from "../../../types/transport-interfaces";
 import {AfterWorkService} from "../../../services/after-work.service";
 
 @Component({
@@ -8,6 +9,7 @@ import {AfterWorkService} from "../../../services/after-work.service";
 })
 export class AfterWorkPanelComponent implements OnInit {
 
+    @Input() afterWorks: WorkLog[] = [];
     panelVisible = false;
 
     constructor(readonly afterWorkService: AfterWorkService) {

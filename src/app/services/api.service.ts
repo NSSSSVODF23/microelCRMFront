@@ -124,10 +124,6 @@ export class ApiService {
         return this.sendGet(`api/private/work-log/task/${taskId}/list`);
     }
 
-    getActiveWorkLogs() {
-        return this.sendGet<WorkLog[]>('api/private/work-log/active/list');
-    }
-
     getCountOfActiveWorkLogs() {
         return this.sendGet<number>('api/private/work-log/active/count');
     }
@@ -500,7 +496,7 @@ export class ApiService {
     }
 
     getActiveWorkLogByTaskId(taskId: number) {
-        return this.sendGetSilent<WorkLog>("api/private/work-log/task/" + taskId + "/active/list");
+        return this.sendGetSilent<WorkLog>("api/private/work-log/task/" + taskId + "/active");
     }
 
     readAllNotifications() {

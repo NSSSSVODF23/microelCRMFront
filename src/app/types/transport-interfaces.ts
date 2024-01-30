@@ -765,8 +765,19 @@ export interface WorkLog {
     task: Task;
     creator: Employee;
     calculated: boolean;
+    targetFiles: WorkLogTargetFile[];
     targetDescription?: string;
     isReportsUncompleted: boolean;
+    lastAcceptedTimestamp?: string;
+}
+
+export interface WorkLogTargetFile {
+    workLogTargetFileId: number;
+    name: string;
+    mimeType: string;
+    type: AttachmentType;
+    size: number;
+    createdAt: string;
 }
 
 export enum NotificationType {

@@ -11,7 +11,7 @@ export class FloatDockPanelComponent implements OnInit {
 
   dockPanelHovered = false;
 
-  constructor(private afterWorkService: AfterWorkService) { }
+  constructor(readonly afterWorkService: AfterWorkService) { }
 
   ngOnInit(): void {
   }

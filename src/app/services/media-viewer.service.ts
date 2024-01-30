@@ -1,5 +1,5 @@
 import {EventEmitter, Injectable, Output} from '@angular/core';
-import {Attachment, TFile} from "../types/transport-interfaces";
+import {Attachment, TFile, WorkLogTargetFile} from "../types/transport-interfaces";
 import {Subject} from "rxjs";
 
 export interface AttachmentAlbum{
@@ -12,12 +12,12 @@ export interface AttachmentAlbum{
 })
 export class MediaViewerService {
 
-  private mediaEmitter$: Subject<Attachment|TFile> = new Subject();
+  private mediaEmitter$: Subject<Attachment|TFile|WorkLogTargetFile> = new Subject();
   private mediaAlbumEmitter$: Subject<AttachmentAlbum> = new Subject();
 
   constructor() { }
 
-  showMedia(media: Attachment|TFile){
+  showMedia(media: Attachment|TFile|WorkLogTargetFile){
     this.mediaEmitter$.next(media);
   }
 

@@ -168,7 +168,7 @@ export class TasksPageCacheService {
     }), map(counter=>counter ? counter.toString() : ''), shareReplay(1));
 
     taskPage$ = DynamicValueFactory.ofPageAltAll(this.filters$,
-        this.api.getPageOfTasks.bind(this.api), 'taskId',
+        this.api.getPageOfTasks.bind(this.api),
         [this.rt.taskCreated(),
             this.rt.taskUpdated(),
             this.rt.taskDeleted()]

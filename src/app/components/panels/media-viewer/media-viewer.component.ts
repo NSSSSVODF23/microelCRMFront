@@ -1,6 +1,6 @@
 import {Component, OnInit} from '@angular/core';
 import {MediaViewerService} from "../../../services/media-viewer.service";
-import {Attachment, TFile} from "../../../types/transport-interfaces";
+import {Attachment, TFile, WorkLogTargetFile} from "../../../types/transport-interfaces";
 import {fade, fadeAlt, fadeFullAlt} from "../../../animations";
 
 @Component({
@@ -12,7 +12,7 @@ import {fade, fadeAlt, fadeFullAlt} from "../../../animations";
 export class MediaViewerComponent implements OnInit {
 
     showFullscreen = false;
-    media?: Attachment | TFile;
+    media?: Attachment | TFile | WorkLogTargetFile;
     albumIndex: number = 0;
     mediaAlbum?: Attachment[];
     showNavigation = 'fade';
@@ -26,6 +26,8 @@ export class MediaViewerComponent implements OnInit {
         if(this.media){
             if('fileSystemItemId' in this.media){
                 return '/api/private/file/'+this.media.fileSystemItemId;
+            }else if ('workLogTargetFileId' in this.media){
+                return '/api/private/work-log/target-file/'+this.media.workLogTargetFileId;
             }else{
                 return '/api/private/attachment/'+this.media.name
             }

@@ -121,7 +121,6 @@ export class TaskPageComponent implements OnInit, OnDestroy {
     @ViewChild('taskLinkingDialog') taskLinkingDialog?: TaskSelectingDialogComponent;
     @ViewChild('workLogsDialogEl') workLogsDialogEl?: WorkLogsDialogComponent;
     forceCloseWorkLogDialogVisible: boolean = false;
-    forceCloseWorkLogReason: string = "";
     isForceClosingWorkLog = false;
     activeWorkLog?: WorkLog;
     commentInputForm = new FormGroup({
@@ -412,17 +411,6 @@ export class TaskPageComponent implements OnInit, OnDestroy {
         this.subscriptions.unsubscribeAll()
     }
 
-    forceCloseWorkLog() {
-        this.api.forceCloseWorkLog(this._taskId, this.forceCloseWorkLogReason)
-            .subscribe({
-                next: () => {
-                    this.forceCloseWorkLogDialogVisible = false;
-                    this.forceCloseWorkLogReason = "";
-                    this.isForceClosingWorkLog = false;
-                },
-                error: () => this.isForceClosingWorkLog = false
-            })
-    }
 
     sendObservableList() {
         this.changingTaskObservers = true;

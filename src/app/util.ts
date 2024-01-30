@@ -1,12 +1,4 @@
-import {
-    DateRange,
-    FieldItem,
-    LoadingState,
-    ModelItem,
-    Page,
-    Wireframe,
-    WireframeFieldType
-} from "./types/transport-interfaces";
+import {FieldItem, LoadingState, ModelItem, Page, Wireframe, WireframeFieldType} from "./types/transport-interfaces";
 import {
     combineLatest,
     fromEvent,
@@ -211,7 +203,7 @@ export class Utils {
         return fieldItem;
     }
 
-    static copyToClipboard(data: string, toast: MessageService, acceptMessage:string, errorMessage:string) {
+    static copyToClipboard(data: string, toast: MessageService, acceptMessage: string, errorMessage: string) {
         if (navigator.clipboard?.writeText) {
             navigator.clipboard.writeText(data).then(
                 () => {
@@ -290,28 +282,28 @@ export class Utils {
         );
     }
 
-    static arrayEquals(a: any[], b: any[]){
-        if(!a || !b) return false;
-        if(a.length !== b.length) return false;
-        const occurrenceCountMap= new Map<any, { aCount: number, bCount: number }>();
+    static arrayEquals(a: any[], b: any[]) {
+        if (!a || !b) return false;
+        if (a.length !== b.length) return false;
+        const occurrenceCountMap = new Map<any, { aCount: number, bCount: number }>();
         a.forEach(value => {
             const count = occurrenceCountMap.get(value);
-            if(count){
-                occurrenceCountMap.set(value, {aCount: count.aCount+1, bCount: 0});
+            if (count) {
+                occurrenceCountMap.set(value, {aCount: count.aCount + 1, bCount: 0});
                 return;
             }
             occurrenceCountMap.set(value, {aCount: 1, bCount: 0});
         })
         b.forEach(value => {
             const count = occurrenceCountMap.get(value);
-            if(count){
-                occurrenceCountMap.set(value, {aCount: count.aCount, bCount: count.bCount+1});
+            if (count) {
+                occurrenceCountMap.set(value, {aCount: count.aCount, bCount: count.bCount + 1});
                 return;
             }
             occurrenceCountMap.set(value, {aCount: 0, bCount: 1});
         })
-        for(let [key, {aCount, bCount}] of occurrenceCountMap){
-            if(aCount !== bCount) return false;
+        for (let [key, {aCount, bCount}] of occurrenceCountMap) {
+            if (aCount !== bCount) return false;
         }
         return true;
     }
@@ -698,8 +690,8 @@ export class DynamicValueFactory {
     }
 
     static ofWithFilter<T>(filterObservable: Observable<any[]>, loadingObservable: (..._: any) => Observable<T[]>, id: keyof T,
-                     appendObservable?: Observable<T> | null, updateObservable?: Observable<T> | null,
-                     deleteObservable?: Observable<T> | null): Observable<DynamicContent<T[]>> {
+                           appendObservable?: Observable<T> | null, updateObservable?: Observable<T> | null,
+                           deleteObservable?: Observable<T> | null): Observable<DynamicContent<T[]>> {
         const content = new DynamicContent<T[]>([]);
 
         const loadingStateChange = new Subject<LoadingState>();
@@ -890,7 +882,7 @@ export class DynamicValueFactory {
         );
     }
 
-    static ofPageAltAll<T>(filterObservable: Observable<any[]>, loadingObservable: (..._: any) => Observable<Page<T>>, id: keyof T, reloadObservables?: Observable<any>[] | null): Observable<DynamicPageContent<T[]>> {
+    static ofPageAltAll<T>(filterObservable: Observable<any[]>, loadingObservable: (..._: any) => Observable<Page<T>>, reloadObservables?: Observable<any>[] | null): Observable<DynamicPageContent<T[]>> {
         const content = new DynamicPageContent<T[]>([]);
 
         const loadingStateChange = new Subject<LoadingState>();
@@ -899,34 +891,34 @@ export class DynamicValueFactory {
             return content;
         }));
 
-        const ob = merge(filterObservable, merge(...(reloadObservables || [])).pipe(switchMap(() => filterObservable.pipe(shareReplay(1))), map(filter=>({
+        const ob = merge(filterObservable, merge(...(reloadObservables || [])).pipe(switchMap(() => filterObservable.pipe(shareReplay(1))), map(filter => ({
             filter,
             update: true
         })))).pipe(
-                    tap({
-                        next: (f: any) => {
-                            if (!('update' in f)) loadingStateChange.next(LoadingState.LOADING)
-                        }
-                    }),
-                    switchMap((filter: any[] | { filter: any[], update: boolean }) => {
-                        return loadingObservable(...('update' in filter ? filter.filter : filter)).pipe(
-                            map(page => {
-                                content.loadingState = page == null || page.content.length === 0 ? LoadingState.EMPTY : LoadingState.READY;
-                                content.value = page.content || [];
-                                content.pageNumber = page.number;
-                                content.totalElements = page.totalElements;
-                                return content;
-                            })
-                        )
+            tap({
+                next: (f: any) => {
+                    if (!('update' in f)) loadingStateChange.next(LoadingState.LOADING)
+                }
+            }),
+            switchMap((filter: any[] | { filter: any[], update: boolean }) => {
+                return loadingObservable(...('update' in filter ? filter.filter : filter)).pipe(
+                    map(page => {
+                        content.loadingState = page == null || page.content.length === 0 ? LoadingState.EMPTY : LoadingState.READY;
+                        content.value = page.content || [];
+                        content.pageNumber = page.number;
+                        content.totalElements = page.totalElements;
+                        return content;
                     })
                 )
+            })
+        )
 
         return merge(ob, loadingStateChange$).pipe(
             startWith(content),
         );
     }
 
-    static ofAltAll<T>(filterObservable: Observable<any[]>, loadingObservable: (..._: any) => Observable<T[]>, id: keyof T, reloadObservables?: Observable<any>[] | null): Observable<DynamicContent<T[]>> {
+    static ofAltAll<T>(filterObservable: Observable<any[]>, loadingObservable: (..._: any) => Observable<T[]>, reloadObservables?: Observable<any>[] | null): Observable<DynamicContent<T[]>> {
         const content = new DynamicContent<T[]>([]);
 
         const loadingStateChange = new Subject<LoadingState>();
@@ -935,38 +927,57 @@ export class DynamicValueFactory {
             return content;
         }));
 
-        const ob = merge(filterObservable, merge(...(reloadObservables || [])).pipe(switchMap(() => filterObservable.pipe(shareReplay(1))), map(filter=>({
+        const ob = merge(filterObservable, merge(...(reloadObservables || [])).pipe(switchMap(() => filterObservable.pipe(shareReplay(1))), map(filter => ({
             filter,
             update: true
         })))).pipe(
-                    tap({
-                        next: (f: any) => {
-                            if (!('update' in f)) loadingStateChange.next(LoadingState.LOADING)
-                        }
-                    }),
-                    switchMap((filter: any[] | { filter: any[], update: boolean }) => {
-                        return loadingObservable(...('update' in filter ? filter.filter : filter)).pipe(
-                            map(response => {
-                                content.loadingState = response == null || response.length === 0 ? LoadingState.EMPTY : LoadingState.READY;
-                                content.value = response || [];
-                                return content;
-                            })
-                        )
+            tap({
+                next: (f: any) => {
+                    if (!('update' in f)) loadingStateChange.next(LoadingState.LOADING)
+                }
+            }),
+            switchMap((filter: any[] | { filter: any[], update: boolean }) => {
+                return loadingObservable(...('update' in filter ? filter.filter : filter)).pipe(
+                    map(response => {
+                        content.loadingState = response == null || response.length === 0 ? LoadingState.EMPTY : LoadingState.READY;
+                        content.value = response || [];
+                        return content;
                     })
                 )
+            })
+        )
 
         return merge(ob, loadingStateChange$).pipe(
             startWith(content),
         );
     }
+
+    static ofAll<T>(loadingObservable: Observable<T[]>, reloadObservables?: Observable<any>[] | null): Observable<DynamicContent<T[]>> {
+        const content = new DynamicContent<T[]>([]);
+
+        const obsrvrs = merge(...reloadObservables || []).pipe(
+            startWith(null),
+            switchMap(() => loadingObservable.pipe(
+                map(loading => {
+                    content.loadingState = loading == null || loading.length === 0 ? LoadingState.EMPTY : LoadingState.READY;
+                    content.value = loading || [];
+                    return content;
+                })
+            ))
+        )
+
+        return obsrvrs.pipe(
+            startWith(content)
+        );
+    }
 }
 
-export const dotAnimation = new Observable((subscribe)=>{
+export const dotAnimation = new Observable((subscribe) => {
     let count = 1;
-    const handler = setInterval(()=>{
+    const handler = setInterval(() => {
         subscribe.next(".".repeat(count))
         count++;
-        if(count > 3) count=1;
-    },300);
+        if (count > 3) count = 1;
+    }, 300);
     return () => clearInterval(handler);
 })

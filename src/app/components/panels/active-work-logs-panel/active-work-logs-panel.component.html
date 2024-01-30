@@ -1,47 +1,75 @@
-<!--<span *ngIf="countOfActive" class="relative flexed">-->
-<!--    <p-button (onClick)="overlayPanelEl.toggle($event)"-->
-<!--              icon="mdi-engineering" styleClass="p-button-secondary p-button-icon p-button-rounded p-button-outlined"></p-button>-->
-<!--    <p-badge [value]="countOfActive.toString()" class="ur-badge"></p-badge>-->
-<!--</span>-->
-<!--<div pRipple (click)="overlayPanelEl.toggle($event)"-->
-<!--     class="bg-white text-primary border-circle shadow-3 p-3 flex relative cursor-pointer transition-colors transition-duration-150 hover:bg-primary hover:text-white">-->
-<!--    <span class="mds-engineering text-4xl"></span>-->
-<!--</div>-->
-<div class="flex flex-column gap-3">
-    <app-avatar-list [employees]="empWlItem.employees" *ngFor="let empWlItem of service.employeeWorkLogs" [size]="4" (click)="overlayPanelEl.toggle($event)"></app-avatar-list>
+<div class="flex flex-column gap-3" *ngIf="service.employeeWorkLogs$ | async as employeeWorkLogs">
+    <div *ngFor="let empWlItem of employeeWorkLogs.value" class="relative w-fit p-overlay-badge">
+        <app-avatar (click)="openPanel($event, overlayPanelEl, empWlItem)" [name]="empWlItem.employees[0].fullName"
+                    [size]="3" [src]="empWlItem.employees[0].avatar"
+                    class="cursor-pointer"></app-avatar>
+        <p-badge *ngIf="!empWlItem.active" severity="danger" [value]="empWlItem.unactive.length+''"></p-badge>
+    </div>
 </div>
 
-<p-overlayPanel #overlayPanelEl [baseZIndex]="2000" appendTo="body">
+<p-overlayPanel #overlayPanelEl [baseZIndex]="2000" appendTo="body" styleClass="flex flex-column gap-2">
     <ng-template pTemplate="content">
-        <div class="caption size-big title">Активные работы</div>
-        <div [style.max-height]="'30rem'" class="work-logs list-view">
-            <ng-container *ngFor="let workLog of workLogs; trackBy: trackByWorkLog">
-                <ng-container *ngTemplateOutlet="workLogItem; context: {$implicit: workLog}"></ng-container>
-            </ng-container>
+        <div *ngIf="activeWorkLog" class="flex flex-column">
+            <span class="font-bold text-orange-400 text-lg">Активная <app-time-elapsed [startTime]="activeWorkLog.lastAcceptedTimestamp"></app-time-elapsed></span>
+            <ng-container *ngTemplateOutlet="activeWorkLogTemplate; context: {activeWorkLog}"></ng-container>
+        </div>
+        <div *ngIf="unactiveWorkLogs.length>0" class="flex flex-column">
+            <span class="font-bold text-bluegray-400 text-lg">Не принятые</span>
+            <div class="flex flex-column gap-3">
+                <ng-container *ngFor="let workLog of unactiveWorkLogs; trackBy: trackByWorkLog">
+                    <ng-container *ngTemplateOutlet="unactiveWorkLogTemplate; context: {workLog}"></ng-container>
+                </ng-container>
+            </div>
         </div>
     </ng-template>
 </p-overlayPanel>
 
-<ng-template #workLogItem let-workLog>
-    <div class="work-log-item">
-        <p-button [label]="'Задача #'+workLog.task.taskId" (onClick)="overlayPanelEl.hide()" [routerLink]="['/task', workLog.task.taskId]"
-                  [style]="{whiteSpace: 'nowrap'}" styleClass="p-button-info p-button-text"></p-button>
-        <div [style]="{}" class="flex flex-column">
-            <span class="caption size-tiny wt-bold f-color-500">Монтажники:</span>
-            <div class="flex gap-2 align-items-center">
-                <app-avatar-list [employees]="workLog.employees" [size]="1.7"></app-avatar-list>
-                <span class="mdi-report_gmailerrorred text-orange-400" pTooltip="Не все монтажники приняли" tooltipPosition="bottom" *ngIf="workLog.employees.length > workLog.acceptedEmployees.length"></span>
-            </div>
+<ng-template #activeWorkLogTemplate let-activeWorkLog="activeWorkLog">
+    <div class="flex terminated p-3">
+        <div class="flex flex-column gap-2">
+            <app-task-link [task]="activeWorkLog.task"></app-task-link>
+            <app-label label="Монтажники" styleClass="translate-x-0">
+                <app-avatar-list [employees]="activeWorkLog.employees" [size]="2"></app-avatar-list>
+            </app-label>
+            <app-label label="Отдана" styleClass="translate-x-0">
+                <span>{{activeWorkLog.created | date: 'dd-MM-yyyy HH:mm'}}</span>
+            </app-label>
         </div>
-        <div>
-            <div class="flexed gap3 hcenter">
-                <span class="caption size-tiny wt-bold f-color-500">Назначил:</span>
-                <app-employee-label [employee]="workLog.creator"></app-employee-label>
-            </div>
-            <div>
-                <span class="caption size-tiny wt-bold f-color-500">Прошло:</span>
-                <app-time-elapsed [startTime]="workLog.created" class="caption size-small wt-bold f-color-500"></app-time-elapsed>
-            </div>
-        </div>
+        <ng-container *ngTemplateOutlet="targetDescriptionTemplate; context: {workLog: activeWorkLog}"></ng-container>
+        <div class="flex-grow-1"></div>
+        <p-button label="Принудительно забрать" class="ml-3" styleClass="p-button-danger p-button-outlined"
+                  (onClick)="forceCloseWorkLog(activeWorkLog.task.taskId)"></p-button>
     </div>
 </ng-template>
+
+<ng-template #unactiveWorkLogTemplate let-workLog="workLog">
+    <div class="flex terminated p-3">
+        <div class="flex flex-column gap-2">
+            <app-task-link [task]="workLog.task"></app-task-link>
+            <app-label label="Монтажники" styleClass="translate-x-0">
+                <app-avatar-list [employees]="workLog.employees" [size]="2"></app-avatar-list>
+            </app-label>
+            <app-label label="Отдана" styleClass="translate-x-0">
+                <span>{{workLog.created | date: 'dd-MM-yyyy HH:mm'}}</span>
+            </app-label>
+        </div>
+        <ng-container *ngTemplateOutlet="targetDescriptionTemplate; context: {workLog}"></ng-container>
+        <div class="flex-grow-1"></div>
+        <p-button label="Принудительно забрать" class="ml-3" styleClass="p-button-danger p-button-outlined"
+                  (onClick)="forceCloseWorkLog(workLog.task.taskId)"></p-button>
+    </div>
+</ng-template>
+
+<ng-template #targetDescriptionTemplate let-workLog="workLog">
+    <app-label *ngIf="workLog.targetDescription || workLog.targetImages.length > 0" label="Цель задачи" class="ml-3" styleClass="translate-x-0">
+        <div class="max-w-30rem flex flex-column gap-2">
+            <span>{{workLog.targetDescription}}</span>
+            <div class="flex flex-column">
+                <app-attachment-link *ngFor="let targetFile of workLog.targetImages;"
+                                     [attachment]="targetFile"></app-attachment-link>
+            </div>
+        </div>
+    </app-label>
+</ng-template>
+
+<app-force-close-dialog [taskId]="targetTaskId" [(visible)]="forceCloseDialogVisible"></app-force-close-dialog>

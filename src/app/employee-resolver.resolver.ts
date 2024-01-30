@@ -15,7 +15,7 @@ export class EmployeeResolverResolver implements Resolve<boolean> {
   constructor(private personalityService: PersonalityService, private router: Router) {
   }
   resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean> {
-    //   return this.personalityService.userData.pipe(tap((value)=>{
+    //   return this.personalityService.userData$.pipe(tap((value)=>{
     //     if(value.offsite){
     //       this.router.resetConfig([
     //         {path: '', loadChildren: () => import('./moduls/installers/installers.module').then(m => m.InstallersModule),

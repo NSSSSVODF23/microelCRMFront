@@ -417,31 +417,7 @@
 <app-task-scheduling-dialog [(visible)]="schedulingTaskDialogVisible" [schedulingType]="schedulingTaskType"
                             [taskId]="taskId"></app-task-scheduling-dialog>
 
-<!--Диалог принудительного закрытия журнала работ-->
-<p-dialog [(visible)]="forceCloseWorkLogDialogVisible" [dismissableMask]="true" [draggable]="false" [modal]="true"
-          [resizable]="false" [style]="{width: '50vw', minWidth: 'fit-content'}"
-          header="Принудительно закрыть журнал работ?">
-    <ng-template pTemplate="content">
-        <div class="flexed column gap10">
-            <div class="input-label-wrapper">
-                <label>Причина принудительного закрытия</label>
-                <textarea [(ngModel)]="forceCloseWorkLogReason" [autoResize]="true" [rows]="5" class="stretched"
-                          pInputTextarea></textarea>
-            </div>
-            <div class="flexed hcenter vend gap10">
-                <p-button (onClick)="forceCloseWorkLogDialogVisible = false; forceCloseWorkLogReason=''"
-                          [disabled]="isForceClosingWorkLog"
-                          icon="mdi-close"
-                          label="Отменить"
-                          styleClass="p-button-secondary p-button-text"></p-button>
-                <p-button (onClick)="forceCloseWorkLog()" [disabled]="!forceCloseWorkLogReason"
-                          [loading]="isForceClosingWorkLog"
-                          icon="mdi-check"
-                          label="Закрыть" styleClass="p-button-danger"></p-button>
-            </div>
-        </div>
-    </ng-template>
-</p-dialog>
+<app-force-close-dialog [taskId]="taskId" [(visible)]="forceCloseWorkLogDialogVisible"></app-force-close-dialog>
 
 <app-work-logs-dialog #workLogsDialogEl></app-work-logs-dialog>
 

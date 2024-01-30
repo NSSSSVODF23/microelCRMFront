@@ -469,10 +469,11 @@ export class RealTimeUpdateService {
         return this.watch<number>('files', 'directory', 'update')
     }
 
-    afterWorksAppend() {
-        return this.watch<WorkLog>('after-work', 'append');
+    afterWorksAppend(login: string) {
+        return this.watchUnicast<WorkLog>(login, 'after-work', 'append');
     }
-    afterWorksRemoved() {
-        return this.watch<number>('after-work', 'remove');
+
+    afterWorksRemoved(login: string) {
+        return this.watchUnicast<number>(login, 'after-work', 'remove');
     }
 }

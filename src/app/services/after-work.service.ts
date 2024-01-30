@@ -1,24 +1,27 @@
 import {Injectable} from '@angular/core';
 import {ApiService} from "./api.service";
 import {RealTimeUpdateService} from "./real-time-update.service";
-import {LoadingState, WorkLog} from "../types/transport-interfaces";
+import {Employee, WorkLog} from "../types/transport-interfaces";
 import {Router} from "@angular/router";
-import {map} from "rxjs";
+import {map, Observable, of, switchMap, tap} from "rxjs";
 import {DynamicValueFactory} from "../util";
+import {PersonalityService} from "./personality.service";
 
 @Injectable({
     providedIn: 'root'
 })
 export class AfterWorkService {
 
-    _isEmpty = true;
+    afterWorks$ = this.personality.userData$.pipe(switchMap(employee => {
+        return DynamicValueFactory.of(this.api.getAfterWorkList(), 'workLogId', this.rt.afterWorksAppend(employee!.login), null, this.rt.afterWorksRemoved(employee!.login)
+            .pipe(map(workLogId => ({workLogId} as WorkLog))));
+    }))
 
-    afterWorks$ = DynamicValueFactory.of(this.api.getAfterWorkList(), 'workLogId', this.rt.afterWorksAppend(), null, this.rt.afterWorksRemoved()
-        .pipe(map(workLogId => ({workLogId}))));
-
-    constructor(private api: ApiService, private rt: RealTimeUpdateService, private router: Router) {
-        this.afterWorks$.subscribe(data => this._isEmpty = !data.value || data.value.length === 0)
+    constructor(private api: ApiService, private rt: RealTimeUpdateService, private router: Router, private personality: PersonalityService) {
+        this.afterWorks$.pipe(tap(console.log)).subscribe(data => this._isEmpty = !data.value || data.value.length === 0)
     }
+
+    _isEmpty = true;
 
     get isEmpty() {
         return this._isEmpty;
@@ -29,8 +32,8 @@ export class AfterWorkService {
     }
 
     markAsUncompleted(workLog: WorkLog, isOpenTask = false) {
-        this.api.markWorkLogAsUncompleted(workLog.workLogId).subscribe(()=>{
-            if(isOpenTask) this.openTask(workLog);
+        this.api.markWorkLogAsUncompleted(workLog.workLogId).subscribe(() => {
+            if (isOpenTask) this.openTask(workLog);
         });
     }
 

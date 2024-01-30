@@ -1,7 +1,7 @@
 <a *ngIf="attachment?.type==='FILE'" [download]="download()" [href]="url()" class="attachment-wrapper">
     <ng-container *ngTemplateOutlet="content"></ng-container>
 </a>
-<div (click)="attachmentOpen()" (mouseenter)="hovered=true" (mouseleave)="hovered=false; previewLoading=false"
+<div (click)="attachmentOpen()" (mouseenter)="showPreview($event)" (mouseleave)="hidePreview()"
      *ngIf="attachment?.type!=='FILE'"
      class="attachment-wrapper">
     <ng-container *ngTemplateOutlet="content"></ng-container>
@@ -12,16 +12,14 @@
     <span [style.font-size]="'1.4rem'" class="material-icons-round">
         {{attachmentIconName()}}
     </span>
-    <span>
+    <span appTicker class="max-w-10rem white-space-nowrap overflow-hidden">
         {{attachment?.name}}
     </span>
     <span class="caption size-small wt-bold f-color-500">
         {{((attachment?.size ?? 0) / 1048576).toFixed(2)}} Мбайт
     </span>
-    <div *ngIf="attachment?.type==='PHOTO' && hovered" class="photo-preview-panel">
-        <div class="preview-loading-indicator flexed vcenter hcenter" *ngIf="!previewLoading">
-            <app-circle-loading-indicator></app-circle-loading-indicator>
-        </div>
-        <img [src]="'/api/private/thumbnail/'+attachment?.name" class="preview-image" (load)="previewLoading=true">
-    </div>
 </ng-template>
+
+<p-overlayPanel #overlayPanelEl appendTo="body" styleClass="overlay-panel-unpadding">
+    <img [src]="previewSrcUrl" class="preview-image " (load)="align(overlayPanelEl)">
+</p-overlayPanel>

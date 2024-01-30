@@ -6,20 +6,20 @@
            contentStyleClass="p-4 surface-overlay shadow-2 border-round flex flex-column gap-3">
     <span class="text-bluegray-500 font-bold">Подтверждение завершения работ</span>
     <div class="flex flex-column overflow-y-auto overflow-x-hidden max-h-30rem w-fit overscroll-none" [style.max-width]="'60vw'">
-        <ng-container *ngFor="let workLog of (afterWorkService.afterWorks$ | async)?.value ?? []">
+        <ng-container *ngFor="let workLog of afterWorks">
             <ng-container *ngTemplateOutlet="workLogItemTemplate; context:{workLog}"></ng-container>
         </ng-container>
     </div>
 </p-overlay>
-<ng-container *ngIf="afterWorkService.afterWorks$ | async as afterWorks">
-    <div *ngIf="afterWorks.value.length > 0" class="absolute flex justify-content-center bg-primary border-round-3xl p-2 line-height-1 text-xs font-semibold top-0 left-100 pointer-events-none"
+<ng-container>
+    <div *ngIf="afterWorks.length > 0" class="absolute flex justify-content-center bg-primary border-round-3xl p-2 line-height-1 text-xs font-semibold top-0 left-100 pointer-events-none"
          [style.translate]="'-100% -25%'" [style.min-width]="'1.8rem'">
-        {{afterWorks.value.length}}
+        {{afterWorks.length}}
     </div>
 </ng-container>
 
 <ng-template #workLogItemTemplate let-workLog="workLog">
-    <div class="flex align-items-center gap-3 terminated p-3">
+    <div class="flex align-items-center gap-1 terminated p-3">
         <div class="flex flex-column gap-2 w-min">
             <div class="flex justify-content-between align-items-center gap-3">
                 <app-task-link [task]="workLog.task"></app-task-link>
@@ -40,6 +40,7 @@
                 <span>{{workLog.report}}</span>
             </app-label>
         </div>
+        <div class="flex-grow-1"></div>
         <div class="flex flex-column gap-3">
             <ng-container *ngIf="workLog.isForceClosed">
                 <ng-container *ngTemplateOutlet="forceClosedButtonsTemplate; context:{workLog}"></ng-container>

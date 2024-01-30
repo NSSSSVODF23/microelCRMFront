@@ -131,7 +131,7 @@ export class IncomingPageCacheService {
 
 
     taskPage$ = DynamicValueFactory.ofPageAltAll(this.filters$,
-        this.api.getIncomingTasks.bind(this.api), 'taskId',
+        this.api.getIncomingTasks.bind(this.api),
         [this.rt.taskCreated(),
             this.rt.taskUpdated(),
             this.rt.taskDeleted()]
@@ -141,7 +141,8 @@ export class IncomingPageCacheService {
         this.stageList$.subscribe(s=>this.stageList = [...s]);
         this.tagsList$.subscribe(s=>this.tagsList = [...s.value]);
         this.searchPhrase.valueChanges.pipe(debounceTime(1000), filter(phrase=>phrase === null || phrase.length === 0)).subscribe(()=>this.pageControl.setValue(0))
-        this.personality.userData.pipe(first()).subscribe(userData=>{
+        this.personality.userData$.subscribe(userData=>{
+            if(!userData) return;
             this.rt.incomingTaskCountChange(userData.login)
                 .pipe(filter((counter)=>(this.isSelectOneTemplate && counter.id === this.firstWireframeId)))
                 .subscribe(counter=>{

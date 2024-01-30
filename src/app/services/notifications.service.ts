@@ -81,7 +81,7 @@ export class NotificationsService {
         this.load();
         personality.onGettingUserData.subscribe(
             me => {
-                if (!me.login) return;
+                if (!me) return;
                 this.rt.notificationCreated(me.login).subscribe(this.createNotificationHandler.bind(this));
                 this.rt.notificationUpdated(me.login).subscribe(this.updateNotificationHandler.bind(this));
             }

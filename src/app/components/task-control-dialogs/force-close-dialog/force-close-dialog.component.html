@@ -1,0 +1,25 @@
+<!--Диалог принудительного закрытия журнала работ-->
+<p-dialog [visible]="visible" (visibleChange)="visibleChange.emit($event)" [dismissableMask]="true" [draggable]="false" [modal]="true"
+          [resizable]="false" [style]="{width: '50vw', minWidth: 'fit-content'}"
+          header="Принудительно закрыть журнал работ?" appendTo="body">
+    <ng-template pTemplate="content">
+        <div class="flexed column gap10">
+            <div class="input-label-wrapper">
+                <label>Причина принудительного закрытия</label>
+                <textarea [(ngModel)]="reason" [autoResize]="true" [rows]="5" class="stretched"
+                          pInputTextarea></textarea>
+            </div>
+            <div class="flexed hcenter vend gap10">
+                <p-button (onClick)="setVisible(false); reason=''"
+                          [disabled]="requestRunning"
+                          icon="mdi-close"
+                          label="Отменить"
+                          styleClass="p-button-secondary p-button-text"></p-button>
+                <p-button (onClick)="forceCloseWorkLog()" [disabled]="!reason"
+                          [loading]="requestRunning"
+                          icon="mdi-check"
+                          label="Закрыть" styleClass="p-button-danger"></p-button>
+            </div>
+        </div>
+    </ng-template>
+</p-dialog>

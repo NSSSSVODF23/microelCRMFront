@@ -1786,3 +1786,7 @@ markdown > p:last-child {
 .overlay-panel-unpadding > .p-overlaypanel-content {
   padding: 0 !important;
 }
+
+.-translate-50{
+  transform: translate(-50%, -50%);
+}

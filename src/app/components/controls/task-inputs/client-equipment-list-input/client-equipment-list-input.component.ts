@@ -84,7 +84,7 @@ export class ClientEquipmentListInputComponent implements OnInit, OnDestroy, Con
     removeEquipment = new Subject<number>();
 
     equipments$ = DynamicValueFactory.ofAltAll(this.filterChange$, this.api.getClientEquipments.bind(this.api),
-        'clientEquipmentId',[this.selectAvailableEquipment.asObservable(), this.removeEquipment.asObservable()]).pipe(
+        [this.selectAvailableEquipment.asObservable(), this.removeEquipment.asObservable()]).pipe(
         map(response=> {
             response.value = response.value.filter(eq => this.equipmentsList.value.map(v => v.equipment).every(exeq => exeq?.clientEquipmentId !== eq.clientEquipmentId));
             return response;

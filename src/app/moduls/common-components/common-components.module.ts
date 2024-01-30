@@ -227,6 +227,9 @@ import {InputSwitchModule} from "primeng/inputswitch";
 import {ContextMenuModule} from "primeng/contextmenu";
 import {AfterWorkPanelComponent} from "../../components/after-work/after-work-panel/after-work-panel.component";
 import {FloatDockPanelComponent} from "../../components/float-dock-panel/float-dock-panel.component";
+import {
+    ForceCloseDialogComponent
+} from "../../components/task-control-dialogs/force-close-dialog/force-close-dialog.component";
 
 
 @NgModule({
@@ -341,7 +344,8 @@ import {FloatDockPanelComponent} from "../../components/float-dock-panel/float-d
         ServerDocumentsInputComponent,
         AddressInputAltComponent,
         AfterWorkPanelComponent,
-        FloatDockPanelComponent
+        FloatDockPanelComponent,
+        ForceCloseDialogComponent
     ],
     exports: [
         AccountPanelComponent,
@@ -453,7 +457,8 @@ import {FloatDockPanelComponent} from "../../components/float-dock-panel/float-d
         LabelComponent,
         ServerDocumentsInputComponent,
         AddressInputAltComponent,
-        AfterWorkPanelComponent
+        AfterWorkPanelComponent,
+        ForceCloseDialogComponent
     ],
     imports: [
         CommonPipesModule,

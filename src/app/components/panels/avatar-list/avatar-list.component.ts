@@ -1,6 +1,7 @@
 import {AfterViewInit, Component, Input, OnDestroy, OnInit} from '@angular/core';
 import {Employee} from "../../../types/transport-interfaces";
 import {SubscriptionsHolder} from "../../../util";
+import {BehaviorSubject, debounceTime} from "rxjs";
 
 @Component({
     selector: 'app-avatar-list',
@@ -10,10 +11,25 @@ import {SubscriptionsHolder} from "../../../util";
 export class AvatarListComponent implements OnInit, OnDestroy, AfterViewInit {
     @Input() employees: Employee[] = [];
     @Input() size = 2;
-    isListShow = false;
+    @Input() vertical = false;
+    visibleSubject = new BehaviorSubject<boolean>(false);
+    visible$ = this.visibleSubject.pipe(debounceTime(300))
     private subscriptions = new SubscriptionsHolder();
 
     constructor() {
+    }
+
+    avatarStyle(index: number){
+        const STYLE = {
+            mask: (index<this.sliced.length-1?this.mask:''),
+            webkitMask: (index<this.sliced.length-1?this.mask:'')
+        } as CSSStyleDeclaration;
+        if (this.vertical){
+            STYLE.marginBottom = (index>0?this.margin+'rem':'');
+        }else{
+            STYLE.marginRight = (this.margin+'rem');
+        }
+        return STYLE;
     }
 
     get margin() {
@@ -21,6 +37,8 @@ export class AvatarListComponent implements OnInit, OnDestroy, AfterViewInit {
     }
 
     get mask() {
+        if(this.vertical)
+            return `radial-gradient(circle at 50% ${this.size-((this.size + this.size / 2) + this.margin)}rem, transparent ${this.size / 2 + 0.1}rem, white ${this.size / 2 + 0.2}rem)`;
         return `radial-gradient(circle at ${(this.size + this.size / 2) + this.margin}rem, transparent ${this.size / 2 + 0.1}rem, white ${this.size / 2 + 0.2}rem)`;
     }
 

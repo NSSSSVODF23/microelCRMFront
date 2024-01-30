@@ -2,11 +2,10 @@ import {Component, Input, OnDestroy, OnInit} from '@angular/core';
 import {Wireframe, WireframeTaskCounter} from "../../../types/transport-interfaces";
 import {ApiService} from "../../../services/api.service";
 import {ControlValueAccessor, NG_VALUE_ACCESSOR} from "@angular/forms";
-import {delay, filter, first, from, lastValueFrom, map, mergeMap} from "rxjs";
+import {filter, first, from, map, mergeMap} from "rxjs";
 import {RealTimeUpdateService} from "../../../services/real-time-update.service";
 import {PersonalityService} from "../../../services/personality.service";
 import {SubscriptionsHolder} from "../../../util";
-import {log} from "util";
 
 @Component({
     selector: 'app-task-template-multi-selector',
@@ -104,7 +103,7 @@ export class TaskTemplateMultiSelectorComponent implements OnInit, OnDestroy, Co
                                     })))
                             })
                         ).subscribe(counter => {
-                            const wireframe = this.templates.find(t=>t.wireframeId === counter.id);
+                            const wireframe = this.templates.find(t => t.wireframeId === counter.id);
                             if (wireframe) wireframe.countTask = counter.num;
                         })
                     this.status = "ready";
@@ -115,17 +114,18 @@ export class TaskTemplateMultiSelectorComponent implements OnInit, OnDestroy, Co
             }
         })
 
-        if(this.countersType === "incoming"){
-            this.personality.userData.pipe(first()).subscribe(user=>{
-                this.subscriptions.addSubscription('countUpdater', this.rt.incomingTaskCountChange(user.login).pipe(filter(()=>this.countersType === "incoming")).subscribe(this.counterUpdateHandler.bind(this)))
+        if (this.countersType === "incoming") {
+            this.personality.userData$.subscribe(user => {
+                if(!user) return;
+                this.subscriptions.addSubscription('countUpdater', this.rt.incomingTaskCountChange(user.login).pipe(filter(() => this.countersType === "incoming")).subscribe(this.counterUpdateHandler.bind(this)))
             })
-        }else if(this.countersType === "all"){
-            this.subscriptions.addSubscription('countUpdater', this.rt.taskCountChange().pipe(filter(()=>this.countersType === "all")).subscribe(this.counterUpdateHandler.bind(this)))
+        } else if (this.countersType === "all") {
+            this.subscriptions.addSubscription('countUpdater', this.rt.taskCountChange().pipe(filter(() => this.countersType === "all")).subscribe(this.counterUpdateHandler.bind(this)))
         }
     }
 
-    counterUpdateHandler(counter: WireframeTaskCounter){
-        const wireframe = this.templates.find(t=>t.wireframeId === counter.id);
+    counterUpdateHandler(counter: WireframeTaskCounter) {
+        const wireframe = this.templates.find(t => t.wireframeId === counter.id);
         if (wireframe) wireframe.countTask = counter.num;
     }
 
