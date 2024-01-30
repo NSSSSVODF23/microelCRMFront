@@ -1,5 +1,5 @@
-<div class="flex flex-column gap-3" *ngIf="service.employeeWorkLogs$ | async as employeeWorkLogs">
-    <div *ngFor="let empWlItem of employeeWorkLogs.value" class="relative w-fit p-overlay-badge">
+<div class="flex flex-column gap-3">
+    <div *ngFor="let empWlItem of workLogs" class="relative w-fit p-overlay-badge">
         <app-avatar (click)="openPanel($event, overlayPanelEl, empWlItem)" [name]="empWlItem.employees[0].fullName"
                     [size]="3" [src]="empWlItem.employees[0].avatar"
                     class="cursor-pointer"></app-avatar>

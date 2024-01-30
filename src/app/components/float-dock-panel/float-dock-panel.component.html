@@ -1,9 +1,11 @@
-<div *ngIf="!isAllEmpty || true" class="fixed bottom-0 right-0 mb-8 mr-5 p-3 flex flex-column gap-3 border-round-xl"
+<div *ngIf="!isAllEmpty" class="fixed bottom-0 right-0 mb-8 mr-5 p-3 flex flex-column gap-3 border-round-xl"
      appFreeDrag [dragHandle]="draghandle" (mouseenter)="dockPanelHover()" (mouseleave)="dockPanelUnhover()">
     <div class="absolute top-0 left-0 w-full h-full border-round-xl border-1 border-bluegray-300 transition-all transition-duration-150" [style.opacity]="dockPanelHovered ? '1' : '0'" ></div>
     <span #draghandle class="mdi-drag_indicator align-self-end cursor-move border-bluegray-300 transition-all transition-duration-150 z-1" [style.opacity]="dockPanelHovered ? '1' : '.1'" ></span>
     <div class="flex flex-column gap-3 transition-all transition-duration-150 align-items-center" [style.opacity]="dockPanelHovered ? '1' : '.5'">
-        <app-active-work-logs-panel></app-active-work-logs-panel>
+        <ng-container  *ngIf="activeWorkLogService.employeeWorkLogs$ | async as employeeWorkLogs">
+            <app-active-work-logs-panel *ngIf="!isActiveWorkEmpty" [workLogs]="employeeWorkLogs.value"></app-active-work-logs-panel>
+        </ng-container>
         <ng-container *ngIf="afterWorkService.afterWorks$ | async as afterWorks">
             <app-after-work-panel *ngIf="!isAfterWorkEmpty" [afterWorks]="afterWorks.value"></app-after-work-panel>
         </ng-container>

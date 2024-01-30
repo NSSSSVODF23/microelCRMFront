@@ -1,7 +1,4 @@
-import {Component, OnDestroy, OnInit} from '@angular/core';
-import {ApiService} from "../../../services/api.service";
-import {RealTimeUpdateService} from "../../../services/real-time-update.service";
-import {SubscriptionsHolder} from "../../../util";
+import {Component, Input, OnDestroy, OnInit} from '@angular/core';
 import {EmployeeWorkLogs, WorkLog} from "../../../types/transport-interfaces";
 import {ActiveWorkLogService} from "../../../services/active-work-log.service";
 import {OverlayPanel} from "primeng/overlaypanel";
@@ -13,6 +10,7 @@ import {OverlayPanel} from "primeng/overlaypanel";
 })
 export class ActiveWorkLogsPanelComponent implements OnInit, OnDestroy {
 
+    @Input() workLogs: EmployeeWorkLogs[] = [];
     activeWorkLog?: WorkLog | null;
     unactiveWorkLogs: WorkLog[] = [];
     forceCloseDialogVisible = false;
