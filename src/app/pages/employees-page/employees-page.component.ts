@@ -6,47 +6,16 @@ import {Department, Employee, PhyPhoneInfo, PhyPhoneModel, Position} from "../..
 import {SubscriptionsHolder} from "../../util";
 import {RealTimeUpdateService} from "../../services/real-time-update.service";
 import {debounceTime, distinctUntilChanged} from "rxjs";
-
-class AccessFlag {
-    static readonly NONE = 0;
-    static readonly READ = 1;
-    static readonly WRITE = 2;
-    static readonly DELETE = 4;
-    static readonly ADMIN = 8;
-    static readonly EMPLOYEE_MANAGEMENT = 16;
-
-    static getName(flag: number) {
-        if (flag === 0) return 'Без доступа';
-        if (flag === 1) return 'Чтение';
-        if (flag === 2) return 'Запись';
-        if (flag === 4) return 'Удаление';
-        if (flag === 8) return 'Администрирование';
-        if (flag === 16) return 'Управление сотрудниками';
-        return 'Неизвестный';
-    }
-
-    static flagList() {
-        return this.array().map(f => {
-            return {name: this.getName(f), value: f}
-        })
-    }
-
-    static read(flags: number): number[] {
-        const extractedFlags = [];
-        for (const flag of AccessFlag.array()) if (flags & flag) extractedFlags.push(flag);
-        return extractedFlags;
-    }
-
-    static array() {
-        return Object.values(AccessFlag);
-    }
-}
+import {AccessFlag} from "../../types/access-flag";
+import {PersonalityService} from "../../services/personality.service";
 
 @Component({
     templateUrl: './employees-page.component.html',
     styleUrls: ['./employees-page.component.scss']
 })
 export class EmployeesPageComponent implements OnInit, OnDestroy {
+
+    AccessFlag = AccessFlag;
 
     employees: Employee[] = [];
     departments: Department[] = [];
@@ -56,16 +25,16 @@ export class EmployeesPageComponent implements OnInit, OnDestroy {
     isBeginCreatingDepartment = false;
     isBeginEditingDepartment = false;
     isBeginDeleteDepartment: { [id: number]: boolean } = {};
-    departmentForm: FormGroup = new FormGroup({
-        id: new FormControl(undefined),
-        name: new FormControl('', Validators.required),
-        description: new FormControl('')
+    departmentForm = new FormGroup({
+        id: new FormControl<number | null>(null),
+        name: new FormControl<string>('', Validators.required),
+        description: new FormControl<string>('')
     })
-    positionForm: FormGroup = new FormGroup({
-        id: new FormControl(undefined),
-        name: new FormControl('', Validators.required),
-        description: new FormControl(''),
-        access: new FormControl([])
+    positionForm = new FormGroup({
+        id: new FormControl<number | null>(null),
+        name: new FormControl<string>('', Validators.required),
+        description: new FormControl<string>(''),
+        access: new FormControl<number[]>([])
     })
     showCreatePositionDialog = false;
     showEditPositionDialog = false;
@@ -115,7 +84,8 @@ export class EmployeesPageComponent implements OnInit, OnDestroy {
 
     subscriptions: SubscriptionsHolder = new SubscriptionsHolder();
 
-    constructor(readonly api: ApiService, readonly confirm: ConfirmationService, readonly rt: RealTimeUpdateService) {
+    constructor(readonly api: ApiService, readonly confirm: ConfirmationService,
+                readonly personality: PersonalityService, readonly rt: RealTimeUpdateService) {
     }
 
     trackByEmployee(index: number, employee: Employee) {
@@ -285,10 +255,13 @@ export class EmployeesPageComponent implements OnInit, OnDestroy {
     }
 
     positionCreate() {
-        const rawValue = this.positionForm.getRawValue();
         this.isBeginCreatingPosition = true;
-        if (Array.isArray(rawValue['access'])) rawValue['access'] = rawValue['access'].reduce((p: number, c: number) => p + c, 0)
-        this.api.createPosition(rawValue).subscribe({
+        const SENDING_FORM = {
+            name: this.positionForm.value.name,
+            description: this.positionForm.value.description,
+            access: this.positionForm.value.access?.reduce((p: number, c: number) => p + c, 0) ?? 0,
+        }
+        this.api.createPosition(SENDING_FORM).subscribe({
             complete: () => {
                 this.isBeginCreatingPosition = false;
                 this.showCreatePositionDialog = false;
@@ -300,11 +273,14 @@ export class EmployeesPageComponent implements OnInit, OnDestroy {
     }
 
     positionEdit() {
-        const rawValue = this.positionForm.getRawValue();
-        if (typeof rawValue['id'] !== 'number') return;
+        if (typeof this.positionForm.value.id !== 'number') return;
         this.isBeginEditingPosition = true;
-        if (Array.isArray(rawValue['access'])) rawValue['access'] = rawValue['access'].reduce((p: number, c: number) => p + c, 0)
-        this.api.editPosition(rawValue, rawValue['id']).subscribe({
+        const SENDING_FORM = {
+            name: this.positionForm.value.name,
+            description: this.positionForm.value.description,
+            access: this.positionForm.value.access?.reduce((p: number, c: number) => p + c, 0) ?? 0,
+        }
+        this.api.editPosition(SENDING_FORM, this.positionForm.value.id).subscribe({
             complete: () => {
                 this.isBeginEditingPosition = false;
                 this.showEditPositionDialog = false;
@@ -368,16 +344,20 @@ export class EmployeesPageComponent implements OnInit, OnDestroy {
         }
     }
 
-    accessFlagTrackBy(index: number, item: any) {
-        return item.value;
-    }
-
-    checkAllAccess(event: any) {
+    checkAllAccessEmployee(event: any) {
         const {checked} = event;
         if (checked)
             this.employeeForm.patchValue({access: AccessFlag.array()});
         else
             this.employeeForm.patchValue({access: []});
+    }
+
+    checkAllAccessPosition(event: any) {
+        const {checked} = event;
+        if (checked)
+            this.positionForm.patchValue({access: AccessFlag.array()});
+        else
+            this.positionForm.patchValue({access: []});
     }
 
     employeeCreate() {

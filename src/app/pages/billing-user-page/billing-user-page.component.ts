@@ -33,12 +33,16 @@ import {RealTimeUpdateService} from "../../services/real-time-update.service";
 import {FormControl, FormGroup, Validators} from "@angular/forms";
 import {OverlayPanel} from "primeng/overlaypanel";
 import {BlockUiService} from "../../services/block-ui.service";
+import {AccessFlag} from "../../types/access-flag";
+import {PersonalityService} from "../../services/personality.service";
 
 @Component({
     templateUrl: './billing-user-page.component.html',
     styleUrls: ['./billing-user-page.component.scss']
 })
 export class BillingUserPageComponent implements OnInit, OnDestroy {
+
+    AccessFlag = AccessFlag;
 
     userInfo?: BillingTotalUserInfo;
     loadingState = LoadingState.LOADING;
@@ -271,8 +275,11 @@ export class BillingUserPageComponent implements OnInit, OnDestroy {
     serviceList: UserTariff[] = [];
     selectedServices: number[] = [];
 
-    constructor(private api: ApiService, private rt: RealTimeUpdateService, private route: ActivatedRoute, readonly customNav: CustomNavigationService,
-                readonly taskCreation: TaskCreatorService, readonly toast: MessageService, private confirm: ConfirmationService, private blockUiService: BlockUiService) {
+    constructor(private api: ApiService, private rt: RealTimeUpdateService,
+                private route: ActivatedRoute, readonly customNav: CustomNavigationService,
+                readonly taskCreation: TaskCreatorService, readonly toast: MessageService,
+                private confirm: ConfirmationService, private blockUiService: BlockUiService,
+                readonly personality: PersonalityService) {
     }
 
     get isEndTariffDateAfter() {

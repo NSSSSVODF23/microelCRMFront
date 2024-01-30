@@ -2,9 +2,19 @@ import {Injectable} from '@angular/core';
 import {ApiService} from "./api.service";
 import {Employee, EmployeeStatus} from "../types/transport-interfaces";
 import {RealTimeUpdateService} from "./real-time-update.service";
-import {BehaviorSubject, distinctUntilChanged, filter, fromEvent, shareReplay, Subscription, tap} from "rxjs";
+import {
+    BehaviorSubject,
+    distinctUntilChanged,
+    filter,
+    fromEvent, map,
+    shareReplay, startWith,
+    Subscription,
+    switchMap,
+    tap
+} from "rxjs";
 import jwtDecode from "jwt-decode";
 import {Router} from "@angular/router";
+import {AccessFlag} from "../types/access-flag";
 
 interface Token {
     access: number;
@@ -27,9 +37,10 @@ export class PersonalityService {
     meUpdate?: Subscription;
     focusStatus: FocusStatus = FocusStatus.BLUR;
     onGettingUserData = new BehaviorSubject<Employee | null>(null);
-    userData$ = this.onGettingUserData.pipe(distinctUntilChanged((e1, e2) => {
+    userData$ = this.onGettingUserData.pipe(filter(e => !!e), shareReplay(1));
+    userLogin$ = this.userData$.pipe(distinctUntilChanged((e1, e2) => {
         return e1?.login === e2?.login
-    }), filter(e => !!e), shareReplay(1));
+    }), map(e => e!.login), shareReplay(1));
     private lastTouch = 0;
 
     constructor(readonly api: ApiService, readonly rt: RealTimeUpdateService, private router: Router) {
@@ -75,15 +86,27 @@ export class PersonalityService {
     }
 
     updateMe() {
-        return this.api.getMe().pipe(tap({
-            next: (value) => {
-                this.me = value;
-                this.onGettingUserData.next(value);
-                if (this.meUpdate) this.meUpdate.unsubscribe()
-                this.meUpdate = this.rt.employeeUpdated(value.login).subscribe(emp => {
-                    this.me = emp;
-                });
-            }
-        }))
+        return this.api.getMe().pipe(
+            tap({
+                next: (value) => {
+                    this.me = value;
+                    this.onGettingUserData.next(value);
+                    if (this.meUpdate) this.meUpdate.unsubscribe();
+                    this.meUpdate = this.rt.employeeUpdated(value.login).subscribe(emp => {
+                        this.me = emp;
+                        this.onGettingUserData.next(emp);
+                    });
+                }
+            })
+        )
+    }
+
+    isHasAccess(...access: number[]) {
+        if(!this.me) return false;
+        if(this.me.access)
+            return AccessFlag.isHasFlag(this.me.access, ...access);
+        if(!this.me.position?.access)
+            return false;
+        return AccessFlag.isHasFlag(this.me.position.access, ...access);
     }
 }

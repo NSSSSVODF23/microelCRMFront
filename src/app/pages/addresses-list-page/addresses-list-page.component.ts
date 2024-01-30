@@ -23,6 +23,8 @@ import {RealTimeUpdateService} from "../../services/real-time-update.service";
 import {swipe} from "../../animations";
 import {YaEvent} from "angular8-yandex-maps";
 import IMapOptions = ymaps.IMapOptions;
+import {AccessFlag} from "../../types/access-flag";
+import {PersonalityService} from "../../services/personality.service";
 
 @Component({
     templateUrl: './addresses-list-page.component.html',
@@ -30,6 +32,8 @@ import IMapOptions = ymaps.IMapOptions;
     animations: [swipe]
 })
 export class AddressesListPageComponent implements OnInit, OnDestroy {
+
+    AccessFlag = AccessFlag;
 
     cities = [] as City[];
     selectedCity?: City;
@@ -231,7 +235,8 @@ export class AddressesListPageComponent implements OnInit, OnDestroy {
         }),
     )
 
-    constructor(readonly api: ApiService, readonly rt: RealTimeUpdateService, readonly toast: MessageService, private confirmationService: ConfirmationService) {
+    constructor(readonly api: ApiService, readonly rt: RealTimeUpdateService, readonly personality: PersonalityService,
+                readonly toast: MessageService, private confirmationService: ConfirmationService) {
     }
 
     trackByHouse(index: number, house: House) {

@@ -4,7 +4,7 @@
     "secure": false
   },
   "/socket": {
-    "target": "http://10.1.3.150:8080",
+    "target": "http://10.1.3.150:8080/socket",
     "secure": false,
     "ws": true
   }

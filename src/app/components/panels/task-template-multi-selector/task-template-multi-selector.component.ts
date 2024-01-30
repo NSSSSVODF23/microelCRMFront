@@ -115,9 +115,8 @@ export class TaskTemplateMultiSelectorComponent implements OnInit, OnDestroy, Co
         })
 
         if (this.countersType === "incoming") {
-            this.personality.userData$.subscribe(user => {
-                if(!user) return;
-                this.subscriptions.addSubscription('countUpdater', this.rt.incomingTaskCountChange(user.login).pipe(filter(() => this.countersType === "incoming")).subscribe(this.counterUpdateHandler.bind(this)))
+            this.personality.userLogin$.subscribe(login => {
+                this.subscriptions.addSubscription('countUpdater', this.rt.incomingTaskCountChange(login).pipe(filter(() => this.countersType === "incoming")).subscribe(this.counterUpdateHandler.bind(this)))
             })
         } else if (this.countersType === "all") {
             this.subscriptions.addSubscription('countUpdater', this.rt.taskCountChange().pipe(filter(() => this.countersType === "all")).subscribe(this.counterUpdateHandler.bind(this)))

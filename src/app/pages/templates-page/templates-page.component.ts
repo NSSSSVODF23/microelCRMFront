@@ -6,12 +6,17 @@ import {SubscriptionsHolder} from "../../util";
 import {ConfirmationService} from "primeng/api";
 import {FormControl, FormGroup, Validators} from "@angular/forms";
 import {map, merge, of, shareReplay, switchMap, tap} from "rxjs";
+import { AccessFlag } from 'src/app/types/access-flag';
+import {PersonalityService} from "../../services/personality.service";
 
 @Component({
     templateUrl: './templates-page.component.html',
     styleUrls: ['./templates-page.component.scss']
 })
 export class TemplatesPageComponent implements OnInit, OnDestroy {
+
+    AccessFlag = AccessFlag;
+
     templateItems: Wireframe[] = [];
     availableTags: TaskTag[] = [];
 
@@ -112,7 +117,8 @@ export class TemplatesPageComponent implements OnInit, OnDestroy {
         price: new FormControl(0, [Validators.required]),
     })
 
-    constructor(readonly api: ApiService, readonly rt: RealTimeUpdateService, readonly confirmation: ConfirmationService) {
+    constructor(readonly api: ApiService, readonly rt: RealTimeUpdateService,
+                readonly personality: PersonalityService, readonly confirmation: ConfirmationService) {
     }
 
     ngOnInit(): void {

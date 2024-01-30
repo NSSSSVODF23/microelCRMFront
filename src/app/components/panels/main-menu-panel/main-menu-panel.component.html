@@ -26,14 +26,14 @@
 
 <ng-template #main>
     <app-extended-menu-item [link]="(lastCatalogRoute$ | async)??['/tasks','catalog']" caption="Задачи" icon="mdi-task"></app-extended-menu-item>
-    <app-extended-menu-item [link]="['/clients','billing','search']" caption="Абоненты" icon="mdi-group"></app-extended-menu-item>
-    <app-extended-menu-item [link]="['/addresses','list']" caption="Адреса" icon="mdi-home_work"></app-extended-menu-item>
-    <app-extended-menu-item [link]="['/commutators','list']" caption="Коммутаторы" icon="mdi-dns"></app-extended-menu-item>
+    <app-extended-menu-item [link]="['/clients','billing','search']" caption="Абоненты" icon="mdi-group" *ngIf="personality.isHasAccess(AccessFlag.BILLING)"></app-extended-menu-item>
+    <app-extended-menu-item [link]="['/addresses','list']" caption="Адреса" icon="mdi-home_work" *ngIf="personality.isHasAccess(AccessFlag.EDIT_ADDRESS_BOOK, AccessFlag.EDIT_HOUSE_ADDRESS_BOOK)"></app-extended-menu-item>
+    <app-extended-menu-item [link]="['/commutators','list']" caption="Коммутаторы" icon="mdi-dns" *ngIf="personality.isHasAccess(AccessFlag.VIEW_SWITCH, AccessFlag.EDIT_SWITCH)"></app-extended-menu-item>
 <!--    <app-extended-menu-item caption="Склад" icon="mdi-warehouse"></app-extended-menu-item>-->
-    <app-extended-menu-item [link]="['/employees']" caption="Сотрудники" icon="mdi-account_circle"></app-extended-menu-item>
-    <app-extended-menu-item [link]="['/salary','table']" caption="Зарплата" icon="mdi-currency_ruble"></app-extended-menu-item>
-    <app-extended-menu-item [link]="['/files']" caption="Файлы" icon="mdi-insert_drive_file"></app-extended-menu-item>
-<!--    <app-extended-menu-item [link]="['/system','billing']" caption="Система" icon="mdi-settings"></app-extended-menu-item>-->
+    <app-extended-menu-item [link]="['/employees']" caption="Сотрудники" icon="mdi-account_circle" *ngIf="personality.isHasAccess(AccessFlag.MANAGE_EMPLOYEES, AccessFlag.MANAGE_DEPARTMENTS, AccessFlag.MANAGE_POSITIONS)"></app-extended-menu-item>
+    <app-extended-menu-item [link]="['/salary','table']" caption="Зарплата" icon="mdi-currency_ruble" *ngIf="personality.isHasAccess(AccessFlag.COUNT_SALARY, AccessFlag.EDIT_PRICE)"></app-extended-menu-item>
+    <app-extended-menu-item [link]="['/files']" caption="Файлы" icon="mdi-insert_drive_file" *ngIf="personality.isHasAccess(AccessFlag.READ_WRITE_FILES)"></app-extended-menu-item>
+    <app-extended-menu-item [link]="['/system','billing']" caption="Система" icon="mdi-settings" *ngIf="personality.isHasAccess(AccessFlag.MANAGE_SYSTEM_SETTINGS)"></app-extended-menu-item>
 </ng-template>
 
 <ng-template #tasks>
@@ -44,16 +44,16 @@
     <app-extended-menu-item [link]="['/tasks','calendar']" caption="Календарь" icon="mdi-calendar_month"></app-extended-menu-item>
 <!--    <app-extended-menu-item [elements]="stagesMenuItems" [isExtended]="stageMenuExtended" [extendable]="true" caption="Доска"-->
 <!--                            icon="mdi-checklist"></app-extended-menu-item>-->
-    <app-extended-menu-item [link]="['/tasks','templates']" caption="Теги/Шаблоны" icon="mdi-ballot"></app-extended-menu-item>
+    <app-extended-menu-item [link]="['/tasks','templates']" caption="Теги/Шаблоны" icon="mdi-ballot" *ngIf="personality.isHasAccess(AccessFlag.EDIT_TASK_TEMPLATES, AccessFlag.EDIT_TASK_TAGS, AccessFlag.EDIT_DEVICES)"></app-extended-menu-item>
 </ng-template>
 
 <ng-template #salary>
     <ng-container *ngTemplateOutlet="backButton; context:{name:'Зарплата'}"></ng-container>
-    <app-extended-menu-item [link]="['/salary','table']" caption="Зарплатная таблица" icon="mdi-table_chart"></app-extended-menu-item>
-    <app-extended-menu-item [link]="['/salary','estimation']" [exact]="true" caption="Подсчет работ" icon="mdi-exposure_plus_2"></app-extended-menu-item>
-    <app-extended-menu-item [link]="['/salary','estimation','bypass']" caption="Подсчет работ (альт.)" icon="mdi-auto_awesome"></app-extended-menu-item>
-    <app-extended-menu-item [link]="['/salary','works']" caption="Список работ" icon="mdi-construction"></app-extended-menu-item>
-    <app-extended-menu-item [link]="['/salary','paid-actions']" caption="Платные действия" icon="mdi-toc"></app-extended-menu-item>
+    <app-extended-menu-item [link]="['/salary','table']" caption="Зарплатная таблица" icon="mdi-table_chart" *ngIf="personality.isHasAccess(AccessFlag.COUNT_SALARY)"></app-extended-menu-item>
+    <app-extended-menu-item [link]="['/salary','estimation']" [exact]="true" caption="Подсчет работ" icon="mdi-exposure_plus_2" *ngIf="personality.isHasAccess(AccessFlag.COUNT_SALARY)"></app-extended-menu-item>
+    <app-extended-menu-item [link]="['/salary','estimation','bypass']" caption="Подсчет работ (альт.)" icon="mdi-auto_awesome" *ngIf="personality.isHasAccess(AccessFlag.COUNT_SALARY)"></app-extended-menu-item>
+    <app-extended-menu-item [link]="['/salary','works']" caption="Список работ" icon="mdi-construction" *ngIf="personality.isHasAccess(AccessFlag.EDIT_PRICE)"></app-extended-menu-item>
+    <app-extended-menu-item [link]="['/salary','paid-actions']" caption="Платные действия" icon="mdi-toc" *ngIf="personality.isHasAccess(AccessFlag.EDIT_PRICE)"></app-extended-menu-item>
 </ng-template>
 
 <ng-template #clients>

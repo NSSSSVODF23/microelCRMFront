@@ -81,9 +81,11 @@
             <p-button (onClick)="createTaskMenu.toggle($event)" icon="mdi-add" label="Создать задачу"
                       styleClass="p-button-success p-button-text"></p-button>
             <p-button (onClick)="controlMenu.toggle($event)" icon="mdi-menu" label="Управление"
-                      styleClass="p-button-info p-button-text"></p-button>
-            <p-button (onClick)="openPaymentDialog()" icon="mdi-currency_ruble" label="Оплата" styleClass="p-button-warning p-button-text"></p-button>
-            <p-button (onClick)="openRecalculationDialog()" icon="mdi-restore" label="Перерасчет" styleClass="p-button-help p-button-text"></p-button>
+                      styleClass="p-button-info p-button-text" *ngIf="personality.isHasAccess(AccessFlag.MANAGE_SUBSCRIBERS)"></p-button>
+            <p-button (onClick)="openPaymentDialog()" icon="mdi-currency_ruble" *ngIf="personality.isHasAccess(AccessFlag.MANAGE_CASH)"
+                      label="Оплата" styleClass="p-button-warning p-button-text"></p-button>
+            <p-button (onClick)="openRecalculationDialog()" icon="mdi-restore" *ngIf="personality.isHasAccess(AccessFlag.MANAGE_RECALCULATION)"
+                      label="Перерасчет" styleClass="p-button-help p-button-text"></p-button>
             <div class="stretched"></div>
             <span *ngIf="creditAmount" class="text-red-400 text-xl font-bold" [style.letter-spacing]="'2px'">
                 Кредит:
@@ -233,7 +235,7 @@
         <span *ngIf="mainTariff?.service" class="text-primary text-sm">
             {{mainTariff?.price}} руб/период
         </span>
-        <span (click)="getTariffList($event, tariffsOverlayPanel)">
+        <span (click)="getTariffList($event, tariffsOverlayPanel)" *ngIf="personality.isHasAccess(AccessFlag.MANAGE_SUBSCRIBERS)">
             <ng-container *ngTemplateOutlet="inlineButtonTemplate; context: {icon: 'mdi-edit', label: 'Изменить', btnClass: ['text-bluegray-400','hover:text-green-400']}"></ng-container>
         </span>
     </span>
@@ -256,13 +258,16 @@
         <div class="text-primary text-sm">
             {{service.price}} руб/период
         </div>
-        <div class="mdi-close text-bluegray-500 hover:text-red-400 text-sm cursor-pointer" (click)="removeService(service.service)"></div>
+        <div class="mdi-close text-bluegray-500 hover:text-red-400 text-sm cursor-pointer" *ngIf="personality.isHasAccess(AccessFlag.MANAGE_SUBSCRIBERS)"
+             (click)="removeService(service.service)"></div>
     </div>
 </ng-template>
 
 <ng-template #emptyServicesTemplate>
     <span (click)="getServiceList($event, servicesOverlayPanel)" *ngIf="!!mainTariff?.service">
-        <ng-container *ngTemplateOutlet="inlineButtonTemplate; context: {icon: 'mdi-add', label: 'Добавить сервис', btnClass: ['text-bluegray-400','hover:text-green-400']}"></ng-container>
+        <ng-container  *ngIf="personality.isHasAccess(AccessFlag.MANAGE_SUBSCRIBERS)">
+            <ng-container *ngTemplateOutlet="inlineButtonTemplate; context: {icon: 'mdi-add', label: 'Добавить сервис', btnClass: ['text-bluegray-400','hover:text-green-400']}"></ng-container>
+        </ng-container>
     </span>
 </ng-template>
 

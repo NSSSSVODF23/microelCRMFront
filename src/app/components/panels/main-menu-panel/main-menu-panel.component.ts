@@ -5,6 +5,8 @@ import {ActivatedRoute} from "@angular/router";
 import {map, Observable, shareReplay} from "rxjs";
 import {Wireframe} from "../../../types/transport-interfaces";
 import {TasksCatalogPageCacheService} from "../../../services/tasks-catalog-page-cache.service";
+import {PersonalityService} from "../../../services/personality.service";
+import {AccessFlag} from "../../../types/access-flag";
 
 @Component({
     selector: 'app-main-menu-panel',
@@ -12,6 +14,9 @@ import {TasksCatalogPageCacheService} from "../../../services/tasks-catalog-page
     styleUrls: ['./main-menu-panel.component.scss']
 })
 export class MainMenuPanelComponent implements OnInit {
+
+    AccessFlag = AccessFlag;
+
     stagesMenuItems: ExtendedMenuModel[] = []
     stageMenuExtended = false;
     stagesLoaded = false;
@@ -25,7 +30,8 @@ export class MainMenuPanelComponent implements OnInit {
             map(path => ['/tasks','catalog',...path])
         );
 
-    constructor(readonly api: ApiService, readonly route: ActivatedRoute, private taskCatalogCache: TasksCatalogPageCacheService) {
+    constructor(readonly api: ApiService, readonly route: ActivatedRoute, readonly personality: PersonalityService,
+                private taskCatalogCache: TasksCatalogPageCacheService) {
 
     }
 

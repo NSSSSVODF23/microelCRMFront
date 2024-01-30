@@ -1,3 +1,4 @@
 <div appExtendPageHeight class="flex flex-column p-3 w-full align-items-center justify-content-center">
-    <app-address-input-alt [formControl]="testControl"></app-address-input-alt>
+    <code>{{personality.userData$ | async | json}}</code>
+    <span>{{personality.isHasAccess(AccessFlag.BILLING)}}</span>
 </div>

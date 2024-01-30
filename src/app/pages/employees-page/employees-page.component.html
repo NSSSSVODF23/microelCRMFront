@@ -3,7 +3,7 @@
         <app-main-menu-panel></app-main-menu-panel>
 
         <p-tabView class="stretched panel overflow">
-            <p-tabPanel>
+            <p-tabPanel *ngIf="personality.isHasAccess(AccessFlag.MANAGE_EMPLOYEES)">
                 <ng-template pTemplate="header">
                     <div class="flexed gap3 hcenter">
                         <i class="mdi-person"></i>
@@ -56,7 +56,7 @@
                     </div>
                 </div>
             </p-tabPanel>
-            <p-tabPanel>
+            <p-tabPanel *ngIf="personality.isHasAccess(AccessFlag.MANAGE_DEPARTMENTS)">
                 <ng-template pTemplate="header">
                     <div class="flexed gap3 hcenter">
                         <i class="mdi-groups"></i>
@@ -94,7 +94,7 @@
                     </div>
                 </div>
             </p-tabPanel>
-            <p-tabPanel>
+            <p-tabPanel *ngIf="personality.isHasAccess(AccessFlag.MANAGE_POSITIONS)">
                 <ng-template pTemplate="header">
                     <div class="flexed gap3 hcenter">
                         <i class="mdi-badge"></i>
@@ -175,7 +175,7 @@
 <p-dialog [(visible)]="showCreatePositionDialog" [modal]="true" [dismissableMask]="true"
           [resizable]="false" header="Создание должности">
     <ng-template pTemplate="content">
-        <form [formGroup]="positionForm" class="flexed column gap5">
+        <form [formGroup]="positionForm" class="flex flex-column gap-2" [style.max-width]="'40rem'">
             <span class="input-label-wrapper">
                 <label>Название</label>
                 <input formControlName="name" pInputText type="text">
@@ -186,9 +186,12 @@
                           pInputTextarea></textarea>
             </span>
             <p-panel header="Параметры доступа">
-                <div class="flexed gap10 wrapped">
-                    <p-checkbox *ngFor="let flag of accessFlags()" [label]="flag.name" [value]="flag.value"
-                                formControlName="access" name="access"></p-checkbox>
+                <p-toggleButton (onChange)="checkAllAccessPosition($event)"
+                                offLabel="Выделить всё"
+                                onLabel="Снять выделение"></p-toggleButton>
+                <div class="flex gap-3 flex-wrap max-h-15rem p-2 overflow-y-auto">
+                    <p-checkbox *ngFor="let flag of accessFlags(); trackBy: AccessFlag.trackByFlag" [label]="flag.name" [value]="flag.value"
+                                [formControl]="positionForm.controls.access" name="access"></p-checkbox>
                 </div>
             </p-panel>
             <app-button (onClick)="positionCreate()" [disabled]="!positionForm.valid" icon="add"
@@ -200,7 +203,7 @@
 <p-dialog [(visible)]="showEditPositionDialog" [modal]="true" [dismissableMask]="true"
           [resizable]="false" header="Редактирование должности">
     <ng-template pTemplate="content">
-        <form [formGroup]="positionForm" class="flexed column gap5">
+        <form [formGroup]="positionForm" class="flex flex-column gap-2" [style.max-width]="'40rem'">
             <span class="input-label-wrapper">
                 <label>Название</label>
                 <input formControlName="name" pInputText type="text">
@@ -211,9 +214,12 @@
                           pInputTextarea></textarea>
             </span>
             <p-panel header="Параметры доступа">
-                <div class="flexed gap10 wrapped">
-                    <p-checkbox *ngFor="let flag of accessFlags()" [label]="flag.name" [value]="flag.value"
-                                formControlName="access" name="access"></p-checkbox>
+                <p-toggleButton (onChange)="checkAllAccessPosition($event)"
+                                offLabel="Выделить всё"
+                                onLabel="Снять выделение"></p-toggleButton>
+                <div class="flex gap-3 flex-wrap max-h-15rem p-2 overflow-y-auto">
+                    <p-checkbox *ngFor="let flag of accessFlags(); trackBy: AccessFlag.trackByFlag" [label]="flag.name" [value]="flag.value"
+                                [formControl]="positionForm.controls.access" name="access"></p-checkbox>
                 </div>
             </p-panel>
             <app-button (onClick)="positionEdit()" [disabled]="!positionForm.valid" icon="save"
@@ -241,7 +247,7 @@
 </p-dialog>
 
 <ng-template #employeeFormTemplate>
-    <form [formGroup]="employeeForm" class="flex flex-column gap-2">
+    <form [formGroup]="employeeForm" class="flex flex-column gap-2" [style.max-width]="'55rem'">
         <div class="flex gap-3 align-items-center">
             <span class="input-label-wrapper full-width">
                 <label>Фамилия</label>
@@ -376,21 +382,21 @@
             </div>
         </p-panel>
         <p-panel header="Параметры доступа" [toggleable]="true" [collapsed]="true">
-            <div class="flexed gap10 column">
-                <div class="flexed gap10 hcenter">
-                    <p-toggleButton (onChange)="checkAllAccess($event)"
+            <div class="flex gap-3 flex-column">
+                <div class="flex gap-3 align-items-center">
+                    <p-toggleButton (onChange)="checkAllAccessEmployee($event)"
                                     [disabled]="isBeingCreatingEmployee || isBeingEditingEmployee || !isAccessOverride" offLabel="Выделить всё"
                                     onLabel="Снять выделение"></p-toggleButton>
                     <p-toggleButton (ngModelChange)="accessOverrideChange($event)" [(ngModel)]="isAccessOverride"
                                     [ngModelOptions]="{standalone:true}" offLabel="Переопределить"
                                     [disabled]="isBeingCreatingEmployee || isBeingEditingEmployee" onLabel="Из должности"></p-toggleButton>
                 </div>
-                <div *ngIf="isAccessOverride" class="flexed gap10 wrapped">
-                    <p-checkbox *ngFor="let flag of accessFlags()" [label]="flag.name" [value]="flag.value"
-                                [disabled]="isBeingCreatingEmployee || isBeingEditingEmployee" formControlName="access" name="access"></p-checkbox>
+                <div *ngIf="isAccessOverride" class="flex gap-3 flex-wrap max-h-15rem p-2 overflow-y-auto">
+                    <p-checkbox *ngFor="let flag of accessFlags(); trackBy: AccessFlag.trackByFlag" [label]="flag.name" [value]="flag.value"
+                                [disabled]="isBeingCreatingEmployee || isBeingEditingEmployee" [formControl]="employeeForm.controls.access" name="access"></p-checkbox>
                 </div>
-                <div *ngIf="!isAccessOverride" class="flexed gap10 wrapped">
-                    <p-checkbox *ngFor="let flag of accessFlags(); trackBy: accessFlagTrackBy"
+                <div *ngIf="!isAccessOverride" class="flex gap-3 flex-wrap max-h-15rem p-2 overflow-y-auto">
+                    <p-checkbox *ngFor="let flag of accessFlags(); trackBy: AccessFlag.trackByFlag"
                                 [disabled]="isBeingCreatingEmployee || isBeingEditingEmployee || true" [label]="flag.name"
                                 [ngModelOptions]="{standalone:true}" [ngModel]="accessOfSelectedPosition"
                                 [value]="flag.value" name="accessPosition"></p-checkbox>

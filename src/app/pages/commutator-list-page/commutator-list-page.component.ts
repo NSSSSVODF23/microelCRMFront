@@ -8,7 +8,6 @@ import {
     debounceTime,
     delay,
     map,
-    merge,
     Observable,
     of,
     shareReplay,
@@ -28,6 +27,8 @@ import {
 import {flowInChild} from "../../animations";
 import {DynamicPageContent, DynamicValueFactory, SubscriptionsHolder} from "../../util";
 import {ConfirmationService, MenuItem} from "primeng/api";
+import {AccessFlag} from "../../types/access-flag";
+import {PersonalityService} from "../../services/personality.service";
 
 @Component({
     templateUrl: './commutator-list-page.component.html',
@@ -35,6 +36,9 @@ import {ConfirmationService, MenuItem} from "primeng/api";
     animations: [flowInChild]
 })
 export class CommutatorListPageComponent implements OnInit, OnDestroy {
+
+    AccessFlag = AccessFlag;
+
     pageNum = 0;
     commutatorFilterForm = new FormGroup({
         name: new FormControl(null),
@@ -44,11 +48,11 @@ export class CommutatorListPageComponent implements OnInit, OnDestroy {
     changeFilterForm$ = this.commutatorFilterForm.valueChanges.pipe(
         startWith(this.commutatorFilterForm.value),
         debounceTime(1000),
-        tap(()=>this.pageNum = 0)
+        tap(() => this.pageNum = 0)
     )
     changeCommutatorPage = new BehaviorSubject(0);
     page$ = this.changeCommutatorPage.pipe(
-        tap(page=>this.pageNum=page)
+        tap(page => this.pageNum = page)
     );
     loadingState = LoadingState.LOADING;
     changePageOrFilters$ = combineLatest([this.page$, this.changeFilterForm$]).pipe(
@@ -56,7 +60,7 @@ export class CommutatorListPageComponent implements OnInit, OnDestroy {
             return [this.pageNum, filter.name, filter.ip, filter.address?.acpHouseBind?.buildingId]
         })
     )
-    commutatorPage$:Observable<DynamicPageContent<SwitchBaseInfo[]>> = DynamicValueFactory.ofPageAlt(
+    commutatorPage$: Observable<DynamicPageContent<SwitchBaseInfo[]>> = DynamicValueFactory.ofPageAlt(
         this.changePageOrFilters$,
         this.api.getCommutators.bind(this.api),
         'id',
@@ -91,19 +95,8 @@ export class CommutatorListPageComponent implements OnInit, OnDestroy {
     selectedToViewCommutator?: Switch;
     private subscriptions = new SubscriptionsHolder();
 
-    openContextMenu(commutator: SwitchBaseInfo){
-        this.contextMenuItems = [
-            {label: 'Изменить', icon: 'mdi-edit', command: () => this.openEditCommutatorDialog(commutator.id)},
-            {label: 'Удалить', styleClass: 'danger-menu-button', icon: 'mdi-delete', command: () => this.confirm.confirm({
-                    header: 'Подтверждение',
-                    message: 'Вы хотите удалить '+commutator.name+' коммутатор?',
-                    accept: () => this.deleteCommutator(commutator.id)
-                })},
-            {label: 'Обновить', icon: 'mdi-sync', command: ()=> this.commutatorRemoteUpdate(commutator.id)}
-        ]
-    }
-
-    constructor(private api: ApiService, private rt: RealTimeUpdateService, private confirm: ConfirmationService) {
+    constructor(private api: ApiService, private rt: RealTimeUpdateService,
+                readonly personality: PersonalityService,private confirm: ConfirmationService) {
     }
 
     get commutatorFormErrors() {
@@ -163,6 +156,28 @@ export class CommutatorListPageComponent implements OnInit, OnDestroy {
         }
     }
 
+    openContextMenu(commutator: SwitchBaseInfo) {
+        this.contextMenuItems = [
+            {
+                label: 'Изменить',
+                icon: 'mdi-edit',
+                disabled: !this.personality.isHasAccess(AccessFlag.EDIT_SWITCH),
+                command: () => this.openEditCommutatorDialog(commutator.id)},
+            {
+                label: 'Удалить',
+                styleClass: 'danger-menu-button',
+                icon: 'mdi-delete',
+                disabled: !this.personality.isHasAccess(AccessFlag.EDIT_SWITCH),
+                command: () => this.confirm.confirm({
+                    header: 'Подтверждение',
+                    message: 'Вы хотите удалить ' + commutator.name + ' коммутатор?',
+                    accept: () => this.deleteCommutator(commutator.id)
+                })
+            },
+            {label: 'Обновить', icon: 'mdi-sync', command: () => this.commutatorRemoteUpdate(commutator.id)}
+        ]
+    }
+
     commutatorNameValidator = (control: AbstractControl): Observable<ValidationErrors | null> => {
         return of(control.value).pipe(
             delay(700),
@@ -195,8 +210,8 @@ export class CommutatorListPageComponent implements OnInit, OnDestroy {
     };
 
     ngOnInit(): void {
-        this.subscriptions.addSubscription('updCom', this.rt.acpCommutatorUpdated().subscribe(commutator=>{
-            if(commutator.id === this.selectedToViewCommutator?.id) this.selectedToViewCommutator = commutator;
+        this.subscriptions.addSubscription('updCom', this.rt.acpCommutatorUpdated().subscribe(commutator => {
+            if (commutator.id === this.selectedToViewCommutator?.id) this.selectedToViewCommutator = commutator;
         }));
     }
 
@@ -221,7 +236,7 @@ export class CommutatorListPageComponent implements OnInit, OnDestroy {
         });
     }
 
-    openEditCommutatorDialog(id:number) {
+    openEditCommutatorDialog(id: number) {
         this.api.getCommutatorEditingPreset(id).subscribe((preset) => {
             this.commutatorForm = new FormGroup({
                 type: new FormControl(preset.targetCommutator.swtype, [Validators.required]),
@@ -286,16 +301,15 @@ export class CommutatorListPageComponent implements OnInit, OnDestroy {
         this.commutatorInfoLoadingState = LoadingState.LOADING;
         this.commutatorViewDialogVisible = true;
         this.api.getCommutator(commutator.id).subscribe({
-            next:(commutator)=>{
-                if(commutator?.commutator?.additionalInfo) {
+            next: (commutator) => {
+                if (commutator?.commutator?.additionalInfo) {
                     this.commutatorInfoLoadingState = LoadingState.READY;
                     this.selectedToViewCommutator = commutator.commutator;
-                }
-                else{
+                } else {
                     this.commutatorInfoLoadingState = LoadingState.EMPTY;
                 }
             },
-            error:()=>{
+            error: () => {
                 this.commutatorInfoLoadingState = LoadingState.ERROR;
             }
         })

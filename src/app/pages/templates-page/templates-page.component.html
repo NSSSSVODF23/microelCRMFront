@@ -9,7 +9,7 @@
 
 <ng-template #tabview>
     <p-tabView>
-        <p-tabPanel header="Шаблоны" leftIcon="mdi-list_alt">
+        <p-tabPanel header="Шаблоны" leftIcon="mdi-list_alt" *ngIf="personality.isHasAccess(AccessFlag.EDIT_TASK_TEMPLATES)">
             <div [style.padding-bottom]="'1rem'" class="flex gap-3">
                 <p-button [routerLink]="['constructor']" icon="mdi-add" label="Создать"
                           styleClass="p-button-outlined p-button-success"></p-button>
@@ -43,7 +43,7 @@
             </ng-container>
 
         </p-tabPanel>
-        <p-tabPanel header="Теги" leftIcon="mdi-local_offer">
+        <p-tabPanel header="Теги" leftIcon="mdi-local_offer" *ngIf="personality.isHasAccess(AccessFlag.EDIT_TASK_TAGS)">
             <div class="flex gap-3 pb-3">
                 <p-button (click)="openCreateTagDialog()" icon="mdi-add" label="Создать"
                           styleClass="p-button-outlined p-button-success"></p-button>
@@ -75,7 +75,7 @@
                 </ng-container>
             </ng-container>
         </p-tabPanel>
-        <p-tabPanel header="Абон. оборудование" leftIcon="mdi-router">
+        <p-tabPanel header="Абон. оборудование" leftIcon="mdi-router" *ngIf="personality.isHasAccess(AccessFlag.EDIT_DEVICES)">
             <div class="flex gap-3 pb-3">
                 <p-button (click)="openCreateEquipmentDialog()" icon="mdi-add" label="Создать"
                           styleClass="p-button-outlined p-button-success"></p-button>

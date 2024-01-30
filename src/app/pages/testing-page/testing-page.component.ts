@@ -6,6 +6,8 @@ import {ApiService} from "../../services/api.service";
 import {bufferTime, debounceTime, distinctUntilChanged, map, of, range, shareReplay, switchMap} from "rxjs";
 import {RealTimeUpdateService} from "../../services/real-time-update.service";
 import {CustomValidators} from "../../custom-validators";
+import {PersonalityService} from "../../services/personality.service";
+import {AccessFlag} from "../../types/access-flag";
 
 @Component({
     templateUrl: './testing-page.component.html',
@@ -14,6 +16,7 @@ import {CustomValidators} from "../../custom-validators";
 export class TestingPageComponent implements OnInit {
 
     items: string[] = [];
+    AccessFlag = AccessFlag;
 
     fields: FieldItem[] = [
         {name: 'Булево', id: v4(), type: WireframeFieldType.BOOLEAN, orderPosition: 1, listViewIndex: 1},
@@ -59,7 +62,7 @@ export class TestingPageComponent implements OnInit {
     ips=["10.163.35.26"];
     // ips=["8.8.8.8","193.111.3.1","10.163.35.140","10.163.35.254"];
 
-    constructor(readonly api: ApiService, readonly rt: RealTimeUpdateService) {
+    constructor(readonly api: ApiService, readonly rt: RealTimeUpdateService, readonly personality: PersonalityService) {
     }
 
     ngOnInit(): void {

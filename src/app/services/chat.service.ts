@@ -22,10 +22,9 @@ export class ChatService {
 
     constructor(private api: ApiService, private rt: RealTimeUpdateService, private personality: PersonalityService, private messageService: MessageService) {
         // this.getChats();
-        personality.userData$.subscribe(emp => {
-            if (!emp) return;
-            this.rt.chatCreated(emp.login).subscribe(this.createChat.bind(this))
-            this.rt.chatMessageCreated(emp.login).subscribe(message=>{
+        personality.userLogin$.subscribe(login => {
+            this.rt.chatCreated(login).subscribe(this.createChat.bind(this))
+            this.rt.chatMessageCreated(login).subscribe(message=>{
                 if(message.parentChatId !== this.currentOpenChat){
                     if(this.notificationAudios.loud.paused) this.notificationAudios.loud.play().then();
                     this.messageService.add({

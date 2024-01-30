@@ -12,8 +12,8 @@ import {PersonalityService} from "./personality.service";
 })
 export class AfterWorkService {
 
-    afterWorks$ = this.personality.userData$.pipe(switchMap(employee => {
-        return DynamicValueFactory.of(this.api.getAfterWorkList(), 'workLogId', this.rt.afterWorksAppend(employee!.login), null, this.rt.afterWorksRemoved(employee!.login)
+    afterWorks$ = this.personality.userLogin$.pipe(switchMap(login => {
+        return DynamicValueFactory.of(this.api.getAfterWorkList(), 'workLogId', this.rt.afterWorksAppend(login), null, this.rt.afterWorksRemoved(login)
             .pipe(map(workLogId => ({workLogId} as WorkLog))));
     }))
 

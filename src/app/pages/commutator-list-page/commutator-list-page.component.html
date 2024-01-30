@@ -8,7 +8,7 @@
                     <span class="mdi-dns"></span>
                     <div class="flex flex-grow-1 align-items-center gap-2">
                         <span>Коммутаторы</span>
-                        <p-button (onClick)="openCreateCommutatorDialog()" icon="mdi-add"
+                        <p-button (onClick)="openCreateCommutatorDialog()" icon="mdi-add" [disabled]="!personality.isHasAccess(AccessFlag.EDIT_SWITCH)"
                                   label="Создать" styleClass="p-button-text p-button-success"></p-button>
                     </div>
                     <span *ngIf="commutatorPage.totalElements"

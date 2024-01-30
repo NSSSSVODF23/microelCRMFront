@@ -141,9 +141,8 @@ export class IncomingPageCacheService {
         this.stageList$.subscribe(s=>this.stageList = [...s]);
         this.tagsList$.subscribe(s=>this.tagsList = [...s.value]);
         this.searchPhrase.valueChanges.pipe(debounceTime(1000), filter(phrase=>phrase === null || phrase.length === 0)).subscribe(()=>this.pageControl.setValue(0))
-        this.personality.userData$.subscribe(userData=>{
-            if(!userData) return;
-            this.rt.incomingTaskCountChange(userData.login)
+        this.personality.userLogin$.subscribe(login=>{
+            this.rt.incomingTaskCountChange(login)
                 .pipe(filter((counter)=>(this.isSelectOneTemplate && counter.id === this.firstWireframeId)))
                 .subscribe(counter=>{
                     this.stageList.forEach(stage=>{
@@ -154,7 +153,7 @@ export class IncomingPageCacheService {
                     const allCounter = this.stageList.find(s=>s.value === null);
                     if(allCounter) allCounter.tasksCount = counter.stages.reduce((prev,curr)=>prev+curr.num,0);
                 });
-            this.rt.incomingTagTaskCountChange(userData.login)
+            this.rt.incomingTagTaskCountChange(login)
                 .subscribe(counter=>{
                     this.tagsList.forEach(tag=>{
                         const wireframeMap = counter[tag.taskTagId];
