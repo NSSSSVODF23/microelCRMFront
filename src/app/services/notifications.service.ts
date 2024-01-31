@@ -3,6 +3,7 @@ import {INotification, NotificationType, Page} from "../types/transport-interfac
 import {ApiService} from "./api.service";
 import {RealTimeUpdateService} from "./real-time-update.service";
 import {FocusStatus, PersonalityService} from "./personality.service";
+import {switchMap} from "rxjs";
 
 const NOTIFICATION_LIMIT = 25;
 
@@ -79,13 +80,8 @@ export class NotificationsService {
             }
         })
         this.load();
-        personality.onGettingUserData.subscribe(
-            me => {
-                if (!me) return;
-                this.rt.notificationCreated(me.login).subscribe(this.createNotificationHandler.bind(this));
-                this.rt.notificationUpdated(me.login).subscribe(this.updateNotificationHandler.bind(this));
-            }
-        )
+        personality.userLogin$.pipe(switchMap(login=>this.rt.notificationCreated(login))).subscribe(this.createNotificationHandler.bind(this));
+        personality.userLogin$.pipe(switchMap(login=>this.rt.notificationUpdated(login))).subscribe(this.updateNotificationHandler.bind(this));
         Notification.requestPermission().then(permission => console.log(permission));
     }
 
