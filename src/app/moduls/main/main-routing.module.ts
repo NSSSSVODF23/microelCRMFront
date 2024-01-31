@@ -42,6 +42,15 @@ import {
 } from "../../pages/task-catalog/catalog-search-tasks-list-view/catalog-search-tasks-list-view.component";
 import {accessCanActivate} from "../../guards/access-flag.guard";
 import {AccessFlag} from "../../types/access-flag";
+import {
+    ContractsBootstrapPageComponent
+} from "../../pages/contracts/contracts-bootstrap-page/contracts-bootstrap-page.component";
+import {
+    ContractsInspectionPageComponent
+} from "../../pages/contracts/children/contracts-inspection-page/contracts-inspection-page.component";
+import {
+    ContractTypesPageComponent
+} from "../../pages/contracts/children/contract-types-page/contract-types-page.component";
 
 const routes: Routes = [{
     path: '', component: MainBootstrapComponent, children: [
@@ -141,6 +150,14 @@ const routes: Routes = [{
         {path: 'system/acp', component: AcpSettingsPageComponent, canActivate:[accessCanActivate(AccessFlag.MANAGE_SYSTEM_SETTINGS)]},
         {path: 'commutators/list', component: CommutatorListPageComponent, canActivate:[accessCanActivate(AccessFlag.VIEW_SWITCH, AccessFlag.EDIT_SWITCH)]},
         {path: 'files', component: FilesPageComponent, canActivate:[accessCanActivate(AccessFlag.READ_WRITE_FILES)]},
+        {
+            path: 'contracts',
+            component: ContractsBootstrapPageComponent,
+            children: [
+                {path: 'inspection', component: ContractsInspectionPageComponent},
+                {path: 'types', component: ContractTypesPageComponent}
+            ]
+        }
     ],
     canActivate: [AuthGuard, MainGuard]
 }];

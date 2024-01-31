@@ -230,6 +230,13 @@ import {FloatDockPanelComponent} from "../../components/float-dock-panel/float-d
 import {
     ForceCloseDialogComponent
 } from "../../components/task-control-dialogs/force-close-dialog/force-close-dialog.component";
+import {ContractItemComponent} from "../../components/contracts/contract-item/contract-item.component";
+import {
+    EmployeeMultiplySelectorComponent
+} from "../../components/controls/employee-multiply-selector/employee-multiply-selector.component";
+import {
+    TypesContractsMultiSelectorComponent
+} from "../../components/controls/types-contracts-multi-selector/types-contracts-multi-selector.component";
 
 
 @NgModule({
@@ -345,7 +352,10 @@ import {
         AddressInputAltComponent,
         AfterWorkPanelComponent,
         FloatDockPanelComponent,
-        ForceCloseDialogComponent
+        ForceCloseDialogComponent,
+        ContractItemComponent,
+        EmployeeMultiplySelectorComponent,
+        TypesContractsMultiSelectorComponent
     ],
     exports: [
         AccountPanelComponent,
@@ -458,7 +468,9 @@ import {
         ServerDocumentsInputComponent,
         AddressInputAltComponent,
         AfterWorkPanelComponent,
-        ForceCloseDialogComponent
+        ForceCloseDialogComponent,
+        ContractItemComponent,
+        EmployeeMultiplySelectorComponent
     ],
     imports: [
         CommonPipesModule,

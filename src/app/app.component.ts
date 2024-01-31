@@ -8,6 +8,7 @@ import {configurePrimeng, registerCustomElements} from "./util";
 import {Router, Scroll} from "@angular/router";
 import {ViewportScroller} from "@angular/common";
 import {delay, filter} from "rxjs";
+import {InputTextarea} from "primeng/inputtextarea";
 
 @Component({
     selector: 'app-root',

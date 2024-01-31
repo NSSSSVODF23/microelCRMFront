@@ -53,12 +53,29 @@
 </ng-template>
 
 <ng-template #normalButtonsTemplate let-workLog="workLog">
-    <p-button label="Отметить как завершенную" styleClass="p-button-sm" (onClick)="afterWorkService.markAsCompleted(workLog)"></p-button>
+    <p-button label="Отметить как завершенную" styleClass="p-button-sm" (onClick)="contractsOverlay.toggle($event); targetWorkLog = workLog"></p-button>
     <p-button label="Переоткрыть и перейти" styleClass="p-button-sm p-button-secondary p-button-outlined" (onClick)="afterWorkService.markAsUncompleted(workLog, true)"></p-button>
 </ng-template>
 
 <ng-template #forceClosedButtonsTemplate let-workLog="workLog">
     <p-button label="Отметить как незавершенную" styleClass="p-button-sm" (onClick)="afterWorkService.markAsUncompleted(workLog)"></p-button>
-    <p-button label="Закрыть как завершенную" styleClass="p-button-sm p-button-warning p-button-outlined" (onClick)="afterWorkService.markAsCompleted(workLog)"></p-button>
+    <p-button label="Закрыть как завершенную" styleClass="p-button-sm p-button-warning p-button-outlined" (onClick)="contractsOverlay.toggle($event); targetWorkLog = workLog"></p-button>
     <p-button label="Закрыть как незавершенную" styleClass="p-button-sm p-button-secondary p-button-outlined" (onClick)="afterWorkService.closeAndMarkAsUncompleted(workLog)"></p-button>
 </ng-template>
+
+<p-overlayPanel #contractsOverlay [dismissable]="true" styleClass="flex flex-column gap-3" (onShow)="concludedContractsControl.reset([])">
+    <div class="flex flex-column gap-4 max-w-30rem" (click)="$event.stopPropagation()">
+        <span class="text-bluegray-500 text-lg font-semibold">Какие договора должен сдать монтажник?</span>
+        <div class="flex flex-column gap-2">
+            <app-types-contracts-multi-selector [formControl]="concludedContractsControl" (onAfterChange)="contractsOverlay.overlayVisible && contractsOverlay.align()"></app-types-contracts-multi-selector>
+            <div class="flex gap-3">
+                <p-button label="Перечисленные" class="flex-grow-1" styleClass="p-button-success w-full"
+                          [disabled]="concludedContractsControl.invalid"
+                          (onClick)="markAsCompleted(contractsOverlay)"></p-button>
+                <p-button label="Без договоров" class="flex-grow-1" styleClass="p-button-info w-full"
+                          [disabled]="!concludedContractsControl.invalid"
+                          (onClick)="markAsCompleted(contractsOverlay)"></p-button>
+            </div>
+        </div>
+    </div>
+</p-overlayPanel>

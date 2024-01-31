@@ -1,6 +1,8 @@
 import {Component, Input, OnInit} from '@angular/core';
-import {WorkLog} from "../../../types/transport-interfaces";
+import {TypesOfContractsSuggestion, WorkLog} from "../../../types/transport-interfaces";
 import {AfterWorkService} from "../../../services/after-work.service";
+import {FormControl, Validators} from "@angular/forms";
+import {OverlayPanel} from "primeng/overlaypanel";
 
 @Component({
     selector: 'app-after-work-panel',
@@ -10,7 +12,10 @@ import {AfterWorkService} from "../../../services/after-work.service";
 export class AfterWorkPanelComponent implements OnInit {
 
     @Input() afterWorks: WorkLog[] = [];
+    targetWorkLog?: WorkLog;
     panelVisible = false;
+    concludedContractsControl = new FormControl<TypesOfContractsSuggestion[]>([], [Validators.required]);
+    isRequestInProcess = false;
 
     constructor(readonly afterWorkService: AfterWorkService) {
     }
@@ -20,5 +25,13 @@ export class AfterWorkPanelComponent implements OnInit {
 
     toggle() {
         this.panelVisible = !this.panelVisible;
+    }
+
+    markAsCompleted(contractsOverlay: OverlayPanel) {
+        if(!this.targetWorkLog)
+            return;
+        this.isRequestInProcess = true;
+        this.afterWorkService.markAsCompleted(this.targetWorkLog, this.concludedContractsControl.value)
+            .subscribe(()=>contractsOverlay.hide())
     }
 }

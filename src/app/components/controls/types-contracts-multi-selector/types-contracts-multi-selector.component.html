@@ -1,0 +1,6 @@
+<p-autoComplete (completeMethod)="querySubject.next($event.query)" [autoHighlight]="true"
+                [forceSelection]="true" [formControl]="control" [unique]="false"
+                [multiple]="true" [showEmptyMessage]="true" [suggestions]="(typesOfContracts$ | async) ?? []"
+                [delay]="500" appendTo="body" dataKey="value" field="label" emptyMessage="Типов договоров не найдено"
+                placeholder="Название договора...">
+</p-autoComplete>

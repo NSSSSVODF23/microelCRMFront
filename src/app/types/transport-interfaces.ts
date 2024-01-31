@@ -769,6 +769,10 @@ export interface WorkLog {
     targetDescription?: string;
     isReportsUncompleted: boolean;
     lastAcceptedTimestamp?: string;
+    //    private Boolean taskIsClearlyCompleted;
+    // private List<Contract> concludedContracts;
+    taskIsClearlyCompleted?: boolean;
+    concludedContracts: Contract[];
 }
 
 export interface WorkLogTargetFile {
@@ -1738,4 +1742,36 @@ export interface EmployeeWorkLogs{
     employees: Employee[];
     active: WorkLog | null;
     unactive: WorkLog[];
+}
+
+export interface TypesOfContracts{
+    typeOfContractId: number;
+    name: string;
+    description?: string;
+    receivers: Employee[];
+    archivers: Employee[];
+    createdBy: EmployeeIntervention;
+    updatedBy: EmployeeIntervention;
+    deletedBy: EmployeeIntervention;
+    isDeleted: boolean;
+}
+
+export interface TypesOfContractsForm{
+    name: string;
+    description?: string;
+    receivers: string[];
+    archivers: string[];
+}
+
+export interface TypesOfContractsSuggestion{
+    label: string;
+    value: number;
+}
+
+export interface Contract{
+    contractId: number;
+    typeOfContract: TypesOfContracts;
+    count: number;
+    received?: EmployeeIntervention;
+    archived?: EmployeeIntervention;
 }

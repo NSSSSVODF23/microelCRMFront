@@ -112,6 +112,15 @@ import {
     CatalogSearchTasksListViewComponent
 } from "../../pages/task-catalog/catalog-search-tasks-list-view/catalog-search-tasks-list-view.component";
 import {ChipModule} from "primeng/chip";
+import {
+    ContractsBootstrapPageComponent
+} from "../../pages/contracts/contracts-bootstrap-page/contracts-bootstrap-page.component";
+import {
+    ContractsInspectionPageComponent
+} from "../../pages/contracts/children/contracts-inspection-page/contracts-inspection-page.component";
+import {
+    ContractTypesPageComponent
+} from "../../pages/contracts/children/contract-types-page/contract-types-page.component";
 
 const mapConfig: YaConfig = {
     apikey: '008574e5-f34b-4270-b3d5-91aaabd036e8',
@@ -149,7 +158,10 @@ const mapConfig: YaConfig = {
         TaskCatalogPageComponent,
         TaskCatalogSearchPageComponent,
         CatalogTasksListViewComponent,
-        CatalogSearchTasksListViewComponent
+        CatalogSearchTasksListViewComponent,
+        ContractsBootstrapPageComponent,
+        ContractsInspectionPageComponent,
+        ContractTypesPageComponent
     ],
     imports: [
         CommonComponentsModule,

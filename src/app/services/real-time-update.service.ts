@@ -33,7 +33,7 @@ import {
     TelegramConf,
     TreeElementPosition,
     TreeNodeMoveEvent,
-    TreeNodeUpdateEvent,
+    TreeNodeUpdateEvent, TypesOfContracts,
     Wireframe,
     WireframeTaskCounter,
     WorkLog
@@ -475,5 +475,17 @@ export class RealTimeUpdateService {
 
     afterWorksRemoved(login: string) {
         return this.watchUnicast<number>(login, 'after-work', 'remove');
+    }
+
+    createTypeOfContract() {
+        return this.watch<TypesOfContracts>('contract', 'type', 'create')
+    }
+
+    updateTypeOfContract() {
+        return this.watch<TypesOfContracts>('contract', 'type', 'update')
+    }
+
+    deleteTypeOfContract() {
+        return this.watch<TypesOfContracts>('contract', 'type', 'delete')
     }
 }

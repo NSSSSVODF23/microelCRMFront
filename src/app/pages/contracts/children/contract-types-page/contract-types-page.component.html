@@ -1,0 +1,47 @@
+<div class="flex flex-column text-bluegray-500 bg-white border-round shadow-1">
+    <div class="flex align-items-center pt-2 pl-3 pr-2 pb-1 select-none">
+        <span class="text-lg text-bluegray-600 font-semibold mr-3 white-space-nowrap">Список типов договоров</span>
+        <div class="flex-grow-1"></div>
+        <p-button styleClass="p-button-sm p-button-success" icon="mdi-add" label="Создать" (onClick)="openCreateDialog()"></p-button>
+    </div>
+    <div class="flex flex-column p-4">
+        <ng-container *ngIf="typesContracts$ | async as typesContracts">
+            <app-contract-item [typeContract]="typeContract" *ngFor="let typeContract of typesContracts.value"
+                               (onEdit)="openEditDialog($event)" (onDelete)="openDeleteDialog($event)" class="terminated"></app-contract-item>
+        </ng-container>
+    </div>
+</div>
+
+<p-dialog appendTo="body" [(visible)]="createDialogVisible" contentStyleClass="flex flex-column gap-3 max-w-30rem"
+          [modal]="true" [draggable]="true" [dismissableMask]="true" header="Создание типа договора">
+    <ng-container *ngTemplateOutlet="typeContractFormTemplate"></ng-container>
+    <div class="flex justify-content-end">
+        <p-button icon="mdi-add" label="Создать" (onClick)="createTypeOfContract()"
+                  styleClass="p-button-success"></p-button>
+    </div>
+</p-dialog>
+
+<p-dialog appendTo="body" [(visible)]="editDialogVisible" contentStyleClass="flex flex-column gap-3 max-w-30rem"
+          [modal]="true" [draggable]="true" [dismissableMask]="true" header="Редактирование типа договора">
+    <ng-container *ngTemplateOutlet="typeContractFormTemplate"></ng-container>
+    <div class="flex justify-content-end">
+        <p-button icon="mdi-save" label="Сохранить" (onClick)="editTypeOfContract()"></p-button>
+    </div>
+</p-dialog>
+
+<ng-template #typeContractFormTemplate>
+    <div class="flex flex-column gap-2" [formGroup]="typeContractForm">
+        <app-label label="Название типа договора">
+            <input pInputText formControlName="name" [size]="30"/>
+        </app-label>
+        <app-label label="Описание типа договора">
+            <textarea pInputTextarea [autoResize]="true" [rows]="4" formControlName="description"></textarea>
+        </app-label>
+        <app-label label="Приемщики">
+            <app-employee-multiply-selector formControlName="receivers" [options]="{showDeleted: false, showOffsite: false}"></app-employee-multiply-selector>
+        </app-label>
+        <app-label label="Архиваторы">
+            <app-employee-multiply-selector formControlName="archivers" [options]="{showDeleted: false, showOffsite: false}"></app-employee-multiply-selector>
+        </app-label>
+    </div>
+</ng-template>

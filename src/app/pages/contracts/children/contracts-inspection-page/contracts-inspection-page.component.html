@@ -1,0 +1,31 @@
+<div class="flex flex-column" *ngIf="workLogs$ | async as workLogs">
+    <div class="flex flex-column gap-2" *ngFor="let workLog of workLogs.value">
+        <app-task-list-element [item]="workLog.task" [inlined]="true"></app-task-list-element>
+        <div class="flex flex-column gap-2">
+            <div class="flex flex-wrap gap-2 align-items-center">
+                <span class="text-bluegray-400 font-bold">Приемка:</span>
+                <div *ngFor="let contract of workLog.concludedContracts" class="p-2 border-round border-1 border-bluegray-100">
+                    <span class="text-bluegray-500">
+                        {{contract.typeOfContract.name}}
+                    </span>
+                    <span class="text-primary">
+                        {{contract.count}}шт.
+                    </span>
+                    <p-checkbox [binary]="true" [ngModel]="!!contract.received" [disabled]="!!contract.received"></p-checkbox>
+                </div>
+            </div>
+            <div class="flex flex-wrap gap-2 align-items-center">
+                <span class="text-bluegray-400 font-bold">Архивация:</span>
+                <div *ngFor="let contract of workLog.concludedContracts" class="p-2 border-round border-1 border-bluegray-100">
+                    <span class="text-bluegray-500">
+                        {{contract.typeOfContract.name}}
+                    </span>
+                    <span class="text-primary">
+                        {{contract.count}}шт.
+                    </span>
+                    <p-checkbox [binary]="true" [ngModel]="!!contract.archived" [disabled]="!contract.received"></p-checkbox>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

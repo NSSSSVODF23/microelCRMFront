@@ -1,7 +1,7 @@
 import {Injectable} from '@angular/core';
 import {ApiService} from "./api.service";
 import {RealTimeUpdateService} from "./real-time-update.service";
-import {Employee, WorkLog} from "../types/transport-interfaces";
+import {Employee, TypesOfContractsSuggestion, WorkLog} from "../types/transport-interfaces";
 import {Router} from "@angular/router";
 import {map, Observable, of, switchMap, tap} from "rxjs";
 import {DynamicValueFactory} from "../util";
@@ -27,8 +27,8 @@ export class AfterWorkService {
         return this._isEmpty;
     }
 
-    markAsCompleted(workLog: WorkLog) {
-        this.api.markWorkLogAsCompleted(workLog.workLogId).subscribe();
+    markAsCompleted(workLog: WorkLog, typesOfContracts?: TypesOfContractsSuggestion[] | null) {
+        return this.api.markWorkLogAsCompleted(workLog.workLogId, typesOfContracts ?? undefined);
     }
 
     markAsUncompleted(workLog: WorkLog, isOpenTask = false) {

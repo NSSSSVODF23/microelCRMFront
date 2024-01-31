@@ -47,7 +47,7 @@ import {
     TelegramConf, TimeFrame,
     TokenChain, TokenChainWithUserInfo,
     TreeDragDropEvent,
-    TreeElementPosition, UserEvents, UserTariff,
+    TreeElementPosition, TypesOfContracts, TypesOfContractsForm, TypesOfContractsSuggestion, UserEvents, UserTariff,
     Wireframe, WireframeDashboardStatistic,
     WorkingDay,
     WorkLog
@@ -1136,8 +1136,8 @@ export class ApiService {
         return this.sendPost(`api/private/billing/user/${login}/make-recalculation`, recalculationForm);
     }
 
-    markWorkLogAsCompleted(workLogId: number) {
-        return this.sendPatch(`api/private/work-log/${workLogId}/mark-as-completed`, {});
+    markWorkLogAsCompleted(workLogId: number, contracts?: TypesOfContractsSuggestion[]) {
+        return this.sendPatch(`api/private/work-log/${workLogId}/mark-as-completed`, contracts);
     }
 
     markWorkLogAsUncompleted(workLogId: number) {
@@ -1148,8 +1148,32 @@ export class ApiService {
         return this.sendPatch(`api/private/work-log/${workLogId}/mark-as-uncompleted-and-close`, {});
     }
 
+    getWorkLogsUnconfirmedContracts(page: number, filters: any) {
+        return this.sendPost<Page<WorkLog>>(`api/private/work-log/unconfirmed-contracts/${page}`, filters);
+    }
+
     getEmployeeWorkLogs() {
         return this.sendGet<EmployeeWorkLogs[]>('api/private/work-log/employee-work-log/list');
+    }
+
+    getContractTypesList() {
+        return this.sendGet<TypesOfContracts[]>('api/private/contract/type/list');
+    }
+
+    getContractTypesSuggestionList(query: string) {
+        return this.sendGet<TypesOfContractsSuggestion[]>('api/private/contract/type/suggestion/list', {query});
+    }
+
+    createContractType(form: TypesOfContractsForm) {
+        return this.sendPost('api/private/contract/type', form);
+    }
+
+    updateContractType(id: number, form: TypesOfContractsForm) {
+        return this.sendPatch(`api/private/contract/type/${id}`, form);
+    }
+
+    removeContractType(id: number) {
+        return this.sendDelete(`api/private/contract/type/${id}`);
     }
 
     // Результаты запросов на сервер кэшируются по таймауту, чтобы не было доп нагрузки на сервер

@@ -1,0 +1,11 @@
+<p-autoComplete (completeMethod)="search($event.query)" [autoHighlight]="true" [forceSelection]="true" [formControl]="control"
+                [multiple]="true" [showEmptyMessage]="true" [suggestions]="employeesSuggestions"
+                appendTo="body" dataKey="login" emptyMessage="Сотрудников не найдено"
+                placeholder="Имя сотрудника...">
+    <ng-template pTemplate="item" let-item>
+        <app-employee-label [size]="1.4" [employee]="item"></app-employee-label>
+    </ng-template>
+    <ng-template pTemplate="selectedItem" let-item>
+        <app-employee-label [size]="1.4" [employee]="item"></app-employee-label>
+    </ng-template>
+</p-autoComplete>

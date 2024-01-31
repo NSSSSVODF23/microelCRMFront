@@ -1,0 +1,8 @@
+<div class="flex align-items-center gap-2 p-3" *ngIf="typeContract">
+    <span class="text-bluegray-500 font-bold">
+        {{typeContract.name}}
+    </span>
+    <div class="flex-grow-1"></div>
+    <p-button icon="mdi-edit" label="Изменить" styleClass="p-button-sm p-button-outlined p-button-warning" (onClick)="onEdit.emit({event:$event, typeContract})"></p-button>
+    <p-button icon="mdi-delete" label="Удалить" styleClass="p-button-sm p-button-outlined p-button-danger" (onClick)="onDelete.emit({event:$event, typeContract})"></p-button>
+</div>
