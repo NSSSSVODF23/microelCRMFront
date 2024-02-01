@@ -1,16 +1,17 @@
-<div pRipple (click)="toggle()"
+<div pRipple (click)="workPanel.toggle($event)"
      class="bg-white text-primary border-circle shadow-3 p-3 flex relative cursor-pointer transition-colors transition-duration-150 hover:bg-primary hover:text-white">
     <span class="mds-work text-4xl"></span>
 </div>
-<p-overlay #workPanel appendTo="body" [(visible)]="panelVisible" appCloseIfScroll [isVisible]="workPanel.visible" [alignFn]="workPanel.alignOverlay.bind(workPanel)"
-           contentStyleClass="p-4 surface-overlay shadow-2 border-round flex flex-column gap-3">
-    <span class="text-bluegray-500 font-bold">Подтверждение завершения работ</span>
-    <div class="flex flex-column overflow-y-auto overflow-x-hidden max-h-30rem w-fit overscroll-none" [style.max-width]="'60vw'">
-        <ng-container *ngFor="let workLog of afterWorks">
-            <ng-container *ngTemplateOutlet="workLogItemTemplate; context:{workLog}"></ng-container>
-        </ng-container>
+<p-overlayPanel #workPanel appendTo="body" [dismissable]="false" [showCloseIcon]="true" styleClass="overlay-panel-unpadding">
+    <div class="p-4 surface-overlay shadow-2 border-round flex flex-column gap-3">
+        <span class="text-bluegray-500 font-bold">Подтверждение завершения работ</span>
+        <div class="flex flex-column overflow-y-auto overflow-x-hidden max-h-30rem w-fit overscroll-none" [style.max-width]="'60vw'">
+            <ng-container *ngFor="let workLog of afterWorks">
+                <ng-container *ngTemplateOutlet="workLogItemTemplate; context:{workLog}"></ng-container>
+            </ng-container>
+        </div>
     </div>
-</p-overlay>
+</p-overlayPanel>
 <ng-container>
     <div *ngIf="afterWorks.length > 0" class="absolute flex justify-content-center bg-primary border-round-3xl p-2 line-height-1 text-xs font-semibold top-0 left-100 pointer-events-none"
          [style.translate]="'-100% -25%'" [style.min-width]="'1.8rem'">

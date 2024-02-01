@@ -1176,6 +1176,14 @@ export class ApiService {
         return this.sendDelete(`api/private/contract/type/${id}`);
     }
 
+    markContractsAsReceived(contractIds: number[]) {
+        return this.sendPatch(`api/private/contract/mark/received`, contractIds);
+    }
+
+    markContractsAsArchived(contractIds: number[]) {
+        return this.sendPatch(`api/private/contract/mark/archived`, contractIds);
+    }
+
     // Результаты запросов на сервер кэшируются по таймауту, чтобы не было доп нагрузки на сервер
 
     private sendGet<T>(uri: string, query?: any) {

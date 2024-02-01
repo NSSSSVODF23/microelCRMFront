@@ -1,0 +1,43 @@
+<div class="bg-white flex flex-column pb-2 border-1 border-bluegray-100" *ngIf="workLog">
+    <app-task-list-element [item]="workLog.task" [inlined]="true"></app-task-list-element>
+    <div class="flex flex-column gap-2 mx-3 mt-3">
+        <div class="flex flex-wrap gap-2 align-items-center">
+            <span class="text-bluegray-400 font-bold">Выполнена:</span>
+            <span class="text-bluegray-500">{{workLog.closed | date: 'dd-MM-yyyy HH:mm'}}</span>
+        </div>
+        <div class="flex flex-wrap gap-2 align-items-center">
+            <span class="text-bluegray-400 font-bold">Монтажники:</span>
+            <app-employee-label *ngFor="let employee of workLog.employees" [employee]="employee"></app-employee-label>
+        </div>
+        <div class="flex flex-wrap gap-2 align-items-center">
+            <span class="text-bluegray-400 font-bold">Приемка:</span>
+            <div *ngFor="let contractGroup of receiveContracts.controls" [formGroup]="contractGroup"
+                 class="p-2 border-round border-1 border-bluegray-100">
+                <span class="text-bluegray-500">
+                    {{contractGroup.value.name}}
+                </span>
+                <span class="text-primary">
+                    {{contractGroup.value.count}} шт.
+                </span>
+                <p-checkbox [binary]="true" [formControl]="contractGroup.controls.checked"></p-checkbox>
+            </div>
+            <p-button icon="mdi-check" label="Отметить" *ngIf="receiveHasChanged$ | async" (onClick)="receiveCheck()"
+                      styleClass="p-button-sm p-button-outlined p-button-success"></p-button>
+        </div>
+        <div class="flex flex-wrap gap-2 align-items-center">
+            <span class="text-bluegray-400 font-bold">Архивация:</span>
+            <div *ngFor="let contractGroup of archiveContracts.controls" [formGroup]="contractGroup"
+                 class="p-2 border-round border-1 border-bluegray-100">
+                <span class="text-bluegray-500">
+                    {{contractGroup.value.name}}
+                </span>
+                <span class="text-primary">
+                    {{contractGroup.value.count}} шт.
+                </span>
+                <p-checkbox [binary]="true" [formControl]="contractGroup.controls.checked"></p-checkbox>
+            </div>
+            <p-button icon="mdi-check" label="Отметить" *ngIf="archiveHasChanged$ | async" (onClick)="archiveCheck()"
+                      styleClass="p-button-sm p-button-outlined p-button-success"></p-button>
+        </div>
+    </div>
+</div>

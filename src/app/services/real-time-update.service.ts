@@ -488,4 +488,8 @@ export class RealTimeUpdateService {
     deleteTypeOfContract() {
         return this.watch<TypesOfContracts>('contract', 'type', 'delete')
     }
+
+    updatingMarkedContracts() {
+        return this.watch<boolean>('contract', 'marked', 'update')
+    }
 }

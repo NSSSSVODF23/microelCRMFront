@@ -716,7 +716,7 @@ html:not(.whited), body:not(.whited) {
   border-bottom: 1px solid var(--bluegray-100);
 }
 
-.overscroll-none{
+.overscroll-none {
   overscroll-behavior: none;
 }
 
@@ -1787,6 +1787,14 @@ markdown > p:last-child {
   padding: 0 !important;
 }
 
-.-translate-50{
+.-translate-50 {
   transform: translate(-50%, -50%);
+}
+
+.top-under-panel {
+  top: calc(var(--top-panel-height) + 1.5rem) !important;
+}
+
+.bottom-1rem {
+  bottom: 1rem !important;
 }

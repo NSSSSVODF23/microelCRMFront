@@ -237,6 +237,9 @@ import {
 import {
     TypesContractsMultiSelectorComponent
 } from "../../components/controls/types-contracts-multi-selector/types-contracts-multi-selector.component";
+import {
+    ContractInspectionItemComponent
+} from "../../components/contracts/contract-inspection-item/contract-inspection-item.component";
 
 
 @NgModule({
@@ -355,7 +358,8 @@ import {
         ForceCloseDialogComponent,
         ContractItemComponent,
         EmployeeMultiplySelectorComponent,
-        TypesContractsMultiSelectorComponent
+        TypesContractsMultiSelectorComponent,
+        ContractInspectionItemComponent
     ],
     exports: [
         AccountPanelComponent,
@@ -470,7 +474,8 @@ import {
         AfterWorkPanelComponent,
         ForceCloseDialogComponent,
         ContractItemComponent,
-        EmployeeMultiplySelectorComponent
+        EmployeeMultiplySelectorComponent,
+        ContractInspectionItemComponent
     ],
     imports: [
         CommonPipesModule,

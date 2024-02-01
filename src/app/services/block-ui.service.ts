@@ -84,6 +84,7 @@ export class BlockUiService {
         this.message = options?.message ?? '';
         this.styleClass = options?.styleClass ?? '';
         this.zIndex = options?.zIndex ?? 0;
+        this.icon = '';
         this.pos = options?.pos ?? 'center';
     }
 
