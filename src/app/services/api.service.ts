@@ -35,7 +35,7 @@ import {
     PaidWorkForm,
     PaidWorkGroupForm, PhyPhoneInfo, PhyPhoneInfoForm,
     Position,
-    SalaryTable, SchedulingType, StreetSuggestion,
+    SalaryTable, SchedulingType, Statistics, StreetSuggestion,
     SuperMessage,
     Switch, SwitchBaseInfo, SwitchEditingPreset, SwitchModel, SwitchWithAddress, TagListItem,
     Task, TaskClassOT,
@@ -56,6 +56,8 @@ import {MessageService, TreeNode} from "primeng/api";
 import {cyrb53, Storage, Utils} from "../util";
 import {Duration} from "@fullcalendar/core";
 import {AddressCorrecting, OldTracker} from "../types/parsing-interfaces";
+import EmployeeWorkStatisticsTable = Statistics.EmployeeWorkStatisticsTable;
+import EmployeeWorkStatisticsForm = Statistics.EmployeeWorkStatisticsForm;
 
 
 @Injectable({
@@ -1182,6 +1184,10 @@ export class ApiService {
 
     markContractsAsArchived(contractIds: number[]) {
         return this.sendPatch(`api/private/contract/mark/archived`, contractIds);
+    }
+
+    getEmployeeWorkStatistics(form: EmployeeWorkStatisticsForm) {
+        return this.sendPost<EmployeeWorkStatisticsTable>('api/private/statistics/employee-work', form);
     }
 
     // Результаты запросов на сервер кэшируются по таймауту, чтобы не было доп нагрузки на сервер

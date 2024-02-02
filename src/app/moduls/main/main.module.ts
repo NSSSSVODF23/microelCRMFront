@@ -121,6 +121,12 @@ import {
 import {
     ContractTypesPageComponent
 } from "../../pages/contracts/children/contract-types-page/contract-types-page.component";
+import {
+    StatisticsBootstrapPage
+} from "../../pages/statistics/statistics-bootstrap-page/statistics-bootstrap-page.component";
+import {
+    EmployeeWorkStatisticsPage
+} from "../../pages/statistics/children/employee-work-statistics-page/employee-work-statistics-page.component";
 
 const mapConfig: YaConfig = {
     apikey: '008574e5-f34b-4270-b3d5-91aaabd036e8',
@@ -161,7 +167,9 @@ const mapConfig: YaConfig = {
         CatalogSearchTasksListViewComponent,
         ContractsBootstrapPageComponent,
         ContractsInspectionPageComponent,
-        ContractTypesPageComponent
+        ContractTypesPageComponent,
+        StatisticsBootstrapPage,
+        EmployeeWorkStatisticsPage
     ],
     imports: [
         CommonComponentsModule,

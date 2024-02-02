@@ -21,6 +21,9 @@
         <ng-container *ngSwitchCase="'contracts'">
             <ng-container *ngTemplateOutlet="contracts"></ng-container>
         </ng-container>
+        <ng-container *ngSwitchCase="'statistics'">
+            <ng-container *ngTemplateOutlet="statistics"></ng-container>
+        </ng-container>
         <ng-container *ngSwitchDefault>
             <ng-container *ngTemplateOutlet="main"></ng-container>
         </ng-container>
@@ -36,6 +39,7 @@
     <app-extended-menu-item [link]="['/employees']" caption="Сотрудники" icon="mdi-account_circle" *ngIf="personality.isHasAccess(AccessFlag.MANAGE_EMPLOYEES, AccessFlag.MANAGE_DEPARTMENTS, AccessFlag.MANAGE_POSITIONS)"></app-extended-menu-item>
     <app-extended-menu-item [link]="['/salary','table']" caption="Зарплата" icon="mdi-currency_ruble" *ngIf="personality.isHasAccess(AccessFlag.COUNT_SALARY, AccessFlag.EDIT_PRICE)"></app-extended-menu-item>
     <app-extended-menu-item [link]="['/contracts','inspection']" caption="Договора" icon="mdi-description"></app-extended-menu-item>
+    <app-extended-menu-item [link]="['/statistics','employee-works']" caption="Статистика" icon="mdi-analytics"></app-extended-menu-item>
     <app-extended-menu-item [link]="['/files']" caption="Файлы" icon="mdi-insert_drive_file" *ngIf="personality.isHasAccess(AccessFlag.READ_WRITE_FILES)"></app-extended-menu-item>
     <app-extended-menu-item [link]="['/system','billing']" caption="Система" icon="mdi-settings" *ngIf="personality.isHasAccess(AccessFlag.MANAGE_SYSTEM_SETTINGS)"></app-extended-menu-item>
 </ng-template>
@@ -70,6 +74,11 @@
     <ng-container *ngTemplateOutlet="backButton; context:{name:'Договора'}"></ng-container>
     <app-extended-menu-item [link]="['/contracts','inspection']" caption="Приемка" icon="mdi-verified"></app-extended-menu-item>
     <app-extended-menu-item [link]="['/contracts','types']" caption="Типы договоров" icon="mdi-plagiarism"></app-extended-menu-item>
+</ng-template>
+
+<ng-template #statistics>
+    <ng-container *ngTemplateOutlet="backButton; context:{name:'Статистика'}"></ng-container>
+    <app-extended-menu-item [link]="['/statistics','employee-works']" caption="Монтажник/Работа" icon="mdi-work_history"></app-extended-menu-item>
 </ng-template>
 
 <ng-template #addresses>

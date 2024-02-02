@@ -1775,3 +1775,70 @@ export interface Contract{
     received?: EmployeeIntervention;
     archived?: EmployeeIntervention;
 }
+
+export namespace Statistics{
+
+    export interface EmployeeWorkStatisticsForm{
+        period: DateRange;
+    }
+
+    export interface EmployeeWorkStatisticsTable{
+        rows: FlatEmployeeRow[];
+    }
+
+    // export interface EmployeeRow{
+    //     employee: Employee;
+    //     rows: TaskClass[];
+    // }
+
+    export interface TaskClass{
+        name: string;
+        rows: TaskType[];
+    }
+
+    export interface TaskType{
+        name: string;
+        count: number;
+        quantityPerShift: number;
+        timings: Timings;
+        money: Money;
+    }
+
+    export interface Timings{
+        givenAndReceived: number;
+        givenAndClosed: number;
+        receivedAndClosed: number;
+    }
+
+    export interface Money{
+        quantityPerShift: number;
+        quantityPerHour: number;
+    }
+
+    //        public static class FlatEmployeeRow {
+    //             @Nullable
+    //             private Employee employee;
+    //             private Integer employeeRowSpanCount;
+    //             @Nullable
+    //             private String className;
+    //             private Integer taskClassRowSpanCount;
+    //             private EmployeeRow.TaskClass.TaskType taskType;
+    //
+    //             public static FlatEmployeeRow of(Employee employee, Integer classCount, String className, Integer taskTypeCount, EmployeeRow.TaskClass.TaskType taskType) {
+    //                 FlatEmployeeRow row = new FlatEmployeeRow();
+    //                 row.employee = employee;
+    //                 row.employeeRowSpanCount = classCount;
+    //                 row.className = className;
+    //                 row.taskClassRowSpanCount = taskTypeCount;
+    //                 row.taskType = taskType;
+    //                 return row;
+    //             }
+    //         }
+    export interface FlatEmployeeRow {
+        employee?: Employee;
+        employeeRowSpanCount: number;
+        className?: string;
+        taskClassRowSpanCount: number;
+        taskType: TaskType;
+    }
+}

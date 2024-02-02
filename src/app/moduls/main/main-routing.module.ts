@@ -51,6 +51,12 @@ import {
 import {
     ContractTypesPageComponent
 } from "../../pages/contracts/children/contract-types-page/contract-types-page.component";
+import {
+    StatisticsBootstrapPage
+} from "../../pages/statistics/statistics-bootstrap-page/statistics-bootstrap-page.component";
+import {
+    EmployeeWorkStatisticsPage
+} from "../../pages/statistics/children/employee-work-statistics-page/employee-work-statistics-page.component";
 
 const routes: Routes = [{
     path: '', component: MainBootstrapComponent, children: [
@@ -156,6 +162,13 @@ const routes: Routes = [{
             children: [
                 {path: 'inspection', component: ContractsInspectionPageComponent},
                 {path: 'types', component: ContractTypesPageComponent}
+            ]
+        },
+        {
+            path: 'statistics',
+            component: StatisticsBootstrapPage,
+            children: [
+                {path: 'employee-works', component: EmployeeWorkStatisticsPage},
             ]
         }
     ],

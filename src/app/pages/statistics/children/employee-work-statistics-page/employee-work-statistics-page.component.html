@@ -1,0 +1,67 @@
+<div class="flex flex-column bg-white border-round shadow-1 w-full h-full text-bluegray-500">
+    <ng-container *ngTemplateOutlet="titleTemplate"></ng-container>
+    <ng-container *ngTemplateOutlet="contentTemplate"></ng-container>
+</div>
+
+<ng-template #titleTemplate>
+    <div class="flex align-items-center pl-4 pt-2 pr-2 pb-2 gap-2 border-bottom-1 border-bluegray-100">
+        <span class="mdi-work_history"></span>
+        <span class="text-xl font-semibold">
+            Статистика по работам монтажников за период
+        </span>
+        <div class="flex-grow-1"></div>
+        <ng-container *ngTemplateOutlet="periodStatisticsFormTemplate"></ng-container>
+    </div>
+</ng-template>
+
+<ng-template #contentTemplate>
+    <div class="flex flex-column gap-2">
+        <ng-container *ngTemplateOutlet="statisticsTableTemplate"></ng-container>
+    </div>
+</ng-template>
+
+<ng-template #statisticsTableTemplate>
+    <p-table *ngIf="statisticsTable$ | async as statisticsTable" [value]="statisticsTable.rows">
+        <ng-template pTemplate="header">
+            <tr>
+                <th rowspan="2">Монтажник</th>
+                <th colspan="4">Задача</th>
+                <th colspan="3">Тайминги среднее</th>
+                <th colspan="2">Деньги среднее</th>
+            </tr>
+            <tr>
+                <th>Класс</th>
+                <th>Тип</th>
+                <th>Кол-во</th>
+                <th>Ср. за смену</th>
+                <th>Отд./Прин.</th>
+                <th>Отд./Закр.</th>
+                <th>Прин./Закр.</th>
+                <th>За смену</th>
+                <th>За час</th>
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-employeeRow>
+            <tr>
+                <td [attr.rowspan]="employeeRow.employeeRowSpanCount+1" *ngIf="employeeRow.employee"><app-employee-label [employee]="employeeRow.employee"></app-employee-label></td>
+                <td [attr.rowspan]="employeeRow.taskClassRowSpanCount" *ngIf="employeeRow.className">{{employeeRow.className}}</td>
+                <td>{{employeeRow.taskType.name}}</td>
+                <td>{{employeeRow.taskType.count}}</td>
+                <td>{{employeeRow.taskType.quantityPerShift}}</td>
+                <td><app-time-elapsed type="short" [timePeriod]="employeeRow.taskType.timings.givenAndReceived"></app-time-elapsed></td>
+                <td><app-time-elapsed type="short" [timePeriod]="employeeRow.taskType.timings.givenAndClosed"></app-time-elapsed></td>
+                <td><app-time-elapsed type="short" [timePeriod]="employeeRow.taskType.timings.receivedAndClosed"></app-time-elapsed></td>
+                <td>{{employeeRow.taskType.money.quantityPerShift}}</td>
+                <td>{{employeeRow.taskType.money.quantityPerHour}}</td>
+            </tr>
+        </ng-template>
+    </p-table>
+
+</ng-template>
+
+<ng-template #periodStatisticsFormTemplate>
+    <div class="flex gap-2 p-2 border-round-xl border-1 border-bluegray-100">
+        <app-data-range-input [(ngModel)]="statisticsPeriod"></app-data-range-input>
+        <button pButton label="Сформировать" id="submitButton"></button>
+    </div>
+</ng-template>
