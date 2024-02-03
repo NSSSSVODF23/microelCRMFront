@@ -97,7 +97,7 @@
 
 <p-blockUI [blocked]="blockUiService.blocked" [autoZIndex]="!blockUiService.zIndex" [baseZIndex]="blockUiService.zIndex">
     <div class="flex p-4 w-full h-full" [style]="{alignItems: blockUiService.align, justifyContent: blockUiService.justify}">
-        <div class="flex flex-column gap-2 align-items-center justify-content-center bg-white border-round shadow-6 p-4 text-lg text-primary-400 font-semibold"
+        <div class="flex flex-column gap-2 align-items-center justify-content-center bg-white border-round-2xl shadow-2 p-4 text-lg text-primary-400 font-semibold"
              *ngIf="blockUiService.isWait || blockUiService.message || blockUiService.icon" >
             <p-progressSpinner *ngIf="blockUiService.isWait" class="custom-spinner custom-spinner-primary custom-spinner-8xl"
                                strokeWidth="2"></p-progressSpinner>

@@ -1,0 +1,12 @@
+<span class="text-bluegray-500 white-space-nowrap">
+    <span *ngIf="ms; else emptyTemplate" class="flex gap-2">
+        <span *ngIf="hours">{{hours}} {{hourSuffix}}</span>
+        <span *ngIf="minutes">{{minutes}} {{minuteSuffix}}</span>
+        <span *ngIf="seconds && !minutes && !hours">{{seconds}} {{secondSuffix}}</span>
+        <span *ngIf="!seconds && !minutes && !hours">{{ms}} мс.</span>
+    </span>
+</span>
+
+<ng-template #emptyTemplate>
+    <span>-</span>
+</ng-template>

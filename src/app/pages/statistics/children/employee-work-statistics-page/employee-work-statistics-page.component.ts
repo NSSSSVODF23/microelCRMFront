@@ -4,6 +4,7 @@ import {DateRange} from "../../../../types/transport-interfaces";
 import {FromEvent} from "../../../../decorators";
 import {filter, Observable, shareReplay, switchMap, tap} from "rxjs";
 import {ApiService} from "../../../../services/api.service";
+import {BlockUiService} from "../../../../services/block-ui.service";
 
 @Component({
     templateUrl: './employee-work-statistics-page.component.html',
@@ -11,25 +12,23 @@ import {ApiService} from "../../../../services/api.service";
 })
 export class EmployeeWorkStatisticsPage implements OnInit {
 
-    statisticsPeriod: DateRange | null = {start: new Date("2021-01-01 00:00:00"), end: new Date("2024-01-31 23:59:59")};
+    statisticsPeriod: DateRange | null = null;
     @FromEvent('submitButton', 'click')
     submit$!: Observable<PointerEvent>;
 
-    statisticsLoading = false;
-
     statisticsTable$ = this.submit$
         .pipe(
-            filter(()=>!!this.statisticsPeriod && !this.statisticsLoading),
-            tap(()=>this.statisticsLoading = true),
+            filter(()=>!!this.statisticsPeriod),
+            tap(()=>this.blockService.wait({message: 'Формирование статистики'})),
             switchMap(()=>this.api.getEmployeeWorkStatistics({period: this.statisticsPeriod!})),
             tap({
-                next: () => this.statisticsLoading = false,
-                error: () => this.statisticsLoading = false,
+                next: () => this.blockService.unblock(),
+                error: () => this.blockService.unblock(),
             }),
             shareReplay(1)
         )
 
-    constructor(private api: ApiService) {
+    constructor(private api: ApiService, private blockService: BlockUiService) {
     }
 
     ngOnInit(): void {

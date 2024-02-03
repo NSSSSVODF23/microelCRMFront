@@ -15,13 +15,14 @@
 </ng-template>
 
 <ng-template #contentTemplate>
-    <div class="flex flex-column gap-2">
+    <div class="flex flex-column gap-2 flex-grow-1">
         <ng-container *ngTemplateOutlet="statisticsTableTemplate"></ng-container>
     </div>
 </ng-template>
 
 <ng-template #statisticsTableTemplate>
-    <p-table *ngIf="statisticsTable$ | async as statisticsTable" [value]="statisticsTable.rows">
+    <p-table *ngIf="statisticsTable$ | async as statisticsTable; else emptyTableTemplate"
+             [value]="statisticsTable.rows">
         <ng-template pTemplate="header">
             <tr>
                 <th rowspan="2">Монтажник</th>
@@ -43,20 +44,35 @@
         </ng-template>
         <ng-template pTemplate="body" let-employeeRow>
             <tr>
-                <td [attr.rowspan]="employeeRow.employeeRowSpanCount+1" *ngIf="employeeRow.employee"><app-employee-label [employee]="employeeRow.employee"></app-employee-label></td>
+                <td [attr.rowspan]="employeeRow.employeeRowSpanCount" *ngIf="employeeRow.employee"><app-employee-label [employee]="employeeRow.employee"></app-employee-label></td>
                 <td [attr.rowspan]="employeeRow.taskClassRowSpanCount" *ngIf="employeeRow.className">{{employeeRow.className}}</td>
                 <td>{{employeeRow.taskType.name}}</td>
                 <td>{{employeeRow.taskType.count}}</td>
                 <td>{{employeeRow.taskType.quantityPerShift}}</td>
-                <td><app-time-elapsed type="short" [timePeriod]="employeeRow.taskType.timings.givenAndReceived"></app-time-elapsed></td>
-                <td><app-time-elapsed type="short" [timePeriod]="employeeRow.taskType.timings.givenAndClosed"></app-time-elapsed></td>
-                <td><app-time-elapsed type="short" [timePeriod]="employeeRow.taskType.timings.receivedAndClosed"></app-time-elapsed></td>
-                <td>{{employeeRow.taskType.money.quantityPerShift}}</td>
-                <td>{{employeeRow.taskType.money.quantityPerHour}}</td>
+                <td><app-duration [ms]="employeeRow.taskType.timings.givenAndReceived"></app-duration></td>
+                <td><app-duration [ms]="employeeRow.taskType.timings.givenAndClosed"></app-duration></td>
+                <td><app-duration [ms]="employeeRow.taskType.timings.receivedAndClosed"></app-duration></td>
+                <td>{{employeeRow.taskType.money.quantityPerShift | currency:'RUB'}}</td>
+                <td>{{employeeRow.taskType.money.quantityPerHour | currency:'RUB'}}</td>
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="emptymessage" let-columns>
+            <tr>
+                <td [attr.colspan]="10" class="text-bluegray-400 text-center font-bold">
+                    Статистики за выбранный период времени нет
+                </td>
             </tr>
         </ng-template>
     </p-table>
+</ng-template>
 
+<ng-template #emptyTableTemplate>
+    <div class="text-bluegray-400 flex flex-column align-items-center justify-content-center w-full h-full">
+        <span class="mds-date_range"></span>
+        <span class="max-w-20rem text-2xl font-semibold text-center">
+            Выберите период времени для получения статистики
+        </span>
+    </div>
 </ng-template>
 
 <ng-template #periodStatisticsFormTemplate>
