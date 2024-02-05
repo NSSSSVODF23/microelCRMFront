@@ -127,6 +127,7 @@ import {
 import {
     EmployeeWorkStatisticsPage
 } from "../../pages/statistics/children/employee-work-statistics-page/employee-work-statistics-page.component";
+import {ChartModule} from "primeng/chart";
 
 const mapConfig: YaConfig = {
     apikey: '008574e5-f34b-4270-b3d5-91aaabd036e8',
@@ -250,7 +251,8 @@ const mapConfig: YaConfig = {
         KeyFilterModule,
         AnimateModule,
         BlockUIModule,
-        ChipModule
+        ChipModule,
+        ChartModule
     ],
     providers: [MessageService, {provide: LOCALE_ID, useValue: 'ru'}, ConfirmationService]
 })

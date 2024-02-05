@@ -38,8 +38,8 @@
 <!--    <app-extended-menu-item caption="Склад" icon="mdi-warehouse"></app-extended-menu-item>-->
     <app-extended-menu-item [link]="['/employees']" caption="Сотрудники" icon="mdi-account_circle" *ngIf="personality.isHasAccess(AccessFlag.MANAGE_EMPLOYEES, AccessFlag.MANAGE_DEPARTMENTS, AccessFlag.MANAGE_POSITIONS)"></app-extended-menu-item>
     <app-extended-menu-item [link]="['/salary','table']" caption="Зарплата" icon="mdi-currency_ruble" *ngIf="personality.isHasAccess(AccessFlag.COUNT_SALARY, AccessFlag.EDIT_PRICE)"></app-extended-menu-item>
-    <app-extended-menu-item [link]="['/contracts','inspection']" caption="Договора" icon="mdi-description"></app-extended-menu-item>
-    <app-extended-menu-item [link]="['/statistics','employee-works']" caption="Статистика" icon="mdi-analytics"></app-extended-menu-item>
+    <app-extended-menu-item [link]="['/contracts','inspection']" caption="Договора" icon="mdi-description" *ngIf="personality.isHasAccess(AccessFlag.MANAGE_CONTRACTS_TYPES, AccessFlag.VIEW_CONTRACTS)"></app-extended-menu-item>
+    <app-extended-menu-item [link]="['/statistics','employee-works']" caption="Статистика" icon="mdi-analytics" *ngIf="personality.isHasAccess(AccessFlag.VIEW_STATISTICS)"></app-extended-menu-item>
     <app-extended-menu-item [link]="['/files']" caption="Файлы" icon="mdi-insert_drive_file" *ngIf="personality.isHasAccess(AccessFlag.READ_WRITE_FILES)"></app-extended-menu-item>
     <app-extended-menu-item [link]="['/system','billing']" caption="Система" icon="mdi-settings" *ngIf="personality.isHasAccess(AccessFlag.MANAGE_SYSTEM_SETTINGS)"></app-extended-menu-item>
 </ng-template>
@@ -72,8 +72,8 @@
 
 <ng-template #contracts>
     <ng-container *ngTemplateOutlet="backButton; context:{name:'Договора'}"></ng-container>
-    <app-extended-menu-item [link]="['/contracts','inspection']" caption="Приемка" icon="mdi-verified"></app-extended-menu-item>
-    <app-extended-menu-item [link]="['/contracts','types']" caption="Типы договоров" icon="mdi-plagiarism"></app-extended-menu-item>
+    <app-extended-menu-item [link]="['/contracts','inspection']" caption="Приемка" icon="mdi-verified" *ngIf="personality.isHasAccess(AccessFlag.VIEW_CONTRACTS)"></app-extended-menu-item>
+    <app-extended-menu-item [link]="['/contracts','types']" caption="Типы договоров" icon="mdi-plagiarism" *ngIf="personality.isHasAccess(AccessFlag.MANAGE_CONTRACTS_TYPES)"></app-extended-menu-item>
 </ng-template>
 
 <ng-template #statistics>

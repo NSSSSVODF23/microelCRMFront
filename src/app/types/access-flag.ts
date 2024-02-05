@@ -17,6 +17,9 @@ export class AccessFlag {
     static readonly EDIT_TASK_TAGS = 32768;
     static readonly EDIT_DEVICES = 65536;
     static readonly MANAGE_SYSTEM_SETTINGS = 131072;
+    static readonly VIEW_STATISTICS = 262144;
+    static readonly VIEW_CONTRACTS = 524288;
+    static readonly MANAGE_CONTRACTS_TYPES = 1048576;
 
     static getName(flag: number) {
         if (flag === 1) return 'Доступ к биллингу';
@@ -37,6 +40,9 @@ export class AccessFlag {
         if (flag === 32768) return 'Редактирование тегов задач';
         if (flag === 65536) return 'Редактирование оборудований абонентов';
         if (flag === 131072) return 'Управление системными настройками';
+        if (flag === 262144) return 'Просмотр статистики';
+        if (flag === 524288) return 'Просмотр договоров';
+        if (flag === 1048576) return 'Управление типами договоров';
         return flag.toString() + ' (Неизвестно)';
     }
 

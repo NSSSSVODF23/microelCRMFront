@@ -160,8 +160,8 @@ const routes: Routes = [{
             path: 'contracts',
             component: ContractsBootstrapPageComponent,
             children: [
-                {path: 'inspection', component: ContractsInspectionPageComponent},
-                {path: 'types', component: ContractTypesPageComponent}
+                {path: 'inspection', component: ContractsInspectionPageComponent, canActivate:[accessCanActivate(AccessFlag.VIEW_CONTRACTS)]},
+                {path: 'types', component: ContractTypesPageComponent, canActivate:[accessCanActivate(AccessFlag.MANAGE_CONTRACTS_TYPES)]}
             ]
         },
         {
@@ -169,7 +169,8 @@ const routes: Routes = [{
             component: StatisticsBootstrapPage,
             children: [
                 {path: 'employee-works', component: EmployeeWorkStatisticsPage},
-            ]
+            ],
+            canActivate:[accessCanActivate(AccessFlag.VIEW_STATISTICS)]
         }
     ],
     canActivate: [AuthGuard, MainGuard]

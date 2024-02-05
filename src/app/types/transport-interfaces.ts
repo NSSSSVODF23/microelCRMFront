@@ -1784,6 +1784,9 @@ export namespace Statistics{
 
     export interface EmployeeWorkStatisticsTable{
         rows: FlatEmployeeRow[];
+        taskCountChart: any;
+        timingsChart: any;
+        moneyChart: any;
     }
 
     // export interface EmployeeRow{
