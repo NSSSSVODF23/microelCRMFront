@@ -11,8 +11,8 @@ import {BlockUiService} from "../../../../services/block-ui.service";
 })
 export class EmployeeWorkStatisticsPage implements OnInit {
 
-    // statisticsPeriod: DateRange | null = null;
-    statisticsPeriod: DateRange | null = {start: new Date(2021, 0, 1), end: new Date(2024, 1, 31)};
+    statisticsPeriod: DateRange | null = null;
+    // statisticsPeriod: DateRange | null = {start: new Date(2021, 0, 1), end: new Date(2024, 1, 31)};
     @FromEvent('submitButton', 'click')
     submit$!: Observable<PointerEvent>;
 
