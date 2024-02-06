@@ -1,6 +1,8 @@
 <div class="top-panel">
     <div class="responsive-wrapper top-panel-content">
-        <img [routerLink]="['/']" [style.height]="'3rem'" alt="" class="cursor-pointer" src="assets/logo-dark.svg">
+        <a href="/">
+            <img [routerLink]="['/']" [style.height]="'3rem'" alt="" class="cursor-pointer" src="assets/logo-dark.svg">
+        </a>
         <app-button (onClick)="taskCreator.standard()" *ngIf="!isTaskCreationPage" icon="add_task"
                     label="Создать задачу"
                     model="p-button-success"></app-button>
