@@ -14,6 +14,7 @@ import {v4} from "uuid";
 import {ApiService} from "../../../services/api.service";
 import {Table} from "primeng/table";
 import {RealTimeUpdateService} from "../../../services/real-time-update.service";
+import {CharacterTranslator} from "../../../character-translator";
 
 export type WorksPickerValue = {
     actionsTaken: any[],
@@ -476,6 +477,7 @@ export class WorksPickerComponent implements OnInit, OnDestroy, ControlValueAcce
 
     filterTable(event: Event, actionTableRef: Table) {
         const target: HTMLInputElement = <HTMLInputElement>event.target;
-        actionTableRef.filterGlobal(target.value, 'contains')
+
+        actionTableRef.filterGlobal(CharacterTranslator.translate(target.value), 'contains')
     }
 }

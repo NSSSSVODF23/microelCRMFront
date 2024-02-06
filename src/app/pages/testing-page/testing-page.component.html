@@ -1,4 +1,4 @@
 <div appExtendPageHeight class="flex flex-column p-3 w-full align-items-center justify-content-center">
-    <code>{{personality.userData$ | async | json}}</code>
-    <span>{{personality.isHasAccess(AccessFlag.BILLING)}}</span>
+    {{value | date:'dd-MM-yyyy HH:mm'}}
+    <app-time-picker [(ngModel)]="value"></app-time-picker>
 </div>

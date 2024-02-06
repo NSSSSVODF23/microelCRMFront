@@ -1,14 +1,16 @@
-import {Component, EventEmitter, Input, OnDestroy, OnInit, Output} from '@angular/core';
+import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {FormControl} from "@angular/forms";
 import {ApiService} from "../../../services/api.service";
-import {SubscriptionsHolder} from "../../../util";
+import {AutoUnsubscribe} from "../../../decorators";
+import {startWith, tap} from "rxjs";
 
 @Component({
     selector: 'app-task-scheduling-dialog',
     templateUrl: './task-scheduling-dialog.component.html',
     styleUrls: ['./task-scheduling-dialog.component.scss']
 })
-export class TaskSchedulingDialogComponent implements OnInit, OnDestroy {
+@AutoUnsubscribe()
+export class TaskSchedulingDialogComponent implements OnInit {
 
     @Input() visible = false;
     @Output() visibleChange = new EventEmitter<boolean>();
@@ -16,67 +18,43 @@ export class TaskSchedulingDialogComponent implements OnInit, OnDestroy {
     @Input() taskId?: number;
 
     dateControl = new FormControl(new Date());
-    hourControl = new FormControl(0);
-    minuteControl = new FormControl(0);
+    dateTimeControl = new FormControl(new Date());
+
+    dateTimeUpdateSub = this.dateControl.valueChanges.pipe(startWith(new Date()),tap(date => {
+        if (date?.getHours() === 0) {
+            date?.setHours(8, 0, 0, 0)
+        }else{
+            const extraMinutes = (date?.getMinutes() || 0) % 10;
+            let currentHours = date?.getHours() || 0;
+            let currentMinutes = (date?.getMinutes() || 0);
+            if(extraMinutes > 0){
+                currentMinutes += 10 - extraMinutes;
+            }
+            date?.setHours(currentHours+1, currentMinutes, 0, 0)
+        }
+
+    })).subscribe(date => this.dateTimeControl.setValue(date))
 
     changingTaskDateTime = false;
 
-    private subscriptions = new SubscriptionsHolder();
 
     constructor(private api: ApiService) {
     }
 
-    ngOnInit(): void {
-        this.subscriptions.addSubscription('dateSchCh', this.dateControl.valueChanges.subscribe(value => {
-            if (value) {
-                this.hourControl.setValue(value.getHours());
-                this.minuteControl.setValue(value.getMinutes());
-            }
-        }))
-        this.subscriptions.addSubscription('hrSchCh', this.hourControl.valueChanges.subscribe(value => {
-            if (value) {
-                const selectedDate = this.dateControl.value;
-                if (selectedDate) {
-                    selectedDate.setHours(value);
-                    this.dateControl.setValue(selectedDate, {emitEvent: false});
-                }
-            }
-        }))
-        this.subscriptions.addSubscription('mnSchCh', this.minuteControl.valueChanges.subscribe(value => {
-            if (value) {
-                const selectedDate = this.dateControl.value;
-                if (selectedDate) {
-                    selectedDate.setMinutes(value);
-                    this.dateControl.setValue(selectedDate, {emitEvent: false});
-                }
-            }
-        }))
+    get title() {
+        return this.schedulingType === 'from' ? 'Запланировать задачу' : 'Установить срок завершения';
     }
 
-    ngOnDestroy() {
-        this.subscriptions.unsubscribeAll();
+    get buttonLabel(){
+        return this.schedulingType === 'from' ? 'Запланировать c ' : 'Установить срок до ';
+    }
+
+    ngOnInit(): void {
     }
 
     setVisible(value: boolean) {
         this.visible = value;
         this.visibleChange.emit(value);
-    }
-
-    initValues() {
-        const now = new Date();
-        const minutes = now.getMinutes();
-        if (minutes > 45) {
-            now.setHours(now.getHours() + 1, 0, 0, 0);
-        } else if (minutes > 30) {
-            now.setMinutes(45, 0, 0);
-        } else if (minutes > 15) {
-            now.setMinutes(30, 0, 0);
-        } else if (minutes > 0) {
-            now.setMinutes(15, 0, 0);
-        }
-        this.dateControl.setValue(now);
-        this.hourControl.setValue(now.getHours());
-        this.minuteControl.setValue(now.getMinutes());
     }
 
     setDateTimeOfTaskRelevance() {
@@ -85,9 +63,13 @@ export class TaskSchedulingDialogComponent implements OnInit, OnDestroy {
         if (this.schedulingType === 'from') this.changeTaskActualFrom(); else if (this.schedulingType === 'to') this.changeTaskActualTo();
     }
 
+    resetDate() {
+        this.dateControl.reset(new Date());
+    }
+
     private changeTaskActualFrom() {
-        if (!this.taskId || this.dateControl.value == null) return;
-        this.api.changeTaskActualFrom(this.taskId, this.dateControl.value).subscribe({
+        if (!this.taskId || this.dateTimeControl.value == null) return;
+        this.api.changeTaskActualFrom(this.taskId, this.dateTimeControl.value).subscribe({
             next: () => {
                 this.changingTaskDateTime = false;
                 this.setVisible(false);
@@ -98,8 +80,8 @@ export class TaskSchedulingDialogComponent implements OnInit, OnDestroy {
     }
 
     private changeTaskActualTo() {
-        if (!this.taskId || this.dateControl.value == null) return;
-        this.api.changeTaskActualTo(this.taskId, this.dateControl.value).subscribe({
+        if (!this.taskId || this.dateTimeControl.value == null) return;
+        this.api.changeTaskActualTo(this.taskId, this.dateTimeControl.value).subscribe({
             next: () => {
                 this.changingTaskDateTime = false;
                 this.setVisible(false);

@@ -1,5 +1,5 @@
 import {fromEvent, Subject, Subscription} from "rxjs";
-import {SimpleChange, SimpleChanges} from "@angular/core";
+import {SimpleChanges} from "@angular/core";
 
 export function FromEvent(selector: string, eventName: string) {
     return function (prototype: any, name: string) {
@@ -27,12 +27,38 @@ export function FromEvent(selector: string, eventName: string) {
     }
 }
 
+export function OnElementInit(selector: string) {
+    return function (prototype: any, name: string, descriptor: PropertyDescriptor) {
+        const originalAfterInit = prototype.ngAfterViewInit ? prototype.ngAfterViewInit : () => {
+        };
+        prototype.ngAfterViewInit = function () {
+            const elementById = document.getElementById(selector);
+            if (elementById)
+                descriptor.value.call(this, elementById);
+            originalAfterInit.apply(this, arguments);
+        }
+    }
+}
+
 export function OnChange(fieldName: string){
     return function (prototype: any, name: string, descriptor: PropertyDescriptor) {
         const originalOnChange = prototype.ngOnChanges ? prototype.ngOnChanges : () => {};
         prototype.ngOnChanges = function (simpleChanges: SimpleChanges) {
             if(simpleChanges[fieldName]) descriptor.value.call(this, simpleChanges[fieldName].currentValue);
             originalOnChange.apply(this, arguments);
+        }
+    }
+}
+
+export function AutoUnsubscribe() {
+    return function (constructor: any) {
+        const originalOnDestroy = constructor.prototype.ngOnDestroy ? constructor.prototype.ngOnDestroy : () => {};
+        constructor.prototype.ngOnDestroy = function () {
+            for(let prop in this){
+                if(this[prop] instanceof Subscription)
+                    this[prop].unsubscribe();
+            }
+            originalOnDestroy.apply(this, arguments);
         }
     }
 }

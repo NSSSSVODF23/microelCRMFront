@@ -10,6 +10,9 @@
                         <span class="flex flex-column" *ngSwitchCase="'PHONE_ARRAY'">
                             <app-dial-buttons-list [phoneData]="field.phoneData"></app-dial-buttons-list>
                         </span>
+                        <span class="font-bold" *ngSwitchCase="'ADDRESS'">
+                            {{field.textRepresentation}}
+                        </span>
                         <span *ngSwitchDefault>{{field.textRepresentation}}</span>
                     </ng-container>
                 </span>

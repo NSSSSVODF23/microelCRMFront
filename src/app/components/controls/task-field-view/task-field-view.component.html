@@ -15,7 +15,9 @@
         {{item.floatData}}
     </ng-container>
     <ng-container *ngSwitchCase="'ADDRESS'">
-        {{address}}
+        <span class="font-bold">
+            {{address}}
+        </span>
     </ng-container>
     <ng-container *ngSwitchCase="'PHONE_ARRAY'">
         <span *ngFor="let phone of item.phoneData | keyvalue">

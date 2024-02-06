@@ -2,7 +2,7 @@ import {Injectable} from '@angular/core';
 import {FormControl, FormGroup} from "@angular/forms";
 import {SubscriptionsHolder} from "../util";
 import {first, map, merge, mergeMap, Observable, of, pairwise, shareReplay, Subject, switchMap, tap} from "rxjs";
-import {LoadingState, SalaryTableCell, WorkReport} from "../types/transport-interfaces";
+import {LoadingState, SalaryTableCell, WorkLog, WorkReport} from "../types/transport-interfaces";
 import {ApiService} from "./api.service";
 import {RealTimeUpdateService} from "./real-time-update.service";
 import {MenuItem} from "primeng/api";
@@ -129,8 +129,9 @@ export class SalaryTableCacheService {
         this.highlightedDay = undefined;
     }
 
-    getReport(reports: WorkReport[], targetLogin: string) {
-        return reports.find(report => report.author.login === targetLogin)?.description;
+    getReport(workLog: WorkLog, targetLogin: string) {
+        if(workLog.isForceClosed) return workLog.forceClosedReason;
+        return workLog.workReports.find(report => report.author.login === targetLogin)?.description;
     }
 
     isSelected(row: number, col: number) {

@@ -1,28 +1,16 @@
 <!--Диалог для установки даты и времени актуальности задачи-->
 <p-dialog [(visible)]="visible" (visibleChange)="visibleChange.emit($event)"
-          [dismissableMask]="true" (onShow)="initValues()"
+          [dismissableMask]="true" appendTo="body" (onHide)="resetDate()"
           [draggable]="false" [modal]="true" [resizable]="false"
           contentStyleClass="flex flex-column gap-3 pt-1"
-          header="Планирование задачи">
+          [header]="title">
     <ng-template pTemplate="content">
+        <span></span>
         <p-calendar [firstDayOfWeek]="1" [formControl]="dateControl"
                     [inline]="true" [selectOtherMonths]="true" class="w-fit align-self-center"></p-calendar>
-        <div class="flex gap-3 align-self-center">
-            <div class="input-label-wrapper">
-                <label>Час</label>
-                <p-inputNumber (onFocus)="$event.target.select()"
-                               [formControl]="hourControl" [max]="23" [min]="0" [showButtons]="true"
-                               [size]="2"></p-inputNumber>
-            </div>
-            <div class="input-label-wrapper">
-                <label>Минута</label>
-                <p-inputNumber (onFocus)="$event.target.select()"
-                               [formControl]="minuteControl" [max]="59" [min]="0"
-                               [showButtons]="true" [size]="2" [step]="10"></p-inputNumber>
-            </div>
-        </div>
+        <app-time-picker [formControl]="dateTimeControl"></app-time-picker>
         <app-button (onClick)="setDateTimeOfTaskRelevance()"
                     [loading]="changingTaskDateTime"
-                    label="Установить"></app-button>
+                    [label]="buttonLabel + (dateTimeControl.value | date:'dd-MM-yyyy HH:mm')"></app-button>
     </ng-template>
 </p-dialog>

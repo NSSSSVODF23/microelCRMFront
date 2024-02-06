@@ -1,0 +1,5 @@
+<div #wrapper id="wrapper" class="flex flex-column gap-2 w-25rem pt-6 relative">
+    <span class="font-semibold absolute bg-primary text-white border-round-2xl shadow-1 p-2" [style]="thumbStyle">{{time}}</span>
+    <p-slider [(ngModel)]="value" (onChange)="changeValue($event.value)" [disabled]="isDisabled"
+              [max]="86340000" [step]="600000" styleClass="h-1rme"></p-slider>
+</div>

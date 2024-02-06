@@ -241,6 +241,7 @@ import {
     ContractInspectionItemComponent
 } from "../../components/contracts/contract-inspection-item/contract-inspection-item.component";
 import {DurationComponent} from "../../components/time/duration/duration.component";
+import {TimePickerComponent} from "../../components/time/time-picker/time-picker.component";
 
 
 @NgModule({
@@ -361,7 +362,8 @@ import {DurationComponent} from "../../components/time/duration/duration.compone
         EmployeeMultiplySelectorComponent,
         TypesContractsMultiSelectorComponent,
         ContractInspectionItemComponent,
-        DurationComponent
+        DurationComponent,
+        TimePickerComponent
     ],
     exports: [
         AccountPanelComponent,
@@ -478,7 +480,8 @@ import {DurationComponent} from "../../components/time/duration/duration.compone
         ContractItemComponent,
         EmployeeMultiplySelectorComponent,
         ContractInspectionItemComponent,
-        DurationComponent
+        DurationComponent,
+        TimePickerComponent
     ],
     imports: [
         CommonPipesModule,

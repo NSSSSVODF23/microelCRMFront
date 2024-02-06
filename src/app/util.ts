@@ -24,7 +24,6 @@ import {MessageService, PrimeNGConfig} from "primeng/api";
 import {AppointedInstallersComponent} from "./components/controls/appointed-installers/appointed-installers.component";
 import {ChatLinkComponent} from "./components/controls/chat-link/chat-link.component";
 
-
 export class Utils {
     static convertModelItemToString(model: ModelItem) {
         switch (model.wireframeFieldType) {
@@ -604,6 +603,8 @@ export function mediaQuery(query: string): Observable<boolean> {
         map((list: MediaQueryList) => list.matches)
     );
 }
+
+
 
 export class Storage {
     static save(key: string, value: any) {

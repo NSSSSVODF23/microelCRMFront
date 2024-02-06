@@ -116,23 +116,7 @@
         <span *ngIf="selectedWorkLog?.isForceClosed" class="caption f-color-danger wt-bold size-big">(Принудительно закрыта)</span>
     </div>
     <div class="flexed column p-sides-20 gap10">
-        <div class="flexed column gap3">
-            <div class="caption f-color-700 size-big with-icon">
-                <span class="mdi-info"></span>
-                <span>
-                    Информация по задаче
-                </span>
-            </div>
-            <div class="flexed column p-sides-20 gap5">
-                <div *ngFor="let field of selectedWorkLog?.task?.fields ?? []; trackBy: trackByField"
-                     class="flexed gap1 column">
-                    <div class="caption size-small wt-bold f-color-500">{{field.name}}</div>
-                    <div class="caption">
-                        {{field.textRepresentation}}
-                    </div>
-                </div>
-            </div>
-        </div>
+        <app-task-fields-table-view [task]="selectedWorkLog?.task" [isTaskBody]="false"></app-task-fields-table-view>
         <div class="flexed column gap3">
             <div *ngIf="selectedWorkLog?.targetDescription" class="caption f-color-700 size-big with-icon">
                 <span class="mdi-radar"></span>
@@ -148,12 +132,20 @@
             <div class="caption f-color-700 size-big with-icon">
                 <span class="mdi-feed"></span>
                 <span>
-                {{selectedWorkLog?.isForceClosed ? 'Причина закрытия' : 'Отчет'}}
-            </span>
+                    {{selectedWorkLog?.isForceClosed ? 'Причина закрытия' : 'Отчет'}}
+                </span>
             </div>
             <div class="caption prewrap p-sides-20">
                 {{selectedWorkLog?.report}}
             </div>
+        </div>
+        <div class="flex flex-column gap-2">
+            <app-label label="Назначил монтажников" styleClass="translate-x-0">
+                <app-employee-label [employee]="selectedWorkLog?.creator"></app-employee-label>
+            </app-label>
+            <app-label label="Время выполнения" styleClass="translate-x-0">
+                <app-duration [short]="false" [ms]="selectedWorkLog?.leadTime"></app-duration>
+            </app-label>
         </div>
         <div class="terminator-bottom"></div>
         <app-works-picker [employees]="selectedWorkLog?.employees" [formControl]="worksPickerForm"

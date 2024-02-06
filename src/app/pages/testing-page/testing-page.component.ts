@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {AfterContentInit, Component, OnInit} from '@angular/core';
 import {BillingUserItemData, FieldItem, WireframeFieldType} from "../../types/transport-interfaces";
 import {v4} from "uuid";
 import {FormControl, FormGroup} from "@angular/forms";
@@ -13,7 +13,7 @@ import {AccessFlag} from "../../types/access-flag";
     templateUrl: './testing-page.component.html',
     styleUrls: ['./testing-page.component.scss']
 })
-export class TestingPageComponent implements OnInit {
+export class TestingPageComponent implements OnInit, AfterContentInit {
 
     items: string[] = [];
     AccessFlag = AccessFlag;
@@ -27,7 +27,7 @@ export class TestingPageComponent implements OnInit {
         {name: 'Адрес', id: v4(), type: WireframeFieldType.ADDRESS, orderPosition: 1, listViewIndex: 1},
         {name: 'Телефон', id: v4(), type: WireframeFieldType.PHONE_ARRAY, orderPosition: 1, listViewIndex: 1},
     ]
-    ips$ = range(1,150).pipe(map(i => `10.163.35.${i}`), bufferTime(1000));
+    ips$ = range(1, 150).pipe(map(i => `10.163.35.${i}`), bufferTime(1000));
     form: FormGroup = new FormGroup({});
     employees$ = this.api.getEmployees();
     users: BillingUserItemData[] = [];
@@ -35,15 +35,15 @@ export class TestingPageComponent implements OnInit {
         mode: new FormControl('login'),
         query: new FormControl(''),
     })
-    filterChange$ = this.filterForm.valueChanges.pipe( debounceTime(1000), distinctUntilChanged(),switchMap((value:any) => {
+    filterChange$ = this.filterForm.valueChanges.pipe(debounceTime(1000), distinctUntilChanged(), switchMap((value: any) => {
         if (!value.query) return of([] as any[]);
         switch (value.mode) {
             case 'login':
-                return this.api.getBillingUsersByLogin(value.query,true);
+                return this.api.getBillingUsersByLogin(value.query, true);
             case 'fio':
-                return this.api.getBillingUsersByFio(value.query,true);
+                return this.api.getBillingUsersByFio(value.query, true);
             case 'address':
-                return this.api.getBillingUsersByAddress(value.query,true);
+                return this.api.getBillingUsersByAddress(value.query, true);
         }
         return of([] as any[]);
     }));
@@ -59,8 +59,58 @@ export class TestingPageComponent implements OnInit {
         }
     }
 
-    ips=["10.163.35.26"];
+    ips = ["10.163.35.26"];
+
     // ips=["8.8.8.8","193.111.3.1","10.163.35.140","10.163.35.254"];
+    workPickerControl = new FormControl(null);
+    //Method to generate a random string and push it to the items array
+    unsub = true;
+    control = new FormControl([{
+        "equipment": {
+            "clientEquipmentId": 2,
+            "name": "Роутер 5",
+            "description": "Необычный роутер",
+            "price": 2000,
+            "created": "2023-08-16T07:12:42.701+00:00",
+            "creator": {
+                "login": "admin",
+                "department": {
+                    "departmentId": 1,
+                    "name": "ТП",
+                    "description": null,
+                    "deleted": false,
+                    "created": "2023-05-02T13:35:15.746+00:00"
+                },
+                "position": {
+                    "positionId": 1,
+                    "name": "Стандартная",
+                    "description": null,
+                    "access": 0,
+                    "created": "2023-05-02T13:40:51.279+00:00",
+                    "deleted": false
+                },
+                "avatar": "9599810d-5d86-4aba-b71b-83fa120ace9c.png",
+                "secondName": "Андреевич",
+                "firstName": "Максим",
+                "lastName": "Ушаков",
+                "internalPhoneNumber": "",
+                "access": 0,
+                "created": "2023-05-01T15:53:59.919+00:00",
+                "telegramUserId": "",
+                "offsite": false,
+                "deleted": false,
+                "status": "ONLINE",
+                "lastSeen": "2023-08-16T13:08:43.102+00:00",
+                "fullName": "Максим Ушаков"
+            },
+            "editedBy": [],
+            "deleted": false,
+            "lastEdit": null
+        }, "count": 1
+    }]);
+    ctrl$ = this.control.valueChanges.pipe(shareReplay(1))
+    value = new Date();
+    testControl = new FormControl(null, CustomValidators.taskInput(WireframeFieldType.ADDRESS, 'APARTMENT_ONLY'));
 
     constructor(readonly api: ApiService, readonly rt: RealTimeUpdateService, readonly personality: PersonalityService) {
     }
@@ -77,17 +127,10 @@ export class TestingPageComponent implements OnInit {
         this.workPickerControl.valueChanges.subscribe(console.log)
     }
 
-    workPickerControl = new FormControl(null);
-
-    //Method to generate a random string and push it to the items array
-    unsub = true;
-    control = new FormControl([ { "equipment": { "clientEquipmentId": 2, "name": "Роутер 5", "description": "Необычный роутер", "price": 2000, "created": "2023-08-16T07:12:42.701+00:00", "creator": { "login": "admin", "department": { "departmentId": 1, "name": "ТП", "description": null, "deleted": false, "created": "2023-05-02T13:35:15.746+00:00" }, "position": { "positionId": 1, "name": "Стандартная", "description": null, "access": 0, "created": "2023-05-02T13:40:51.279+00:00", "deleted": false }, "avatar": "9599810d-5d86-4aba-b71b-83fa120ace9c.png", "secondName": "Андреевич", "firstName": "Максим", "lastName": "Ушаков", "internalPhoneNumber": "", "access": 0, "created": "2023-05-01T15:53:59.919+00:00", "telegramUserId": "", "offsite": false, "deleted": false, "status": "ONLINE", "lastSeen": "2023-08-16T13:08:43.102+00:00", "fullName": "Максим Ушаков" }, "editedBy": [], "deleted": false, "lastEdit": null }, "count": 1 } ]);
-    ctrl$ = this.control.valueChanges.pipe(shareReplay(1))
-    value = null;
-    testControl = new FormControl(null, CustomValidators.taskInput(WireframeFieldType.ADDRESS, 'APARTMENT_ONLY'));
-    valueChange(value:any){
+    valueChange(value: any) {
         console.log(value)
     }
+
     generateRandomString() {
         const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
         let result1 = '';
@@ -100,5 +143,8 @@ export class TestingPageComponent implements OnInit {
 
     loadDocument() {
 
+    }
+
+    ngAfterContentInit(): void {
     }
 }
