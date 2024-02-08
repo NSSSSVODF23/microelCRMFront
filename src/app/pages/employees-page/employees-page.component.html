@@ -379,6 +379,19 @@
                         </app-label>
                     </div>
                 </div>
+                <div class="flex flex-column">
+                    <span class="text-bluegray-400 font-bold">Реквизиты биллинга 1783</span>
+                    <div class="flex gap-3 align-items-center" formGroupName="base1783Credentials">
+                        <app-label label="Логин">
+                            <input appRegexPatternChecker formControlName="username" pInputText patternRx="^[\w\.]+$"
+                                   [disabled]="isBeingCreatingEmployee || isBeingEditingEmployee" type="text">
+                        </app-label>
+                        <app-label label="Пароль">
+                            <input appRegexPatternChecker formControlName="password" pInputText patternRx="^[\w\.]+$"
+                                   [disabled]="isBeingCreatingEmployee || isBeingEditingEmployee" type="text">
+                        </app-label>
+                    </div>
+                </div>
             </div>
         </p-panel>
         <p-panel header="Параметры доступа" [toggleable]="true" [collapsed]="true">

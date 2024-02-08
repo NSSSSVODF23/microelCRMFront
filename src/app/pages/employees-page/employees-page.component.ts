@@ -74,6 +74,10 @@ export class EmployeesPageComponent implements OnInit, OnDestroy {
         base781Credentials: new FormGroup({
             username: new FormControl(''),
             password: new FormControl(''),
+        }),
+        base1783Credentials: new FormGroup({
+            username: new FormControl(''),
+            password: new FormControl(''),
         })
     });
     isAccessOverride = false;

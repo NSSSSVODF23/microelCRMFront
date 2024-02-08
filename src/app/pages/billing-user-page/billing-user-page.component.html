@@ -48,8 +48,10 @@
             </div>
             <div class="flex flex-column flex-grow-1">
                 <ng-container *ngTemplateOutlet="acpInfo"></ng-container>
-                <p-listbox appListElementLazyScroll [options]="dhcpLogsGroupedList" [group]="true" listStyleClass="simple-list" class="mt-3"
-                           [listStyle]="{'max-height':'250px'}" (onClick)="copyMacAddress($event)" (onScrollDown)="logsLoad(currentLogin)">
+                <p-listbox (onClick)="copyMacAddress($event)" (onScrollDown)="logsLoad(currentLogin)" [group]="true"
+                           [listStyle]="{'max-height':'250px'}" [options]="dhcpLogsGroupedList"
+                           appListElementLazyScroll class="mt-3"
+                           listStyleClass="simple-list">
                     <ng-template let-group pTemplate="group">
                         <div class="flex align-items-center text-sm">
                             <span *ngIf="!isToday(group.state.date)">{{group.state.date | date:'dd MMMM yyyy' | titlecase}}</span>
@@ -57,16 +59,16 @@
                         </div>
                     </ng-template>
                     <ng-template let-item pTemplate="item">
-                        <div class="flex flex-grow-1 m-1 px-3 py-2 gap-2 border-round align-items-center text-white font-bold text-sm"
-                             [style.background-color]="item.state.color">
+                        <div [style.background-color]="item.state.color"
+                             class="flex flex-grow-1 m-1 px-3 py-2 gap-2 border-round align-items-center text-white font-bold text-sm">
                             <span>
                                 <span>{{item.state.endTime | date:'HH:mm'}}</span>
                                 <span *ngIf="item.state.startTime !== item.state.endTime">-{{item.state.startTime | date: 'HH:mm'}}</span>
                             </span>
                             <span>{{item.state.description}}</span>
                             <span *ngIf="item.state.numbers > 1" class="flex-grow-1"></span>
-                            <span class="bg-white border-round px-2 py-1 text-xs" *ngIf="item.state.numbers > 1"
-                                  [style.color]="item.state.color">{{item.state.numbers}}</span>
+                            <span *ngIf="item.state.numbers > 1" [style.color]="item.state.color"
+                                  class="bg-white border-round px-2 py-1 text-xs">{{item.state.numbers}}</span>
                         </div>
                     </ng-template>
                     <ng-template pTemplate="empty">
@@ -80,19 +82,22 @@
         <div class="flexed gap10 p10 hcenter">
             <p-button (onClick)="createTaskMenu.toggle($event)" icon="mdi-add" label="Создать задачу"
                       styleClass="p-button-success p-button-text"></p-button>
-            <p-button (onClick)="controlMenu.toggle($event)" icon="mdi-menu" label="Управление"
-                      styleClass="p-button-info p-button-text" *ngIf="personality.isHasAccess(AccessFlag.MANAGE_SUBSCRIBERS)"></p-button>
-            <p-button (onClick)="openPaymentDialog()" icon="mdi-currency_ruble" *ngIf="personality.isHasAccess(AccessFlag.MANAGE_CASH)"
+            <p-button (onClick)="controlMenu.toggle($event)" *ngIf="personality.isHasAccess(AccessFlag.MANAGE_SUBSCRIBERS)" icon="mdi-menu"
+                      label="Управление"
+                      styleClass="p-button-info p-button-text"></p-button>
+            <p-button (onClick)="openPaymentDialog()" *ngIf="personality.isHasAccess(AccessFlag.MANAGE_CASH)"
+                      icon="mdi-currency_ruble"
                       label="Оплата" styleClass="p-button-warning p-button-text"></p-button>
-            <p-button (onClick)="openRecalculationDialog()" icon="mdi-restore" *ngIf="personality.isHasAccess(AccessFlag.MANAGE_RECALCULATION)"
+            <p-button (onClick)="openRecalculationDialog()" *ngIf="personality.isHasAccess(AccessFlag.MANAGE_RECALCULATION)"
+                      icon="mdi-restore"
                       label="Перерасчет" styleClass="p-button-help p-button-text"></p-button>
             <div class="stretched"></div>
-            <span *ngIf="creditAmount" class="text-red-400 text-xl font-bold" [style.letter-spacing]="'2px'">
+            <span *ngIf="creditAmount" [style.letter-spacing]="'2px'" class="text-red-400 text-xl font-bold">
                 Кредит:
                 {{creditAmount | currency: 'RUB'}}
             </span>
             <span [ngClass]="{'f-color-primary': moneyAmount>=0, 'f-color-danger': moneyAmount<0}"
-                  class="text-primary text-xl font-bold" [style.letter-spacing]="'2px'">
+                  [style.letter-spacing]="'2px'" class="text-primary text-xl font-bold">
                 Баланс:
                 {{moneyAmount | currency: 'RUB'}}
             </span>
@@ -143,43 +148,69 @@
 
 <ng-template #titleTagsTemp>
     <div class="flexed gap5 hcenter">
-        <app-colored-tag [caption]="userInfo?.newTarif?.userStatusName" [color]="userInfo?.newTarif?.userStatusColor"></app-colored-tag>
-<!--        <app-colored-tag *ngIf="activeClientHardware$ | async as activeClientHardware" [caption]="activeClientHardware ? 'Онлайн' : 'Офлайн'"-->
-<!--                         [color]="isOnline ? 'var(&#45;&#45;scs-500)' : 'var(&#45;&#45;danger-500)'"></app-colored-tag>-->
+        <app-colored-tag [caption]="userInfo?.newTarif?.userStatusName"
+                         [color]="userInfo?.newTarif?.userStatusColor"></app-colored-tag>
+        <!--        <app-colored-tag *ngIf="activeClientHardware$ | async as activeClientHardware" [caption]="activeClientHardware ? 'Онлайн' : 'Офлайн'"-->
+        <!--                         [color]="isOnline ? 'var(&#45;&#45;scs-500)' : 'var(&#45;&#45;danger-500)'"></app-colored-tag>-->
         <app-colored-tag *ngIf="hasCredit" caption="Кредит" color="var(--warm-500)"></app-colored-tag>
     </div>
 </ng-template>
 
 <ng-template #mainUserInfoTemp>
     <div class="flex flex-column">
-        <span class="text-lg font-bold text-gray-600">
-            Пользователь
-        </span>
-        <div class="flex flex-column gap-2 p-3">
-            <ng-container *ngTemplateOutlet="infoRowTemplate; context: {label: 'Адрес', value: userInfo?.ibase?.addr}"></ng-container>
-            <ng-container *ngTemplateOutlet="infoRowTemplate; context: {label: 'ФИО', value: userInfo?.ibase?.fio}"></ng-container>
-            <ng-container *ngTemplateOutlet="infoRowTemplate; context: {label: 'Телефон', value: userInfo?.ibase?.phone}"></ng-container>
-            <ng-container *ngTemplateOutlet="infoRowTemplate; context: {label: 'Договор заключен', value: userInfo?.ibase?.ddog | date: 'EEEE dd-MM-yyyy' | titlecase}"></ng-container>
+        <div class="flex align-items-center gap-2">
+            <span class="text-lg font-bold text-gray-600">
+                Пользователь
+            </span>
+            <button pButton icon="mdi-edit" label="Редактировать" (click)="openEditUserDialog()"
+                    class="p-button-sm p-button-success p-button-text"></button>
+        </div>
+        <div class="flex flex-column gap-2 p-3 pt-1">
+            <div *ngIf="!isLoginEnable" class="flex gap-2 align-items-center text-red-400">
+                <div class="flex gap-2 align-items-center max-w-16rem">
+                    <span class="mdi-warning"></span>
+                    <span class="font-bold">
+                        Логин абонента отключен, доступ к ЛК ограничен
+                    </span>
+                </div>
+                <p-button (onClick)="enableLogin()" icon="mdi-account_box" label="Включить"
+                          styleClass="p-button-success p-button-sm p-button-outlined"></p-button>
+            </div>
+            <ng-container
+                    *ngTemplateOutlet="infoRowTemplate; context: {label: 'Адрес', value: userInfo?.ibase?.addr}"></ng-container>
+            <ng-container
+                    *ngTemplateOutlet="infoRowTemplate; context: {label: 'ФИО', value: userInfo?.ibase?.fio}"></ng-container>
+            <ng-container
+                    *ngTemplateOutlet="infoRowTemplate; context: {label: 'Телефон', value: userInfo?.ibase?.phone}"></ng-container>
+            <ng-container
+                    *ngTemplateOutlet="infoRowTemplate; context: {label: 'Договор заключен', value: userInfo?.ibase?.ddog | date: 'EEEE dd-MM-yyyy' | titlecase}"></ng-container>
+            <ng-container
+                    *ngTemplateOutlet="infoRowTemplate; context: {label: 'Комментарий', value: userInfo?.ibase?.coment}"></ng-container>
         </div>
     </div>
 </ng-template>
 
 <ng-template #hardwareInfoTemp>
-    <div class="flex flex-column" *ngIf="dhcpBindings$ | async">
+    <div *ngIf="dhcpBindings$ | async" class="flex flex-column">
         <span class="text-lg font-bold text-gray-600">
             Оборудование
         </span>
-        <span class="flex gap-2 p-3 text-orange-400 font-semibold align-items-center" *ngIf="hardwareEmptyMessage$ | async as hardwareEmptyMessage">
+        <span *ngIf="hardwareEmptyMessage$ | async as hardwareEmptyMessage"
+              class="flex gap-2 p-3 text-orange-400 font-semibold align-items-center">
             <span class="mdi-warning"></span>
             <span>
                 {{hardwareEmptyMessage}}
             </span>
         </span>
-        <div class="flex flex-column gap-2 p-3" *ngIf="activeClientHardware$ | async as activeClientHardware">
-            <ng-container *ngTemplateOutlet="infoRowTemplate; context: {label: 'Статус', value: (activeClientHardware.onlineStatus === 'ONLINE' ? 'Онлайн' : 'Офлайн'), valueClass: activeClientHardware.onlineStatus === 'ONLINE' ? 'text-green-400' : 'text-red-400'}"></ng-container>
-            <ng-container *ngTemplateOutlet="infoRowTemplate; context: {label: 'Оборудование', value: activeClientHardware.dhcpClient ?? '' + activeClientHardware.dhcpHostname ?? ''}"></ng-container>
-            <ng-container *ngTemplateOutlet="infoRowTemplate; context: {label: 'IP', value: activeClientHardware.ipaddr}"></ng-container>
-            <ng-container *ngTemplateOutlet="infoRowTemplate; context: {label: 'Активность', value: activeClientHardware.leaseStart | date: 'dd-MM-yyyy HH:mm:ss' | titlecase, help: 'Момент времени, когда оборудование отправило запрос серверу.'}"></ng-container>
+        <div *ngIf="activeClientHardware$ | async as activeClientHardware" class="flex flex-column gap-2 p-3">
+            <ng-container
+                    *ngTemplateOutlet="infoRowTemplate; context: {label: 'Статус', value: (activeClientHardware.onlineStatus === 'ONLINE' ? 'Онлайн' : 'Офлайн'), valueClass: activeClientHardware.onlineStatus === 'ONLINE' ? 'text-green-400' : 'text-red-400'}"></ng-container>
+            <ng-container
+                    *ngTemplateOutlet="infoRowTemplate; context: {label: 'Оборудование', value: activeClientHardware.dhcpClient ?? '' + activeClientHardware.dhcpHostname ?? ''}"></ng-container>
+            <ng-container
+                    *ngTemplateOutlet="infoRowTemplate; context: {label: 'IP', value: activeClientHardware.ipaddr}"></ng-container>
+            <ng-container
+                    *ngTemplateOutlet="infoRowTemplate; context: {label: 'Активность', value: activeClientHardware.leaseStart | date: 'dd-MM-yyyy HH:mm:ss' | titlecase, help: 'Момент времени, когда оборудование отправило запрос серверу.'}"></ng-container>
         </div>
     </div>
 </ng-template>
@@ -190,29 +221,36 @@
             Тарифы
         </span>
         <div class="flex flex-column gap-2 p-3">
-            <ng-container *ngTemplateOutlet="infoRowTemplatedTemplate; context:{label:'Основной', template: mainTariffTemplate}"></ng-container>
+            <ng-container
+                    *ngTemplateOutlet="infoRowTemplatedTemplate; context:{label:'Основной', template: mainTariffTemplate}"></ng-container>
             <ng-container *ngIf="services.length>0 else emptyServicesTemplate">
-                <ng-container *ngTemplateOutlet="infoRowTemplatedTemplate; context:{label:'Сервисы', template: serviceListTemplate}"></ng-container>
+                <ng-container
+                        *ngTemplateOutlet="infoRowTemplatedTemplate; context:{label:'Сервисы', template: serviceListTemplate}"></ng-container>
             </ng-container>
-            <ng-container *ngTemplateOutlet="infoRowTemplate; context: {label: 'Общая стоимость', value: (totalCost+' руб/период')}"></ng-container>
-            <ng-container *ngTemplateOutlet="infoRowTemplatedTemplate; context:{label:'Скорость', template: speedViewTemplate}"></ng-container>
-            <ng-container *ngTemplateOutlet="infoRowTemplate; context: {label: 'Период тарифа', value: (userInfo?.newTarif?.hdate | date: 'dd-MM-yyyy HH:mm' | titlecase) + ' до ' + (userInfo?.newTarif?.edate | date: 'dd-MM-yyyy HH:mm' | titlecase)}"></ng-container>
-            <ng-container *ngTemplateOutlet="infoRowTemplate; context: {label: 'Списание через', value: userInfo?.newTarif?.edate | elapsedTime:'':'':false:true}"></ng-container>
-            <ng-container *ngTemplateOutlet="infoRowTemplate; context: {label: 'Изм. состояния', value: userInfo?.newTarif?.endstate | date: 'dd-MM-yyyy HH:mm' | titlecase, help: 'Момент времени, когда произойдет изменение состояния абонента. (Прим. закончится отл. платеж)'}"></ng-container>
+            <ng-container
+                    *ngTemplateOutlet="infoRowTemplate; context: {label: 'Общая стоимость', value: (totalCost+' руб/период')}"></ng-container>
+            <ng-container
+                    *ngTemplateOutlet="infoRowTemplatedTemplate; context:{label:'Скорость', template: speedViewTemplate}"></ng-container>
+            <ng-container
+                    *ngTemplateOutlet="infoRowTemplate; context: {label: 'Период тарифа', value: (userInfo?.newTarif?.hdate | date: 'dd-MM-yyyy HH:mm' | titlecase) + ' до ' + (userInfo?.newTarif?.edate | date: 'dd-MM-yyyy HH:mm' | titlecase)}"></ng-container>
+            <ng-container
+                    *ngTemplateOutlet="infoRowTemplate; context: {label: 'Списание через', value: userInfo?.newTarif?.edate | elapsedTime:'':'':false:true}"></ng-container>
+            <ng-container
+                    *ngTemplateOutlet="infoRowTemplate; context: {label: 'Изм. состояния', value: userInfo?.newTarif?.endstate | date: 'dd-MM-yyyy HH:mm' | titlecase, help: 'Момент времени, когда произойдет изменение состояния абонента. (Прим. закончится отл. платеж)'}"></ng-container>
         </div>
     </div>
 </ng-template>
 
-<ng-template #infoRowTemplate let-label="label" let-value="value" let-help="help" let-valueClass="valueClass">
+<ng-template #infoRowTemplate let-help="help" let-label="label" let-value="value" let-valueClass="valueClass">
     <span class="flex align-items-center gap-1">
         <span class="text-bluegray-400 font-bold">
             {{label}}:
         </span>
-        <span class="text-bluegray-500 text-lg" [ngClass]="valueClass">
-            {{value}}
+        <span [ngClass]="valueClass" class="text-bluegray-500 text-lg max-w-18rem">
+            {{value ?? '-'}}
         </span>
-        <span class="mdi-help_outline caption size-big f-color-300" *ngIf="help"
-              [pTooltip]="help"></span>
+        <span *ngIf="help" [pTooltip]="help"
+              class="mdi-help_outline caption size-big f-color-300"></span>
     </span>
 </ng-template>
 
@@ -235,8 +273,10 @@
         <span *ngIf="mainTariff?.service" class="text-primary text-sm">
             {{mainTariff?.price}} руб/период
         </span>
-        <span (click)="getTariffList($event, tariffsOverlayPanel)" *ngIf="personality.isHasAccess(AccessFlag.MANAGE_SUBSCRIBERS)">
-            <ng-container *ngTemplateOutlet="inlineButtonTemplate; context: {icon: 'mdi-edit', label: 'Изменить', btnClass: ['text-bluegray-400','hover:text-green-400']}"></ng-container>
+        <span (click)="getTariffList($event, tariffsOverlayPanel)"
+              *ngIf="personality.isHasAccess(AccessFlag.MANAGE_SUBSCRIBERS)">
+            <ng-container
+                    *ngTemplateOutlet="inlineButtonTemplate; context: {icon: 'mdi-edit', label: 'Изменить', btnClass: ['text-bluegray-400','hover:text-green-400']}"></ng-container>
         </span>
     </span>
 </ng-template>
@@ -258,21 +298,23 @@
         <div class="text-primary text-sm">
             {{service.price}} руб/период
         </div>
-        <div class="mdi-close text-bluegray-500 hover:text-red-400 text-sm cursor-pointer" *ngIf="personality.isHasAccess(AccessFlag.MANAGE_SUBSCRIBERS)"
-             (click)="removeService(service.service)"></div>
+        <div (click)="removeService(service.service)"
+             *ngIf="personality.isHasAccess(AccessFlag.MANAGE_SUBSCRIBERS)"
+             class="mdi-close text-bluegray-500 hover:text-red-400 text-sm cursor-pointer"></div>
     </div>
 </ng-template>
 
 <ng-template #emptyServicesTemplate>
     <span (click)="getServiceList($event, servicesOverlayPanel)" *ngIf="!!mainTariff?.service">
-        <ng-container  *ngIf="personality.isHasAccess(AccessFlag.MANAGE_SUBSCRIBERS)">
-            <ng-container *ngTemplateOutlet="inlineButtonTemplate; context: {icon: 'mdi-add', label: 'Добавить сервис', btnClass: ['text-bluegray-400','hover:text-green-400']}"></ng-container>
+        <ng-container *ngIf="personality.isHasAccess(AccessFlag.MANAGE_SUBSCRIBERS)">
+            <ng-container
+                    *ngTemplateOutlet="inlineButtonTemplate; context: {icon: 'mdi-add', label: 'Добавить сервис', btnClass: ['text-bluegray-400','hover:text-green-400']}"></ng-container>
         </ng-container>
     </span>
 </ng-template>
 
-<ng-template #inlineButtonTemplate let-icon="icon" let-label="label" let-btnClass="btnClass">
-    <span class="flex align-items-center gap-1 cursor-pointer w-fit" [ngClass]="btnClass">
+<ng-template #inlineButtonTemplate let-btnClass="btnClass" let-icon="icon" let-label="label">
+    <span [ngClass]="btnClass" class="flex align-items-center gap-1 cursor-pointer w-fit">
         <span [ngClass]="icon" class="text-sm"></span>
         <span>
             {{label}}
@@ -385,10 +427,12 @@
             <ng-container *ngIf="commutatorsByVlan$ | async as commutators">
                 <p-tabPanel header="Коммутаторы">
                     <div class="flex justify-content-end mb-3">
-                        <p-button icon="mdi-refresh" label="Обновить все" styleClass="p-button-outlined" (onClick)="refreshCommutators()" [loading]="isCommutatorRefreshing"></p-button>
+                        <p-button (onClick)="refreshCommutators()" [loading]="isCommutatorRefreshing" icon="mdi-refresh"
+                                  label="Обновить все" styleClass="p-button-outlined"></p-button>
                     </div>
                     <div class="flex flex-column gap-2 overflow-auto max-h-30rem">
-                        <app-commutator-view *ngFor="let commutator of commutators.value" [commutator]="commutator" [tiny]="true"></app-commutator-view>
+                        <app-commutator-view *ngFor="let commutator of commutators.value" [commutator]="commutator"
+                                             [tiny]="true"></app-commutator-view>
                     </div>
                 </p-tabPanel>
             </ng-container>
@@ -421,8 +465,9 @@
             </div>
             <div class="flex gap-2 align-items-center">
                 <span class="text-xs font-bold text-bluegray-300">VLAN: {{binding.vlanid}}</span>
-                <span class="text-xs font-bold text-bluegray-300">{{binding.onlineStatus === 'ONLINE' ? "Онлайн" : "Оффлайн"}}: <app-time-elapsed [startTime]="binding.leaseStart"
-                                                         type="short"></app-time-elapsed></span>
+                <span class="text-xs font-bold text-bluegray-300">{{binding.onlineStatus === 'ONLINE' ? "Онлайн" : "Оффлайн"}}
+                    : <app-time-elapsed [startTime]="binding.leaseStart"
+                                        type="short"></app-time-elapsed></span>
             </div>
         </div>
         <div class="flex align-items-center">
@@ -522,7 +567,28 @@
     </ng-template>
 </p-dialog>
 
-<p-dialog (onHide)="closeHistoryDialog()" (onShow)="getHistory()" [(visible)]="isHistoryDialogVisible" [dismissableMask]="true"
+<p-dialog [(visible)]="isUserEditDialogVisible" [dismissableMask]="true" [modal]="true"
+          [resizable]="false" [draggable]="true" appendTo="body" header="Редактирование пользователя">
+    <form [formGroup]="userEditForm" class="flex flex-column gap-2">
+        <app-label label="Адрес">
+            <input pInputText formControlName="address">
+        </app-label>
+        <app-label label="ФИО">
+            <input pInputText formControlName="fullName">
+        </app-label>
+        <app-label label="Телефон">
+            <input pInputText formControlName="phone">
+        </app-label>
+        <app-label label="Комментарий">
+            <textarea pInputTextarea formControlName="comment"></textarea>
+        </app-label>
+        <button pButton class="mt-2" icon="mdi-check" (click)="confirmUserEdit()"
+                label="Сохранить" [disabled]="userEditForm.invalid"></button>
+    </form>
+</p-dialog>
+
+<p-dialog (onHide)="closeHistoryDialog()" (onShow)="getHistory()" [(visible)]="isHistoryDialogVisible"
+          [dismissableMask]="true"
           [modal]="true" [resizable]="false" appendTo="body" header="История операций за полгода">
     <ng-template pTemplate="content">
         <div *ngIf="userEventsLoadingState === 'LOADING'" [style]="{width: '20rem', height: '20rem'}"
@@ -625,89 +691,114 @@
     </ng-template>
 </p-dialog>
 
-<p-dialog [(visible)]="isNCLHistoryDialogVisible" [style]="{width:'90rem'}" [dismissableMask]="true"
-          [modal]="true" [resizable]="false" appendTo="body" header="История локаций подключений">
-        <div [style]="nclHistoryLoadingState === 'READY' ? (nclHistoryViewStyle$ | async) : {display:'grid', alignItems:'center'}" class="p-3 border-1 border-bluegray-100 border-round-lg">
-            <ng-container *ngIf="nclHistory$ | async as history">
-                <ng-container [ngSwitch]="nclHistoryLoadingState">
-                    <ng-container *ngSwitchCase="'READY'">
-                        <ng-container *ngFor="let location of (history.nclItems | keyvalue); let i = index">
-                            <div [style]="{'gridArea': (i+1) + '/1/'+(i+2)+'/2'}" class="text-bluegray-400 mr-2 pr-2 border-right-1 border-bluegray-100">{{location.key}}</div>
-                            <ng-container *ngFor="let item of (history.nclItems[location.key])">
-                                <div [style]="{'gridArea': (i+1) + '/'+(item.percentStart+2)+'/'+(i+2)+'/'+(item.percentEnd+2),
-                                 'backgroundColor': item.color, 'border': '1px solid '+item.borderColor}" class="h-50 mr-1 opacity-70"
-                                [pTooltip]="'Начало: ' + (item.timeStart|date:'EEEE dd MMMM yyyy HH:mm'|titlecase) + ' Конец: ' + (item.timeEnd|date:'EEEE dd MMMM yyyy HH:mm'|titlecase)"
-                                tooltipPosition="bottom"></div>
-                            </ng-container>
+<p-dialog [(visible)]="isNCLHistoryDialogVisible" [dismissableMask]="true" [modal]="true"
+          [resizable]="false" [style]="{width:'90rem'}" appendTo="body" header="История локаций подключений">
+    <div [style]="nclHistoryLoadingState === 'READY' ? (nclHistoryViewStyle$ | async) : {display:'grid', alignItems:'center'}"
+         class="p-3 border-1 border-bluegray-100 border-round-lg">
+        <ng-container *ngIf="nclHistory$ | async as history">
+            <ng-container [ngSwitch]="nclHistoryLoadingState">
+                <ng-container *ngSwitchCase="'READY'">
+                    <ng-container *ngFor="let location of (history.nclItems | keyvalue); let i = index">
+                        <div [style]="{'gridArea': (i+1) + '/1/'+(i+2)+'/2'}"
+                             class="text-bluegray-400 mr-2 pr-2 border-right-1 border-bluegray-100">{{location.key}}</div>
+                        <ng-container *ngFor="let item of (history.nclItems[location.key])">
+                            <div [pTooltip]="'Начало: ' + (item.timeStart|date:'EEEE dd MMMM yyyy HH:mm'|titlecase) + ' Конец: ' + (item.timeEnd|date:'EEEE dd MMMM yyyy HH:mm'|titlecase)"
+                                 [style]="{'gridArea': (i+1) + '/'+(item.percentStart+2)+'/'+(i+2)+'/'+(item.percentEnd+2),
+                                 'backgroundColor': item.color, 'border': '1px solid '+item.borderColor}"
+                                 class="h-50 mr-1 opacity-70"
+                                 tooltipPosition="bottom"></div>
                         </ng-container>
-                        <div [style]="{gridArea:'-1/2/-1/-1'}" class="flex align-items-center justify-content-between text-bluegray-400 text-sm font-bold">
-                            <span>{{history.from|date:'EEEE dd MMMM yyyy HH:mm'|titlecase}}</span>
-                            <span>{{history.to|date:'EEEE dd MMMM yyyy HH:mm'|titlecase}}</span>
-                        </div>
                     </ng-container>
-                    <ng-container *ngSwitchCase="'LOADING'">
-                        <div class="flex flex-column align-items-center justify-content-center" [style]="{gridAreaColumn:'1/-1'}">
-                            <p-progressSpinner class="custom-spinner custom-spinner-gray custom-spinner-8xl"></p-progressSpinner>
-                            <span class="text-bluegray-400 font-bold text-lg">Загрузка</span>
-                        </div>
-                    </ng-container>
-                    <ng-container *ngSwitchCase="'ERROR'">
-                        <div class="flex flex-column align-items-center justify-content-center text-red-400 font-bold text-lg" [style]="{gridAreaColumn:'1/-1'}">
-                            <span class="mds-error"></span>
-                            <span>Не удалось загрузить данные</span>
-                        </div>
-                    </ng-container>
-                    <ng-container *ngSwitchCase="'EMPTY'">
-                        <div class="flex flex-column align-items-center justify-content-center text-bluegray-400 font-bold text-lg" [style]="{gridAreaColumn:'1/-1'}">
-                            <span class="mds-radar"></span>
-                            <span>Нет данных</span>
-                        </div>
-                    </ng-container>
+                    <div [style]="{gridArea:'-1/2/-1/-1'}"
+                         class="flex align-items-center justify-content-between text-bluegray-400 text-sm font-bold">
+                        <span>{{history.from|date:'EEEE dd MMMM yyyy HH:mm'|titlecase}}</span>
+                        <span>{{history.to|date:'EEEE dd MMMM yyyy HH:mm'|titlecase}}</span>
+                    </div>
+                </ng-container>
+                <ng-container *ngSwitchCase="'LOADING'">
+                    <div [style]="{gridAreaColumn:'1/-1'}"
+                         class="flex flex-column align-items-center justify-content-center">
+                        <p-progressSpinner
+                                class="custom-spinner custom-spinner-gray custom-spinner-8xl"></p-progressSpinner>
+                        <span class="text-bluegray-400 font-bold text-lg">Загрузка</span>
+                    </div>
+                </ng-container>
+                <ng-container *ngSwitchCase="'ERROR'">
+                    <div [style]="{gridAreaColumn:'1/-1'}"
+                         class="flex flex-column align-items-center justify-content-center text-red-400 font-bold text-lg">
+                        <span class="mds-error"></span>
+                        <span>Не удалось загрузить данные</span>
+                    </div>
+                </ng-container>
+                <ng-container *ngSwitchCase="'EMPTY'">
+                    <div [style]="{gridAreaColumn:'1/-1'}"
+                         class="flex flex-column align-items-center justify-content-center text-bluegray-400 font-bold text-lg">
+                        <span class="mds-radar"></span>
+                        <span>Нет данных</span>
+                    </div>
                 </ng-container>
             </ng-container>
-        </div>
+        </ng-container>
+    </div>
 </p-dialog>
 
 <p-dialog [(visible)]="isBalanceDialogVisible" [dismissableMask]="true"
           [modal]="true" [resizable]="false" appendTo="body" header="Менеджер баланса">
     <ng-template pTemplate="content">
         <div class="flex flex-column gap-4 mt-1">
-            <form class="flex flex-column gap-2" [formGroup]="balanceForm">
+            <form [formGroup]="balanceForm" class="flex flex-column gap-2">
                 <p-dropdown [options]="(billingPaymentTypes$ | async) ?? []" appendTo="body"
-                            placeholder="Тип платежа" formControlName="payType"></p-dropdown>
-<!--                <p-inputNumber placeholder="Сумма" mode="currency" currency="RUB" formControlName="sum"></p-inputNumber>-->
-                <p-inputNumber placeholder="Сумма" formControlName="sum"></p-inputNumber>
-                <textarea [autoResize]="true" pInputTextarea placeholder="Комментарий"
-                          formControlName="comment" [rows]="3" [cols]="40"></textarea>
+                            formControlName="payType" placeholder="Тип платежа"></p-dropdown>
+                <p-inputNumber formControlName="sum" placeholder="Сумма"></p-inputNumber>
+                <textarea [autoResize]="true" [cols]="40" [rows]="3"
+                          formControlName="comment" pInputTextarea placeholder="Комментарий"></textarea>
             </form>
-            <p-button label="Оплата" icon="mdi-attach_money" (onClick)="sendBalance()" [disabled]="!balanceForm.valid"
-                      styleClass="p-button-primary" class="align-self-end"></p-button>
+            <p-button (onClick)="sendBalance()" [disabled]="!balanceForm.valid" class="align-self-end" icon="mdi-attach_money"
+                      label="Оплата" styleClass="p-button-primary"></p-button>
         </div>
     </ng-template>
 </p-dialog>
 
-<p-dialog [(visible)]="isPaymentDialogVisible" [dismissableMask]="true" contentStyleClass="flex flex-column gap-3 pt-2"
-          [modal]="true" [resizable]="false" appendTo="body" header="Оплата">
-    <ng-template pTemplate="content" [formGroup]="paymentForm">
+<p-dialog [(visible)]="isBalanceResetDialogVisible" [dismissableMask]="true"
+          [modal]="true" [resizable]="false" appendTo="body" header="Обнуление баланса">
+    <ng-template pTemplate="content">
+        <div class="flex flex-column gap-4 mt-1">
+            <textarea [autoResize]="true" [cols]="40" [formControl]="balanceResetCommentControl"
+                      [rows]="3" pInputTextarea placeholder="Комментарий к обнулению баланса..."></textarea>
+            <p-button (onClick)="sendBalanceReset()" [disabled]="!balanceResetCommentControl.valid" class="align-self-end"
+                      icon="mdi-exposure_zero"
+                      label="Обнулить баланс" styleClass="p-button-primary"></p-button>
+        </div>
+    </ng-template>
+</p-dialog>
+
+<p-dialog [(visible)]="isPaymentDialogVisible" [dismissableMask]="true" [modal]="true"
+          [resizable]="false" appendTo="body" contentStyleClass="flex flex-column gap-3 pt-2" header="Оплата">
+    <ng-template [formGroup]="paymentForm" pTemplate="content">
         <div class="flex gap-3 align-items-center">
             <p-selectButton [options]="paymentModeOptions" formControlName="paymentType"></p-selectButton>
-            <input pInputText formControlName="sum" pKeyFilter="pint" [size]="10" placeholder="Сумма"/>
+            <input [size]="10" formControlName="sum" pInputText pKeyFilter="pint" placeholder="Сумма"/>
         </div>
-        <textarea [autoResize]="true" pInputTextarea placeholder="Комментарий" formControlName="comment" [rows]="3" [cols]="30"></textarea>
-        <p-button label="Оплатить" icon="mdi-attach_money" (onClick)="sendPayment()" [disabled]="!paymentForm.valid" class="mt-3 align-self-end"></p-button>
+        <textarea [autoResize]="true" [cols]="30" [rows]="3" formControlName="comment" pInputTextarea
+                  placeholder="Комментарий"></textarea>
+        <p-button (onClick)="sendPayment()" [disabled]="!paymentForm.valid" class="mt-3 align-self-end"
+                  icon="mdi-attach_money" label="Оплатить"></p-button>
     </ng-template>
 </p-dialog>
 
-<p-dialog [(visible)]="isRecalculationDialogVisible" [dismissableMask]="true" contentStyleClass="flex flex-column gap-3 pt-2"
-          [modal]="true" [resizable]="false" appendTo="body" header="Перерасчет">
-    <ng-template pTemplate="content" [formGroup]="recalculationForm">
+<p-dialog [(visible)]="isRecalculationDialogVisible" [dismissableMask]="true"
+          [modal]="true"
+          [resizable]="false" appendTo="body" contentStyleClass="flex flex-column gap-3 pt-2" header="Перерасчет">
+    <ng-template [formGroup]="recalculationForm" pTemplate="content">
         <div class="flex gap-3 align-items-center">
             <p-selectButton [options]="recalculationModeOptions" formControlName="mode"></p-selectButton>
-            <input pInputText formControlName="count" pKeyFilter="int" [size]="12"
-                   [placeholder]="recalculationForm.value.mode === 'DAYS' ? 'Кол-во дней' : 'Кол-во рублей'"/>
+            <input [placeholder]="recalculationForm.value.mode === 'DAYS' ? 'Кол-во дней' : 'Кол-во рублей'" [size]="12" formControlName="count" pInputText
+                   pKeyFilter="int"/>
         </div>
-        <textarea [autoResize]="true" pInputTextarea placeholder="Комментарий" formControlName="comment" [rows]="3" [cols]="30"></textarea>
-        <p-button label="Применить" icon="mdi-restore" (onClick)="sendRecalculation()" [disabled]="!recalculationForm.valid" class="mt-3 align-self-end"></p-button>
+        <textarea [autoResize]="true" [cols]="30" [rows]="3" formControlName="comment" pInputTextarea
+                  placeholder="Комментарий"></textarea>
+        <p-button (onClick)="sendRecalculation()" [disabled]="!recalculationForm.valid" class="mt-3 align-self-end"
+                  icon="mdi-restore" label="Применить"></p-button>
     </ng-template>
 </p-dialog>
 
@@ -719,10 +810,12 @@
 </ng-template>
 
 <p-overlayPanel #tariffsOverlayPanel appendTo="body" styleClass="overlay-panel-unpadding">
-    <p-listbox [listStyle]="{'max-height':'250px'}" filterBy="name" emptyFilterMessage="Тарифа не найдено" emptyMessage="Загрузка..." [filter]="true"
-               [options]="tariffList" optionLabel="name" optionValue="id" (onClick)="changeTariff($event)">
+    <p-listbox (onClick)="changeTariff($event)" [filter]="true" [listStyle]="{'max-height':'250px'}"
+               [options]="tariffList" emptyFilterMessage="Тарифа не найдено"
+               emptyMessage="Загрузка..." filterBy="name" optionLabel="name" optionValue="id">
         <ng-template let-tariff pTemplate="item">
-            <div class="flex align-items-center justify-content-between w-full h-full" [pTooltip]="tariff.description" [showDelay]="500">
+            <div [pTooltip]="tariff.description" [showDelay]="500"
+                 class="flex align-items-center justify-content-between w-full h-full">
                 <span>
                     {{tariff.name}}
                 </span>
@@ -735,11 +828,13 @@
 </p-overlayPanel>
 
 <p-overlayPanel #servicesOverlayPanel appendTo="body" styleClass="overlay-panel-unpadding">
-    <p-listbox [listStyle]="{'max-height':'250px'}" filterBy="name" optionDisabled="disabled"
-               emptyFilterMessage="Доп. сервиса не найдено" emptyMessage="Загрузка..." [filter]="true" (onClick)="appendService($event)"
-               [options]="serviceList" optionLabel="name" optionValue="id" [(ngModel)]="selectedServices">
+    <p-listbox (onClick)="appendService($event)" [(ngModel)]="selectedServices" [filter]="true"
+               [listStyle]="{'max-height':'250px'}" [options]="serviceList" emptyFilterMessage="Доп. сервиса не найдено"
+               emptyMessage="Загрузка..."
+               filterBy="name" optionDisabled="disabled" optionLabel="name" optionValue="id">
         <ng-template let-service pTemplate="item">
-            <div class="flex align-items-center justify-content-between w-full h-full" [pTooltip]="service.description" [showDelay]="500">
+            <div [pTooltip]="service.description" [showDelay]="500"
+                 class="flex align-items-center justify-content-between w-full h-full">
                 <span>
                     {{service.name}}
                 </span>
@@ -751,4 +846,4 @@
     </p-listbox>
 </p-overlayPanel>
 
-<p-menu #controlMenu [popup]="true" appendTo="body" [model]="controlMenuItems"></p-menu>
+<p-menu #controlMenu [model]="controlMenuItems" [popup]="true" appendTo="body"></p-menu>

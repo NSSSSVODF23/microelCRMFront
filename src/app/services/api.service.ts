@@ -792,6 +792,38 @@ export class ApiService {
         return this.sendPost(`api/private/billing/user/${encodeURIComponent(login)}/stop-service`,{});
     }
 
+    balanceReset(login: string, comment: string) {
+        return this.sendPatch(`api/private/billing/user/${encodeURIComponent(login)}/balance-reset`, comment);
+    }
+
+    isLoginEnable(login: string) {
+        return this.sendGetSilent<boolean>(`api/private/billing/user/${encodeURIComponent(login)}/is-enable`);
+    }
+
+    enableLogin(login: string) {
+        return this.sendPatch(`api/private/billing/user/${encodeURIComponent(login)}/enable-login`, {});
+    }
+
+    changeUserAddress(login: string, address: string) {
+        return this.sendPatch(`api/private/billing/user/${encodeURIComponent(login)}/change/address`, address);
+    }
+
+    changeUserFullName(login: string, fullName: string) {
+        return this.sendPatch(`api/private/billing/user/${encodeURIComponent(login)}/change/full-name`, fullName);
+    }
+
+    changeUserPhone(login: string, phone: string) {
+        return this.sendPatch(`api/private/billing/user/${encodeURIComponent(login)}/change/phone`, phone);
+    }
+
+    changeUserComment(login: string, comment: string) {
+        return this.sendPatch(`api/private/billing/user/${encodeURIComponent(login)}/change/comment`, comment);
+    }
+
+    editUser(login: string, editUserForm: any) {
+        return this.sendPatch(`api/private/billing/user/${encodeURIComponent(login)}/edit`, editUserForm);
+    }
+
     convertBillingAddress(addressString: string | undefined) {
         return this.sendGet<Address | null>('api/private/convert/billing-address-string', {addressString});
     }

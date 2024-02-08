@@ -15,11 +15,11 @@ import {CustomNavigationService} from "../../services/custom-navigation.service"
 import {
     BehaviorSubject,
     combineLatest,
-    debounceTime,
+    debounceTime, delay,
     filter,
     first,
     map,
-    merge,
+    merge, mergeMap, repeat,
     shareReplay,
     startWith,
     Subject,
@@ -35,11 +35,14 @@ import {OverlayPanel} from "primeng/overlaypanel";
 import {BlockUiService} from "../../services/block-ui.service";
 import {AccessFlag} from "../../types/access-flag";
 import {PersonalityService} from "../../services/personality.service";
+import {AutoUnsubscribe} from "../../decorators";
+import {co} from "@fullcalendar/core/internal-common";
 
 @Component({
     templateUrl: './billing-user-page.component.html',
     styleUrls: ['./billing-user-page.component.scss']
 })
+@AutoUnsubscribe()
 export class BillingUserPageComponent implements OnInit, OnDestroy {
 
     AccessFlag = AccessFlag;
@@ -67,7 +70,6 @@ export class BillingUserPageComponent implements OnInit, OnDestroy {
         }
     }
     wireframes: any[] = [];
-
 
     houseBindingsPage = new BehaviorSubject(0);
     houseBindingsPage$ = this.houseBindingsPage.pipe(
@@ -135,7 +137,9 @@ export class BillingUserPageComponent implements OnInit, OnDestroy {
     userEventsLoadingState = LoadingState.LOADING;
     billingPaymentTypes$ = this.api.getBillingPaymentTypesList();
     isBalanceDialogVisible = false;
+    isBalanceResetDialogVisible = false;
     isPaymentDialogVisible = false;
+    balanceResetCommentControl = new FormControl<string>('', [Validators.required]);
     paymentModeOptions = [
         {label: 'Наличные', value: 1, icon: 'mdi-money'},
         {label: 'Карта', value: 25, icon: 'mdi-credit_card'},
@@ -173,8 +177,24 @@ export class BillingUserPageComponent implements OnInit, OnDestroy {
         this.rt.taskUpdated(),
         this.rt.taskDeleted(),
     );
-    loadUser$ = merge(this.pathChange$, this.update$);
-    dhcpBindingsLoad$ = this.loadUser$.pipe(
+
+    login$ = merge(this.pathChange$, this.update$);
+    loadUser$ = this.login$.pipe(switchMap(login => this.api.getBillingUserInfo(login)))
+    updateUser$ = this.login$.pipe(switchMap(login => this.rt.billingUserUpdated(login)));
+
+    isLoginEnable = true;
+    isLoginEnableSub = merge(this.loadUser$, this.updateUser$).pipe(switchMap(user => this.api.isLoginEnable(user.uname)))
+        .subscribe(isEnable => this.isLoginEnable = isEnable);
+
+    loadUserSub = this.loadUser$.subscribe(this.userInfoHandler);
+    updateUserSub = this.updateUser$.subscribe(this.userInfoHandler);
+    dhcpLogsUpdateSub = this.login$.subscribe(login=>{
+        this.dhcpLogsPageNum = 0;
+        this.dhcpLogsIsLastPage = false;
+        this.logsLoad(login);
+    })
+
+    dhcpBindingsLoad$ = this.login$.pipe(
         switchMap(login => this.api.getDhcpBindingsByLogin(login)),
         shareReplay(1)
     );
@@ -275,6 +295,14 @@ export class BillingUserPageComponent implements OnInit, OnDestroy {
     serviceList: UserTariff[] = [];
     selectedServices: number[] = [];
 
+    isUserEditDialogVisible = false;
+    userEditForm = new FormGroup({
+        address: new FormControl<string>("", [Validators.required]),
+        fullName: new FormControl<string>("", [Validators.required]),
+        phone: new FormControl<string>("", [Validators.required]),
+        comment: new FormControl<string>(""),
+    });
+
     constructor(private api: ApiService, private rt: RealTimeUpdateService,
                 private route: ActivatedRoute, readonly customNav: CustomNavigationService,
                 readonly taskCreation: TaskCreatorService, readonly toast: MessageService,
@@ -367,6 +395,11 @@ export class BillingUserPageComponent implements OnInit, OnDestroy {
                 command: () => this.openBalanceDialog()
             },
             {
+                label: 'Обнулить баланс',
+                icon: 'mdi-exposure_zero',
+                command: () => this.openBalanceResetDialog()
+            },
+            {
                 label: this.userInfo?.newTarif?.isServiceSuspended ? 'Возобновить обслуживание' : 'Приостановить обслуживание',
                 icon: this.userInfo?.newTarif?.isServiceSuspended ? 'mdi-play_arrow' : 'mdi-pause',
                 styleClass: !this.userInfo?.newTarif?.isServiceSuspended ? 'danger-menu-button' : 'success-menu-button',
@@ -399,7 +432,12 @@ export class BillingUserPageComponent implements OnInit, OnDestroy {
             message: 'Включить отложенный платеж?',
             accept: () => {
                 if (!this.currentLogin) return;
-                this.api.setDeferredPayment(this.currentLogin).subscribe();
+                this.block("Включение отложенного платежа");
+                this.api.setDeferredPayment(this.currentLogin)
+                    .subscribe({
+                        next: ()=>this.unblock(),
+                        error: ()=>this.unblock()
+                    });
             }
         });
     }
@@ -409,10 +447,9 @@ export class BillingUserPageComponent implements OnInit, OnDestroy {
     };
 
     ngOnInit(): void {
-        this.rt.acpDhcpBindingUpdated().subscribe()
-        this.subscriptions.addSubscription('pch',
-            this.loadUser$.subscribe(this.load.bind(this))
-        )
+        // this.subscriptions.addSubscription('pch',
+        //     this.loadUser$.subscribe(this.load.bind(this))
+        // )
         this.api.getWireframesNames().subscribe(wf => {
             this.wireframes = wf.map(value => ({
                 label: value.name,
@@ -436,18 +473,18 @@ export class BillingUserPageComponent implements OnInit, OnDestroy {
         });
     }
 
-    load() {
-        if (this.currentLogin) {
-            this.subscriptions.unsubscribe('userUpd');
-            this.api.getBillingUserInfo(this.currentLogin).subscribe(this.userInfoHandler);
-            this.dhcpLogsPageNum = 0;
-            this.dhcpLogsIsLastPage = false;
-            this.logsLoad(this.currentLogin);
-            this.subscriptions.addSubscription('userUpd', this.rt.billingUserUpdated(this.currentLogin).subscribe(this.userInfoHandler));
-        } else {
-            this.loadingState = LoadingState.ERROR;
-        }
-    }
+    // load() {
+    //     if (this.currentLogin) {
+    //         this.subscriptions.unsubscribe('userUpd');
+    //         this.api.getBillingUserInfo(this.currentLogin).subscribe(this.userInfoHandler);
+    //         this.dhcpLogsPageNum = 0;
+    //         this.dhcpLogsIsLastPage = false;
+    //         this.logsLoad(this.currentLogin);
+    //         this.subscriptions.addSubscription('userUpd', this.rt.billingUserUpdated(this.currentLogin).subscribe(this.userInfoHandler));
+    //     } else {
+    //         this.loadingState = LoadingState.ERROR;
+    //     }
+    // }
 
     logsLoad(login?: string){
         if(!this.dhcpLogsIsLastPage && login && this.dhcpLogsLoadingState === LoadingState.READY){
@@ -616,6 +653,10 @@ export class BillingUserPageComponent implements OnInit, OnDestroy {
         this.isBalanceDialogVisible = true;
     }
 
+    openBalanceResetDialog() {
+        this.isBalanceResetDialogVisible = true;
+    }
+
     openPaymentDialog() {
         this.paymentForm.reset({
             paymentType: 1
@@ -630,9 +671,79 @@ export class BillingUserPageComponent implements OnInit, OnDestroy {
         this.isRecalculationDialogVisible = true;
     }
 
+    openEditUserDialog() {
+        if(!this.userInfo) return;
+        this.userEditForm.reset({
+            address: this.userInfo.ibase.addr,
+            fullName: this.userInfo.ibase.fio,
+            phone: this.userInfo.ibase.phone,
+            comment: this.userInfo.ibase.coment,
+        })
+        this.isUserEditDialogVisible = true;
+    }
+
     sendBalance() {
         if (!this.currentLogin) return;
-        this.api.updateBalance(this.currentLogin, this.balanceForm.value).subscribe();
+        this.confirm.confirm({
+            header: 'Подтверждение изменения баланса логина ' + this.currentLogin,
+            message: 'Изменить баланс логина ' + this.currentLogin + ' на ' + this.balanceForm.value.sum + ' рублей?',
+            accept: () => {
+                if (!this.currentLogin) return;
+                this.block('Изменяется баланс');
+                this.api.updateBalance(this.currentLogin, this.balanceForm.value).subscribe({
+                    next: () => {
+                        this.unblock()
+                        this.isBalanceDialogVisible = false;
+                        this.balanceForm.reset();
+                    },
+                    error: () => {
+                        this.unblock()
+                    }
+                });
+            }
+        })
+    }
+
+    sendBalanceReset() {
+        if (!this.currentLogin) return;
+        this.confirm.confirm({
+            header: 'Подтверждение обнуления баланса логина ' + this.currentLogin,
+            message: 'Обнулить баланс логина ' + this.currentLogin + '?',
+            accept: () => {
+                if (!this.currentLogin || !this.balanceResetCommentControl.value) return;
+                this.block('Обнуление баланса');
+                this.api.balanceReset(this.currentLogin, this.balanceResetCommentControl.value).subscribe({
+                    next: () => {
+                        this.unblock()
+                        this.isBalanceResetDialogVisible = false;
+                        this.balanceResetCommentControl.reset('');
+                    },
+                    error: () => {
+                        this.unblock()
+                    }
+                });
+            }
+        })
+    }
+
+    enableLogin() {
+        if (!this.currentLogin) return;
+        this.confirm.confirm({
+            header: 'Подтверждение включения логина ' + this.currentLogin,
+            message: 'Включить логин ' + this.currentLogin + '?',
+            accept: () => {
+                if (!this.currentLogin) return;
+                this.block('Включение логина');
+                this.api.enableLogin(this.currentLogin).subscribe({
+                    next: () => {
+                        this.unblock()
+                    },
+                    error: () => {
+                        this.unblock()
+                    }
+                });
+            }
+        })
     }
 
     sendPayment() {
@@ -647,6 +758,7 @@ export class BillingUserPageComponent implements OnInit, OnDestroy {
                     next: () => {
                         this.unblock()
                         this.isPaymentDialogVisible = false;
+                        this.paymentForm.reset({paymentType: 1});
                     },
                     error: () => {
                         this.unblock()
@@ -668,6 +780,28 @@ export class BillingUserPageComponent implements OnInit, OnDestroy {
                     next: () => {
                         this.unblock()
                         this.isRecalculationDialogVisible = false;
+                        this.recalculationForm.reset({mode: 'DAYS'});
+                    },
+                    error: () => {
+                        this.unblock()
+                    }
+                });
+            }
+        })
+    }
+
+    confirmUserEdit() {
+        if (!this.currentLogin) return;
+        this.confirm.confirm({
+            header: 'Подтверждение редактирования данных логина ' + this.currentLogin,
+            message: 'Изменить данные логина ' + this.currentLogin + '?',
+            accept: () => {
+                if (!this.currentLogin) return;
+                this.block('Редактирование логина');
+                this.api.editUser(this.currentLogin, this.userEditForm.value).subscribe({
+                    next: () => {
+                        this.unblock()
+                        this.isUserEditDialogVisible = false;
                     },
                     error: () => {
                         this.unblock()
