@@ -206,6 +206,7 @@ export interface Employee {
     oldTrackerCredentials?: OldTrackerCredentials;
     base781Credentials?: Credentials;
     base1785Credentials?: Credentials;
+    base1783Credentials?: Credentials;
 }
 
 export interface Credentials {

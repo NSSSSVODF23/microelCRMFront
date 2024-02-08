@@ -449,6 +449,10 @@ export class EmployeesPageComponent implements OnInit, OnDestroy {
                     base781Credentials: {
                         username: employee.base781Credentials?.username ?? "",
                         password: employee.base781Credentials?.password ?? "",
+                    },
+                    base1783Credentials: {
+                        username: employee.base1783Credentials?.username ?? "",
+                        password: employee.base1783Credentials?.password ?? "",
                     }
                 })
                 this.positionSelecting({value: employee.position?.positionId})
