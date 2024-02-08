@@ -38,7 +38,6 @@ import {TimelineModule} from "primeng/timeline";
 import {LMarkdownEditorModule} from "ngx-markdown-editor";
 import {CalendarModule} from "primeng/calendar";
 import {ScrollTopModule} from "primeng/scrolltop";
-// import {VirtualScrollerModule} from "@daalex90/ngx-virtual-scroller";
 import {StepsModule} from "primeng/steps";
 import {OrderListModule} from "primeng/orderlist";
 import {MenuModule} from "primeng/menu";
@@ -94,8 +93,6 @@ import {BypassWorkCalculationComponent} from "../../pages/bypass-work-calculatio
 import {BillingSettingsPageComponent} from "../../pages/billing-settings-page/billing-settings-page.component";
 import {TelegramSettingsPageComponent} from "../../pages/telegram-settings-page/telegram-settings-page.component";
 import {AcpSettingsPageComponent} from "../../pages/acp-settings-page/acp-settings-page.component";
-import {AcpSessionsPageComponent} from "../../pages/acp-sessions-page/acp-sessions-page.component";
-import {CommutatorListPageComponent} from "../../pages/commutator-list-page/commutator-list-page.component";
 import {AutoCompleteModule} from "primeng/autocomplete";
 import {KeyFilterModule} from "primeng/keyfilter";
 import {FilesPageComponent} from "../../pages/files-page/files-page.component";
@@ -128,6 +125,16 @@ import {
     EmployeeWorkStatisticsPage
 } from "../../pages/statistics/children/employee-work-statistics-page/employee-work-statistics-page.component";
 import {ChartModule} from "primeng/chart";
+import {TopologyBootstrapPage} from "../../pages/topology/topology-bootstrap-page/topology-bootstrap-page.component";
+import {
+    TopologyHousesPageComponent
+} from "../../pages/topology/children/topology-houses-page/topology-houses-page.component";
+import {
+    TopologySessionsPage
+} from "../../pages/topology/children/topology-sessions-page/topology-sessions-page.component";
+import {
+    TopologyCommutatorsPage
+} from "../../pages/topology/children/topology-commutators-page/topology-commutators-page.component";
 
 const mapConfig: YaConfig = {
     apikey: '008574e5-f34b-4270-b3d5-91aaabd036e8',
@@ -159,8 +166,6 @@ const mapConfig: YaConfig = {
         BillingSettingsPageComponent,
         TelegramSettingsPageComponent,
         AcpSettingsPageComponent,
-        AcpSessionsPageComponent,
-        CommutatorListPageComponent,
         FilesPageComponent,
         TaskCatalogPageComponent,
         TaskCatalogSearchPageComponent,
@@ -170,7 +175,11 @@ const mapConfig: YaConfig = {
         ContractsInspectionPageComponent,
         ContractTypesPageComponent,
         StatisticsBootstrapPage,
-        EmployeeWorkStatisticsPage
+        EmployeeWorkStatisticsPage,
+        TopologyBootstrapPage,
+        TopologyHousesPageComponent,
+        TopologySessionsPage,
+        TopologyCommutatorsPage
     ],
     imports: [
         CommonComponentsModule,

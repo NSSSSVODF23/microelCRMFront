@@ -1,7 +1,5 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
 import {AbstractControl, FormControl, FormGroup, ValidationErrors, Validators} from "@angular/forms";
-import {ApiService} from "../../services/api.service";
-import {RealTimeUpdateService} from "../../services/real-time-update.service";
 import {
     BehaviorSubject,
     combineLatest,
@@ -16,6 +14,8 @@ import {
     switchMap,
     tap
 } from "rxjs";
+import {ConfirmationService, MenuItem} from "primeng/api";
+import {flowInChild} from "../../../../animations";
 import {
     Address,
     LoadingState,
@@ -23,19 +23,19 @@ import {
     SwitchBaseInfo,
     SwitchModel,
     SwitchWithAddress
-} from "../../types/transport-interfaces";
-import {flowInChild} from "../../animations";
-import {DynamicPageContent, DynamicValueFactory, SubscriptionsHolder} from "../../util";
-import {ConfirmationService, MenuItem} from "primeng/api";
-import {AccessFlag} from "../../types/access-flag";
-import {PersonalityService} from "../../services/personality.service";
+} from "../../../../types/transport-interfaces";
+import { AccessFlag } from 'src/app/types/access-flag';
+import {DynamicPageContent, DynamicValueFactory, SubscriptionsHolder} from "../../../../util";
+import {ApiService} from "../../../../services/api.service";
+import {RealTimeUpdateService} from "../../../../services/real-time-update.service";
+import {PersonalityService} from "../../../../services/personality.service";
 
 @Component({
-    templateUrl: './commutator-list-page.component.html',
-    styleUrls: ['./commutator-list-page.component.scss'],
+    templateUrl: './topology-commutators-page.component.html',
+    styleUrls: ['./topology-commutators-page.component.scss'],
     animations: [flowInChild]
 })
-export class CommutatorListPageComponent implements OnInit, OnDestroy {
+export class TopologyCommutatorsPage implements OnInit, OnDestroy {
 
     AccessFlag = AccessFlag;
 

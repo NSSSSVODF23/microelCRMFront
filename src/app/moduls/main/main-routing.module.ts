@@ -24,8 +24,6 @@ import {BypassWorkCalculationComponent} from "../../pages/bypass-work-calculatio
 import {BillingSettingsPageComponent} from "../../pages/billing-settings-page/billing-settings-page.component";
 import {TelegramSettingsPageComponent} from "../../pages/telegram-settings-page/telegram-settings-page.component";
 import {AcpSettingsPageComponent} from "../../pages/acp-settings-page/acp-settings-page.component";
-import {AcpSessionsPageComponent} from "../../pages/acp-sessions-page/acp-sessions-page.component";
-import {CommutatorListPageComponent} from "../../pages/commutator-list-page/commutator-list-page.component";
 import {FilesPageComponent} from "../../pages/files-page/files-page.component";
 import {AuthGuard} from "../../guards/auth.guard";
 import {MainGuard} from "../../guards/main.guard";
@@ -57,6 +55,16 @@ import {
 import {
     EmployeeWorkStatisticsPage
 } from "../../pages/statistics/children/employee-work-statistics-page/employee-work-statistics-page.component";
+import {TopologyBootstrapPage} from "../../pages/topology/topology-bootstrap-page/topology-bootstrap-page.component";
+import {
+    TopologyHousesPageComponent
+} from "../../pages/topology/children/topology-houses-page/topology-houses-page.component";
+import {
+    TopologyCommutatorsPage
+} from "../../pages/topology/children/topology-commutators-page/topology-commutators-page.component";
+import {
+    TopologySessionsPage
+} from "../../pages/topology/children/topology-sessions-page/topology-sessions-page.component";
 
 const routes: Routes = [{
     path: '', component: MainBootstrapComponent, children: [
@@ -149,12 +157,10 @@ const routes: Routes = [{
         {path: 'salary/estimation/bypass', component: BypassWorkCalculationComponent, canActivate:[accessCanActivate(AccessFlag.COUNT_SALARY)]},
         {path: 'clients/billing/search', component: BillingSearchUserPageComponent, canActivate:[accessCanActivate(AccessFlag.BILLING)]},
         {path: 'clients/billing/user/:login', component: BillingUserPageComponent, canActivate:[accessCanActivate(AccessFlag.BILLING)]},
-        {path: 'clients/sessions', component: AcpSessionsPageComponent, canActivate:[accessCanActivate(AccessFlag.BILLING)]},
         {path: 'addresses/list', component: AddressesListPageComponent, canActivate:[accessCanActivate(AccessFlag.EDIT_ADDRESS_BOOK, AccessFlag.EDIT_HOUSE_ADDRESS_BOOK)]},
         {path: 'system/billing', component: BillingSettingsPageComponent, canActivate:[accessCanActivate(AccessFlag.MANAGE_SYSTEM_SETTINGS)]},
         {path: 'system/telegram', component: TelegramSettingsPageComponent, canActivate:[accessCanActivate(AccessFlag.MANAGE_SYSTEM_SETTINGS)]},
         {path: 'system/acp', component: AcpSettingsPageComponent, canActivate:[accessCanActivate(AccessFlag.MANAGE_SYSTEM_SETTINGS)]},
-        {path: 'commutators/list', component: CommutatorListPageComponent, canActivate:[accessCanActivate(AccessFlag.VIEW_SWITCH, AccessFlag.EDIT_SWITCH)]},
         {path: 'files', component: FilesPageComponent, canActivate:[accessCanActivate(AccessFlag.READ_WRITE_FILES)]},
         {
             path: 'contracts',
@@ -171,6 +177,16 @@ const routes: Routes = [{
                 {path: 'employee-works', component: EmployeeWorkStatisticsPage},
             ],
             canActivate:[accessCanActivate(AccessFlag.VIEW_STATISTICS)]
+        },
+        {
+            path: 'topology',
+            component: TopologyBootstrapPage,
+            children: [
+                {path: 'houses', component: TopologyHousesPageComponent},
+                {path: 'commutators', component: TopologyCommutatorsPage, canActivate:[accessCanActivate(AccessFlag.VIEW_SWITCH, AccessFlag.EDIT_SWITCH)]},
+                {path: 'sessions', component: TopologySessionsPage, canActivate:[accessCanActivate(AccessFlag.BILLING)]},
+            ],
+            // canActivate:[accessCanActivate(AccessFlag.VIEW_STATISTICS)]
         }
     ],
     canActivate: [AuthGuard, MainGuard]

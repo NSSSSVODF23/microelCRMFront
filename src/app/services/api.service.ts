@@ -45,7 +45,7 @@ import {
     TaskFiltrationConditions, TaskJournalSortingTypes, TaskStage,
     TaskTag, TaskTypeDirectory,
     TelegramConf, TimeFrame,
-    TokenChain, TokenChainWithUserInfo,
+    TokenChain, TokenChainWithUserInfo, TopologyStreet,
     TreeDragDropEvent,
     TreeElementPosition, TypesOfContracts, TypesOfContractsForm, TypesOfContractsSuggestion, UserEvents, UserTariff,
     Wireframe, WireframeDashboardStatistic,
@@ -994,7 +994,7 @@ export class ApiService {
     }
 
     getAcpConfiguration() {
-        return this.sendGet<AcpConf>('api/private/configuration/acp');
+        return this.sendGet<AcpConf>('api/private/acp/configuration');
     }
 
     setBillingConfiguration(billingConf: BillingConf) {
@@ -1006,7 +1006,7 @@ export class ApiService {
     }
 
     setAcpConfiguration(acpConf: AcpConf) {
-        return this.sendPost('api/private/configuration/acp', acpConf);
+        return this.sendPatch('api/private/acp/configuration', acpConf);
     }
 
     getClientEquipments(query?: string | null, isDeleted?: boolean | null) {
@@ -1055,6 +1055,10 @@ export class ApiService {
 
     getCommutatorsByVlan(vlan: number) {
         return this.sendGet<Switch[]>(`api/private/acp/commutators/vlan/${vlan}`);
+    }
+
+    getTopology(){
+        return this.sendGet<TopologyStreet[]>(`api/private/acp/topology`);
     }
 
     getCountingLivesCalculation(form: {[key:string]: any})  {

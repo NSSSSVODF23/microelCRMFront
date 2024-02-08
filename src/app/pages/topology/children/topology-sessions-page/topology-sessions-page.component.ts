@@ -1,20 +1,20 @@
 import {Component, OnInit} from '@angular/core';
 import {BehaviorSubject, combineLatest, debounceTime, map, shareReplay, startWith, Subject, switchMap, tap} from "rxjs";
 import {FormControl, FormGroup} from "@angular/forms";
-import {ApiService} from "../../services/api.service";
-import {DhcpBinding, SwitchWithAddress} from "../../types/transport-interfaces";
 import {ConfirmationService} from "primeng/api";
-import {flowInChild} from "../../animations";
-import {DynamicValueFactory} from "../../util";
-import {CustomValidators} from "../../custom-validators";
-import {RealTimeUpdateService} from "../../services/real-time-update.service";
+import {flowInChild} from "../../../../animations";
+import {DhcpBinding, SwitchWithAddress} from "../../../../types/transport-interfaces";
+import {CustomValidators} from "../../../../custom-validators";
+import {DynamicValueFactory} from "../../../../util";
+import {ApiService} from "../../../../services/api.service";
+import {RealTimeUpdateService} from "../../../../services/real-time-update.service";
 
 @Component({
-    templateUrl: './acp-sessions-page.component.html',
-    styleUrls: ['./acp-sessions-page.component.scss'],
+    templateUrl: './topology-sessions-page.component.html',
+    styleUrls: ['./topology-sessions-page.component.scss'],
     animations: [flowInChild]
 })
-export class AcpSessionsPageComponent implements OnInit {
+export class TopologySessionsPage implements OnInit {
 
     pageNum = 0;
     isLoadingLastBindings = true;

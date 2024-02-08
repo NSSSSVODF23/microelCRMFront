@@ -1846,3 +1846,41 @@ export namespace Statistics{
         taskType: TaskType;
     }
 }
+
+//    @Data
+//     public static class TopologyStreet {
+//         private String streetName;
+//         private List<TopologyHouse> houses;
+//
+//         public static TopologyStreet of(Street street, List<TopologyHouse> topologyHouses) {
+//             TopologyStreet topologyStreet = new TopologyStreet();
+//             topologyStreet.setStreetName(street.getName());
+//             topologyStreet.setHouses(topologyHouses);
+//             return topologyStreet;
+//         }
+//     }
+//
+//     @Data
+//     public static class TopologyHouse {
+//         private Integer buildingId;
+//         private String houseNum;
+//
+//         public static TopologyHouse of(Building building) {
+//             TopologyHouse house = new TopologyHouse();
+//             house.setBuildingId(building.getId());
+//             house.setHouseNum(building.getHouseNum());
+//             return house;
+//         }
+//     }
+
+export interface TopologyStreet {
+    streetName: string;
+    houses: TopologyHouse[];
+    highlighted?: boolean;
+}
+
+export interface TopologyHouse {
+    buildingId: number;
+    houseNum: string;
+    highlighted?: boolean;
+}

@@ -1,0 +1,17 @@
+<div class="flex flex-column gap-1">
+    <div>
+        <input id="searchInput" placeholder="Найти" pInputText/>
+    </div>
+    <div *ngIf="topology$ | async as topology" class="flex flex-column gap-1">
+        <div class="flex align-items-center gap-2 text-sm topology" *ngFor="let street of topology" [ngClass]="{highlighted: street.highlighted}">
+            <span class="white-space-nowrap font-bold">
+                {{street.streetName}}
+            </span>
+            <div class="flex flex-wrap gap-1">
+                <span class="border-1 border-bluegray-100 p-1 border-round topology" *ngFor="let house of street.houses" [ngClass]="{highlighted: house.highlighted}">
+                    {{house.houseNum}}
+                </span>
+            </div>
+        </div>
+    </div>
+</div>

@@ -12,6 +12,9 @@
         <ng-container *ngSwitchCase="'addresses'">
             <ng-container *ngTemplateOutlet="addresses"></ng-container>
         </ng-container>
+        <ng-container *ngSwitchCase="'topology'">
+            <ng-container *ngTemplateOutlet="topology"></ng-container>
+        </ng-container>
         <ng-container *ngSwitchCase="'system'">
             <ng-container *ngTemplateOutlet="system"></ng-container>
         </ng-container>
@@ -34,7 +37,7 @@
     <app-extended-menu-item [link]="(lastCatalogRoute$ | async)??['/tasks','catalog']" caption="Задачи" icon="mdi-task"></app-extended-menu-item>
     <app-extended-menu-item [link]="['/clients','billing','search']" caption="Абоненты" icon="mdi-group" *ngIf="personality.isHasAccess(AccessFlag.BILLING)"></app-extended-menu-item>
     <app-extended-menu-item [link]="['/addresses','list']" caption="Адреса" icon="mdi-home_work" *ngIf="personality.isHasAccess(AccessFlag.EDIT_ADDRESS_BOOK, AccessFlag.EDIT_HOUSE_ADDRESS_BOOK)"></app-extended-menu-item>
-    <app-extended-menu-item [link]="['/commutators','list']" caption="Коммутаторы" icon="mdi-dns" *ngIf="personality.isHasAccess(AccessFlag.VIEW_SWITCH, AccessFlag.EDIT_SWITCH)"></app-extended-menu-item>
+    <app-extended-menu-item [link]="['/topology','houses']" caption="Топология" icon="mdi-hub" *ngIf="personality.isHasAccess(AccessFlag.VIEW_SWITCH, AccessFlag.EDIT_SWITCH)"></app-extended-menu-item>
 <!--    <app-extended-menu-item caption="Склад" icon="mdi-warehouse"></app-extended-menu-item>-->
     <app-extended-menu-item [link]="['/employees']" caption="Сотрудники" icon="mdi-account_circle" *ngIf="personality.isHasAccess(AccessFlag.MANAGE_EMPLOYEES, AccessFlag.MANAGE_DEPARTMENTS, AccessFlag.MANAGE_POSITIONS)"></app-extended-menu-item>
     <app-extended-menu-item [link]="['/salary','table']" caption="Зарплата" icon="mdi-currency_ruble" *ngIf="personality.isHasAccess(AccessFlag.COUNT_SALARY, AccessFlag.EDIT_PRICE)"></app-extended-menu-item>
@@ -85,6 +88,14 @@
     <ng-container *ngTemplateOutlet="backButton; context:{name:'Адреса'}"></ng-container>
     <app-extended-menu-item [link]="['/addresses','list']" caption="Список" icon="mdi-view_list"></app-extended-menu-item>
     <app-extended-menu-item [link]="['/addresses','schemes']" caption="Схемы домов" icon="mdi-schema"></app-extended-menu-item>
+</ng-template>
+
+<ng-template #topology>
+    <ng-container *ngTemplateOutlet="backButton; context:{name:'Топология'}"></ng-container>
+    <app-extended-menu-item [link]="['/topology','houses']" caption="Дома" icon="mdi-maps_home_work"></app-extended-menu-item>
+    <app-extended-menu-item [link]="['/topology','commutators']" caption="Коммутаторы" icon="mdi-dns"></app-extended-menu-item>
+    <app-extended-menu-item [link]="['/topology','nets']" caption="Сети" icon="mdi-lan"></app-extended-menu-item>
+    <app-extended-menu-item [link]="['/topology','sessions']" caption="Сессии" icon="mdi-stream"></app-extended-menu-item>
 </ng-template>
 
 <ng-template #system>

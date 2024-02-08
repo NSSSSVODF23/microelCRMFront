@@ -1,4 +1,9 @@
-.top-panel{
+:host {
+  display: flex;
+  flex-direction: column;
+}
+
+.top-panel {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -11,7 +16,7 @@
   height: var(--top-panel-height);
   z-index: 1009;
 
-  &-content{
+  &-content {
     display: flex;
     align-items: center;
     gap: 1.5rem;
