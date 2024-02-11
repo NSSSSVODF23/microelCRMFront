@@ -74,7 +74,6 @@ export class BillingUserSearchingService {
                 this.users = [];
                 return of([] as BillingUserItemData[]);
             }),
-            repeat(),
         )
 
     usersHandler = {

@@ -66,7 +66,7 @@
 
 <p-overlayPanel #contractsOverlay [dismissable]="true" styleClass="flex flex-column gap-3" (onShow)="concludedContractsControl.reset([])">
     <div class="flex flex-column gap-4 max-w-30rem" (click)="$event.stopPropagation()">
-        <span class="text-bluegray-500 text-lg font-semibold">Какие договора должен сдать монтажник?</span>
+        <span class="text-bluegray-500 text-lg font-semibold">Какие договоры должен сдать монтажник?</span>
         <div class="flex flex-column gap-2">
             <app-types-contracts-multi-selector [formControl]="concludedContractsControl" (onAfterChange)="contractsOverlay.overlayVisible && contractsOverlay.align()"></app-types-contracts-multi-selector>
             <div class="flex gap-3">

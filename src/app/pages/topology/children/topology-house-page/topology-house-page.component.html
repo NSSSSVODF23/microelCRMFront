@@ -1,0 +1,229 @@
+<ng-container *ngIf="building$ | async as building">
+    <ng-container [ngSwitch]="houseLoadingState">
+        <ng-container *ngSwitchCase="LoadingState.LOADING">
+            <ng-container *ngTemplateOutlet="loadingTemplate"></ng-container>
+        </ng-container>
+        <ng-container *ngSwitchCase="LoadingState.READY">
+            <ng-container *ngTemplateOutlet="houseTemplate; context: {building}"></ng-container>
+        </ng-container>
+    </ng-container>
+</ng-container>
+
+<ng-template #loadingTemplate>
+    <div class="flex flex-column flex-grow-1 h-fit bg-white border-round shadow-1">
+        <div class="flex flex-column p-3 gap-1">
+            <p-skeleton width="12rem" height="1.7rem"></p-skeleton>
+            <p-skeleton width="8rem" height="1.1rem"></p-skeleton>
+        </div>
+        <div class="flex gap-2 p-4 pt-1">
+            <p-skeleton width="200px" height="150px"></p-skeleton>
+            <p-skeleton width="200px" height="150px"></p-skeleton>
+            <p-skeleton width="auto" height="150px" class="flex-grow-1"></p-skeleton>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #houseTemplate let-building="building">
+    <div class="flex flex-column flex-grow-1 h-fit bg-white border-round shadow-1">
+        <div class="flex flex-column p-3">
+            <span class="text-bluegray-500 text-xl font-semibold">
+                {{building.fullName}}
+            </span>
+            <span class="text-primary font-bold cursor-pointer hover:text-primary-700"
+                  *ngIf="building.uplink" [routerLink]="['/topology', 'house', building.uplink?.buildingId]">
+                Uplink: {{building.uplink?.fullName}}
+            </span>
+        </div>
+        <div class="flex flex-column gap-2 p-4 pt-1">
+            <div class="flex gap-2">
+                <ng-container *ngTemplateOutlet="downlinksListTemplate; context:{building}"></ng-container>
+                <ng-container *ngTemplateOutlet="networksTableTemplate; context:{building}"></ng-container>
+                <ng-container *ngTemplateOutlet="commutatorsTableTemplate"></ng-container>
+            </div>
+            <ng-container *ngTemplateOutlet="bindingsTableTemplate"></ng-container>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #networkItemTemplate let-network="network">
+    <tr>
+        <td>{{network.network}}</td>
+        <td>{{network.vid}}</td>
+        <td>
+            <ng-container [ngSwitch]="network.nettype">
+                <ng-container *ngSwitchCase="1">
+                    DHCP
+                </ng-container>
+            </ng-container>
+        </td>
+    </tr>
+</ng-template>
+
+<ng-template #downlinksListTemplate let-building="building">
+    <ng-container *ngIf="building.downlinks as downlinks">
+        <div class="flex flex-column border-1 border-bluegray-100 border-round overflow-hidden" *ngIf="downlinks.length > 0">
+            <div class="text-bluegray-500 font-bold p-2 bg-gray-50 border-bottom-1 border-bluegray-100">
+                Downlinks
+            </div>
+            <div class="flex flex-column px-3 py-2">
+                <div class="flex align-items-center gap-2" *ngFor="let downlink of downlinks">
+                    <span class="text-primary cursor-pointer hover:text-primary-700"
+                          [routerLink]="['/topology', 'house', downlink.buildingId]">
+                        {{downlink.fullName}}
+                    </span>
+                </div>
+            </div>
+        </div>
+    </ng-container>
+
+</ng-template>
+
+<ng-template #networksTableTemplate let-building="building">
+    <div class="overflow-hidden border-round border-1 border-bluegray-100">
+        <p-table [value]="building.networks" styleClass="p-datatable-sm">
+            <ng-template pTemplate="header">
+                <tr>
+                    <th>Сеть</th>
+                    <th>Vlan</th>
+                    <th>Тип</th>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-network>
+                <ng-container *ngTemplateOutlet="networkItemTemplate; context:{network}"></ng-container>
+            </ng-template>
+        </p-table>
+    </div>
+
+</ng-template>
+
+<ng-template #commutatorsTableTemplate>
+    <ng-container *ngIf="commutators$ | async as commutators">
+        <div class="flex flex-grow-1 overflow-hidden border-round border-1 border-bluegray-100">
+            <p-table [value]="commutators" class="flex-grow-1" styleClass="p-datatable-sm flex-grow-1">
+                <ng-template pTemplate="header">
+                    <tr>
+                        <th>Имя</th>
+                        <th>Тип</th>
+                        <th>Модель</th>
+                        <th>Адрес</th>
+                        <th>Ping</th>
+                        <th>Управление</th>
+                    </tr>
+                </ng-template>
+                <ng-template pTemplate="body" let-commutator>
+                    <tr>
+                        <td>{{commutator.name}}</td>
+                        <td>{{commutator.type}}</td>
+                        <td>{{commutator.model}}</td>
+                        <td>{{commutator.ip}}</td>
+                        <td>
+                            <ng-container *ngIf="commutatorsPings[commutator.ip] | async as ping; else pingInitTemplate">
+                                <span [ngClass]="ping.styleClass">
+                                    <span>
+                                        {{ping.latency === 999 ? '- ' : ping.latency | number:'1.2-2'}}мс
+                                    </span>
+                                    <span>
+                                        {{ping.loss | number:'1.2-2'}}%
+                                    </span>
+                                </span>
+                            </ng-container>
+                        </td>
+                        <td class="flex gap-2">
+                            <span class="text-primary font-bold hover:text-primary-700 cursor-pointer" (click)="openCommutatorWeb(commutator.ip)">
+                                Web
+                            </span>
+                            <span class="text-primary font-bold hover:text-primary-700 cursor-pointer">
+                                Telnet
+                            </span>
+                        </td>
+                    </tr>
+                </ng-template>
+            </p-table>
+        </div>
+    </ng-container>
+</ng-template>
+
+<ng-template #bindingsTableTemplate>
+    <div class="flex flex-grow-1 overflow-hidden border-round border-1 border-bluegray-100">
+        <p-table [value]="bindingsPage?.content ?? []" class="flex-grow-1" styleClass="p-datatable-sm flex-grow-1"
+                 [totalRecords]="bindingsPage?.totalElements ?? 0" dataKey="id" paginatorDropdownAppendTo="body"
+                 currentPageReportTemplate="Найдено {totalRecords} сессий" [showCurrentPageReport]="true" sortMode="multiple"
+                 [multiSortMeta]="[{field:'leaseStart', order: -1}]" [rowsPerPageOptions]="[10,25,50,100]"
+                 [paginator]="true" [(first)]="bindingsTableOffset" [lazy]="true"
+                 (onLazyLoad)="bindingsLazyLoad$.next($event)" [rows]="10">
+            <ng-template pTemplate="header">
+                <tr>
+                    <th>Статус</th>
+                    <th pSortableColumn="authName">Логин <p-sortIcon field="authName"></p-sortIcon></th>
+                    <th pSortableColumn="authExpire" >Авторизация <p-sortIcon field="authExpire"></p-sortIcon></th>
+                    <th pSortableColumn="leaseStart" >В сети <p-sortIcon field="leaseStart"></p-sortIcon></th>
+                    <th>Адрес</th>
+                    <th pSortableColumn="ipaddr" >IP Адрес <p-sortIcon field="ipaddr"></p-sortIcon></th>
+                    <th pSortableColumn="macaddr" >MAC Адрес <p-sortIcon field="macaddr"></p-sortIcon></th>
+                    <th pSortableColumn="vlanid" >VLAN <p-sortIcon field="vlanid"></p-sortIcon></th>
+                    <th pSortableColumn="dhcpHostname" >Оборудование <p-sortIcon field="dhcpHostname"></p-sortIcon></th>
+                    <th>Ping</th>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-binding>
+                <tr (click)="selectBinding($event, binding, bindingContextPanel, menuTargetElement)" class="cursor-pointer hover:bg-bluegray-50">
+                    <td>
+                        <app-colored-tag *ngIf="bindingsUserBriefs[binding.authName] as userBrief" [caption]="userBrief.statusName" [color]="userBrief.statusColor"></app-colored-tag>
+                    </td>
+                    <td>{{binding.authName}}</td>
+                    <td>
+                        <span *ngIf="binding.isAuth" class="font-bold text-green-400">Авторизован</span>
+                        <span *ngIf="!binding.isAuth" class="font-bold text-gray-400">Не авторизован</span>
+                    </td>
+                    <td>
+                        <app-time-elapsed [startTime]="binding.leaseStart"
+                                          type="short"></app-time-elapsed>
+                    </td>
+                    <td>
+                        <span *ngIf="bindingsUserBriefs[binding.authName] as userBrief">{{userBrief.address}}</span>
+                    </td>
+                    <td>{{binding.ipaddr}}</td>
+                    <td>{{binding.macaddr}}</td>
+                    <td>{{binding.vlanid}}</td>
+                    <td>{{binding.dhcpHostname}}</td>
+                    <td>
+                        <ng-container *ngIf="bindingsPings[binding.ipaddr] | async as ping; else pingInitTemplate">
+                            <span [ngClass]="ping.styleClass">
+                                <span>
+                                    {{ping.latency === 999 ? '- ' : ping.latency | number:'1.2-2'}}мс
+                                </span>
+                                <span>
+                                    {{ping.loss | number:'1.2-2'}}%
+                                </span>
+                            </span>
+                        </ng-container>
+                    </td>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="paginatorright">
+                <p-button type="button" icon="mdi-update" styleClass="p-button-text" [disabled]="bindingsLoadingState !== LoadingState.READY"
+                          (onClick)="bindingsUpdate$.next(true)"></p-button>
+            </ng-template>
+        </p-table>
+    </div>
+</ng-template>
+
+<div #menuTargetElement class="fixed w-1rem h-1rem pointer-events-none"></div>
+
+<p-menu #bindingContextPanel appendTo="body" [popup]="true" [model]="bindingContextOptions"></p-menu>
+
+<p-dialog #userAuthDialog header="Авторизовать под логином" [(visible)]="userAuthDialogVisible"
+          [modal]="true" [draggable]="true" [dismissableMask]="true" appendTo="body" contentStyleClass="flex flex-column gap-3">
+    <span class="font-bold text-bluegray-500">Авторизация устройства {{selectBindingForAuth?.dhcpHostname}} {{selectBindingForAuth?.ipaddr}} {{selectBindingForAuth?.macaddr}}</span>
+    <div class="flex gap-3" [formGroup]="authUserForm">
+        <input pInputText placeholder="Логин для авторизации" formControlName="login" class="flex-grow-1"/>
+        <button pButton type="button" label="Авторизовать" [disabled]="authUserForm.invalid"
+                (click)="authUser()" class="p-button-success"></button>
+    </div>
+</p-dialog>
+
+<ng-template #pingInitTemplate>
+    <div class="flex justify-content-center">
+        <p-progressSpinner class="custom-spinner custom-spinner-gray custom-spinner-md" strokeWidth="3"></p-progressSpinner>
+    </div>
+</ng-template>

@@ -1,4 +1,4 @@
-import {NgModule} from '@angular/core';
+import {EnvironmentInjector, Injector, NgModule} from '@angular/core';
 import {CanActivateFn, RouterModule, Routes} from '@angular/router';
 import {TaskCreationPageComponent} from "../../pages/task-creation-page/task-creation-page.component";
 import {TaskPageComponent} from "../../pages/task-page/task-page.component";
@@ -57,7 +57,7 @@ import {
 } from "../../pages/statistics/children/employee-work-statistics-page/employee-work-statistics-page.component";
 import {TopologyBootstrapPage} from "../../pages/topology/topology-bootstrap-page/topology-bootstrap-page.component";
 import {
-    TopologyHousesPageComponent
+    TopologyHousesPage
 } from "../../pages/topology/children/topology-houses-page/topology-houses-page.component";
 import {
     TopologyCommutatorsPage
@@ -65,6 +65,9 @@ import {
 import {
     TopologySessionsPage
 } from "../../pages/topology/children/topology-sessions-page/topology-sessions-page.component";
+import {
+    TopologyHousePage
+} from "../../pages/topology/children/topology-house-page/topology-house-page.component";
 
 const routes: Routes = [{
     path: '', component: MainBootstrapComponent, children: [
@@ -182,7 +185,8 @@ const routes: Routes = [{
             path: 'topology',
             component: TopologyBootstrapPage,
             children: [
-                {path: 'houses', component: TopologyHousesPageComponent},
+                {path: 'houses', component: TopologyHousesPage},
+                {path: 'house/:id', component: TopologyHousePage},
                 {path: 'commutators', component: TopologyCommutatorsPage, canActivate:[accessCanActivate(AccessFlag.VIEW_SWITCH, AccessFlag.EDIT_SWITCH)]},
                 {path: 'sessions', component: TopologySessionsPage, canActivate:[accessCanActivate(AccessFlag.BILLING)]},
             ],
@@ -196,4 +200,9 @@ const routes: Routes = [{
     imports: [RouterModule.forChild(routes)], exports: [RouterModule],
 })
 export class MainRoutingModule {
+    static injector: EnvironmentInjector;
+
+    constructor(injector: EnvironmentInjector) {
+        MainRoutingModule.injector = injector;
+    }
 }

@@ -1,4 +1,4 @@
-import {LOCALE_ID, NgModule, SecurityContext} from '@angular/core';
+import {Injector, LOCALE_ID, NgModule, SecurityContext} from '@angular/core';
 
 import {MainRoutingModule} from './main-routing.module';
 import {TasksPageComponent} from "../../pages/tasks-page/tasks-page.component";
@@ -127,7 +127,7 @@ import {
 import {ChartModule} from "primeng/chart";
 import {TopologyBootstrapPage} from "../../pages/topology/topology-bootstrap-page/topology-bootstrap-page.component";
 import {
-    TopologyHousesPageComponent
+    TopologyHousesPage
 } from "../../pages/topology/children/topology-houses-page/topology-houses-page.component";
 import {
     TopologySessionsPage
@@ -135,6 +135,9 @@ import {
 import {
     TopologyCommutatorsPage
 } from "../../pages/topology/children/topology-commutators-page/topology-commutators-page.component";
+import {
+    TopologyHousePage
+} from "../../pages/topology/children/topology-house-page/topology-house-page.component";
 
 const mapConfig: YaConfig = {
     apikey: '008574e5-f34b-4270-b3d5-91aaabd036e8',
@@ -177,7 +180,8 @@ const mapConfig: YaConfig = {
         StatisticsBootstrapPage,
         EmployeeWorkStatisticsPage,
         TopologyBootstrapPage,
-        TopologyHousesPageComponent,
+        TopologyHousesPage,
+        TopologyHousePage,
         TopologySessionsPage,
         TopologyCommutatorsPage
     ],

@@ -4,7 +4,7 @@ import {catchError, delay, map, Observable, of, share, tap, zip} from "rxjs";
 import {
     AcpCommutator,
     AcpConf,
-    AcpHouse,
+    AcpHouse, AcpUserBrief,
     Address,
     Attachment,
     BillingConf,
@@ -14,7 +14,7 @@ import {
     ChatMessage,
     City,
     ClientEquipment,
-    Comment, DateRange,
+    Comment, CommutatorListItem, DateRange,
     DefaultObservers,
     Department,
     DhcpBinding, DhcpLogsRequest,
@@ -1059,6 +1059,26 @@ export class ApiService {
 
     getTopology(){
         return this.sendGet<TopologyStreet[]>(`api/private/acp/topology`);
+    }
+
+    getBuilding(id: number) {
+        return this.sendGet<AcpHouse>('api/private/acp/building/' + id);
+    }
+
+    getCommutatorsByBuildingId(id: number) {
+        return this.sendGet<CommutatorListItem[]>('api/private/acp/building/' + id + '/commutators');
+    }
+
+    getBindingsByBuildingId(id: number, page: number, filter?:any) {
+        return this.sendPost<Page<DhcpBinding>>('api/private/acp/building/' + id + '/bindings/' + page, filter);
+    }
+
+    getUserBriefInfo(login: string) {
+        return this.sendGet<AcpUserBrief>(`api/private/acp/user/${login}/brief-info`);
+    }
+
+    getBulkUserBriefInfo(login: string[]) {
+        return this.sendPost<{[key: string]:AcpUserBrief}>(`api/private/acp/user/brief-info/bulk`, login);
     }
 
     getCountingLivesCalculation(form: {[key:string]: any})  {

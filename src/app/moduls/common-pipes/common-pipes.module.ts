@@ -8,6 +8,7 @@ import {ModelItemValuePipe} from "../../pipes/model-item-value.pipe";
 import {FloorPipe} from "../../pipes/floor.pipe";
 import {UnitNamePipe} from "../../pipes/unit-name.pipe";
 import {DeclinePipe} from "../../pipes/decline.pipe";
+import {PrettyJsonPipe} from "../../pipes/pretty-json.pipe";
 
 
 @NgModule({
@@ -19,7 +20,8 @@ import {DeclinePipe} from "../../pipes/decline.pipe";
         ModelItemValuePipe,
         FloorPipe,
         UnitNamePipe,
-        DeclinePipe
+        DeclinePipe,
+        PrettyJsonPipe
     ],
     imports: [
         CommonModule
@@ -32,7 +34,8 @@ import {DeclinePipe} from "../../pipes/decline.pipe";
         ModelItemValuePipe,
         FloorPipe,
         UnitNamePipe,
-        DeclinePipe
+        DeclinePipe,
+        PrettyJsonPipe
     ]
 })
 export class CommonPipesModule {

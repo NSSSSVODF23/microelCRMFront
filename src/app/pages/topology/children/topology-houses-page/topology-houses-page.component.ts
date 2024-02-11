@@ -9,7 +9,7 @@ import {CharacterTranslator} from "../../../../character-translator";
     templateUrl: './topology-houses-page.component.html',
     styleUrls: ['./topology-houses-page.component.scss']
 })
-export class TopologyHousesPageComponent implements OnInit {
+export class TopologyHousesPage implements OnInit {
 
     @FromEvent('searchInput', 'input')
     search$!: Observable<Event>
@@ -37,8 +37,8 @@ export class TopologyHousesPageComponent implements OnInit {
 
                         return topology.map(street => {
                             const HL_HOUSES = street.houses.filter(h => SPLIT_QUERY.some(q => h.houseNum.toLowerCase().includes(q)));
-                            street.highlighted = (HL_HOUSES.length > 0 && SPLIT_QUERY.length == 1) || SPLIT_QUERY.some(q => street.streetName.toLowerCase().includes(q));
-                            street.houses.forEach(h => h.highlighted = HL_HOUSES.some(hlh => hlh.buildingId === h.buildingId) );
+                            street.highlighted = (HL_HOUSES.length > 0 && SPLIT_QUERY.length === 1) || SPLIT_QUERY.some(q => street.streetName.toLowerCase().includes(q));
+                            street.houses.forEach(h => h.highlighted = HL_HOUSES.some(hlh => hlh.buildingId === h.buildingId));
                             return street;
                         }).sort((a, b) => a.highlighted ? -1 : b.highlighted ? 1 : 0)
                     })

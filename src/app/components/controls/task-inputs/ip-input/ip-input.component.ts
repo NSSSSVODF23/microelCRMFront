@@ -1,24 +1,5 @@
-import {
-    Component,
-    EventEmitter,
-    forwardRef,
-    Inject, Injector,
-    INJECTOR, Input,
-    OnDestroy,
-    OnInit,
-    Optional,
-    Output,
-    Self
-} from '@angular/core';
-import {
-    AbstractControl, AsyncValidator, AsyncValidatorFn,
-    ControlValueAccessor,
-    FormArray,
-    FormControl,
-    FormGroup, NG_ASYNC_VALIDATORS,
-    NG_VALIDATORS,
-    NG_VALUE_ACCESSOR, NgControl, ValidationErrors, Validator, ValidatorFn
-} from '@angular/forms';
+import {Component, EventEmitter, forwardRef, Input, OnDestroy, OnInit, Output} from '@angular/core';
+import {ControlValueAccessor, FormArray, FormControl, FormGroup, NG_VALUE_ACCESSOR} from '@angular/forms';
 import {map, Subscription} from "rxjs";
 
 @Component({
@@ -35,13 +16,13 @@ import {map, Subscription} from "rxjs";
 })
 export class IpInputComponent implements ControlValueAccessor, OnInit, OnDestroy {
 
-    @Input() inputClasses: {[key:string]:boolean} = {};
+    @Input() inputClasses: { [key: string]: boolean } = {};
     @Output() onBlur = new EventEmitter();
     control1 = new FormControl(0);
     control2 = new FormControl(0);
     control3 = new FormControl(0);
     control4 = new FormControl(0);
-    formGroup = new FormGroup({octets:new FormArray([this.control1, this.control2, this.control3, this.control4])});
+    formGroup = new FormGroup({octets: new FormArray([this.control1, this.control2, this.control3, this.control4])});
     subscription?: Subscription;
     updateValue = "";
 
@@ -77,7 +58,7 @@ export class IpInputComponent implements ControlValueAccessor, OnInit, OnDestroy
         this.onChange = fn;
     }
 
-    registerOnTouched(fn: ()=>void) {
+    registerOnTouched(fn: () => void) {
         this.onTouch = fn;
     }
 
@@ -89,7 +70,7 @@ export class IpInputComponent implements ControlValueAccessor, OnInit, OnDestroy
             if (obj.length !== 4) {
                 obj = [0, 0, 0, 0];
             }
-            this.formGroup.patchValue({octets:this.mapOctets(obj)});
+            this.formGroup.patchValue({octets: this.mapOctets(obj)});
             this.updateValue = obj.join(".");
         }
     }
@@ -110,7 +91,7 @@ export class IpInputComponent implements ControlValueAccessor, OnInit, OnDestroy
     ngOnInit(): void {
         this.subscription = this.formGroup.valueChanges.pipe(map(value => {
             let octets = value.octets;
-            if(octets === undefined) {
+            if (octets === undefined) {
                 this.formGroup.patchValue({octets: [0, 0, 0, 0]}, {emitEvent: false});
                 return "0.0.0.0";
             }
@@ -129,7 +110,7 @@ export class IpInputComponent implements ControlValueAccessor, OnInit, OnDestroy
     focusNext(event: Event, next: HTMLInputElement) {
         const target = (event.target as HTMLInputElement)
         let value = target.value;
-        if(value.length === 3) {
+        if (value.length === 3) {
             next.focus();
         }
     }

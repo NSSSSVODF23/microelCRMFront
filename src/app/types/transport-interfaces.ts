@@ -1297,6 +1297,58 @@ export interface DhcpBinding {
     lastConnectionLocation?: NetworkConnectionLocation;
 }
 
+export interface AcpUserBriefLogin{
+    login: string;
+    uname: string;
+    ipaddr: string;
+    lastUse: string;
+    ctime: string;
+    state: number;
+}
+
+export interface AcpUserBriefAccount{
+    uname: string;
+    utype: string;
+    ndog: string;
+    login: string;
+    addr: string;
+    fio: string;
+    comment: string;
+    phone: string;
+}
+
+export interface AcpUserBriefBalance{
+    bmoney: string;
+    bcredit: string;
+    btraf: string;
+    btime: string;
+    deferredPay: boolean;
+}
+
+export interface AcpUserBriefTariff{
+    serviceN: number;
+    service: string;
+    uname: string;
+    login: string;
+    price: number;
+    hdate: string;
+    edate: string;
+    adate: string;
+    mdate: string;
+    state: number;
+    isMain: string;
+    last: string;
+    autorun: string;
+    stype: string;
+    iExt: string;
+}
+
+export interface AcpUserBrief {
+    address?: string;
+    statusName: string;
+    statusColor: string;
+}
+
 export interface DhcpSessions {
     id: number;
     authName: string;
@@ -1631,12 +1683,24 @@ export interface Switchport {
     description: string;
 }
 
+export interface CommutatorListItem{
+    id: number;
+    ip: string;
+    name: string;
+    model: string;
+    type: string;
+    uplink?: CommutatorListItem;
+}
+
 export interface AcpHouse {
     streetId: number;
     streetName: string;
     buildingId: number;
     houseNum: string;
     fullName: string;
+    uplink?: AcpHouse;
+    downlinks?: AcpHouse[];
+    networks?: Network[];
 }
 
 export interface NetworkRemoteControl {

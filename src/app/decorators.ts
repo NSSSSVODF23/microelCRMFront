@@ -1,5 +1,9 @@
-import {fromEvent, Subject, Subscription} from "rxjs";
-import {SimpleChanges} from "@angular/core";
+import {distinctUntilChanged, filter, fromEvent, map, shareReplay, Subject, Subscription, tap} from "rxjs";
+import {EnvironmentInjector, inject, Inject, Injectable, SimpleChanges} from "@angular/core";
+import {ActivatedRoute, OutletContext} from "@angular/router";
+import {AppModule} from "./app.module";
+import {MainModule} from "./moduls/main/main.module";
+import {MainRoutingModule} from "./moduls/main/main-routing.module";
 
 export function FromEvent(selector: string, eventName: string) {
     return function (prototype: any, name: string) {
@@ -19,9 +23,7 @@ export function FromEvent(selector: string, eventName: string) {
             originalAfterInit.apply(this, arguments);
         }
         prototype.ngOnDestroy = function () {
-            console.log(sub.closed)
             sub?.unsubscribe();
-            console.log(sub.closed)
             originalOnDestroy.apply(this, arguments);
         }
     }
@@ -36,6 +38,28 @@ export function OnElementInit(selector: string) {
             if (elementById)
                 descriptor.value.call(this, elementById);
             originalAfterInit.apply(this, arguments);
+        }
+    }
+}
+
+export function RouteParam(paramName?: string) {
+    return function (prototype: any, name: string) {
+        const originalAfterViewInit = prototype.ngAfterViewInit ? prototype.ngAfterViewInit : () => {};
+        const originalOnDestroy = prototype.ngOnDestroy ? prototype.ngOnDestroy : () => {};
+        const subject = new Subject<String>();
+        let sub: Subscription;
+        Object.defineProperty(prototype, name, {value: subject.pipe(shareReplay(1))});
+        prototype.ngAfterViewInit = function () {
+            sub = this.route.params.pipe(
+                filter((p:{[key:string]:string}) => p[paramName?paramName:name] !== undefined),
+                map((p:{[key:string]:string}) => p[paramName?paramName:name]),
+                distinctUntilChanged(),
+            ).subscribe(subject);
+            originalAfterViewInit.apply(this, arguments);
+        }
+        prototype.ngOnDestroy = function () {
+            sub?.unsubscribe();
+            originalOnDestroy.apply(this, arguments);
         }
     }
 }
@@ -61,4 +85,22 @@ export function AutoUnsubscribe() {
             originalOnDestroy.apply(this, arguments);
         }
     }
+}
+
+function getCurrentOutlet(contextsMap: Map<string, OutletContext>, component: any) {
+    const contextsArray = Array.from(contextsMap.values());
+
+    while (contextsArray.length) {
+        const outlet = contextsArray.shift();
+
+        if (outlet?.route?.component === component) {
+            return outlet;
+        }
+
+        const childrenContexts = (outlet?.children as any)?.contexts as Map<string, OutletContext>;
+
+        contextsArray.push(...Array.from(childrenContexts.values()));
+    }
+
+    return null;
 }

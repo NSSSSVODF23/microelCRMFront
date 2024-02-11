@@ -1,4 +1,4 @@
-import {NgModule} from '@angular/core';
+import {Injector, NgModule} from '@angular/core';
 
 import {AppComponent} from './app.component';
 import {registerLocaleData} from "@angular/common";
@@ -46,4 +46,5 @@ registerLocaleData(localeRu, 'ru');
     bootstrap: [AppComponent]
 })
 export class AppModule {
+
 }
