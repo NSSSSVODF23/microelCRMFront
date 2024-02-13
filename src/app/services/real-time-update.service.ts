@@ -30,7 +30,7 @@ import {
     Task,
     TaskEvent,
     TaskTag,
-    TelegramConf,
+    TelegramConf, TelnetConnectionCredentials,
     TreeElementPosition,
     TreeNodeMoveEvent,
     TreeNodeUpdateEvent, TypesOfContracts,
@@ -491,5 +491,13 @@ export class RealTimeUpdateService {
 
     updatingMarkedContracts() {
         return this.watch<boolean>('contract', 'marked', 'update')
+    }
+
+    remoteTelnetConnection(ip: string, sessionId: string) {
+        return this.watch<{data: string, state: string}>('remote', 'telnet', ip, sessionId)
+    }
+
+    telnetConnectionMessage(login: string) {
+        return this.watchUnicast<TelnetConnectionCredentials>(login, 'remote', 'telnet', 'connection-message')
     }
 }

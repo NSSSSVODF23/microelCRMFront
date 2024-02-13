@@ -19,6 +19,8 @@ import {
 } from './pages/bootstaps/module-loading-bootstrap/module-loading-bootstrap.component';
 import {ProgressSpinnerModule} from "primeng/progressspinner";
 import {ButtonModule} from "primeng/button";
+import {TerminalDialogComponent} from "./components/terminal/terminal-dialog/terminal-dialog.component";
+import {DialogService, DynamicDialogModule} from "primeng/dynamicdialog";
 
 registerLocaleData(localeRu, 'ru');
 
@@ -39,10 +41,8 @@ registerLocaleData(localeRu, 'ru');
         CommonComponentsModule,
         ProgressSpinnerModule,
         ButtonModule,
-
     ],
     exports: [BrowserAnimationsModule, RouterOutlet, FormsModule, HttpClientModule],
-    providers: [],
     bootstrap: [AppComponent]
 })
 export class AppModule {

@@ -44,7 +44,7 @@ import {
     TaskFieldsSnapshot,
     TaskFiltrationConditions, TaskJournalSortingTypes, TaskStage,
     TaskTag, TaskTypeDirectory,
-    TelegramConf, TimeFrame,
+    TelegramConf, TelnetConnectionCredentials, TimeFrame,
     TokenChain, TokenChainWithUserInfo, TopologyStreet,
     TreeDragDropEvent,
     TreeElementPosition, TypesOfContracts, TypesOfContractsForm, TypesOfContractsSuggestion, UserEvents, UserTariff,
@@ -1244,6 +1244,14 @@ export class ApiService {
 
     getEmployeeWorkStatistics(form: EmployeeWorkStatisticsForm) {
         return this.sendPost<EmployeeWorkStatisticsTable>('api/private/statistics/employee-work', form);
+    }
+
+    sendDataToTelnetSession(sessionId: string, data: string) {
+        return this.sendPost(`api/private/remote/telnet/${sessionId}`, data);
+    }
+
+    connectToTelnetSession(credentials: TelnetConnectionCredentials) {
+        return this.sendPost(`api/private/remote/telnet/connect`, credentials);
     }
 
     // Результаты запросов на сервер кэшируются по таймауту, чтобы не было доп нагрузки на сервер

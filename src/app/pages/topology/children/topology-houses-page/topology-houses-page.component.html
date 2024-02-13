@@ -1,8 +1,9 @@
-<div class="flex flex-column gap-1">
-    <div>
-        <input id="searchInput" pInputText placeholder="Найти"/>
+<div class="flex flex-column gap-3">
+    <div class="flex gap-3 border-round-2xl bg-white shadow-1 align-items-center py-2 px-3 sticky top-under-panel">
+        <span class="text-2xl text-bluegray-500 font-semibold">Топология домов</span>
+        <input id="searchInput" pInputText placeholder="Найти дом..."/>
     </div>
-    <div *ngIf="topology$ | async as topology" class="flex flex-column gap-1 cursor-default">
+    <div *ngIf="topology$ | async as topology; else topologyLoadingTemplate" class="flex flex-column gap-1 cursor-default p-3 bg-white border-round-2xl shadow-1">
         <div *ngFor="let street of topology"
              [ngClass]="{highlighted: street.highlighted}" class="flex align-items-center gap-2 text-sm topology">
             <span class="white-space-nowrap font-bold">
@@ -22,3 +23,14 @@
         </div>
     </div>
 </div>
+
+<ng-template #topologyLoadingTemplate>
+    <div class="flex flex-column gap-1 cursor-default p-3 bg-white border-round-2xl shadow-1">
+        <div *ngFor="let row of topologyLoadingSkeleton" class="flex align-items-center gap-2 text-sm">
+            <p-skeleton [width]="row.stWidth+'px'"></p-skeleton>
+            <div class="flex flex-wrap gap-1">
+                <p-skeleton *ngFor="let house of row.houses" width="23px" height="1.5rem"></p-skeleton>
+            </div>
+        </div>
+    </div>
+</ng-template>

@@ -117,7 +117,7 @@
                         <td>{{commutator.model}}</td>
                         <td>{{commutator.ip}}</td>
                         <td>
-                            <ng-container *ngIf="commutatorsPings[commutator.ip] | async as ping; else pingInitTemplate">
+                            <ng-container *ngIf="commutatorsPings[commutator.ip] | async as ping">
                                 <span [ngClass]="ping.styleClass">
                                     <span>
                                         {{ping.latency === 999 ? '- ' : ping.latency | number:'1.2-2'}}мс
@@ -127,12 +127,15 @@
                                     </span>
                                 </span>
                             </ng-container>
+                            <ng-container *ngIf="!(commutatorsPings[commutator.ip] | async)">
+                                <ng-container *ngTemplateOutlet="emptyCellTemplate; context:{width:'85px'}"></ng-container>
+                            </ng-container>
                         </td>
                         <td class="flex gap-2">
                             <span class="text-primary font-bold hover:text-primary-700 cursor-pointer" (click)="openCommutatorWeb(commutator.ip)">
                                 Web
                             </span>
-                            <span class="text-primary font-bold hover:text-primary-700 cursor-pointer">
+                            <span class="text-primary font-bold hover:text-primary-700 cursor-pointer" (click)="openTelnetTerminal(commutator.name, commutator.ip)">
                                 Telnet
                             </span>
                         </td>
@@ -168,9 +171,17 @@
             <ng-template pTemplate="body" let-binding>
                 <tr (click)="selectBinding($event, binding, bindingContextPanel, menuTargetElement)" class="cursor-pointer hover:bg-bluegray-50">
                     <td>
-                        <app-colored-tag *ngIf="bindingsUserBriefs[binding.authName] as userBrief" [caption]="userBrief.statusName" [color]="userBrief.statusColor"></app-colored-tag>
+                        <app-colored-tag *ngIf="bindingsUserBriefs[binding.authName] as userBrief"
+                                         [caption]="userBrief.statusName" [color]="userBrief.statusColor"></app-colored-tag>
+                        <ng-container *ngIf="!bindingsUserBriefs[binding.authName]">
+                            <ng-container *ngTemplateOutlet="emptyCellTemplate; context:{width:'65px'}"></ng-container>
+                        </ng-container>
                     </td>
-                    <td>{{binding.authName}}</td>
+                    <td [routerLink]="['/clients', 'billing', 'user', binding.authName]"
+                        class="font-bold text-primary hover:text-primary-700 cursor-pointer"
+                        (click)="$event.stopPropagation()">
+                        {{binding.authName}}
+                    </td>
                     <td>
                         <span *ngIf="binding.isAuth" class="font-bold text-green-400">Авторизован</span>
                         <span *ngIf="!binding.isAuth" class="font-bold text-gray-400">Не авторизован</span>
@@ -180,14 +191,19 @@
                                           type="short"></app-time-elapsed>
                     </td>
                     <td>
-                        <span *ngIf="bindingsUserBriefs[binding.authName] as userBrief">{{userBrief.address}}</span>
+                        <span *ngIf="bindingsUserBriefs[binding.authName] as userBrief">
+                            {{userBrief.address}}
+                        </span>
+                        <ng-container *ngIf="!bindingsUserBriefs[binding.authName]">
+                            <ng-container *ngTemplateOutlet="emptyCellTemplate; context:{width:'105px'}"></ng-container>
+                        </ng-container>
                     </td>
                     <td>{{binding.ipaddr}}</td>
                     <td>{{binding.macaddr}}</td>
                     <td>{{binding.vlanid}}</td>
                     <td>{{binding.dhcpHostname}}</td>
                     <td>
-                        <ng-container *ngIf="bindingsPings[binding.ipaddr] | async as ping; else pingInitTemplate">
+                        <ng-container *ngIf="bindingsPings[binding.ipaddr] | async as ping;">
                             <span [ngClass]="ping.styleClass">
                                 <span>
                                     {{ping.latency === 999 ? '- ' : ping.latency | number:'1.2-2'}}мс
@@ -197,11 +213,14 @@
                                 </span>
                             </span>
                         </ng-container>
+                        <ng-container *ngIf="!(bindingsPings[binding.ipaddr] | async)">
+                            <ng-container *ngTemplateOutlet="emptyCellTemplate; context:{width:'85px'}"></ng-container>
+                        </ng-container>
                     </td>
                 </tr>
             </ng-template>
             <ng-template pTemplate="paginatorright">
-                <p-button type="button" icon="mdi-update" styleClass="p-button-text" [disabled]="bindingsLoadingState !== LoadingState.READY"
+                <p-button type="button" icon="mdi-update" label="Обновить" styleClass="p-button-text" [disabled]="bindingsLoadingState !== LoadingState.READY"
                           (onClick)="bindingsUpdate$.next(true)"></p-button>
             </ng-template>
         </p-table>
@@ -222,8 +241,6 @@
     </div>
 </p-dialog>
 
-<ng-template #pingInitTemplate>
-    <div class="flex justify-content-center">
-        <p-progressSpinner class="custom-spinner custom-spinner-gray custom-spinner-md" strokeWidth="3"></p-progressSpinner>
-    </div>
+<ng-template #emptyCellTemplate let-width="width">
+    <p-skeleton [width]="width"></p-skeleton>
 </ng-template>

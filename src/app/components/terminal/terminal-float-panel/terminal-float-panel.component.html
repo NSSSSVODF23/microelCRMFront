@@ -1,0 +1,22 @@
+<div [ngClass]="{flex: service.sessions.length > 0, hidden: service.sessions.length === 0}" [ngStyle]="panelPosition"
+     class="flex p-2 gap-2 bg-white border-1 border-primary-300 border-round-top-lg shadow-2 w-fit align-items-center
+      fixed bottom-0 left-50 text-bluegray-500 transition-all transition-duration-300"
+     id="wrapper-panel">
+    <span class="mds-terminal text-5xl"></span>
+    <ng-container *ngFor="let session of service.sessions">
+        <ng-container *ngTemplateOutlet="panelItemTemplate; context: {session}"></ng-container>
+    </ng-container>
+</div>
+
+<ng-template #panelItemTemplate let-session="session">
+    <div (click)="service.openTerminalDialog(session)"
+         [ngClass]="service.isDialogOpen(session.sessionId) ? 'border-primary text-white bg-primary cursor-default' : 'border-bluegray-500 cursor-pointer hover:bg-bluegray-50'"
+         class="flex gap-2 px-2 py-1 border-round-lg border-1 align-items-center select-none">
+        <span class="font-bold">
+            {{session.name}}
+        </span>
+        <span class="mdi-close text-lg hover:text-primary-700 cursor-pointer"
+              (click)="$event.stopPropagation(); service.removeSession(session.sessionId)"
+        ></span>
+    </div>
+</ng-template>

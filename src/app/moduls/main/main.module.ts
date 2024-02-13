@@ -138,6 +138,7 @@ import {
 import {
     TopologyHousePage
 } from "../../pages/topology/children/topology-house-page/topology-house-page.component";
+import {NgTerminalModule} from "ng-terminal";
 
 const mapConfig: YaConfig = {
     apikey: '008574e5-f34b-4270-b3d5-91aaabd036e8',
@@ -265,7 +266,8 @@ const mapConfig: YaConfig = {
         AnimateModule,
         BlockUIModule,
         ChipModule,
-        ChartModule
+        ChartModule,
+        NgTerminalModule
     ],
     providers: [MessageService, {provide: LOCALE_ID, useValue: 'ru'}, ConfirmationService]
 })

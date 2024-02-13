@@ -9,6 +9,7 @@ import {MenuItem, MessageService, SortMeta} from "primeng/api";
 import {Menu} from "primeng/menu";
 import {BlockUiService} from "../../../../services/block-ui.service";
 import {FormControl, FormGroup, Validators} from "@angular/forms";
+import {TelnetTerminalsService} from "../../../../services/telnet-terminals.service";
 
 type TableFilter = {first: number, rows: number, multiSortMeta: {field: string, order: number}[]}
 
@@ -115,7 +116,8 @@ export class TopologyHousePage implements OnInit {
     bindingsPage: Page<DhcpBinding> | null = null;
     bindingsPageSub = this.bindings$.subscribe(bindings => this.bindingsPage = bindings);
 
-    constructor(private api: ApiService, private rt: RealTimeUpdateService, private route: ActivatedRoute, private toast: MessageService, private blockService: BlockUiService) {
+    constructor(private api: ApiService, private rt: RealTimeUpdateService, private route: ActivatedRoute,
+                private toast: MessageService, private blockService: BlockUiService, private telnetService: TelnetTerminalsService) {
     }
 
     ngOnInit(): void {
@@ -201,7 +203,10 @@ export class TopologyHousePage implements OnInit {
         this.api.authDhcpBinding(login, macaddr)
             .subscribe(
                 {
-                    next:()=>this.blockService.unblock(),
+                    next:()=> {
+                        this.blockService.unblock();
+                        this.userAuthDialogVisible = false;
+                    },
                     error:()=>this.blockService.unblock()
                 }
             )
@@ -209,5 +214,9 @@ export class TopologyHousePage implements OnInit {
 
     openCommutatorWeb(ip: string) {
         window.open(`http://${ip}`, '_blank');
+    }
+
+    openTelnetTerminal(name: string, ip: string) {
+        this.telnetService.connect(name, ip);
     }
 }

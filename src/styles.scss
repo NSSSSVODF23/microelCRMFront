@@ -1791,6 +1791,14 @@ markdown > p:last-child {
   transform: translate(-50%, -50%);
 }
 
+.-translate-x-50 {
+  transform: translateX(-50%);
+}
+
+.-translate-y-50 {
+  transform: translateY(-50%);
+}
+
 .top-under-panel {
   top: calc(var(--top-panel-height) + 1.5rem) !important;
 }

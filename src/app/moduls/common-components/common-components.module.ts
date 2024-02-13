@@ -242,6 +242,12 @@ import {
 } from "../../components/contracts/contract-inspection-item/contract-inspection-item.component";
 import {DurationComponent} from "../../components/time/duration/duration.component";
 import {TimePickerComponent} from "../../components/time/time-picker/time-picker.component";
+import {
+    TerminalFloatPanelComponent
+} from "../../components/terminal/terminal-float-panel/terminal-float-panel.component";
+import {DialogService, DynamicDialogModule} from "primeng/dynamicdialog";
+import {TerminalDialogComponent} from "../../components/terminal/terminal-dialog/terminal-dialog.component";
+import {NgTerminalModule} from "ng-terminal";
 
 
 @NgModule({
@@ -363,7 +369,9 @@ import {TimePickerComponent} from "../../components/time/time-picker/time-picker
         TypesContractsMultiSelectorComponent,
         ContractInspectionItemComponent,
         DurationComponent,
-        TimePickerComponent
+        TimePickerComponent,
+        TerminalFloatPanelComponent,
+        TerminalDialogComponent
     ],
     exports: [
         AccountPanelComponent,
@@ -481,7 +489,8 @@ import {TimePickerComponent} from "../../components/time/time-picker/time-picker
         EmployeeMultiplySelectorComponent,
         ContractInspectionItemComponent,
         DurationComponent,
-        TimePickerComponent
+        TimePickerComponent,
+        TerminalDialogComponent
     ],
     imports: [
         CommonPipesModule,
@@ -537,12 +546,18 @@ import {TimePickerComponent} from "../../components/time/time-picker/time-picker
         PickListModule,
         InputSwitchModule,
         ContextMenuModule,
+        DynamicDialogModule,
+        NgTerminalModule
+    ],
+    entryComponents: [
+        TerminalDialogComponent
     ],
     providers: [
         {
             provide: StompClientService,
             useFactory: stompFactory
-        }
+        },
+        DialogService
     ]
 })
 export class CommonComponentsModule {

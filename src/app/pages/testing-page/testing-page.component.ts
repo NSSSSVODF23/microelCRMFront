@@ -3,11 +3,24 @@ import {BillingUserItemData, FieldItem, WireframeFieldType} from "../../types/tr
 import {v4} from "uuid";
 import {FormControl, FormGroup} from "@angular/forms";
 import {ApiService} from "../../services/api.service";
-import {bufferTime, debounceTime, distinctUntilChanged, map, of, range, shareReplay, switchMap} from "rxjs";
+import {
+    bufferTime,
+    debounceTime,
+    distinctUntilChanged,
+    map,
+    Observable,
+    of,
+    range,
+    shareReplay,
+    switchMap,
+    tap
+} from "rxjs";
 import {RealTimeUpdateService} from "../../services/real-time-update.service";
 import {CustomValidators} from "../../custom-validators";
 import {PersonalityService} from "../../services/personality.service";
 import {AccessFlag} from "../../types/access-flag";
+import {FromEvent} from "../../decorators";
+import {ITerminalOptions} from "xterm";
 
 @Component({
     templateUrl: './testing-page.component.html',
@@ -111,6 +124,23 @@ export class TestingPageComponent implements OnInit, AfterContentInit {
     ctrl$ = this.control.valueChanges.pipe(shareReplay(1))
     value = new Date();
     testControl = new FormControl(null, CustomValidators.taskInput(WireframeFieldType.ADDRESS, 'APARTMENT_ONLY'));
+
+    sessionId = v4();
+
+    telnetCon$: Observable<string> = this.rt.remoteTelnetConnection('10.100.164.62', this.sessionId)
+        .pipe(
+            map(r=> {
+                return r.data;
+            }),
+        );
+
+    telnetSendData(event: string) {
+        if(event===''){
+            this.api.sendDataToTelnetSession(this.sessionId, '\b').subscribe();
+            return;
+        }
+        this.api.sendDataToTelnetSession(this.sessionId, event).subscribe();
+    }
 
     constructor(readonly api: ApiService, readonly rt: RealTimeUpdateService, readonly personality: PersonalityService) {
     }
