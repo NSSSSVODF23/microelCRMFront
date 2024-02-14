@@ -57,7 +57,7 @@ export class TelnetTerminalsService {
             TerminalDialogComponent,
             {
                 header: credentials.name + '・' + credentials.ip,
-                contentStyle: {padding: '0'},
+                contentStyle: {padding: '0', minWidth: '800px'},
                 resizable: true,
                 draggable: true,
                 modal: false,
@@ -67,7 +67,7 @@ export class TelnetTerminalsService {
                 }
             });
         REF.onClose
-            .pipe(first(), finalize(()=>console.log('Closed', credentials)))
+            .pipe(first())
             .subscribe(()=>this.openTerminalDialogs.delete(credentials.sessionId))
         this.openTerminalDialogs.set(credentials.sessionId, REF);
     }
@@ -102,11 +102,6 @@ export class TelnetTerminalsService {
 
     isDialogOpen(sessionId: string){
         return this.openTerminalDialogs.has(sessionId);
-    }
-
-    private setupDialogHeader(sessionId: string) {
-        if(!this.openTerminalDialogs.has(sessionId)) return;
-        const REF = this.openTerminalDialogs.get(sessionId);
     }
 
 }

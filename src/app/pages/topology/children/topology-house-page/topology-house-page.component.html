@@ -128,7 +128,7 @@
                                 </span>
                             </ng-container>
                             <ng-container *ngIf="!(commutatorsPings[commutator.ip] | async)">
-                                <ng-container *ngTemplateOutlet="emptyCellTemplate; context:{width:'85px'}"></ng-container>
+                                <ng-container *ngTemplateOutlet="loadingCellTemplate; context:{width:'85px'}"></ng-container>
                             </ng-container>
                         </td>
                         <td class="flex gap-2">
@@ -171,16 +171,18 @@
             <ng-template pTemplate="body" let-binding>
                 <tr (click)="selectBinding($event, binding, bindingContextPanel, menuTargetElement)" class="cursor-pointer hover:bg-bluegray-50">
                     <td>
-                        <app-colored-tag *ngIf="bindingsUserBriefs[binding.authName] as userBrief"
-                                         [caption]="userBrief.statusName" [color]="userBrief.statusColor"></app-colored-tag>
-                        <ng-container *ngIf="!bindingsUserBriefs[binding.authName]">
-                            <ng-container *ngTemplateOutlet="emptyCellTemplate; context:{width:'65px'}"></ng-container>
+                        <ng-container *ngIf="binding.authName; else emptyCellTemplate">
+                            <app-colored-tag *ngIf="bindingsUserBriefs[binding.authName] as userBrief"
+                                             [caption]="userBrief.statusName" [color]="userBrief.statusColor"></app-colored-tag>
+                            <ng-container *ngIf="!bindingsUserBriefs[binding.authName]">
+                                <ng-container *ngTemplateOutlet="loadingCellTemplate; context:{width:'65px'}"></ng-container>
+                            </ng-container>
                         </ng-container>
                     </td>
-                    <td [routerLink]="['/clients', 'billing', 'user', binding.authName]"
-                        class="font-bold text-primary hover:text-primary-700 cursor-pointer"
-                        (click)="$event.stopPropagation()">
-                        {{binding.authName}}
+                    <td class="font-bold text-primary hover:text-primary-700 cursor-pointer" (click)="$event.stopPropagation()">
+                        <span [routerLink]="['/clients', 'billing', 'user', binding.authName]" *ngIf="binding.authName; else emptyCellTemplate">
+                            {{binding.authName}}
+                        </span>
                     </td>
                     <td>
                         <span *ngIf="binding.isAuth" class="font-bold text-green-400">Авторизован</span>
@@ -191,11 +193,13 @@
                                           type="short"></app-time-elapsed>
                     </td>
                     <td>
-                        <span *ngIf="bindingsUserBriefs[binding.authName] as userBrief">
-                            {{userBrief.address}}
-                        </span>
-                        <ng-container *ngIf="!bindingsUserBriefs[binding.authName]">
-                            <ng-container *ngTemplateOutlet="emptyCellTemplate; context:{width:'105px'}"></ng-container>
+                        <ng-container *ngIf="binding.authName; else emptyCellTemplate">
+                            <span *ngIf="bindingsUserBriefs[binding.authName] as userBrief">
+                                {{userBrief.address}}
+                            </span>
+                            <ng-container *ngIf="!bindingsUserBriefs[binding.authName]">
+                                <ng-container *ngTemplateOutlet="loadingCellTemplate; context:{width:'105px'}"></ng-container>
+                            </ng-container>
                         </ng-container>
                     </td>
                     <td>{{binding.ipaddr}}</td>
@@ -203,18 +207,20 @@
                     <td>{{binding.vlanid}}</td>
                     <td>{{binding.dhcpHostname}}</td>
                     <td>
-                        <ng-container *ngIf="bindingsPings[binding.ipaddr] | async as ping;">
-                            <span [ngClass]="ping.styleClass">
-                                <span>
-                                    {{ping.latency === 999 ? '- ' : ping.latency | number:'1.2-2'}}мс
+                        <ng-container *ngIf="binding.ipaddr; else emptyCellTemplate">
+                            <ng-container *ngIf="bindingsPings[binding.ipaddr] | async as ping;">
+                                <span [ngClass]="ping.styleClass">
+                                    <span>
+                                        {{ping.latency === 999 ? '- ' : ping.latency | number:'1.2-2'}}мс
+                                    </span>
+                                    <span>
+                                        {{ping.loss | number:'1.2-2'}}%
+                                    </span>
                                 </span>
-                                <span>
-                                    {{ping.loss | number:'1.2-2'}}%
-                                </span>
-                            </span>
-                        </ng-container>
-                        <ng-container *ngIf="!(bindingsPings[binding.ipaddr] | async)">
-                            <ng-container *ngTemplateOutlet="emptyCellTemplate; context:{width:'85px'}"></ng-container>
+                            </ng-container>
+                            <ng-container *ngIf="!(bindingsPings[binding.ipaddr] | async)">
+                                <ng-container *ngTemplateOutlet="loadingCellTemplate; context:{width:'85px'}"></ng-container>
+                            </ng-container>
                         </ng-container>
                     </td>
                 </tr>
@@ -241,6 +247,12 @@
     </div>
 </p-dialog>
 
-<ng-template #emptyCellTemplate let-width="width">
+<ng-template #loadingCellTemplate let-width="width">
     <p-skeleton [width]="width"></p-skeleton>
+</ng-template>
+
+<ng-template #emptyCellTemplate>
+    <span class="text-bluegray-300 text-xl font-bold">
+        -
+    </span>
 </ng-template>
