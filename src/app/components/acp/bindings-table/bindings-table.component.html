@@ -1,0 +1,131 @@
+<div [ngClass]="{'flex flex-grow-1 overflow-hidden border-round border-1 border-bluegray-100':!inline}">
+    <p-table [value]="bindingsPage?.content ?? []" class="flex-grow-1" styleClass="p-datatable-sm flex-grow-1"
+             [totalRecords]="bindingsPage?.totalElements ?? 0" dataKey="id" paginatorDropdownAppendTo="body"
+             currentPageReportTemplate="Найдено {totalRecords} сессий" [showCurrentPageReport]="true" sortMode="multiple"
+             [multiSortMeta]="[{field:'leaseStart', order: -1}]" [rowsPerPageOptions]="[10,25,50,100]"
+             [paginator]="true" [(first)]="bindingsTableOffset" [lazy]="true"
+             (onLazyLoad)="bindingsLazyLoad$.next($event)" [rows]="10">
+        <ng-template pTemplate="header">
+            <tr>
+                <ng-container *ngIf="filterMode==='commutator'">
+                    <th pSortableColumn="ports">Порты <p-sortIcon field="ports"></p-sortIcon></th>
+                </ng-container>
+                <ng-container *ngIf="filterMode!=='login'">
+                    <th>Статус</th>
+                    <th pSortableColumn="authName">Логин <p-sortIcon field="authName"></p-sortIcon></th>
+                </ng-container>
+                <ng-container *ngIf="filterMode==='login'">
+                    <th>Статус</th>
+                </ng-container>
+                <th pSortableColumn="authExpire" >Авторизация <p-sortIcon field="authExpire"></p-sortIcon></th>
+                <th pSortableColumn="leaseStart" >В сети <p-sortIcon field="leaseStart"></p-sortIcon></th>
+                <th>Адрес</th>
+                <th pSortableColumn="ipaddr" >IP Адрес <p-sortIcon field="ipaddr"></p-sortIcon></th>
+                <th pSortableColumn="macaddr" >MAC Адрес <p-sortIcon field="macaddr"></p-sortIcon></th>
+                <th pSortableColumn="vlanid" >VLAN <p-sortIcon field="vlanid"></p-sortIcon></th>
+                <th pSortableColumn="dhcpHostname" >Оборудование <p-sortIcon field="dhcpHostname"></p-sortIcon></th>
+                <th *ngIf="ping">Ping</th>
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-binding>
+            <tr (click)="selectBinding($event, binding, bindingContextPanel)" class="cursor-pointer hover:bg-bluegray-50">
+                <ng-container *ngIf="filterMode==='commutator'">
+                    <td>
+                        <span>{{binding.portList}}</span>
+                    </td>
+                </ng-container>
+                <ng-container *ngIf="filterMode!=='login'">
+                    <td>
+                        <ng-container *ngIf="binding.authName; else emptyCellTemplate">
+                            <app-colored-tag *ngIf="bindingsUserBriefs[binding.authName] as userBrief"
+                                             [caption]="userBrief.statusName" [color]="userBrief.statusColor"></app-colored-tag>
+                            <ng-container *ngIf="!bindingsUserBriefs[binding.authName]">
+                                <ng-container *ngTemplateOutlet="loadingCellTemplate; context:{width:'65px'}"></ng-container>
+                            </ng-container>
+                        </ng-container>
+                    </td>
+                    <td class="font-bold text-primary hover:text-primary-700 cursor-pointer" (click)="$event.stopPropagation()">
+                            <span [routerLink]="['/clients', 'billing', 'user', binding.authName]" *ngIf="binding.authName; else emptyCellTemplate">
+                                {{binding.authName}}
+                            </span>
+                    </td>
+                </ng-container>
+                <ng-container *ngIf="filterMode==='login'">
+                    <td>
+                        <span *ngIf="binding.onlineStatus === 'ONLINE'" class="font-bold text-green-400">Онлайн</span>
+                        <span *ngIf="binding.onlineStatus !== 'ONLINE'" class="font-bold text-gray-400">Офлайн</span>
+                    </td>
+                </ng-container>
+                <td>
+                    <span *ngIf="binding.isAuth" class="font-bold text-green-400">Авторизован</span>
+                    <span *ngIf="!binding.isAuth" class="font-bold text-gray-400">Не авторизован</span>
+                </td>
+                <td>
+                    <app-time-elapsed [startTime]="binding.leaseStart" type="short"></app-time-elapsed>
+                </td>
+                <td>
+                    <ng-container *ngIf="binding.authName; else emptyCellTemplate">
+                            <span *ngIf="bindingsUserBriefs[binding.authName] as userBrief">
+                                {{userBrief.address}}
+                            </span>
+                        <ng-container *ngIf="!bindingsUserBriefs[binding.authName]">
+                            <ng-container *ngTemplateOutlet="loadingCellTemplate; context:{width:'105px'}"></ng-container>
+                        </ng-container>
+                    </ng-container>
+                </td>
+                <td>{{binding.ipaddr}}</td>
+                <td *ngIf="filterMode==='commutator'">{{binding.macaddr}}</td>
+                <td *ngIf="filterMode!=='commutator'"><app-binding-connection-location-view [binding]="binding"></app-binding-connection-location-view></td>
+                <td>{{binding.vlanid}}</td>
+                <td>
+                    <div appTicker class="max-w-10rem white-space-nowrap overflow-hidden">
+                        {{binding.dhcpHostname}}
+                    </div>
+                </td>
+                <td *ngIf="ping">
+                    <ng-container *ngIf="binding.ipaddr; else emptyCellTemplate">
+                        <ng-container *ngIf="bindingsPings[binding.ipaddr] | async as ping;">
+                                <span [ngClass]="ping.styleClass">
+                                    <span>
+                                        {{ping.latency === 999 ? '- ' : ping.latency | number:'1.2-2'}}мс
+                                    </span>
+                                    <span>
+                                        {{ping.loss | number:'1.2-2'}}%
+                                    </span>
+                                </span>
+                        </ng-container>
+                        <ng-container *ngIf="!(bindingsPings[binding.ipaddr] | async)">
+                            <ng-container *ngTemplateOutlet="loadingCellTemplate; context:{width:'85px'}"></ng-container>
+                        </ng-container>
+                    </ng-container>
+                </td>
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="paginatorright">
+            <p-button type="button" icon="mdi-update" label="Обновить" styleClass="p-button-text" [disabled]="bindingsLoadingState !== LoadingState.READY"
+                      (onClick)="bindingsUpdator$.next(true)"></p-button>
+        </ng-template>
+    </p-table>
+</div>
+
+<p-menu #bindingContextPanel appendTo="body" [popup]="true" [model]="bindingContextOptions"></p-menu>
+
+<p-dialog #userAuthDialog header="Авторизовать под логином" [(visible)]="userAuthDialogVisible"
+          [modal]="true" [draggable]="true" [dismissableMask]="true" appendTo="body" contentStyleClass="flex flex-column gap-3">
+    <span class="font-bold text-bluegray-500">Авторизация устройства {{selectBindingForAuth?.dhcpHostname}} {{selectBindingForAuth?.ipaddr}} {{selectBindingForAuth?.macaddr}}</span>
+    <div class="flex gap-3" [formGroup]="authUserForm">
+        <input pInputText placeholder="Логин для авторизации" formControlName="login" class="flex-grow-1" [autofocus]="true"/>
+        <button pButton type="button" label="Авторизовать" [disabled]="authUserForm.invalid"
+                (click)="authUser()" class="p-button-success"></button>
+    </div>
+</p-dialog>
+
+<ng-template #loadingCellTemplate let-width="width">
+    <p-skeleton [width]="width"></p-skeleton>
+</ng-template>
+
+<ng-template #emptyCellTemplate>
+    <span class="text-bluegray-300 text-xl font-bold">
+        -
+    </span>
+</ng-template>

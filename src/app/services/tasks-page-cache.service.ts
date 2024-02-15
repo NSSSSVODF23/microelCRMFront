@@ -160,7 +160,6 @@ export class TasksPageCacheService {
                 }
                 return !!f.value;
             }).forEach(f=> {
-                console.log(f)
                 counter++
             });
         }

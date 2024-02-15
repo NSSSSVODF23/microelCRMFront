@@ -69,7 +69,7 @@ export class ParseTaskPageComponent implements OnInit, OnDestroy {
                     this.vs.scrollToIndex(this.messages.length, "auto");
                 }
             }))
-        this.settingsForm.valueChanges.subscribe(value => console.log(value));
+        this.settingsForm.valueChanges.subscribe();
         this.api.getAddressCorrectingPool().subscribe(pool => {
             this.addressCorrectingPool = pool;
             this.updateStreetToCorrect();

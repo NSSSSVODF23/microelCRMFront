@@ -140,14 +140,14 @@ export class TaskTemplateInputComponent implements OnInit, ControlValueAccessor 
             label: "Создать логин",
             command: ()=>{
                 if(this.field && 'modelItemId' in this.field && this.field.modelItemId)
-                    this.api.createUserInBilling(this.field.modelItemId).subscribe(console.log)
+                    this.api.createUserInBilling(this.field.modelItemId).subscribe()
             }
         },
         {
             label: "Создать BIZ логин",
             command: ()=>{
                 if(this.field && 'modelItemId' in this.field && this.field.modelItemId)
-                    this.api.createUserInBilling(this.field.modelItemId, true).subscribe(console.log)
+                    this.api.createUserInBilling(this.field.modelItemId, true).subscribe()
             }
         }
     ];

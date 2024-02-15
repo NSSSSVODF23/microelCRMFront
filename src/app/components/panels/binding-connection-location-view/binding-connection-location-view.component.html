@@ -1,6 +1,7 @@
 <div (mouseenter)="overlayVisibleChange.next(true)"
      (mouseleave)="overlayVisibleChange.next(false)"
-     class="flex align-items-center font-bold text-bluegray-400 border-1 border-bluegray-100 bg-white border-round-md" [style.cursor]="'default'">
+     class="flex align-items-center font-bold text-bluegray-400 w-fit
+      border-1 border-bluegray-100 bg-white border-round-md" [style.cursor]="'default'">
     <span *ngIf="binding && binding.lastConnectionLocation; else notFinded"
           [ngClass]="binding.lastConnectionLocation.isHasLink ? 'text-green-400' : 'text-red-400'"
           class="mdi-dns text-sm p-2 terminator-right"></span>

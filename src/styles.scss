@@ -1787,6 +1787,10 @@ markdown > p:last-child {
   padding: 0 !important;
 }
 
+.tabview-unpadding.p-tabview > .p-tabview-panels {
+  padding: 0 !important;
+}
+
 .-translate-50 {
   transform: translate(-50%, -50%);
 }

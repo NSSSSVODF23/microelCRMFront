@@ -72,7 +72,6 @@ export class TaskTagInlineSelectorComponent implements OnInit, OnDestroy, Contro
     }
 
     appendTag(tag: TaskTag) {
-        console.log(tag)
         if(!tag) return;
         this.tags.push(tag);
         this.selectedTagsSubject.next(this.tags);

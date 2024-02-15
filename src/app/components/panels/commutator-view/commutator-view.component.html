@@ -12,12 +12,12 @@
                 </div>
                 <div class="flex gap-3">
                     <div class="flex flex-column text-bluegray-400">
-                    <span>
-                        {{commutator.additionalInfo.systemInfo.device}} {{commutator.additionalInfo.systemInfo.hwVersion}}
-                    </span>
+                        <span>
+                            {{commutator.additionalInfo.systemInfo.device}} {{commutator.additionalInfo.systemInfo.hwVersion}}
+                        </span>
                         <span class="text-sm">
-                        FW: {{commutator.additionalInfo.systemInfo.fwVersion}}
-                    </span>
+                            FW: {{commutator.additionalInfo.systemInfo.fwVersion}}
+                        </span>
                         <span class="text-xs font-bold text-bluegray-300">
                         <span>Аптайм</span>
                         <app-time-elapsed [startTime]="uptime"></app-time-elapsed>
@@ -70,6 +70,7 @@
                         </div>
                     </ng-container>
                 </div>
+                <app-bindings-table [filterId]="commutator.id" filterMode="commutator" [ping]="false"></app-bindings-table>
             </ng-container>
         </div>
     </p-tabPanel>

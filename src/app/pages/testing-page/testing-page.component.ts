@@ -153,12 +153,9 @@ export class TestingPageComponent implements OnInit, AfterContentInit {
             this.form.addControl(field.id, new FormControl(null));
         }
         this.filterChange$.subscribe(this.usersHandler)
-        this.form.valueChanges.subscribe(value => console.log(value))
-        this.workPickerControl.valueChanges.subscribe(console.log)
     }
 
     valueChange(value: any) {
-        console.log(value)
     }
 
     generateRandomString() {

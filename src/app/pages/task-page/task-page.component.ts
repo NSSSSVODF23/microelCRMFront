@@ -1001,8 +1001,4 @@ export class TaskPageComponent implements OnInit, OnDestroy {
             })
         }
     }
-
-    log($event: any) {
-        console.log($event);
-    }
 }

@@ -10,14 +10,12 @@ import {OverlayPanel} from "primeng/overlaypanel";
     templateUrl: './commutator-view.component.html',
     styleUrls: ['./commutator-view.component.scss']
 })
-export class CommutatorViewComponent implements OnInit, OnDestroy {
+export class CommutatorViewComponent implements OnInit {
 
     @Input() commutator?: Switch;
     @Input() tiny = false;
     @ViewChild('macPanel') macPanel?: OverlayPanel;
     isUpdating = false;
-
-    subscription = new SubscriptionsHolder();
 
     lastSelectedPortId: number | null = null;
     selectPortChange$ = new BehaviorSubject<PortInfo | null>(null);
@@ -67,10 +65,6 @@ export class CommutatorViewComponent implements OnInit, OnDestroy {
                 }
             }, 100);
         })
-    }
-
-    ngOnDestroy() {
-        this.subscription.unsubscribeAll()
     }
 
     portSpeedName(port?: PortInfo): string {

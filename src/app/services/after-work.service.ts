@@ -18,7 +18,7 @@ export class AfterWorkService {
     }))
 
     constructor(private api: ApiService, private rt: RealTimeUpdateService, private router: Router, private personality: PersonalityService) {
-        this.afterWorks$.pipe(tap(console.log)).subscribe(data => this._isEmpty = !data.value || data.value.length === 0)
+        this.afterWorks$.subscribe(data => this._isEmpty = !data.value || data.value.length === 0)
     }
 
     _isEmpty = true;

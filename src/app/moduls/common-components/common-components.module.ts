@@ -248,6 +248,8 @@ import {
 import {DialogService, DynamicDialogModule} from "primeng/dynamicdialog";
 import {TerminalDialogComponent} from "../../components/terminal/terminal-dialog/terminal-dialog.component";
 import {NgTerminalModule} from "ng-terminal";
+import {BindingsTableComponent} from "../../components/acp/bindings-table/bindings-table.component";
+import {CommutatorsTableComponent} from "../../components/acp/commutators-table/commutators-table.component";
 
 
 @NgModule({
@@ -371,7 +373,9 @@ import {NgTerminalModule} from "ng-terminal";
         DurationComponent,
         TimePickerComponent,
         TerminalFloatPanelComponent,
-        TerminalDialogComponent
+        TerminalDialogComponent,
+        BindingsTableComponent,
+        CommutatorsTableComponent
     ],
     exports: [
         AccountPanelComponent,
@@ -490,7 +494,9 @@ import {NgTerminalModule} from "ng-terminal";
         ContractInspectionItemComponent,
         DurationComponent,
         TimePickerComponent,
-        TerminalDialogComponent
+        TerminalDialogComponent,
+        BindingsTableComponent,
+        CommutatorsTableComponent
     ],
     imports: [
         CommonPipesModule,

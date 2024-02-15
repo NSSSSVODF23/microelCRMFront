@@ -192,7 +192,6 @@ export class FilesViewerComponent implements OnInit, OnDestroy {
 
         this.subscriptions.addSubscription('dirUpd',
             this.rt.updateFilesDirectory().subscribe((id) => {
-                console.log(id, this.currentDirectory?.fileSystemItemId ?? null)
                 if (id === 0 && this.currentDirectory === null) {
                     this.isLoading = true;
                     this.api.getFilesRoot(this.filesSortingControl.value).subscribe(this.rootDirectoryLoadHandler())
@@ -234,7 +233,6 @@ export class FilesViewerComponent implements OnInit, OnDestroy {
 
     dropFilesHandler(event: DragEvent) {
         if (this.insideDragDrop) return
-        console.log(event);
 
         // Prevent default behavior (Prevent file from being opened)
         event.preventDefault();
@@ -253,7 +251,6 @@ export class FilesViewerComponent implements OnInit, OnDestroy {
         } else if (event.dataTransfer?.files) {
             // Use DataTransfer interface to access the file(s)
             for (let i = 0; i < event.dataTransfer.files.length; i++) {
-                console.log(`… file[${i}].name = ${event.dataTransfer.files[i].name}`);
                 uploadFiles.push(event.dataTransfer.files[i]);
             }
         }
@@ -266,7 +263,6 @@ export class FilesViewerComponent implements OnInit, OnDestroy {
         const files = event.target.files;
         const uploadFiles = [] as File[];
         for (let i = 0; i < files.length; i++) {
-            console.log(`… file[${i}].name = ${files[i].name}`);
             uploadFiles.push(files[i]);
         }
         this.uploadFiles(uploadFiles);
@@ -362,7 +358,6 @@ export class FilesViewerComponent implements OnInit, OnDestroy {
     }
 
     filesDropped(directory: FileSystemItem) {
-        console.log("Files dropped");
         if (this.isSelected(directory)) return;
         const directoryWhereFilesAreMoved = directory.fileSystemItemId;
         const filesToMove = this.selectedItems.map(x => x.fileSystemItemId);
@@ -370,7 +365,6 @@ export class FilesViewerComponent implements OnInit, OnDestroy {
     }
 
     setCopyItems() {
-        console.log("Copy items")
         this.itemsForMove = []
         this.itemsForCopy = this.selectedItems
         this.selectedItems = []
@@ -378,7 +372,6 @@ export class FilesViewerComponent implements OnInit, OnDestroy {
     }
 
     setMoveItems() {
-        console.log("Move items")
         this.itemsForCopy = []
         this.itemsForMove = this.selectedItems
         this.selectedItems = []
@@ -403,7 +396,6 @@ export class FilesViewerComponent implements OnInit, OnDestroy {
     }
 
     pasteItems() {
-        console.log("Paste items", this.itemsForMove, this.itemsForCopy)
         if (this.itemsForMove.length > 0) {
             this.api.filesMoveTo(this.currentDirectory?.fileSystemItemId ?? null, this.itemsForMove.map(x => x.fileSystemItemId)).subscribe()
         } else if (this.itemsForCopy.length > 0) {

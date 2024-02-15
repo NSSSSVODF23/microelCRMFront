@@ -19,7 +19,7 @@ import {
     filter,
     first,
     map,
-    merge, mergeMap, repeat,
+    merge, mergeMap, of, repeat,
     shareReplay,
     startWith,
     Subject,
@@ -179,6 +179,17 @@ export class BillingUserPageComponent implements OnInit, OnDestroy {
     );
 
     login$ = merge(this.pathChange$, this.update$);
+    activeBinding$ = this.login$.pipe(switchMap(login=>this.api.getActiveBindingByLogin(login)));
+    activeBuildingId$ = this.activeBinding$
+        .pipe(
+            switchMap(binding=> {
+                if(binding?.vlanid){
+                    return this.api.getBuildingIdByVlan(binding?.vlanid);
+                }else{
+                    return of(null);
+                }
+            })
+        );
     loadUser$ = this.login$.pipe(switchMap(login => this.api.getBillingUserInfo(login)))
     updateUser$ = this.login$.pipe(switchMap(login => this.rt.billingUserUpdated(login)));
 
@@ -194,64 +205,64 @@ export class BillingUserPageComponent implements OnInit, OnDestroy {
         this.logsLoad(login);
     })
 
-    dhcpBindingsLoad$ = this.login$.pipe(
-        switchMap(login => this.api.getDhcpBindingsByLogin(login)),
-        shareReplay(1)
-    );
-    dhcpBindings$ = DynamicValueFactory.of(this.dhcpBindingsLoad$, 'id', null, this.rt.acpDhcpBindingUpdated());
-    hardwareEmptyMessage$ = this.dhcpBindings$.pipe(
-        map(bindings => {
-            if(bindings.value.length === 0){
+    // dhcpBindingsLoad$ = this.login$.pipe(
+    //     switchMap(login => this.api.getDhcpBindingsByLogin(login)),
+    //     shareReplay(1)
+    // );
+    // dhcpBindings$ = DynamicValueFactory.of(this.dhcpBindingsLoad$, 'id', null, this.rt.acpDhcpBindingUpdated());
+    hardwareEmptyMessage$ = this.activeBinding$.pipe(
+        map(binding => {
+            if(!binding){
                 return 'Нет абонентского оборудования';
-            }else if(bindings.value.every(b=>!b.isAuth)){
+            }else if(!binding.isAuth){
                 return 'Нет авторизованного оборудования';
             }else{
                 return null;
             }
         }),
     );
-    activeClientHardware$ = this.dhcpBindings$.pipe(
-        map(bindings => bindings.value.find(b=>b.isAuth)),
-    )
-    firstVlanOfBindings$ = this.dhcpBindingsLoad$.pipe(
-        filter(bindings => bindings && bindings.length > 0),
-        map(binds => {
-            const authBind = binds.find(bind => bind.isAuth);
-            if (authBind) {
-                return authBind.vlanid;
-            } else {
-                return binds[0].vlanid;
-            }
-        }),
-        tap(vlan => this.lastBindingVlan = vlan),
-        shareReplay(1)
-    )
-    changeHouseVlanPage$ = combineLatest([this.firstVlanOfBindings$, this.houseBindingsPage$]).pipe(shareReplay(1));
+    // activeClientHardware$ = this.dhcpBindings$.pipe(
+    //     map(bindings => bindings.value.find(b=>b.isAuth)),
+    // )
+    // firstVlanOfBindings$ = this.dhcpBindingsLoad$.pipe(
+    //     filter(bindings => bindings && bindings.length > 0),
+    //     map(binds => {
+    //         const authBind = binds.find(bind => bind.isAuth);
+    //         if (authBind) {
+    //             return authBind.vlanid;
+    //         } else {
+    //             return binds[0].vlanid;
+    //         }
+    //     }),
+    //     tap(vlan => this.lastBindingVlan = vlan),
+    //     shareReplay(1)
+    // )
+    // changeHouseVlanPage$ = combineLatest([this.firstVlanOfBindings$, this.houseBindingsPage$]).pipe(shareReplay(1));
 
-    updateHousePage$ = this.rt.acpDhcpBindingHousePageUpdateSignal().pipe(
-        switchMap((resp) => this.changeHouseVlanPage$.pipe(first(), filter(([vlan, page]) => vlan === resp.vlan))),
-    )
-    dhcpBindingsByVlan$$ = DynamicValueFactory.ofPage(
-        merge(this.changeHouseVlanPage$, this.updateHousePage$),
-        (vlan, page) => this.api.getDhcpBindingsByVlan(page, vlan, this.currentLogin),
-        'id',
-        null,
-        this.rt.acpDhcpBindingUpdated(),
-        null
-    )
-    isCommutatorRefreshing = false;
-    lastBindingVlan: null | number = null;
-    commutatorsByVlan$ = DynamicValueFactory.ofWithFilter(
-        this.firstVlanOfBindings$.pipe(
-            filter(vlan => vlan != undefined && vlan > 0 && vlan < 4097),
-            map(vlan => [vlan]),
-        ),
-        (vlan) => this.api.getCommutatorsByVlan(vlan),
-        'id',
-        this.rt.acpCommutatorCreated(),
-        this.rt.acpCommutatorUpdated(),
-        this.rt.acpCommutatorDeleted()
-    )
+    // updateHousePage$ = this.rt.acpDhcpBindingHousePageUpdateSignal().pipe(
+    //     switchMap((resp) => this.changeHouseVlanPage$.pipe(first(), filter(([vlan, page]) => vlan === resp.vlan))),
+    // )
+    // dhcpBindingsByVlan$$ = DynamicValueFactory.ofPage(
+    //     merge(this.changeHouseVlanPage$, this.updateHousePage$),
+    //     (vlan, page) => this.api.getDhcpBindingsByVlan(page, vlan, this.currentLogin),
+    //     'id',
+    //     null,
+    //     this.rt.acpDhcpBindingUpdated(),
+    //     null
+    // )
+    // isCommutatorRefreshing = false;
+    // lastBindingVlan: null | number = null;
+    // commutatorsByVlan$ = DynamicValueFactory.ofWithFilter(
+    //     this.firstVlanOfBindings$.pipe(
+    //         filter(vlan => vlan != undefined && vlan > 0 && vlan < 4097),
+    //         map(vlan => [vlan]),
+    //     ),
+    //     (vlan) => this.api.getCommutatorsByVlan(vlan),
+    //     'id',
+    //     this.rt.acpCommutatorCreated(),
+    //     this.rt.acpCommutatorUpdated(),
+    //     this.rt.acpCommutatorDeleted()
+    // )
     nclHistory$ = new BehaviorSubject<NCLHistoryWrapper|null>(null);
     nclHistoryLoadingState = LoadingState.LOADING;
     nclHistoryViewStyle$ = this.nclHistory$.pipe(
@@ -811,15 +822,15 @@ export class BillingUserPageComponent implements OnInit, OnDestroy {
         })
     }
 
-    refreshCommutators() {
-        if (this.lastBindingVlan)
-            this.api.commutatorRemoteUpdateByVlan(this.lastBindingVlan).pipe(
-                tap(() => this.isCommutatorRefreshing = true)
-            ).subscribe({
-                next: () => this.isCommutatorRefreshing = false,
-                error: () => this.isCommutatorRefreshing = false
-            })
-    }
+    // refreshCommutators() {
+    //     if (this.lastBindingVlan)
+    //         this.api.commutatorRemoteUpdateByVlan(this.lastBindingVlan).pipe(
+    //             tap(() => this.isCommutatorRefreshing = true)
+    //         ).subscribe({
+    //             next: () => this.isCommutatorRefreshing = false,
+    //             error: () => this.isCommutatorRefreshing = false
+    //         })
+    // }
 
     openNCLHistoryDialog(binding: DhcpBinding) {
         this.isNCLHistoryDialogVisible = true;

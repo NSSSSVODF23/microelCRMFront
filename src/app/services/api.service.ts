@@ -58,6 +58,9 @@ import {Duration} from "@fullcalendar/core";
 import {AddressCorrecting, OldTracker} from "../types/parsing-interfaces";
 import EmployeeWorkStatisticsTable = Statistics.EmployeeWorkStatisticsTable;
 import EmployeeWorkStatisticsForm = Statistics.EmployeeWorkStatisticsForm;
+import {DhcpBindingFilter} from "../types/service-interfaces";
+import _default from "chart.js/dist/plugins/plugin.tooltip";
+import numbers = _default.defaults.animations.numbers;
 
 
 @Injectable({
@@ -1069,8 +1072,32 @@ export class ApiService {
         return this.sendGet<CommutatorListItem[]>('api/private/acp/building/' + id + '/commutators');
     }
 
-    getBindingsByBuildingId(id: number, page: number, filter?:any) {
+    getBindingsByLogin(login: string, page: number, filter?:DhcpBindingFilter) {
+        return this.sendPost<Page<DhcpBinding>>('api/private/acp/user/' + login + '/bindings/' + page, filter);
+    }
+
+    getBindingsByVlan(vlan: number, page: number, filter?:DhcpBindingFilter) {
+        return this.sendPost<Page<DhcpBinding>>('api/private/acp/vlan/' + vlan + '/bindings/' + page, filter);
+    }
+
+    getBindingsByBuildingId(id: number, page: number, filter?:DhcpBindingFilter) {
         return this.sendPost<Page<DhcpBinding>>('api/private/acp/building/' + id + '/bindings/' + page, filter);
+    }
+
+    getBindingsFromBuildingByLogin(login: string, page: number, filter?:DhcpBindingFilter) {
+        return this.sendPost<Page<DhcpBinding>>('api/private/acp/user/' + login + '/bindings-from-building/' + page, filter);
+    }
+
+    getBindingsByCommutator(id: number, page: number, filter?:DhcpBindingFilter) {
+        return this.sendPost<Page<DhcpBinding>>(`api/private/acp/commutator/${id}/bindings/${page}`, filter);
+    }
+
+    getActiveBindingByLogin(login: string) {
+        return this.sendGet<DhcpBinding | null>('api/private/acp/user/' + login + '/active-binding');
+    }
+
+    getBuildingIdByVlan(vlanId: number) {
+        return this.sendGet<number | null>('api/private/acp/vlan/' + vlanId + '/building-id');
     }
 
     getUserBriefInfo(login: string) {
@@ -1336,4 +1363,6 @@ export class ApiService {
     private generateHash(uri: string, query: any) {
         return cyrb53(uri + JSON.stringify(query), 0);
     }
+
+
 }

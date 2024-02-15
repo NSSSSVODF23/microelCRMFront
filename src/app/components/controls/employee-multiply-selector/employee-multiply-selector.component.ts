@@ -70,7 +70,6 @@ export class EmployeeMultiplySelectorComponent implements OnInit, OnDestroy, Con
 
     search(query: string) {
         this.employeesSuggestions = this.employees.filter(e => e.fullName?.toLowerCase().includes(query.toLowerCase()));
-        console.log(this.employeesSuggestions)
     }
 
     initEmployeeLoader(){

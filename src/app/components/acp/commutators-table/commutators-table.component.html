@@ -1,0 +1,61 @@
+<div class="flex flex-grow-1" [ngClass]="{'overflow-hidden border-round border-1 border-bluegray-100': !inline}" *ngIf="commutators$ | async as commutators">
+    <p-table [value]="commutators" class="flex-grow-1" styleClass="p-datatable-sm flex-grow-1">
+        <ng-template pTemplate="header">
+            <tr>
+                <th>Имя</th>
+                <th>Тип</th>
+                <th>Модель</th>
+                <th>Адрес</th>
+                <th>Ping</th>
+                <th>Управление</th>
+                <th>Сессии</th>
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-commutator>
+            <tr>
+                <td>{{commutator.name}}</td>
+                <td>{{commutator.type}}</td>
+                <td>{{commutator.model}}</td>
+                <td>{{commutator.ip}}</td>
+                <td>
+                    <ng-container *ngIf="commutatorsPings[commutator.ip] | async as ping">
+                                <span [ngClass]="ping.styleClass">
+                                    <span>
+                                        {{ping.latency === 999 ? '- ' : ping.latency | number:'1.2-2'}}мс
+                                    </span>
+                                    <span>
+                                        {{ping.loss | number:'1.2-2'}}%
+                                    </span>
+                                </span>
+                    </ng-container>
+                    <ng-container *ngIf="!(commutatorsPings[commutator.ip] | async)">
+                        <ng-container *ngTemplateOutlet="loadingCellTemplate; context:{width:'85px'}"></ng-container>
+                    </ng-container>
+                </td>
+                <td class="flex gap-2">
+                    <span class="text-primary font-bold hover:text-primary-700 cursor-pointer" (click)="openCommutatorWeb(commutator.ip)">
+                        Web
+                    </span>
+                    <span class="text-primary font-bold hover:text-primary-700 cursor-pointer" (click)="openTelnetTerminal(commutator.name, commutator.ip)">
+                        Telnet
+                    </span>
+                </td>
+                <td>
+                    <span class="text-primary font-bold hover:text-primary-700 cursor-pointer" (click)="openCommutatorView(commutator)">
+                        Просмотр
+                    </span>
+                </td>
+            </tr>
+        </ng-template>
+    </p-table>
+</div>
+
+<ng-template #loadingCellTemplate let-width="width">
+    <p-skeleton [width]="width"></p-skeleton>
+</ng-template>
+
+<p-dialog appendTo="body" [(visible)]="commutatorViewVisible" [modal]="true"
+          [draggable]="true" [dismissableMask]="true" [header]="commutatorViewHeader"
+          contentStyle="">
+    <app-commutator-view *ngIf="commutatorForView" [commutator]="commutatorForView"></app-commutator-view>
+</p-dialog>

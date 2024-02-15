@@ -25,3 +25,19 @@ export class EmptyPage implements Page<any>{
     totalElements = 0;
     totalPages = 0;
 }
+
+export interface TableFilter {
+    first: number,
+    rows: number,
+    sortField?: string,
+    sortOrder?: number,
+    multiSortMeta?: { field: string, order: number }[],
+    filters?: { [key: string]: any }
+    globalFilter?: string
+}
+
+export interface DhcpBindingFilter {
+    size?: number,
+    status?: 'online' | 'offline',
+    sort?: {filter: string, order: number}[],
+}

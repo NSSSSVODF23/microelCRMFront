@@ -5,27 +5,36 @@ import {Menu} from "primeng/menu";
 import {ApiService} from 'src/app/services/api.service';
 import {v4} from "uuid";
 import {
-    FieldDataBind,
     FieldItem,
     StepItem,
-    Task, TaskClassOT,
+    Task,
+    TaskClassOT,
     TaskStage,
     Wireframe,
     WireframeFieldType,
     WireframeType
 } from "../../types/transport-interfaces";
 import {CustomNavigationService} from "../../services/custom-navigation.service";
-import {AbstractControl, FormArray, FormControl, FormGroup, Validators} from "@angular/forms";
-import {delay, delayWhen, find, map, mergeMap, shareReplay, startWith, switchMap, tap, combineLatest, of} from "rxjs";
+import {FormArray, FormControl, FormGroup, Validators} from "@angular/forms";
+import {combineLatest, map, shareReplay, switchMap, tap} from "rxjs";
 import {SubscriptionsHolder} from "../../util";
 
 const defaultStep: StepItem = {
     id: 0, name: 'Название этапа', fields: []
 }
 
-type FieldBindType = 'AddressFieldDataBind' | 'AdSourceFieldDataBind' | 'ConnectionTypeFieldDataBind'
-    | 'DateFieldDataBind' | 'DateTimeFieldDataBind' | 'DefaultFieldDataBind' | 'InstallersHardAssignFieldDataBind'
-    | 'InstallersSimpleAssignFieldDataBind' | 'TextFieldDataBind' | 'FullNameFieldDataBind' | 'PassportDetailsFieldDataBind';
+type FieldBindType =
+    'AddressFieldDataBind'
+    | 'AdSourceFieldDataBind'
+    | 'ConnectionTypeFieldDataBind'
+    | 'DateFieldDataBind'
+    | 'DateTimeFieldDataBind'
+    | 'DefaultFieldDataBind'
+    | 'InstallersHardAssignFieldDataBind'
+    | 'InstallersSimpleAssignFieldDataBind'
+    | 'TextFieldDataBind'
+    | 'FullNameFieldDataBind'
+    | 'PassportDetailsFieldDataBind';
 
 @Component({
     selector: 'app-wireframe-constructor-page',
@@ -73,44 +82,19 @@ export class WireframeConstructorPageComponent implements OnInit, OnDestroy {
     taskTypeDirectoriesDialogVisible = false;
     taskTypeDirectoriesFormArray = new FormArray<FormGroup>([]);
     taskTypeDirectoriesList = [] as FormGroup[];
-    getTaskTypeDirectoryFormTemplate(id?: number, name?: string, description?: string, orderIndex?: number | null){
-        return new FormGroup({
-            taskTypeDirectoryId: new FormControl<number | string>(id ? id : v4()),
-            name: new FormControl(name ?? '', [Validators.required, Validators.minLength(3)]),
-            description: new FormControl(description ?? ''),
-            orderIndex: new FormControl<number | null | undefined>(orderIndex),
-        })
-    }
-
-    addTaskTypeDirectory(){
-        this.taskTypeDirectoriesFormArray.push(this.getTaskTypeDirectoryFormTemplate(undefined, undefined, undefined, this.taskTypeDirectoriesFormArray.controls.length));
-        this.taskTypeDirectoriesList = [...this.taskTypeDirectoriesFormArray.controls]
-    }
-
-    removeTaskTypeDirectory(id: number | string){
-        this.taskTypeDirectoriesFormArray.removeAt(this.taskTypeDirectoriesFormArray.controls.findIndex(c=>c.value.taskTypeDirectoryId === id));
-        this.taskTypeDirectoriesList = [...this.taskTypeDirectoriesFormArray.controls]
-    }
-
-    reorderTaskTypeDirectories(){
-        this.taskTypeDirectoriesFormArray.markAsDirty();
-        this.taskTypeDirectoriesList.forEach((taskDir, orderIndex)=>taskDir.patchValue({orderIndex}))
-    }
-
-    trackByTaskTypeDirectories(index: number, taskDir: FormGroup){
-        return taskDir.value.taskTypeDirectoryId;
-    }
-
     selectedTaskClass$ = combineLatest([this.oldTrackerIntegrationForm.controls.classId.valueChanges, this.oldTrackerTaskClasses$]).pipe(
-            tap(console.log),
-            map(([classId, classList]:[number, TaskClassOT[]])=>classList?.find(cl=>cl.id === classId) ?? null),
-            shareReplay(1)
-        );
-
-    selectedClassFields$ = this.selectedTaskClass$.pipe(map(cls=>[{label: "Нет", value: null},...(cls?.fields.map(f=>{return {label: f.name, value: f.id}})??[])]), shareReplay(1));
-
+        tap(console.log),
+        map(([classId, classList]: [number, TaskClassOT[]]) => classList?.find(cl => cl.id === classId) ?? null),
+        shareReplay(1)
+    );
+    selectedClassFields$ = this.selectedTaskClass$.pipe(map(cls => [{
+        label: "Нет",
+        value: null
+    }, ...(cls?.fields.map(f => {
+        return {label: f.name, value: f.id}
+    }) ?? [])]), shareReplay(1));
     appendBindToIntegrationDialogVisible = false;
-    selectedDataBind?: ()=>FormGroup;
+    selectedDataBind?: () => FormGroup;
     dataBindFieldOptions = [
         {
             label: 'Простой текст',
@@ -147,96 +131,8 @@ export class WireframeConstructorPageComponent implements OnInit, OnDestroy {
     ]
     selectedStageForIntegration?: TaskStage;
     selectedStageForDirectoriesSetup?: TaskStage;
-
-    simpleTextFieldFormGroup(){
-        return new FormGroup({
-            type: new FormControl<FieldBindType>('TextFieldDataBind'),
-            fieldDataBindId: new FormControl<null | number>(null),
-            fieldItemId: new FormControl<null | string>(null, [Validators.required]),
-            textFieldId: new FormControl<null | number>(null, [Validators.required]),
-        })
-    }
-
-    fullNameFieldFormGroup(){
-        return new FormGroup({
-            type: new FormControl<FieldBindType>('FullNameFieldDataBind'),
-            fieldDataBindId: new FormControl<null | number>(null),
-            fieldItemId: new FormControl<null | string>(null, [Validators.required]),
-            lastNameFieldId: new FormControl<null | number>(null, [Validators.required]),
-            firstNameFieldId: new FormControl<null | number>(null, [Validators.required]),
-            patronymicFieldId: new FormControl<null | number>(null, [Validators.required]),
-        })
-    }
-
-    addressFieldFormGroup(){
-        return new FormGroup({
-            type: new FormControl<FieldBindType>('AddressFieldDataBind'),
-            fieldDataBindId: new FormControl<null | number>(null),
-            fieldItemId: new FormControl<null | string>(null, [Validators.required]),
-            streetFieldId: new FormControl<null | number>(null, [Validators.required]),
-            houseFieldId: new FormControl<null | number>(null),
-            apartmentFieldId: new FormControl<null | number>(null),
-            entranceFieldId: new FormControl<null | number>(null),
-            floorFieldId: new FormControl<null | number>(null),
-            backupFieldId: new FormControl<null | number>(null),
-        })
-    }
-
-    adSourceFieldFormGroup(){
-        return new FormGroup({
-            type: new FormControl<FieldBindType>('AdSourceFieldDataBind'),
-            fieldDataBindId: new FormControl<null | number>(null),
-            fieldItemId: new FormControl<null | string>(null, [Validators.required]),
-            adSourceFieldId: new FormControl<null | number>(null, [Validators.required]),
-        })
-    }
-
-    connectionTypeFieldFormGroup(){
-        return new FormGroup({
-            type: new FormControl<FieldBindType>('ConnectionTypeFieldDataBind'),
-            fieldDataBindId: new FormControl<null | number>(null),
-            fieldItemId: new FormControl<null | string>(null, [Validators.required]),
-            connectionServicesInnerFieldId: new FormControl<null | number>(null, [Validators.required]),
-            ctFieldDataBindId: new FormControl<null | number>(null, [Validators.required]),
-        })
-    }
-
-    dateFieldFormGroup(){
-        return new FormGroup({
-            type: new FormControl<FieldBindType>('DateFieldDataBind'),
-            fieldDataBindId: new FormControl<null | number>(null),
-            fieldItemId: new FormControl<null | string>(null, [Validators.required]),
-            dateFieldDataBind: new FormControl<null | number>(null, [Validators.required]),
-        })
-    }
-
-    dateTimeFieldFormGroup(){
-        return new FormGroup({
-            type: new FormControl<FieldBindType>('DateTimeFieldDataBind'),
-            fieldDataBindId: new FormControl<null | number>(null),
-            fieldItemId: new FormControl<null | string>(null, [Validators.required]),
-            dateTimeFieldDataBind: new FormControl<null | number>(null, [Validators.required]),
-        })
-    }
-
-    passportFieldFormGroup(){
-        return new FormGroup({
-            type: new FormControl<FieldBindType>('PassportDetailsFieldDataBind'),
-            fieldDataBindId: new FormControl<null | number>(null),
-            fieldItemId: new FormControl<null | string>(null, [Validators.required]),
-            passportSeriesFieldId: new FormControl<null | number>(null),
-            passportNumberFieldId: new FormControl<null | number>(null),
-            passportIssuedByFieldId: new FormControl<null | number>(null),
-            passportIssuedDateFieldId: new FormControl<null | number>(null),
-            registrationAddressFieldId: new FormControl<null | number>(null),
-        })
-    }
-
     documentDialogVisible = false;
     documentDialogMode: 'new' | 'edit' = 'new';
-    get documentDialogHeader(){
-        return this.documentDialogMode === 'new' ? 'Добавление документа' : 'Редактирование документа';
-    }
     documentTypesOptions$ = this.api.getDocumentTemplateTypes().pipe(shareReplay(1));
     documentDialogForm = new FormGroup({
         temporalId: new FormControl<string | null>(null),
@@ -254,10 +150,13 @@ export class WireframeConstructorPageComponent implements OnInit, OnDestroy {
         passwordFieldId: new FormControl<string | null>(null),
         tariffFieldId: new FormControl<string | null>(null),
     })
-
     subscriptions = new SubscriptionsHolder();
 
     constructor(readonly api: ApiService, readonly route: ActivatedRoute, readonly nav: CustomNavigationService) {
+    }
+
+    get documentDialogHeader() {
+        return this.documentDialogMode === 'new' ? 'Добавление документа' : 'Редактирование документа';
     }
 
     _wireframe: Wireframe = {
@@ -283,6 +182,118 @@ export class WireframeConstructorPageComponent implements OnInit, OnDestroy {
         this.wireframeFieldsList = this.fieldsLabelsList();
     }
 
+    getTaskTypeDirectoryFormTemplate(id?: number, name?: string, description?: string, orderIndex?: number | null) {
+        return new FormGroup({
+            taskTypeDirectoryId: new FormControl<number | string>(id ? id : v4()),
+            name: new FormControl(name ?? '', [Validators.required, Validators.minLength(3)]),
+            description: new FormControl(description ?? ''),
+            orderIndex: new FormControl<number | null | undefined>(orderIndex),
+        })
+    }
+
+    addTaskTypeDirectory() {
+        this.taskTypeDirectoriesFormArray.push(this.getTaskTypeDirectoryFormTemplate(undefined, undefined, undefined, this.taskTypeDirectoriesFormArray.controls.length));
+        this.taskTypeDirectoriesList = [...this.taskTypeDirectoriesFormArray.controls]
+    }
+
+    removeTaskTypeDirectory(id: number | string) {
+        this.taskTypeDirectoriesFormArray.removeAt(this.taskTypeDirectoriesFormArray.controls.findIndex(c => c.value.taskTypeDirectoryId === id));
+        this.taskTypeDirectoriesList = [...this.taskTypeDirectoriesFormArray.controls]
+    }
+
+    reorderTaskTypeDirectories() {
+        this.taskTypeDirectoriesFormArray.markAsDirty();
+        this.taskTypeDirectoriesList.forEach((taskDir, orderIndex) => taskDir.patchValue({orderIndex}))
+    }
+
+    trackByTaskTypeDirectories(index: number, taskDir: FormGroup) {
+        return taskDir.value.taskTypeDirectoryId;
+    }
+
+    simpleTextFieldFormGroup() {
+        return new FormGroup({
+            type: new FormControl<FieldBindType>('TextFieldDataBind'),
+            fieldDataBindId: new FormControl<null | number>(null),
+            fieldItemId: new FormControl<null | string>(null, [Validators.required]),
+            textFieldId: new FormControl<null | number>(null, [Validators.required]),
+        })
+    }
+
+    fullNameFieldFormGroup() {
+        return new FormGroup({
+            type: new FormControl<FieldBindType>('FullNameFieldDataBind'),
+            fieldDataBindId: new FormControl<null | number>(null),
+            fieldItemId: new FormControl<null | string>(null, [Validators.required]),
+            lastNameFieldId: new FormControl<null | number>(null, [Validators.required]),
+            firstNameFieldId: new FormControl<null | number>(null, [Validators.required]),
+            patronymicFieldId: new FormControl<null | number>(null, [Validators.required]),
+        })
+    }
+
+    addressFieldFormGroup() {
+        return new FormGroup({
+            type: new FormControl<FieldBindType>('AddressFieldDataBind'),
+            fieldDataBindId: new FormControl<null | number>(null),
+            fieldItemId: new FormControl<null | string>(null, [Validators.required]),
+            streetFieldId: new FormControl<null | number>(null, [Validators.required]),
+            houseFieldId: new FormControl<null | number>(null),
+            apartmentFieldId: new FormControl<null | number>(null),
+            entranceFieldId: new FormControl<null | number>(null),
+            floorFieldId: new FormControl<null | number>(null),
+            backupFieldId: new FormControl<null | number>(null),
+        })
+    }
+
+    adSourceFieldFormGroup() {
+        return new FormGroup({
+            type: new FormControl<FieldBindType>('AdSourceFieldDataBind'),
+            fieldDataBindId: new FormControl<null | number>(null),
+            fieldItemId: new FormControl<null | string>(null, [Validators.required]),
+            adSourceFieldId: new FormControl<null | number>(null, [Validators.required]),
+        })
+    }
+
+    connectionTypeFieldFormGroup() {
+        return new FormGroup({
+            type: new FormControl<FieldBindType>('ConnectionTypeFieldDataBind'),
+            fieldDataBindId: new FormControl<null | number>(null),
+            fieldItemId: new FormControl<null | string>(null, [Validators.required]),
+            connectionServicesInnerFieldId: new FormControl<null | number>(null, [Validators.required]),
+            ctFieldDataBindId: new FormControl<null | number>(null, [Validators.required]),
+        })
+    }
+
+    dateFieldFormGroup() {
+        return new FormGroup({
+            type: new FormControl<FieldBindType>('DateFieldDataBind'),
+            fieldDataBindId: new FormControl<null | number>(null),
+            fieldItemId: new FormControl<null | string>(null, [Validators.required]),
+            dateFieldDataBind: new FormControl<null | number>(null, [Validators.required]),
+        })
+    }
+
+    dateTimeFieldFormGroup() {
+        return new FormGroup({
+            type: new FormControl<FieldBindType>('DateTimeFieldDataBind'),
+            fieldDataBindId: new FormControl<null | number>(null),
+            fieldItemId: new FormControl<null | string>(null, [Validators.required]),
+            dateTimeFieldDataBind: new FormControl<null | number>(null, [Validators.required]),
+        })
+    }
+
+    passportFieldFormGroup() {
+        return new FormGroup({
+            type: new FormControl<FieldBindType>('PassportDetailsFieldDataBind'),
+            fieldDataBindId: new FormControl<null | number>(null),
+            fieldItemId: new FormControl<null | string>(null, [Validators.required]),
+            passportSeriesFieldId: new FormControl<null | number>(null),
+            passportNumberFieldId: new FormControl<null | number>(null),
+            passportIssuedByFieldId: new FormControl<null | number>(null),
+            passportIssuedDateFieldId: new FormControl<null | number>(null),
+            registrationAddressFieldId: new FormControl<null | number>(null),
+        })
+    }
+
     ngOnInit(): void {
         this.route.queryParams.subscribe(params => {
             //if it has editing id
@@ -299,18 +310,18 @@ export class WireframeConstructorPageComponent implements OnInit, OnDestroy {
         this.subscriptions.addSubscription('docNameUpd', this.documentDialogForm.controls.type.valueChanges
             .pipe(
                 switchMap(value => this.documentTypesOptions$.pipe(
-                    map(opt=>opt.find(o=>o.value === value)?.label ?? ""))
+                    map(opt => opt.find(o => o.value === value)?.label ?? ""))
                 )
-            ).subscribe(label=>this.documentDialogForm.controls.name.setValue(label))
+            ).subscribe(label => this.documentDialogForm.controls.name.setValue(label))
         )
     }
 
-    ngOnDestroy(): void{
+    ngOnDestroy(): void {
         this.subscriptions.unsubscribeAll();
     }
 
-    createDocumentTemplate(){
-        if(this.documentDialogForm.valid) {
+    createDocumentTemplate() {
+        if (this.documentDialogForm.valid) {
             if (!this.wireframe.documentTemplates) this.wireframe.documentTemplates = [];
             this.wireframe.documentTemplates.push(this.documentDialogForm.value);
             this.wireframe.documentTemplates = [...this.wireframe.documentTemplates];
@@ -318,10 +329,10 @@ export class WireframeConstructorPageComponent implements OnInit, OnDestroy {
         }
     }
 
-    editDocumentTemplate(){
-        if(this.documentDialogForm.valid && this.wireframe.documentTemplates) {
-            const templateIndex = this.wireframe.documentTemplates.findIndex(item=>item.temporalId === this.documentDialogForm.value.temporalId);
-            if(templateIndex>-1){
+    editDocumentTemplate() {
+        if (this.documentDialogForm.valid && this.wireframe.documentTemplates) {
+            const templateIndex = this.wireframe.documentTemplates.findIndex(item => item.temporalId === this.documentDialogForm.value.temporalId);
+            if (templateIndex > -1) {
                 this.wireframe.documentTemplates[templateIndex] = this.documentDialogForm.value;
                 this.wireframe.documentTemplates = [...this.wireframe.documentTemplates];
             }
@@ -329,8 +340,8 @@ export class WireframeConstructorPageComponent implements OnInit, OnDestroy {
         }
     }
 
-    deleteDocumentTemplate(index:number){
-        this.wireframe.documentTemplates?.splice(index,1);
+    deleteDocumentTemplate(index: number) {
+        this.wireframe.documentTemplates?.splice(index, 1);
     }
 
     createField(createFieldType: WireframeFieldType) {
@@ -351,6 +362,7 @@ export class WireframeConstructorPageComponent implements OnInit, OnDestroy {
             step.fields = step.fields.filter(f => f.id !== id);
         }
     }
+
     //swap index fields in array
     // swapFields(currentIndex: number, targetIndex: number) {
     //     //get wireframe by activeStepIndex
@@ -375,7 +387,7 @@ export class WireframeConstructorPageComponent implements OnInit, OnDestroy {
     }
 
     removeStep(id: number) {
-        if (this.activeStepIndex >= id) this.selectStep(this.activeStepIndex-1);
+        if (this.activeStepIndex >= id) this.selectStep(this.activeStepIndex - 1);
         this.stepsArray.splice(id, 1)
         // this.stepsArray = this.stepsArray.map((s, i) => {
         //     return {
@@ -512,6 +524,7 @@ export class WireframeConstructorPageComponent implements OnInit, OnDestroy {
             return stage;
         });
     }
+
     trackByStep = (index: number, step: MenuItem) => (index + (step.label ?? ''));
 
     dragStart(event: any, field: FieldItem) {
@@ -554,12 +567,12 @@ export class WireframeConstructorPageComponent implements OnInit, OnDestroy {
 
     dropToStage(event: any, stageIndex: number) {
         this.stageHoverTarget = null;
-        if(stageIndex !== this.activeStepIndex){
+        if (stageIndex !== this.activeStepIndex) {
             const sourceStep: StepItem | undefined = this.wireframe.steps.find(s => s.id === this.activeStepIndex)
             const targetStep: StepItem | undefined = this.wireframe.steps.find(s => s.id === stageIndex)
 
             if (sourceStep && targetStep && this.draggedField) {
-                sourceStep.fields.splice(sourceStep.fields.findIndex(f=>f===this.draggedField),1);
+                sourceStep.fields.splice(sourceStep.fields.findIndex(f => f === this.draggedField), 1);
                 targetStep.fields.unshift(this.draggedField);
                 this.draggedField = undefined;
             }
@@ -567,7 +580,7 @@ export class WireframeConstructorPageComponent implements OnInit, OnDestroy {
     }
 
     dragEnterStage(event: any, stageIndex: number) {
-        if(stageIndex !== this.activeStepIndex)
+        if (stageIndex !== this.activeStepIndex)
             this.stageHoverTarget = stageIndex;
     }
 
@@ -579,7 +592,7 @@ export class WireframeConstructorPageComponent implements OnInit, OnDestroy {
         this.oldTrackerIntegrationDialogVisible = true;
         this.selectedStageForIntegration = stage;
 
-        setTimeout(()=> {
+        setTimeout(() => {
             this.oldTrackerIntegrationForm.patchValue({
                 classId: stage.oldTrackerBind?.classId ?? null,
                 initialStageId: stage.oldTrackerBind?.initialStageId ?? null,
@@ -588,7 +601,7 @@ export class WireframeConstructorPageComponent implements OnInit, OnDestroy {
                 autoCloseStageId: stage.oldTrackerBind?.autoCloseStageId ?? null
             })
             this.oldTrackerIntegrationForm.controls.fieldDataBinds.clear();
-            stage.oldTrackerBind?.fieldDataBinds.forEach((bind:any) => this.oldTrackerIntegrationForm.controls.fieldDataBinds.push(new FormGroup<any>({
+            stage.oldTrackerBind?.fieldDataBinds.forEach((bind: any) => this.oldTrackerIntegrationForm.controls.fieldDataBinds.push(new FormGroup<any>({
                 type: new FormControl(bind.type),
                 fieldDataBindId: new FormControl(bind.fieldDataBindId),
                 fieldItemId: new FormControl(bind.fieldItemId),
@@ -620,20 +633,20 @@ export class WireframeConstructorPageComponent implements OnInit, OnDestroy {
         }, 100)
     }
 
-    openTaskTypeDirectoriesDialog(stage: TaskStage){
+    openTaskTypeDirectoriesDialog(stage: TaskStage) {
         this.taskTypeDirectoriesDialogVisible = true;
         this.selectedStageForDirectoriesSetup = stage;
         this.taskTypeDirectoriesFormArray.clear();
-        stage.directories?.sort((a,b)=>(a.orderIndex??0)-(b.orderIndex??0)).forEach((dir, index)=>{
+        stage.directories?.sort((a, b) => (a.orderIndex ?? 0) - (b.orderIndex ?? 0)).forEach((dir, index) => {
             this.taskTypeDirectoriesFormArray.push(this.getTaskTypeDirectoryFormTemplate(dir.taskTypeDirectoryId, dir.name, dir.description, dir.orderIndex ?? index));
         })
         this.taskTypeDirectoriesList = [...this.taskTypeDirectoriesFormArray.controls];
     }
 
-    saveTaskTypeDirectories(){
-        if(this.selectedStageForDirectoriesSetup && this.taskTypeDirectoriesFormArray.valid){
-            this.selectedStageForDirectoriesSetup.directories = this.taskTypeDirectoriesFormArray.controls.map(({value})=>{
-                if(typeof value['taskTypeDirectoryId'] === 'string'){
+    saveTaskTypeDirectories() {
+        if (this.selectedStageForDirectoriesSetup && this.taskTypeDirectoriesFormArray.valid) {
+            this.selectedStageForDirectoriesSetup.directories = this.taskTypeDirectoriesFormArray.controls.map(({value}) => {
+                if (typeof value['taskTypeDirectoryId'] === 'string') {
                     value['taskTypeDirectoryId'] = null;
                 }
                 return value;
@@ -643,7 +656,7 @@ export class WireframeConstructorPageComponent implements OnInit, OnDestroy {
     }
 
     appendBindToIntegration() {
-        if(this.selectedDataBind) {
+        if (this.selectedDataBind) {
             this.oldTrackerIntegrationForm.controls.fieldDataBinds.push(this.selectedDataBind())
             this.appendBindToIntegrationDialogVisible = false;
         }
@@ -654,8 +667,7 @@ export class WireframeConstructorPageComponent implements OnInit, OnDestroy {
     }
 
     saveOldTrackerIntegration() {
-        if(this.selectedStageForIntegration) {
-            console.log(this.oldTrackerIntegrationForm.value);
+        if (this.selectedStageForIntegration) {
             this.selectedStageForIntegration.oldTrackerBind = this.oldTrackerIntegrationForm.value;
         }
     }
@@ -666,19 +678,18 @@ export class WireframeConstructorPageComponent implements OnInit, OnDestroy {
 
     openAppendDocumentDialog() {
         this.clearDocumentDialogForm();
-        this.documentDialogVisible=true;
-        this.documentDialogMode='new';
+        this.documentDialogVisible = true;
+        this.documentDialogMode = 'new';
     }
 
-    openEditDocumentDialog(item:any){
-        console.log(item);
+    openEditDocumentDialog(item: any) {
         this.clearDocumentDialogForm();
-        this.documentDialogVisible=true;
-        this.documentDialogMode='edit';
+        this.documentDialogVisible = true;
+        this.documentDialogMode = 'edit';
         this.documentDialogForm.patchValue(item)
     }
 
-    clearDocumentDialogForm(){
+    clearDocumentDialogForm() {
         this.documentDialogForm.reset({
             temporalId: v4(),
             documentTemplateId: null,

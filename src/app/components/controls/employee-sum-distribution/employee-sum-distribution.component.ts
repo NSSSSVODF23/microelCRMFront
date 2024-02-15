@@ -176,7 +176,6 @@ export class EmployeeSumDistributionComponent implements OnInit, OnDestroy, Cont
     };
 
     ngOnInit(): void {
-        this.employeeRatioForm.valueChanges.subscribe(console.log)
     }
 
     ngOnDestroy(): void {
