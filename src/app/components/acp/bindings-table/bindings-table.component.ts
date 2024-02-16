@@ -88,7 +88,7 @@ export class BindingsTableComponent implements OnInit {
                                 return binding.authName === id;
                             if (mode === 'vlan')
                                 return binding.vlanid === Number.parseInt(id);
-                            return true;
+                            return false;
                         }),
                     )
             }),

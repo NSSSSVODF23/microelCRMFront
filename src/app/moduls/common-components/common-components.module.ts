@@ -250,6 +250,7 @@ import {TerminalDialogComponent} from "../../components/terminal/terminal-dialog
 import {NgTerminalModule} from "ng-terminal";
 import {BindingsTableComponent} from "../../components/acp/bindings-table/bindings-table.component";
 import {CommutatorsTableComponent} from "../../components/acp/commutators-table/commutators-table.component";
+import {ThumbnailPreviewComponent} from "../../components/content/thumbnail-preview/thumbnail-preview.component";
 
 
 @NgModule({
@@ -375,7 +376,8 @@ import {CommutatorsTableComponent} from "../../components/acp/commutators-table/
         TerminalFloatPanelComponent,
         TerminalDialogComponent,
         BindingsTableComponent,
-        CommutatorsTableComponent
+        CommutatorsTableComponent,
+        ThumbnailPreviewComponent
     ],
     exports: [
         AccountPanelComponent,
@@ -496,7 +498,8 @@ import {CommutatorsTableComponent} from "../../components/acp/commutators-table/
         TimePickerComponent,
         TerminalDialogComponent,
         BindingsTableComponent,
-        CommutatorsTableComponent
+        CommutatorsTableComponent,
+        ThumbnailPreviewComponent
     ],
     imports: [
         CommonPipesModule,

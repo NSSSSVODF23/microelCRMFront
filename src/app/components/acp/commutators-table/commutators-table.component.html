@@ -32,12 +32,14 @@
                         <ng-container *ngTemplateOutlet="loadingCellTemplate; context:{width:'85px'}"></ng-container>
                     </ng-container>
                 </td>
-                <td class="flex gap-2">
-                    <span class="text-primary font-bold hover:text-primary-700 cursor-pointer" (click)="openCommutatorWeb(commutator.ip)">
-                        Web
-                    </span>
-                    <span class="text-primary font-bold hover:text-primary-700 cursor-pointer" (click)="openTelnetTerminal(commutator.name, commutator.ip)">
-                        Telnet
+                <td>
+                    <span class="flex flex-wrap gap-2">
+                        <span class="text-primary font-bold hover:text-primary-700 cursor-pointer" (click)="openCommutatorWeb(commutator.ip)">
+                            Web
+                        </span>
+                        <span class="text-primary font-bold hover:text-primary-700 cursor-pointer" (click)="openTelnetTerminal(commutator.name, commutator.ip)">
+                            Telnet
+                        </span>
                     </span>
                 </td>
                 <td>

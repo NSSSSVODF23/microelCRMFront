@@ -8852,6 +8852,18 @@
 
 .mds {
 
+  &-image {
+    @include mds("image");
+  }
+
+  &-movie {
+    @include mds("movie");
+  }
+
+  &-music_note {
+    @include mds("music_note");
+  }
+
   &-terminal {
     @include mds("terminal");
   }

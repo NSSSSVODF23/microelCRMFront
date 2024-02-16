@@ -1,26 +1,10 @@
 import {Component, OnInit} from '@angular/core';
 import {AutoUnsubscribe, RouteParam} from "../../../../decorators";
-import {
-    BehaviorSubject,
-    combineLatest,
-    map,
-    Observable,
-    ReplaySubject,
-    shareReplay,
-    startWith,
-    Subject,
-    switchMap,
-    tap
-} from "rxjs";
+import {map, ReplaySubject, shareReplay, switchMap, tap} from "rxjs";
 import {ApiService} from "../../../../services/api.service";
 import {ActivatedRoute} from "@angular/router";
-import {AcpUserBrief, DhcpBinding, LoadingState, Page} from "../../../../types/transport-interfaces";
-import {RealTimeUpdateService} from "../../../../services/real-time-update.service";
-import {MenuItem, MessageService, SortMeta} from "primeng/api";
-import {Menu} from "primeng/menu";
-import {BlockUiService} from "../../../../services/block-ui.service";
-import {FormControl, FormGroup, Validators} from "@angular/forms";
-import {TelnetTerminalsService} from "../../../../services/telnet-terminals.service";
+import {LoadingState} from "../../../../types/transport-interfaces";
+import {MediaViewerService} from "../../../../services/media-viewer.service";
 
 
 @Component({
@@ -34,6 +18,12 @@ export class TopologyHousePage implements OnInit {
 
     houseLoadingState = LoadingState.LOADING;
 
+    streetNameSchemesTranslation = new Map<string, string>([
+        ["Академика Королева", "Королева"],
+        ["Великой Победы", "БВП"],
+        ["К.Маркса", "КМ"],
+        ["Октябрьское", "Октябрьское шоссе"],
+    ]);
 
     @RouteParam('id')
     buildIdParam$ = new ReplaySubject<string>(1);
@@ -53,16 +43,48 @@ export class TopologyHousePage implements OnInit {
 
     files$ = this.building$
         .pipe(
-            map(building=> building.fullName),
+            map(building => {
+                let regExpStreetMatch = building.streetName.match(/([А-я\d \.]+), /);
+                let regExpHouseMatch = building.houseNum.match(/(\d+)/);
+
+                if (!regExpStreetMatch || !regExpStreetMatch[1])
+                    return null;
+                if (!regExpHouseMatch || !regExpHouseMatch[1])
+                    return null;
+
+                let streetName = regExpStreetMatch[1];
+                let houseNum = regExpHouseMatch[1];
+
+                if(this.streetNameSchemesTranslation.has(streetName))
+                    streetName = this.streetNameSchemesTranslation.get(streetName) ?? '';
+
+                console.log(streetName + ' ' + houseNum)
+
+                return streetName + ' ' + houseNum;
+            }),
             switchMap(name => this.api.getFilesSuggestions(name))
         )
 
 
-
-    constructor(private api: ApiService, private route: ActivatedRoute) {
+    constructor(private api: ApiService, private route: ActivatedRoute, private fileViewer: MediaViewerService) {
     }
 
     ngOnInit(): void {
     }
 
+    openFile(file: any) {
+        switch (file.type) {
+            case 'PHOTO':
+            case 'VIDEO':
+            case 'AUDIO':
+                this.fileViewer.showMedia({fileSystemItemId: file.id, name: file.name, type: file.type})
+                break;
+            case 'DOCUMENT':
+            case 'FILE':
+                window.open('/api/private/file/' + file.id, '_blank')
+                break;
+            default:
+                break;
+        }
+    }
 }

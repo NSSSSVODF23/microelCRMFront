@@ -39,7 +39,7 @@
                 <ng-container *ngTemplateOutlet="downlinksListTemplate; context:{building}"></ng-container>
                 <ng-container *ngTemplateOutlet="networksTableTemplate; context:{building}"></ng-container>
                 <app-commutators-table [buildId]="buildId$ | async" class="flex-grow-1"></app-commutators-table>
-<!--                <ng-container *ngTemplateOutlet="filesTableTemplate"></ng-container>-->
+                <ng-container *ngTemplateOutlet="filesTableTemplate"></ng-container>
             </div>
             <app-bindings-table [filterId]="buildId$ | async" filterMode="building"></app-bindings-table>
         </div>
@@ -101,6 +101,7 @@
         <p-table [value]="(files$ | async) ?? []" styleClass="p-datatable-sm">
             <ng-template pTemplate="header">
                 <tr>
+                    <th></th>
                     <th>Имя</th>
                 </tr>
             </ng-template>
@@ -112,7 +113,14 @@
 </ng-template>
 
 <ng-template #fileItemTemplate let-file="file">
-    <tr>
-        <td>{{file.name}}</td>
+    <tr (click)="openFile(file)" class="cursor-pointer hover:bg-bluegray-50">
+        <td class="text-center">
+            <app-thumbnail-preview [data]="file"></app-thumbnail-preview>
+        </td>
+        <td>
+            <div appTicker class="max-w-10rem white-space-nowrap overflow-hidden">
+                {{file.name}}
+            </div>
+        </td>
     </tr>
 </ng-template>

@@ -1,0 +1,18 @@
+<ng-container *ngIf="fileId$ | async as fileId; else loadingTemplate">
+    <ng-container *ngIf="fileType$ | async as fileType" [ngSwitch]="fileType">
+        <img [src]="'/api/private/file-thumbnail/'+fileId" [height]="32" [hidden]="!thumbnailLoad"
+             *ngSwitchCase="AttachmentType.PHOTO" (load)="thumbnailLoad = true">
+        <img [src]="'/api/private/file-thumbnail/'+fileId" [height]="32" [hidden]="!thumbnailLoad"
+             *ngSwitchCase="AttachmentType.VIDEO" (load)="thumbnailLoad = true">
+        <ng-container *ngIf="!thumbnailLoad">
+            <span class="mds-image text-4xl text-bluegray-300" *ngSwitchCase="AttachmentType.PHOTO"></span>
+            <span class="mds-movie text-4xl text-bluegray-300" *ngSwitchCase="AttachmentType.VIDEO"></span>
+        </ng-container>
+        <span class="mds-description text-4xl text-bluegray-300" *ngSwitchCase="AttachmentType.DOCUMENT"></span>
+        <span class="mds-music_note text-4xl text-bluegray-300" *ngSwitchCase="AttachmentType.AUDIO"></span>
+        <span class="mds-draft text-4xl text-bluegray-300" *ngSwitchCase="AttachmentType.FILE"></span>
+    </ng-container>
+</ng-container>
+<ng-template #loadingTemplate>
+    <p-skeleton width="32px" height="32px"></p-skeleton>
+</ng-template>
