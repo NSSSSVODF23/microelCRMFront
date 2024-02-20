@@ -1929,3 +1929,21 @@ export interface TelnetConnectionCredentials {
     sessionId: string;
     lastState: string;
 }
+
+export interface DynamicTableColumn {
+    field: string;
+    title: string;
+    isSort: boolean;
+    filterType?: string;
+}
+
+export interface DynamicTableCell {
+    type: DynamicTableCellType;
+    value: string;
+}
+
+export enum DynamicTableCellType{
+    STRING = "STRING",
+    DATE = "DATE",
+    LOGIN = "LOGIN"
+}

@@ -139,6 +139,7 @@ import {
     TopologyHousePage
 } from "../../pages/topology/children/topology-house-page/topology-house-page.component";
 import {NgTerminalModule} from "ng-terminal";
+import {TaskRegistryPage} from "../../pages/task-registry-page/task-registry-page.component";
 
 const mapConfig: YaConfig = {
     apikey: '008574e5-f34b-4270-b3d5-91aaabd036e8',
@@ -184,7 +185,8 @@ const mapConfig: YaConfig = {
         TopologyHousesPage,
         TopologyHousePage,
         TopologySessionsPage,
-        TopologyCommutatorsPage
+        TopologyCommutatorsPage,
+        TaskRegistryPage
     ],
     imports: [
         CommonComponentsModule,

@@ -68,10 +68,12 @@ import {
 import {
     TopologyHousePage
 } from "../../pages/topology/children/topology-house-page/topology-house-page.component";
+import {TaskRegistryPage} from "../../pages/task-registry-page/task-registry-page.component";
 
 const routes: Routes = [{
     path: '', component: MainBootstrapComponent, children: [
         {path: '', component: GeneralDashboardPageComponent},
+        {path: 'tasks/registry', component: TaskRegistryPage},
         {
             path: 'tasks/search',
             component: TaskCatalogSearchPageComponent,

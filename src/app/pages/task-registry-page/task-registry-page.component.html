@@ -1,0 +1,38 @@
+<p-dropdown [formControl]="service.taskStatusSelector" [options]="service.taskStatusOptions"></p-dropdown>
+<p-dropdown [formControl]="service.taskClassSelector" [options]="service.taskClassOptions"></p-dropdown>
+<ng-container *ngIf="service.tabelColumns$ | async as tableColumns">
+    <p-table styleClass="p-datatable-sm" [value]="service.tableContent?.content ?? []" [paginator]="true"
+             [totalRecords]="service.tableContent?.totalElements ?? 0" paginatorDropdownAppendTo="body"
+             currentPageReportTemplate="Найдено {totalRecords} сессий" [showCurrentPageReport]="true"
+             [rowsPerPageOptions]="[50,100,250]" [rows]="100" [(first)]="service.tableOffset"
+             [lazy]="true" (onLazyLoad)="service.tableLazyLoad$.next($event)" sortMode="multiple">
+        <ng-template pTemplate="header">
+            <tr>
+                <th [pSortableColumn]="column.isSort ? column.field : ''" *ngFor="let column of tableColumns">
+                    <div class="flex align-items-center">
+                        <span>{{column.title}}</span>
+                        <p-columnFilter *ngIf="column.filterType" [type]="column.filterType" [field]="column.field" display="menu"></p-columnFilter>
+                        <p-sortIcon [field]="column.field" *ngIf="column.isSort"></p-sortIcon>
+                    </div>
+                </th>
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-data>
+            <tr>
+                <td *ngFor="let column of tableColumns">
+                    <ng-container [ngSwitch]="data[column.field]?.type">
+                        <span *ngSwitchCase="CellType.STRING">
+                            {{data[column.field]?.value}}
+                        </span>
+                        <span *ngSwitchCase="CellType.DATE">
+                            {{data[column.field]?.value | date: 'dd-MM-yyyy HH:mm'}}
+                        </span>
+                        <span *ngSwitchCase="CellType.LOGIN">
+                            {{data[column.field]?.value}}
+                        </span>
+                    </ng-container>
+                </td>
+            </tr>
+        </ng-template>
+    </p-table>
+</ng-container>

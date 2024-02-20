@@ -2,9 +2,9 @@ import {Injectable} from '@angular/core';
 import {HttpClient} from "@angular/common/http";
 import {catchError, delay, map, Observable, of, share, tap, zip} from "rxjs";
 import {
-    AcpCommutator,
     AcpConf,
-    AcpHouse, AcpUserBrief,
+    AcpHouse,
+    AcpUserBrief,
     Address,
     Attachment,
     BillingConf,
@@ -14,18 +14,29 @@ import {
     ChatMessage,
     City,
     ClientEquipment,
-    Comment, CommutatorListItem, DateRange,
+    Comment,
+    CommutatorListItem,
     DefaultObservers,
     Department,
-    DhcpBinding, DhcpLogsRequest,
+    DhcpBinding,
+    DhcpLogsRequest, DynamicTableCell,
+    DynamicTableColumn,
     Employee,
-    EmployeeStatus, EmployeeWorkLogs, FdbItem,
+    EmployeeStatus,
+    EmployeeWorkLogs,
+    FdbItem,
     FieldItem,
-    FileData, FilesLoadFileEvent, FileSuggestion, FileSystemItem, FilterModelItem,
+    FileData,
+    FilesLoadFileEvent,
+    FileSuggestion,
+    FileSystemItem,
+    FilterModelItem,
     House,
-    INotification, LoadingDirectoryWrapper,
+    INotification,
+    LoadingDirectoryWrapper,
     MessageData,
-    ModelItem, NCLHistoryItem, NCLHistoryWrapper, NetworkConnectionLocation,
+    ModelItem,
+    NCLHistoryWrapper,
     NetworkRemoteControl,
     Page,
     PaidAction,
@@ -33,22 +44,44 @@ import {
     PaidActionForm,
     PaidWork,
     PaidWorkForm,
-    PaidWorkGroupForm, PhyPhoneInfo, PhyPhoneInfoForm,
+    PaidWorkGroupForm,
+    PhyPhoneInfoForm,
     Position,
-    SalaryTable, SchedulingType, Statistics, StreetSuggestion,
+    SalaryTable,
+    Statistics,
+    StreetSuggestion,
     SuperMessage,
-    Switch, SwitchBaseInfo, SwitchEditingPreset, SwitchModel, SwitchWithAddress, TagListItem,
-    Task, TaskClassOT,
+    Switch,
+    SwitchBaseInfo,
+    SwitchEditingPreset,
+    SwitchModel,
+    SwitchWithAddress,
+    TagListItem,
+    Task,
+    TaskClassOT,
     TaskCreationBody,
     TaskEvent,
     TaskFieldsSnapshot,
-    TaskFiltrationConditions, TaskJournalSortingTypes, TaskStage,
-    TaskTag, TaskTypeDirectory,
-    TelegramConf, TelnetConnectionCredentials, TimeFrame,
-    TokenChain, TokenChainWithUserInfo, TopologyStreet,
+    TaskFiltrationConditions,
+    TaskJournalSortingTypes,
+    TaskStage,
+    TaskStatus,
+    TaskTag,
+    TaskTypeDirectory,
+    TelegramConf,
+    TelnetConnectionCredentials,
+    TokenChain,
+    TokenChainWithUserInfo,
+    TopologyStreet,
     TreeDragDropEvent,
-    TreeElementPosition, TypesOfContracts, TypesOfContractsForm, TypesOfContractsSuggestion, UserEvents, UserTariff,
-    Wireframe, WireframeDashboardStatistic,
+    TreeElementPosition,
+    TypesOfContracts,
+    TypesOfContractsForm,
+    TypesOfContractsSuggestion,
+    UserEvents,
+    UserTariff,
+    Wireframe,
+    WireframeDashboardStatistic,
     WorkingDay,
     WorkLog
 } from "../types/transport-interfaces";
@@ -56,11 +89,10 @@ import {MessageService, TreeNode} from "primeng/api";
 import {cyrb53, Storage, Utils} from "../util";
 import {Duration} from "@fullcalendar/core";
 import {AddressCorrecting, OldTracker} from "../types/parsing-interfaces";
-import EmployeeWorkStatisticsTable = Statistics.EmployeeWorkStatisticsTable;
-import EmployeeWorkStatisticsForm = Statistics.EmployeeWorkStatisticsForm;
 import {DhcpBindingFilter} from "../types/service-interfaces";
 import _default from "chart.js/dist/plugins/plugin.tooltip";
-import numbers = _default.defaults.animations.numbers;
+import EmployeeWorkStatisticsTable = Statistics.EmployeeWorkStatisticsTable;
+import EmployeeWorkStatisticsForm = Statistics.EmployeeWorkStatisticsForm;
 
 
 @Injectable({
@@ -102,7 +134,7 @@ export class ApiService {
     }
 
     updateWireframe(id: number, wireframe: any): Observable<Wireframe> {
-        return this.sendPatch('api/private/wireframe/'+id, wireframe);
+        return this.sendPatch('api/private/wireframe/' + id, wireframe);
     }
 
     createTask(taskCreationBody: TaskCreationBody): Observable<Task> {
@@ -122,7 +154,7 @@ export class ApiService {
     }
 
     getTasksByLogin(login: string, page: number): Observable<Page<Task>> {
-        return this.sendGet<Page<Task>>(`api/private/tasks/by-login/${login}`, {page});
+        return this.sendGet<Page<Task>>(`api/private/task/page/by-login/${login}`, {page});
     }
 
     getWorkLogsByTaskId(taskId: number): Observable<WorkLog[]> {
@@ -142,10 +174,10 @@ export class ApiService {
     }
 
     getPageOfTasks(page: number, filter: TaskFiltrationConditions): Observable<Page<Task>> {
-        return this.sendPost<Page<Task>>(`api/private/tasks/${page}`, filter);
+        return this.sendPost<Page<Task>>(`api/private/task/page/${page}`, filter);
     }
 
-    getWireframeFiltrationFields(wireframeId: number){
+    getWireframeFiltrationFields(wireframeId: number) {
         return this.sendGet<FilterModelItem[]>(`api/private/wireframe/${wireframeId}/filter-fields`);
     }
 
@@ -189,7 +221,7 @@ export class ApiService {
         return this.sendGet('api/private/streets/' + cityId);
     }
 
-    getStreetSuggestions(query?: string|null){
+    getStreetSuggestions(query?: string | null) {
         return this.sendGet<StreetSuggestion[]>('api/private/suggestions/street', {query});
     }
 
@@ -334,11 +366,14 @@ export class ApiService {
     }
 
     getActiveTaskInStage(offset: number, limit: number, templateId: number, stageId: string): Observable<Page<Task>> {
-        return this.sendGet<Page<Task>>(`api/private/tasks/template/${templateId}/stage/${stageId}`, {offset, limit});
+        return this.sendGet<Page<Task>>(`api/private/task/page/template/${templateId}/stage/${stageId}`, {
+            offset,
+            limit
+        });
     }
 
     getActiveTaskInNullStage(offset: number, limit: number, templateId: number): Observable<Page<Task>> {
-        return this.sendGet<Page<Task>>(`api/private/tasks/template/${templateId}/stage`, {offset, limit});
+        return this.sendGet<Page<Task>>(`api/private/task/page/template/${templateId}/stage`, {offset, limit});
     }
 
     changeTaskStage(taskId: number, stageId: string): Observable<Task> {
@@ -346,11 +381,11 @@ export class ApiService {
     }
 
     getActiveTaskIdsInStage(templateId: number, stageId: string) {
-        return this.sendGet<number[]>(`api/private/tasks/template/${templateId}/stage/${stageId}/taskIdOnly`);
+        return this.sendGet<number[]>(`api/private/task/template/${templateId}/stage/${stageId}/taskIdOnly`);
     }
 
     getActiveTaskIdsInNullStage(templateId: number) {
-        return this.sendGet<number[]>(`api/private/tasks/template/${templateId}/stage/taskIdOnly`);
+        return this.sendGet<number[]>(`api/private/task/template/${templateId}/stage/taskIdOnly`);
     }
 
     updateComment(editedComment: Comment): Observable<Comment> {
@@ -365,8 +400,10 @@ export class ApiService {
         return this.sendGet<Employee[]>("api/private/employees/installers");
     }
 
-    assignInstallersToTask(taskId: number, targetInstallers: { installers: Employee[], gangLeader?: string,
-        deferredReport: boolean, description: string, files?: FileData[], serverFiles?: FileSuggestion[] }) {
+    assignInstallersToTask(taskId: number, targetInstallers: {
+        installers: Employee[], gangLeader?: string,
+        deferredReport: boolean, description: string, files?: FileData[], serverFiles?: FileSuggestion[]
+    }) {
         return this.sendPost("api/private/task/" + taskId + "/assign-installers", targetInstallers);
     }
 
@@ -397,11 +434,11 @@ export class ApiService {
         return this.sendPatch<Task>("api/private/task/" + taskId + "/append-links-to-children", childIds);
     }
 
-    getTaskTag(id:number) {
-        return this.sendGet<TaskTag>("api/private/task-tag/"+id);
+    getTaskTag(id: number) {
+        return this.sendGet<TaskTag>("api/private/task-tag/" + id);
     }
 
-    getTaskTags(queryName?:string | null, includingRemove?: boolean | null) {
+    getTaskTags(queryName?: string | null, includingRemove?: boolean | null) {
         const query: any = {};
         if (queryName) query.query = queryName;
         if (includingRemove !== undefined && includingRemove !== null) query.includingRemove = includingRemove;
@@ -549,13 +586,7 @@ export class ApiService {
     }
 
     getIncomingTasks(page: number, filters: any) {
-        return this.sendGet<Page<Task>>(`api/private/tasks/incoming/${page}`, Utils.prepareForHttpRequest(filters));
-
-        // return this.sendGet<Page<Task>>("api/private/tasks/incoming", {
-        //     page,
-        //     limit,
-        //     ...filters
-        // });
+        return this.sendGet<Page<Task>>(`api/private/task/page/incoming/${page}`, Utils.prepareForHttpRequest(filters));
     }
 
     getWireframeStages(wireframeId: number) {
@@ -563,39 +594,39 @@ export class ApiService {
     }
 
     getCountIncomingTasks() {
-        return this.sendGet<number>("api/private/tasks/incoming/count", {});
+        return this.sendGet<number>("api/private/task/incoming/count", {});
     }
 
     getCountIncomingTasksByWireframeId(wireframeId: number) {
-        return this.sendGet<number>("api/private/tasks/incoming/wireframe/" + wireframeId + "/count", {});
+        return this.sendGet<number>("api/private/task/incoming/wireframe/" + wireframeId + "/count", {});
     }
 
     getCountTasksByWireframeIdByTags(wireframeIds: number[]) {
-        if(wireframeIds.length === 0)
-            return of({} as {[key:string]:number})
-        return this.sendGet<{[key:number]:number}>("api/private/tasks/wireframe/by-tags/count", {wireframeIds});
+        if (wireframeIds.length === 0)
+            return of({} as { [key: string]: number })
+        return this.sendGet<{ [key: number]: number }>("api/private/task/wireframe/by-tags/count", {wireframeIds});
     }
 
     getCountIncomingTasksByWireframeIdByTags(wireframeIds: number[]) {
-        if(wireframeIds.length === 0)
-            return of({} as {[key:string]:number})
-        return this.sendGet<{[key:number]:number}>("api/private/tasks/incoming/wireframe/by-tags/count", {wireframeIds});
+        if (wireframeIds.length === 0)
+            return of({} as { [key: string]: number })
+        return this.sendGet<{ [key: number]: number }>("api/private/task/incoming/wireframe/by-tags/count", {wireframeIds});
     }
 
     getCountAllTasksByWireframeId(wireframeId: number) {
-        return this.sendGet<number>("api/private/tasks/wireframe/" + wireframeId + "/count", {});
+        return this.sendGet<number>("api/private/task/wireframe/" + wireframeId + "/count", {});
     }
 
-    getCountIncomingTasksByStages(wireframeId: number){
-        if(!wireframeId)
-            return of({} as {[key:string]:number})
-        return this.sendGet<{[key:string]:number}>(`api/private/tasks/incoming/wireframe/${wireframeId}/by-stages/count`, {});
+    getCountIncomingTasksByStages(wireframeId: number) {
+        if (!wireframeId)
+            return of({} as { [key: string]: number })
+        return this.sendGet<{ [key: string]: number }>(`api/private/task/incoming/wireframe/${wireframeId}/by-stages/count`, {});
     }
 
-    getCountTasksByStages(wireframeId: number){
-        if(!wireframeId)
-            return of({} as {[key:string]:number})
-        return this.sendGet<{[key:string]:number}>(`api/private/tasks/wireframe/${wireframeId}/by-stages/count`, {});
+    getCountTasksByStages(wireframeId: number) {
+        if (!wireframeId)
+            return of({} as { [key: string]: number })
+        return this.sendGet<{ [key: string]: number }>(`api/private/task/wireframe/${wireframeId}/by-stages/count`, {});
     }
 
     // getCountTasks(status: string[], cls: number[] | null, type: string | null, directory:  number | null,
@@ -606,7 +637,7 @@ export class ApiService {
     // }
 
     getCountTasks(filters: TaskFiltrationConditions = {}) {
-        return this.sendPost<number>("api/private/tasks/count", filters);
+        return this.sendPost<number>("api/private/task/count", filters);
     }
 
     getTagsListFromCatalog(filters: TaskFiltrationConditions = {}) {
@@ -614,7 +645,7 @@ export class ApiService {
     }
 
     getScheduledTask(start: string, end: string) {
-        return this.sendGet<Task[]>("api/private/tasks/scheduled", {start, end});
+        return this.sendGet<Task[]>("api/private/task/list/scheduled", {start, end});
     }
 
     moveScheduledTask(taskId: number, delta: Duration) {
@@ -659,12 +690,17 @@ export class ApiService {
         return this.sendPost("api/private/parser/addresses/start", {});
     }
 
-    getAddressSuggestions(query: string, isAcpConnected: boolean|null, isHouseOnly: boolean) {
+    getAddressSuggestions(query: string, isAcpConnected: boolean | null, isHouseOnly: boolean) {
         return this.sendGet<Address[]>("api/private/suggestions/address", {query, isAcpConnected, isHouseOnly});
     }
 
-    getAddressSuggestionsAlt(streetId: number, query: string, isAcpConnected: boolean|null, isHouseOnly: boolean) {
-        return this.sendGet<Address[]>("api/private/suggestions/address/alt", {streetId, query, isAcpConnected, isHouseOnly});
+    getAddressSuggestionsAlt(streetId: number, query: string, isAcpConnected: boolean | null, isHouseOnly: boolean) {
+        return this.sendGet<Address[]>("api/private/suggestions/address/alt", {
+            streetId,
+            query,
+            isAcpConnected,
+            isHouseOnly
+        });
     }
 
     getCountOfUnreadMessages(chatId: number) {
@@ -739,11 +775,11 @@ export class ApiService {
         return this.sendGet<WorkLog[]>('api/private/work-log/uncalculated/list');
     }
 
-    getAfterWorkList(){
+    getAfterWorkList() {
         return this.sendGet<WorkLog[]>('api/private/work-log/after-work/list');
     }
 
-    getUncompletedReports(){
+    getUncompletedReports() {
         return this.sendGet<WorkLog[]>('api/private/uncompleted-reports');
     }
 
@@ -784,15 +820,15 @@ export class ApiService {
     }
 
     setDeferredPayment(login: string) {
-        return this.sendPost(`api/private/billing/user/${encodeURIComponent(login)}/deferred-payment`,{});
+        return this.sendPost(`api/private/billing/user/${encodeURIComponent(login)}/deferred-payment`, {});
     }
 
     startUserService(login: string) {
-        return this.sendPost(`api/private/billing/user/${encodeURIComponent(login)}/start-service`,{});
+        return this.sendPost(`api/private/billing/user/${encodeURIComponent(login)}/start-service`, {});
     }
 
     stopUserService(login: string) {
-        return this.sendPost(`api/private/billing/user/${encodeURIComponent(login)}/stop-service`,{});
+        return this.sendPost(`api/private/billing/user/${encodeURIComponent(login)}/stop-service`, {});
     }
 
     balanceReset(login: string, comment: string) {
@@ -883,7 +919,7 @@ export class ApiService {
         return this.sendGet<DhcpLogsRequest>(`api/private/acp/dhcp/binding/${login}/logs/${page}`, {});
     }
 
-    getLastBindings(page: number, state?: number, macaddr?: string | null, login?: string | null, ip?: string | null, vlan?: number | null, buildingId?: number | null, commutator?: number | null, port?: number|null) {
+    getLastBindings(page: number, state?: number, macaddr?: string | null, login?: string | null, ip?: string | null, vlan?: number | null, buildingId?: number | null, commutator?: number | null, port?: number | null) {
         return this.sendGet<Page<DhcpBinding>>('api/private/acp/dhcp/bindings/' + page + '/last', {
             state,
             macaddr,
@@ -905,7 +941,7 @@ export class ApiService {
     }
 
     getNetworkConnectionLocationHistory(bindingId: number) {
-        return this.sendGet<NCLHistoryWrapper>('api/private/acp/dhcp/binding/' + bindingId + '/ncl-history',{});
+        return this.sendGet<NCLHistoryWrapper>('api/private/acp/dhcp/binding/' + bindingId + '/ncl-history', {});
     }
 
     getBuildings(query?: string) {
@@ -913,7 +949,11 @@ export class ApiService {
     }
 
     getCommutators(page: number, name?: string | null, ip?: string | null, buildingId?: number | null) {
-        return this.sendGet<Page<SwitchBaseInfo>>('api/private/acp/commutators/' + page+'/page', {name, ip, buildingId});
+        return this.sendGet<Page<SwitchBaseInfo>>('api/private/acp/commutators/' + page + '/page', {
+            name,
+            ip,
+            buildingId
+        });
     }
 
     getCommutator(swId: number) {
@@ -921,14 +961,14 @@ export class ApiService {
     }
 
     getCommutatorEditingPreset(swId: number) {
-        return this.sendGet<SwitchEditingPreset>('api/private/acp/commutator/' + swId+'/editing-preset');
+        return this.sendGet<SwitchEditingPreset>('api/private/acp/commutator/' + swId + '/editing-preset');
     }
 
-    searchCommutators(query?: string|null) {
+    searchCommutators(query?: string | null) {
         return this.sendGet<SwitchWithAddress[]>('api/private/acp/commutators/search', {query});
     }
 
-    getCommutatorModels(query?: string|null) {
+    getCommutatorModels(query?: string | null) {
         return this.sendGet<SwitchModel[]>('api/private/acp/commutator/models', {query});
     }
 
@@ -952,7 +992,7 @@ export class ApiService {
         return this.sendGet<NetworkRemoteControl>(`api/private/remote-control/${ipaddr}/check-access`);
     }
 
-    getDocumentTemplateTypes(){
+    getDocumentTemplateTypes() {
         return this.sendGet<{ label: string, value: string }[]>('api/private/types/document-template');
     }
 
@@ -1016,7 +1056,7 @@ export class ApiService {
         return this.sendGet<ClientEquipment[]>('api/private/client-equipments', {query, isDeleted});
     }
 
-    getClientEquipmentsSuggestions(query?: string | null){
+    getClientEquipmentsSuggestions(query?: string | null) {
         return this.sendGet<{ label: string, value: string }[]>('api/private/client-equipments/suggestions', {query});
     }
 
@@ -1060,7 +1100,7 @@ export class ApiService {
         return this.sendGet<Switch[]>(`api/private/acp/commutators/vlan/${vlan}`);
     }
 
-    getTopology(){
+    getTopology() {
         return this.sendGet<TopologyStreet[]>(`api/private/acp/topology`);
     }
 
@@ -1072,23 +1112,23 @@ export class ApiService {
         return this.sendGet<CommutatorListItem[]>('api/private/acp/building/' + id + '/commutators');
     }
 
-    getBindingsByLogin(login: string, page: number, filter?:DhcpBindingFilter) {
+    getBindingsByLogin(login: string, page: number, filter?: DhcpBindingFilter) {
         return this.sendPost<Page<DhcpBinding>>('api/private/acp/user/' + login + '/bindings/' + page, filter);
     }
 
-    getBindingsByVlan(vlan: number, page: number, filter?:DhcpBindingFilter) {
+    getBindingsByVlan(vlan: number, page: number, filter?: DhcpBindingFilter) {
         return this.sendPost<Page<DhcpBinding>>('api/private/acp/vlan/' + vlan + '/bindings/' + page, filter);
     }
 
-    getBindingsByBuildingId(id: number, page: number, filter?:DhcpBindingFilter) {
+    getBindingsByBuildingId(id: number, page: number, filter?: DhcpBindingFilter) {
         return this.sendPost<Page<DhcpBinding>>('api/private/acp/building/' + id + '/bindings/' + page, filter);
     }
 
-    getBindingsFromBuildingByLogin(login: string, page: number, filter?:DhcpBindingFilter) {
+    getBindingsFromBuildingByLogin(login: string, page: number, filter?: DhcpBindingFilter) {
         return this.sendPost<Page<DhcpBinding>>('api/private/acp/user/' + login + '/bindings-from-building/' + page, filter);
     }
 
-    getBindingsByCommutator(id: number, page: number, filter?:DhcpBindingFilter) {
+    getBindingsByCommutator(id: number, page: number, filter?: DhcpBindingFilter) {
         return this.sendPost<Page<DhcpBinding>>(`api/private/acp/commutator/${id}/bindings/${page}`, filter);
     }
 
@@ -1105,10 +1145,10 @@ export class ApiService {
     }
 
     getBulkUserBriefInfo(login: string[]) {
-        return this.sendPost<{[key: string]:AcpUserBrief}>(`api/private/acp/user/brief-info/bulk`, login);
+        return this.sendPost<{ [key: string]: AcpUserBrief }>(`api/private/acp/user/brief-info/bulk`, login);
     }
 
-    getCountingLivesCalculation(form: {[key:string]: any})  {
+    getCountingLivesCalculation(form: { [key: string]: any }) {
         return this.sendPost<{ result: string }>(`api/private/billing/counting-lives`, form)
     }
 
@@ -1116,19 +1156,19 @@ export class ApiService {
         return this.sendPost(`api/private/chat/${chatId}/message/${superMessageId}/attach-to-task`, {description});
     }
 
-    getFilesSuggestions(query?: string | null){
+    getFilesSuggestions(query?: string | null) {
         return this.sendGet<FileSuggestion[]>('api/private/files/suggestions', {query});
     }
 
-    getFilesRoot(sortingType?: string | null){
+    getFilesRoot(sortingType?: string | null) {
         return this.sendGet<FileSystemItem[]>('api/private/files/root', {sortingType});
     }
 
-    getFilesDirectory(id: number, sortingType?: string | null){
+    getFilesDirectory(id: number, sortingType?: string | null) {
         return this.sendGet<LoadingDirectoryWrapper>(`api/private/files/directory/${id}`, {sortingType});
     }
 
-    filesMoveTo(target: number | null, source: number[]){
+    filesMoveTo(target: number | null, source: number[]) {
         return this.sendPatch(`api/private/files/move-to`, {target, source});
     }
 
@@ -1153,7 +1193,7 @@ export class ApiService {
         return this.sendPost(`api/private/files/load`, fileEvents);
     }
 
-    searchFiles(query: string, sortingType?: string | null){
+    searchFiles(query: string, sortingType?: string | null) {
         return this.sendGet<FileSystemItem[]>('api/private/files/search', {query, sortingType});
     }
 
@@ -1177,11 +1217,11 @@ export class ApiService {
         return this.sendPatch(`api/private/employee/phy-phone/${phoneId}/bind`, {});
     }
 
-    getPhyPhoneList(){
+    getPhyPhoneList() {
         return this.sendGet<{ label: string, value: number }[]>('api/private/phy-phone-list');
     }
 
-    getOldTrackerClasses(){
+    getOldTrackerClasses() {
         return this.sendGet<TaskClassOT[]>('api/private/ot/classes');
     }
 
@@ -1189,15 +1229,15 @@ export class ApiService {
         return this.sendPatch(`api/private/task/${taskId}/old-tracker-stage/${taskStageId}/change`, {});
     }
 
-    createUserInBilling(modelItemId: number, isOrg = false){
+    createUserInBilling(modelItemId: number, isOrg = false) {
         return this.sendPost(`api/private/billing/user/create`, {modelItemId, isOrg});
     }
 
-    getBillingUserTariffs(login: string){
+    getBillingUserTariffs(login: string) {
         return this.sendGet<UserTariff[]>(`api/private/billing/user/${login}/tariffs`);
     }
 
-    getBillingUserServices(login: string){
+    getBillingUserServices(login: string) {
         return this.sendGet<UserTariff[]>(`api/private/billing/user/${login}/services`);
     }
 
@@ -1279,6 +1319,20 @@ export class ApiService {
 
     connectToTelnetSession(credentials: TelnetConnectionCredentials) {
         return this.sendPost(`api/private/remote/telnet/connect`, credentials);
+    }
+
+    /**
+     * Получить заголовки таблицы реестра задач
+     */
+    getTaskRegistryTableHeaders(taskStatus: TaskStatus, taskClass: number) {
+        return this.sendGet<DynamicTableColumn[]>(`api/private/task/registry/headers/${taskStatus}/${taskClass}`);
+    }
+
+    /**
+     * Получить контент таблицы реестра задач
+     */
+    getTaskRegistryTableContent(taskStatus: TaskStatus, taskClass: number, paging: any) {
+        return this.sendPost<Page<{[key:string]:DynamicTableCell}>>(`api/private/task/registry/content/${taskStatus}/${taskClass}`, paging);
     }
 
     // Результаты запросов на сервер кэшируются по таймауту, чтобы не было доп нагрузки на сервер
