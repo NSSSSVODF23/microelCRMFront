@@ -1,21 +1,22 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {TaskRegistryService} from "../../services/task-registry.service";
-import {DynamicTableCellType} from "../../types/transport-interfaces";
+import {DynamicTableCell, DynamicTableCellType} from "../../types/transport-interfaces";
 
 @Component({
-  templateUrl: './task-registry-page.component.html',
-  styleUrls: ['./task-registry-page.component.scss']
+    templateUrl: './task-registry-page.component.html',
+    styleUrls: ['./task-registry-page.component.scss']
 })
 export class TaskRegistryPage implements OnInit {
 
-  CellType = DynamicTableCellType
+    CellType = DynamicTableCellType
 
-  constructor(readonly service: TaskRegistryService) { }
+    constructor(readonly service: TaskRegistryService) {
+    }
 
-  ngOnInit(): void {
-  }
+    ngOnInit(): void {
+    }
 
-  loadTaskTable(event: any) {
-    console.log(event)
-  }
+    isNotLargeText(value: {[key:string]:DynamicTableCell}){
+      return !Object.keys(value).includes("largeText");
+    }
 }

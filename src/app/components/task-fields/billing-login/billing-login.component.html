@@ -1,1 +1,2 @@
-<a [routerLink]="['/clients','billing','user',loginData]" (click)="$event.stopPropagation()">{{loginData}}</a>
+<span class="select-none cursor-pointer hover:text-primary-700" [ngClass]="loginColor$ | async"
+      [routerLink]="['/clients','billing','user',loginData]" (click)="$event.stopPropagation()">{{loginData}}</span>

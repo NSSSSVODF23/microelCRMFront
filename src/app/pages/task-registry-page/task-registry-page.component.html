@@ -3,7 +3,8 @@
 <ng-container *ngIf="service.tabelColumns$ | async as tableColumns">
     <p-table styleClass="p-datatable-sm" [value]="service.tableContent?.content ?? []" [paginator]="true"
              [totalRecords]="service.tableContent?.totalElements ?? 0" paginatorDropdownAppendTo="body"
-             currentPageReportTemplate="Найдено {totalRecords} сессий" [showCurrentPageReport]="true"
+             currentPageReportTemplate="Найдено {totalRecords} задач" [showCurrentPageReport]="true"
+             [multiSortMeta]="[{field:'created', order: -1}]"
              [rowsPerPageOptions]="[50,100,250]" [rows]="100" [(first)]="service.tableOffset"
              [lazy]="true" (onLazyLoad)="service.tableLazyLoad$.next($event)" sortMode="multiple">
         <ng-template pTemplate="header">
@@ -19,19 +20,27 @@
         </ng-template>
         <ng-template pTemplate="body" let-data>
             <tr>
-                <td *ngFor="let column of tableColumns">
-                    <ng-container [ngSwitch]="data[column.field]?.type">
-                        <span *ngSwitchCase="CellType.STRING">
-                            {{data[column.field]?.value}}
-                        </span>
-                        <span *ngSwitchCase="CellType.DATE">
-                            {{data[column.field]?.value | date: 'dd-MM-yyyy HH:mm'}}
-                        </span>
-                        <span *ngSwitchCase="CellType.LOGIN">
-                            {{data[column.field]?.value}}
-                        </span>
-                    </ng-container>
-                </td>
+                <ng-container *ngIf="isNotLargeText(data)">
+                    <td *ngFor="let column of tableColumns" [attr.rowspan]="data[column.field]?.rowSpan">
+                        <ng-container [ngSwitch]="data[column.field]?.type">
+                            <span *ngSwitchCase="CellType.STRING">
+                                {{data[column.field]?.value}}
+                            </span>
+                            <span *ngSwitchCase="CellType.DATE">
+                                {{data[column.field]?.value | date: 'dd-MM-yyyy HH:mm'}}
+                            </span>
+                            <span *ngSwitchCase="CellType.LOGIN">
+                                {{data[column.field]?.value}}
+                            </span>
+                        </ng-container>
+                    </td>
+                </ng-container>
+                <ng-container *ngIf="!isNotLargeText(data)">
+                    <td [attr.colspan]="data['largeText']?.colSpan"
+                        class="white-space-nowrap text-overflow-ellipsis overflow-hidden max-w-0">
+                        {{data['largeText']?.value}}
+                    </td>
+                </ng-container>
             </tr>
         </ng-template>
     </p-table>

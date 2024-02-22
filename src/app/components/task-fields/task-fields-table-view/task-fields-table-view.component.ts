@@ -17,7 +17,7 @@ export class TaskFieldsTableViewComponent implements OnInit {
     const {fields, modelWireframe} = this.task ?? {};
     if(!fields || !modelWireframe) return {inline: [], block: []};
     const blocks = ['LARGE_TEXT', 'COUNTING_LIVES'];
-    const listDisplayTypes = ['LIST_ONLY', 'LIST_AND_TELEGRAM', null, undefined];
+    const listDisplayTypes = ['LIST_ONLY', 'LIST_AND_TELEGRAM', 'EXCEPT_THE_REGISTRY', null, undefined];
     if(this.isTaskBody){
       return {
         inline: fields.filter(f=>!blocks.includes(f.wireframeFieldType)) ?? [],
