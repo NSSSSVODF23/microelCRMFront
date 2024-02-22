@@ -31,7 +31,7 @@ export class BillingUserSearchingService {
     PAGE_SIZE: number = 10;
     userLoadingState: LoadingState = LoadingState.EMPTY;
     filtrationForm = new FormGroup({
-        mode: new FormControl('address'), query: new FormControl(''), isActive: new FormControl(false)
+        mode: new FormControl('address'), query: new FormControl(''), isActive: new FormControl(true)
     })
     changeUsersSubject = new Subject<BillingUserItemData[]>();
     changeUsers$ = this.changeUsersSubject.asObservable();
