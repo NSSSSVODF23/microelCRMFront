@@ -21,6 +21,7 @@ import {PersonalityService} from "../../services/personality.service";
 import {AccessFlag} from "../../types/access-flag";
 import {FromEvent} from "../../decorators";
 import {ITerminalOptions} from "xterm";
+import {TaskCreatorService} from "../../services/task-creator.service";
 
 @Component({
     templateUrl: './testing-page.component.html',
@@ -142,7 +143,7 @@ export class TestingPageComponent implements OnInit, AfterContentInit {
         this.api.sendDataToTelnetSession(this.sessionId, event).subscribe();
     }
 
-    constructor(readonly api: ApiService, readonly rt: RealTimeUpdateService, readonly personality: PersonalityService) {
+    constructor(readonly api: ApiService, readonly rt: RealTimeUpdateService, readonly personality: PersonalityService, private taskCreatorService: TaskCreatorService) {
     }
 
     ngOnInit(): void {
@@ -173,5 +174,14 @@ export class TestingPageComponent implements OnInit, AfterContentInit {
     }
 
     ngAfterContentInit(): void {
+    }
+
+    createTask() {
+        this.api.convertBillingAddress("К.М 44-118 (4.7)").subscribe((address) => {
+            this.taskCreatorService.wireframe(7, {
+                login: '16111630',
+                address
+            })
+        })
     }
 }

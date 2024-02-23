@@ -899,6 +899,10 @@ export class ApiService {
         return this.sendPatch(`api/private/house/${houseId}`, houseForm);
     }
 
+    makeHouseAnApartmentsBuilding(houseId: number) {
+        return this.sendPatch(`api/private/house/${houseId}/to-apartments-building`, {});
+    }
+
     deleteHouse(houseId: number) {
         return this.sendDelete(`api/private/house/${houseId}`);
     }

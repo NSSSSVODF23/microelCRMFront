@@ -454,16 +454,19 @@ export interface Address {
     city?: City;
     district?: District;
     street?: Street;
-    houseNum?: number;
-    fraction?: number;
-    letter?: string;
-    build?: number;
-    entrance?: number;
-    floor?: number;
-    apartmentNum?: number;
-    apartmentMod?: string;
-    addressName?: string;
-    acpHouseBind?: AcpHouse;
+    houseId?: number | null;
+    houseNum?: number | null;
+    fraction?: number | null;
+    letter?: string | null;
+    build?: number | null;
+    entrance?: number | null;
+    floor?: number | null;
+    apartmentNum?: number | null;
+    apartmentMod?: string | null;
+    addressName?: string | null;
+    acpHouseBind?: AcpHouse | null;
+    streetNamePart?: string | null;
+    tailPart?: string | null;
 }
 
 export interface City {

@@ -1,3 +1,5 @@
 <div appExtendPageHeight class="flex flex-column p-3 w-full align-items-center justify-content-center">
-    <ng-terminal [dataSource]="telnetCon$" (keyInput)="telnetSendData($event)" [cols]="80" [rows]="24"></ng-terminal>
+    <app-address-input-alt></app-address-input-alt>
+    <button pButton label="Создать задачу" (click)="createTask()"></button>
+<!--    <ng-terminal [dataSource]="telnetCon$" (keyInput)="telnetSendData($event)" [cols]="80" [rows]="24"></ng-terminal>-->
 </div>

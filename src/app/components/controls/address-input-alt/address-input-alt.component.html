@@ -1,23 +1,40 @@
 <div class="flex align-items-center gap-1" (focusin)="onTouched()">
-    <p-autoComplete appendTo="body" placeholder="Улица" [(ngModel)]="selectedStreet" [ngClass]="inputClasses"
-                    [suggestions]="(streetSuggestions$ | async) ?? []" (onSelect)="focusHouseControl()" (ngModelChange)="streetChange()" [size]="30"
-                    (completeMethod)="streetSearch($event.query)" field="name" [showClear]="true" [showEmptyMessage]="true"
-                    emptyMessage="Улиц не найдено"
-                    [forceSelection]="true" [autoHighlight]="true">
+    <p-autoComplete appendTo="body" placeholder="Улица" [ngClass]="inputClasses" [size]="30" [delay]="500"
+                    field="name" [showClear]="true" [showEmptyMessage]="true" emptyMessage="Улиц не найдено" [(ngModel)]="selectedStreet"
+                    [forceSelection]="true" [autoHighlight]="true" (completeMethod)="streetInputChange$.next($event.query)"
+                    [suggestions]="(streetSuggestions$ | async) ?? []" (onSelect)="streetSelect$.next($event)" (onClear)="streetSelect$.next(null)">
     </p-autoComplete>
-    <p-autoComplete #houseControl class="flipleft animation-duration-150" *ngIf="selectedStreet" [ngClass]="inputClasses"
-                    [(ngModel)]="selectedAddress" (ngModelChange)="onChange($event)" appendTo="body"
-                    placeholder="Дом Кв." [suggestions]="(addressSuggestions$ | async) ?? []" [showClear]="true"
-                    (completeMethod)="addressSearch($event.query)" field="tailPart" [size]="16"
-                    [forceSelection]="true" [autoHighlight]="true"></p-autoComplete>
-    <p-overlay appendTo="body" [visible]="(isEmptyAddressSuggestions$ | async) ?? false">
-        <div class="bg-white border-round flex flex-column gap-1 shadow-1 p-3 w-fit">
-            <span class="text-orange-500 font-bold">Дом не найден</span>
-            <p-button label="Добавить" (onClick)="showCreateHouseDialog()" styleClass="p-button-success p-button-sm w-full"></p-button>
-        </div>
-    </p-overlay>
+    <input pInputText #houseControl class="flipleft animation-duration-150" (focus)="isHouseControlFocused$.next(true)"
+           (blur)="isHouseControlFocused$.next(false)" [ngClass]="houseInputClasses$ | async" placeholder="Дом Кв."
+           [size]="16" (input)="houseInputChange$.next(houseControl.value)" *ngIf="!!selectedStreet" [(ngModel)]="selectedHouse"/>
 </div>
-
+<p-overlayPanel #houseNotFoundPanel appendTo="body">
+    <div class="flex flex-column gap-2">
+        <span class="text-orange-500 font-bold">Дом не найден</span>
+        <button pButton label="Добавить дом" (click)="showCreateHouseDialog()" class="p-button-success p-button-sm"></button>
+        <ng-container *ngIf="houseError$ | async as houseError">
+            <div class="flex flex-column gap-1" *ngIf="(houseError.foundAddresses?.length ?? 0) > 0">
+                <span class="font-bold text-bluegray-400 ">Или выбрать из найденных:</span>
+                <div class="flex flex-column gap-1">
+                    <span *ngFor="let address of houseError.foundAddresses" (click)="forcedAddress$.next(address)"
+                          class="px-2 py-1 bg-bluegray-50 text-bluegray-400 cursor-pointer select-none hover:text-primary hover:bg-primary-50 border-round">
+                        {{address.tailPart}}
+                    </span>
+                </div>
+            </div>
+        </ng-container>
+    </div>
+</p-overlayPanel>
+<p-overlayPanel #isApartmentHousePanel appendTo="body">
+    <ng-container *ngIf="houseError$ | async as houseError">
+        <div class="flex flex-column gap-2">
+            <span class="text-orange-500 font-bold">Дом не многоквартирный</span>
+            <p-button label="Сделать многоквартирным" (onClick)="confirmMakeTheHouseAnApartmentBuilding(houseError)" styleClass="p-button-success p-button-sm"></p-button>
+        </div>
+    </ng-container>
+</p-overlayPanel>
+<!--<pre *ngIf="streetSelect$ | async as streetSelect" [innerHTML]="streetSelect | prettyJson:[1,3]"></pre>-->
+<!--<pre *ngIf="address$ | async as address" [innerHTML]="address | prettyJson:[1,3]"></pre>-->
 <p-dialog appendTo="body" header="Создать дом" [modal]="true" [resizable]="false" [draggable]="false" [dismissableMask]="true" [(visible)]="createHouseVisible">
     <div class="flex flex-column gap-3" [formGroup]="createHouseForm">
         <div class="input-label-wrapper">

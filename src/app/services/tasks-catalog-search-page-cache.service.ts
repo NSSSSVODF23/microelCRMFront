@@ -194,6 +194,7 @@ export class TasksCatalogSearchPageCacheService {
     connectionServices$ = this.api.getConnectionServicesList();
 
     constructor(private api: ApiService) {
+        // this.filterForm.controls.fieldFilters.valueChanges.subscribe((value)=>console.log(value))
     }
 
     static getFilterPath(status?: string | null, cls?: number | null, type?: string | null){
