@@ -38,7 +38,7 @@
             <p-dropdown formControlName="state" placeholder="Статус" [options]="statusOptions"></p-dropdown>
             <p-autoComplete (completeMethod)="commutatorUplinkQuerySearch.next($event.query)"
                             (onClear)="lastBindingsFilterForm.controls.commutator.setValue(null)" [showClear]="true"
-                            [size]="20" [forceSelection]="true"
+                            [size]="20" [forceSelection]="false"
                             [suggestions]="(commutatorUplinks$ | async) ?? []"
                             appendTo="body" field="label"
                             formControlName="commutator"

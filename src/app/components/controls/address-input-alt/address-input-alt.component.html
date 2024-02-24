@@ -1,7 +1,7 @@
 <div class="flex align-items-center gap-1" (focusin)="onTouched()">
     <p-autoComplete appendTo="body" placeholder="Улица" [ngClass]="inputClasses" [size]="30" [delay]="500"
                     field="name" [showClear]="true" [showEmptyMessage]="true" emptyMessage="Улиц не найдено" [(ngModel)]="selectedStreet"
-                    [forceSelection]="true" [autoHighlight]="true" (completeMethod)="streetInputChange$.next($event.query)"
+                    [forceSelection]="false" [autoHighlight]="true" (completeMethod)="streetInputChange$.next($event.query)"
                     [suggestions]="(streetSuggestions$ | async) ?? []" (onSelect)="streetSelect$.next($event)" (onClear)="streetSelect$.next(null)">
     </p-autoComplete>
     <input pInputText #houseControl class="flipleft animation-duration-150" (focus)="isHouseControlFocused$.next(true)"

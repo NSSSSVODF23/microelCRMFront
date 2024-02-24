@@ -1,4 +1,4 @@
 <p-autoComplete [formControl]="control" [showClear]="true" [showEmptyMessage]="true" (onClear)="control.patchValue(null)"
                 [suggestions]="(suggestions$ | async) ?? []" emptyMessage="Адреса не найдены"
-                field="fullName" [forceSelection]="true" placeholder="Адрес..." (onBlur)="onTouched()"
+                field="fullName" [forceSelection]="false" placeholder="Адрес..." (onBlur)="onTouched()"
                 (completeMethod)="queryInput.next($event.query)" appendTo="body" [completeOnFocus]="true"></p-autoComplete>
