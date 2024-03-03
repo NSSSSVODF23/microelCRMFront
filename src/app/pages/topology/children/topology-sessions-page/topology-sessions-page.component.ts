@@ -8,6 +8,7 @@ import {CustomValidators} from "../../../../custom-validators";
 import {DynamicValueFactory} from "../../../../util";
 import {ApiService} from "../../../../services/api.service";
 import {RealTimeUpdateService} from "../../../../services/real-time-update.service";
+import {UserSessionsListService} from "../../../../services/page-cache/user-sessions-list.service";
 
 @Component({
     templateUrl: './topology-sessions-page.component.html',
@@ -90,7 +91,8 @@ export class TopologySessionsPage implements OnInit {
 
     numberMask = /^\d{1,4}$/;
 
-    constructor(private api: ApiService, private rt: RealTimeUpdateService, private confirm: ConfirmationService) {
+    constructor(private api: ApiService, private rt: RealTimeUpdateService, readonly service: UserSessionsListService,
+                private confirm: ConfirmationService) {
     }
 
     ngOnInit(): void {
@@ -125,5 +127,9 @@ export class TopologySessionsPage implements OnInit {
         //       detail: 'Логин успешно авторизован', severity: 'dark', key: 'darktoast', icon: 'mdi-verified', closable: false
         //     })
         //   });
+    }
+
+    scrollTop() {
+        window.scrollTo(0,0);
     }
 }

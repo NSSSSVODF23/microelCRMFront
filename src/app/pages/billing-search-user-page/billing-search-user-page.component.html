@@ -1,115 +1,137 @@
-<div appExtendPageHeight class="flexed vcenter">
-    <div [style]="{marginBottom: '1rem'}" class="responsive-wrapper flexed gap10">
-        <app-main-menu-panel></app-main-menu-panel>
-        <div class="flexed column gap10 stretched">
-            <div class="flexed column gap10 panel p10">
-                <span class="caption size-big f-color-500">Поиск абонентов</span>
-                <div [formGroup]="busService.filtrationForm" class="flex flex-column gap-1">
-                    <div class="flex gap-3 align-items-end">
-                        <div class="input-label-wrapper">
-                            <label>Режим поиска</label>
-                            <p-selectButton [options]="filterModeItems" formControlName="mode"></p-selectButton>
-                        </div>
-                        <p-toggleButton formControlName="isActive" offLabel="Только активные" onLabel="Все"></p-toggleButton>
-                    </div>
-                    <div class="flex gap-3 align-items-end">
-                        <div class="input-label-wrapper stretched">
-                            <label>Запрос</label>
-                            <div class="p-inputgroup">
-                                <input #mainInput (keydown.enter)="busService.enterSearch.next(true)" (focus)="mainInput.select()"
-                                       [appPreventInput]="busService.userLoadingState === 'LOADING'"
-                                       formControlName="query" pInputText type="text"/>
-                                <button (click)="busService.enterSearch.next(true)" icon="mdi-search" pButton pRipple
-                                        type="button"></button>
-                            </div>
-                        </div>
-                        <p-button (onClick)="clearSearchQuery()" [disabled]="busService.userLoadingState==='LOADING'"
-                                  icon="mdi-cancel"
-                                  label="Очистить" styleClass="p-button-outlined p-button-secondary"></p-button>
+<div class="flex flex-column flex-grow-1">
+    <div class="flex flex-column gap-3 p-4 border-bottom-1 border-bluegray-100">
+        <span class="text-bluegray-500 text-3xl">Поиск абонентов</span>
+        <div [formGroup]="busService.filtrationForm" class="flex flex-column gap-1">
+            <div class="flex gap-3 align-items-end">
+                <div class="input-label-wrapper">
+                    <label>Режим поиска</label>
+                    <p-selectButton [options]="filterModeItems" formControlName="mode"></p-selectButton>
+                </div>
+                <p-toggleButton formControlName="isActive" offLabel="Только активные" onLabel="Все"></p-toggleButton>
+                <div class="input-label-wrapper stretched">
+                    <label>Запрос</label>
+                    <div class="p-inputgroup">
+                        <input #mainInput (keydown.enter)="busService.enterSearch.next(true)" (focus)="mainInput.select()"
+                               [appPreventInput]="busService.userLoadingState === 'LOADING'"
+                               formControlName="query" pInputText type="text"/>
+                        <button (click)="busService.enterSearch.next(true)" icon="mdi-search" pButton pRipple
+                                type="button"></button>
                     </div>
                 </div>
+                <p-button (onClick)="clearSearchQuery()" [disabled]="busService.userLoadingState==='LOADING'"
+                          icon="mdi-cancel"
+                          label="Очистить" styleClass="p-button-outlined p-button-secondary"></p-button>
             </div>
-            <ng-container [ngSwitch]="busService.userLoadingState">
-                <ng-container *ngSwitchCase="'LOADING'">
-                    <div class="flexed vcenter hcenter gap10 stretched panel p10">
-                        <p-progressSpinner class="custom-spinner custom-spinner-8xl custom-spinner-primary"
-                                           strokeWidth="1"></p-progressSpinner>
-                    </div>
-                </ng-container>
-                <ng-container *ngSwitchCase="'EMPTY'">
-                    <div class="flexed vcenter hcenter gap10 stretched panel p10">
-                        <div class="flexed column vcenter caption f-color-500 size-huge wt-tiny">
-                            <span class="mds-person_search"></span>
-                            <span>Пусто</span>
-                        </div>
-                    </div>
-                </ng-container>
-                <ng-container *ngSwitchCase="'ERROR'">
-                    <div class="flexed vcenter hcenter gap10 stretched panel p10">
-                        <div class="flexed column vcenter caption f-color-danger size-huge wt-tiny">
-                            <span class="mds-error"></span>
-                            <span>Произошла ошибка</span>
-                        </div>
-                    </div>
-                </ng-container>
-                <ng-container *ngSwitchCase="'READY'">
-                    <div class="flexed column gap5 stretched panel p10">
-                        <div @flowInChild class="flexed column stretched">
-                            <div *ngFor="let user of busService.page"
-                                 [routerLink]="['/clients','billing','user',user.uname]"
-                                 class="subscriber-item split-line">
-                                <span class="flexed gap5 hcenter">
-                                    <span class="caption wt-bold f-color-600">{{user.uname}}</span>
-                                    <span class="caption f-color-600">{{user.addr}}</span>
-                                    <app-colored-tag
-                                            [caption]="user.stateName"
-                                            [color]="user.stateColor"></app-colored-tag>
-                                    <app-colored-tag *ngIf="user.utype === '11'"
-                                                     caption="Бизнес" color="var(--warm-600)"></app-colored-tag>
-                                    <div class="stretched"></div>
-                                    <span>
-                                        <span class="caption wt-black size-small f-color-500">
-                                            Телефон:
-                                        </span>
-                                        <span class="caption">
-                                            {{user.phone}}
-                                        </span>
-                                    </span>
-                                </span>
-                                <span class="flexed gap5 hcenter">
-                                    <span>
-                                        <span class="caption wt-black size-small f-color-500">
-                                            ФИО:
-                                        </span>
-                                        <span class="caption">
-                                            {{user.fio}}
-                                        </span>
-                                    </span>
-                                    <span>
-                                        <span class="caption wt-black size-small f-color-500">
-                                            Тариф:
-                                        </span>
-                                        <span [ngClass]="{'f-color-danger': !user.tarif}" class="caption">
-                                            {{user.tarif ? user.tarif : 'Не установлен'}}
-                                        </span>
-                                    </span>
-                                </span>
-                                <span *ngIf="user.coment">
-                                    <span class="caption wt-black size-small f-color-500">
-                                        Комментарий:
-                                    </span>
-                                    <span class="caption size-small">
-                                        {{user.coment}}
-                                    </span>
-                                </span>
-                            </div>
-                        </div>
-                        <p-paginator (onPageChange)="pageChange($event)" [first]="busService.first"
-                                     [rows]="busService.PAGE_SIZE"
-                                     [totalRecords]="busService.users.length"></p-paginator>
-                    </div>
-                </ng-container>
-            </ng-container>
         </div>
     </div>
+    <p-table [loading]="busService.userLoadingState==='LOADING'" [value]="busService.users" dataKey="id">
+        <ng-template pTemplate="header">
+            <tr>
+                <th>Логин</th>
+                <th>Адрес</th>
+                <th>ФИО</th>
+                <th>Телефон</th>
+                <th>Тариф</th>
+                <th>Статус</th>
+                <th>Комментарий</th>
+            </tr>
+        </ng-template>
+        <ng-template let-user pTemplate="body">
+            <tr>
+                <td>{{user.uname}}</td>
+                <td>{{user.addr}}</td>
+                <td>{{user.fio}}</td>
+                <td>{{user.phone}}</td>
+                <td>{{user.tarif ? user.tarif : 'Не установлен'}}</td>
+                <td>
+                    <app-colored-tag [caption]="user.stateName"
+                            [color]="user.stateColor"></app-colored-tag>
+                    <app-colored-tag *ngIf="user.utype === '11'"
+                                     caption="Бизнес" color="var(--warm-600)"></app-colored-tag>
+                </td>
+                <td>{{user.coment}}</td>
+            </tr>
+        </ng-template>
+    </p-table>
+<!--    <ng-container [ngSwitch]="busService.userLoadingState">-->
+<!--        <ng-container *ngSwitchCase="'LOADING'">-->
+<!--            <div class="flexed vcenter hcenter gap10 stretched panel p10">-->
+<!--                <p-progressSpinner class="custom-spinner custom-spinner-8xl custom-spinner-primary"-->
+<!--                                   strokeWidth="1"></p-progressSpinner>-->
+<!--            </div>-->
+<!--        </ng-container>-->
+<!--        <ng-container *ngSwitchCase="'EMPTY'">-->
+<!--            <div class="flexed vcenter hcenter gap10 stretched panel p10">-->
+<!--                <div class="flexed column vcenter caption f-color-500 size-huge wt-tiny">-->
+<!--                    <span class="mds-person_search"></span>-->
+<!--                    <span>Пусто</span>-->
+<!--                </div>-->
+<!--            </div>-->
+<!--        </ng-container>-->
+<!--        <ng-container *ngSwitchCase="'ERROR'">-->
+<!--            <div class="flexed vcenter hcenter gap10 stretched panel p10">-->
+<!--                <div class="flexed column vcenter caption f-color-danger size-huge wt-tiny">-->
+<!--                    <span class="mds-error"></span>-->
+<!--                    <span>Произошла ошибка</span>-->
+<!--                </div>-->
+<!--            </div>-->
+<!--        </ng-container>-->
+<!--        <ng-container *ngSwitchCase="'READY'">-->
+<!--            <div class="flexed column gap5 stretched panel p10">-->
+<!--                <div @flowInChild class="flexed column stretched">-->
+<!--                    <div *ngFor="let user of busService.page"-->
+<!--                         [routerLink]="['/clients','billing','user',user.uname]"-->
+<!--                         class="subscriber-item split-line">-->
+<!--                        <span class="flexed gap5 hcenter">-->
+<!--                            <span class="caption wt-bold f-color-600">{{user.uname}}</span>-->
+<!--                            <span class="caption f-color-600">{{user.addr}}</span>-->
+<!--                            <app-colored-tag-->
+<!--                                    [caption]="user.stateName"-->
+<!--                                    [color]="user.stateColor"></app-colored-tag>-->
+<!--                            <app-colored-tag *ngIf="user.utype === '11'"-->
+<!--                                             caption="Бизнес" color="var(&#45;&#45;warm-600)"></app-colored-tag>-->
+<!--                            <div class="stretched"></div>-->
+<!--                            <span>-->
+<!--                                <span class="caption wt-black size-small f-color-500">-->
+<!--                                    Телефон:-->
+<!--                                </span>-->
+<!--                                <span class="caption">-->
+<!--                                    {{user.phone}}-->
+<!--                                </span>-->
+<!--                            </span>-->
+<!--                        </span>-->
+<!--                        <span class="flexed gap5 hcenter">-->
+<!--                            <span>-->
+<!--                                <span class="caption wt-black size-small f-color-500">-->
+<!--                                    ФИО:-->
+<!--                                </span>-->
+<!--                                <span class="caption">-->
+<!--                                    {{user.fio}}-->
+<!--                                </span>-->
+<!--                            </span>-->
+<!--                            <span>-->
+<!--                                <span class="caption wt-black size-small f-color-500">-->
+<!--                                    Тариф:-->
+<!--                                </span>-->
+<!--                                <span [ngClass]="{'f-color-danger': !user.tarif}" class="caption">-->
+<!--                                    {{user.tarif ? user.tarif : 'Не установлен'}}-->
+<!--                                </span>-->
+<!--                            </span>-->
+<!--                        </span>-->
+<!--                        <span *ngIf="user.coment">-->
+<!--                            <span class="caption wt-black size-small f-color-500">-->
+<!--                                Комментарий:-->
+<!--                            </span>-->
+<!--                            <span class="caption size-small">-->
+<!--                                {{user.coment}}-->
+<!--                            </span>-->
+<!--                        </span>-->
+<!--                    </div>-->
+<!--                </div>-->
+<!--                <p-paginator (onPageChange)="pageChange($event)" [first]="busService.first"-->
+<!--                             [rows]="busService.PAGE_SIZE"-->
+<!--                             [totalRecords]="busService.users.length"></p-paginator>-->
+<!--            </div>-->
+<!--        </ng-container>-->
+<!--    </ng-container>-->
 </div>

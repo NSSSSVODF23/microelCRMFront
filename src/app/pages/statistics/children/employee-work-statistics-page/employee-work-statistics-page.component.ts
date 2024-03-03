@@ -1,7 +1,7 @@
 import {Component, OnInit} from '@angular/core';
 import {DateRange} from "../../../../types/transport-interfaces";
 import {FromEvent} from "../../../../decorators";
-import {filter, Observable, shareReplay, switchMap, tap} from "rxjs";
+import {filter, Observable, ReplaySubject, shareReplay, switchMap, tap} from "rxjs";
 import {ApiService} from "../../../../services/api.service";
 import {BlockUiService} from "../../../../services/block-ui.service";
 
@@ -14,7 +14,7 @@ export class EmployeeWorkStatisticsPage implements OnInit {
     statisticsPeriod: DateRange | null = null;
     // statisticsPeriod: DateRange | null = {start: new Date(2021, 0, 1), end: new Date(2024, 1, 31)};
     @FromEvent('submitButton', 'click')
-    submit$!: Observable<PointerEvent>;
+    submit$ = new ReplaySubject<PointerEvent>(1);
 
     statisticsTable$ = this.submit$
         .pipe(

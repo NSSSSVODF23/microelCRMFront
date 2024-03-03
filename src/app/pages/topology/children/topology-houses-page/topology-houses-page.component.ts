@@ -1,6 +1,6 @@
 import {Component, OnInit} from '@angular/core';
 import {ApiService} from "../../../../services/api.service";
-import {map, mergeMap, Observable, shareReplay, startWith} from "rxjs";
+import {map, mergeMap, Observable, ReplaySubject, shareReplay, startWith, tap} from "rxjs";
 import {FromEvent} from "../../../../decorators";
 import {TopologyStreet} from "../../../../types/transport-interfaces";
 import {CharacterTranslator} from "../../../../character-translator";
@@ -13,7 +13,7 @@ import {topologyLoadingTemplate, Utils} from "../../../../util";
 export class TopologyHousesPage implements OnInit {
 
     @FromEvent('searchInput', 'input')
-    search$!: Observable<Event>
+    search$ = new ReplaySubject<Event>(1);
     searchQuery$ = this.search$.pipe(
         map(e => (e.target as HTMLInputElement).value),
         startWith("")
@@ -24,6 +24,7 @@ export class TopologyHousesPage implements OnInit {
             shareReplay(1),
             mergeMap(topology => this.searchQuery$
                 .pipe(
+                    tap(()=>window.scrollTo(0, 0)),
                     map((query) => {
                         if (!query || (query = query.trim().toLowerCase()).length == 0)
                             return topology.map(street => {

@@ -1,4 +1,4 @@
-import {Injector, NgModule} from '@angular/core';
+import {NgModule} from '@angular/core';
 
 import {AppComponent} from './app.component';
 import {registerLocaleData} from "@angular/common";
@@ -19,8 +19,6 @@ import {
 } from './pages/bootstaps/module-loading-bootstrap/module-loading-bootstrap.component';
 import {ProgressSpinnerModule} from "primeng/progressspinner";
 import {ButtonModule} from "primeng/button";
-import {TerminalDialogComponent} from "./components/terminal/terminal-dialog/terminal-dialog.component";
-import {DialogService, DynamicDialogModule} from "primeng/dynamicdialog";
 
 registerLocaleData(localeRu, 'ru');
 

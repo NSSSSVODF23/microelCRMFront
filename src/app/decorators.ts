@@ -17,15 +17,13 @@ export function FromEvent(selector: string, eventName: string) {
         };
         const originalOnDestroy = prototype.ngOnDestroy ? prototype.ngOnDestroy : () => {
         };
-        const subject = new Subject<Event>();
         let sub: Subscription;
-        Object.defineProperty(prototype, name, {value: subject.asObservable()});
         prototype.ngAfterViewInit = function () {
             const elementById = document.getElementById(selector);
             if (!elementById)
                 throw new Error(`Element with id ${selector} not found`);
             else
-                sub = fromEvent(elementById, eventName).subscribe(subject);
+                sub = fromEvent(elementById, eventName).subscribe(this[name]);
             originalAfterInit.apply(this, arguments);
         }
         prototype.ngOnDestroy = function () {

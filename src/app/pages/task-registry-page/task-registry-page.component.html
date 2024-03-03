@@ -1,47 +1,169 @@
-<p-dropdown [formControl]="service.taskStatusSelector" [options]="service.taskStatusOptions"></p-dropdown>
-<p-dropdown [formControl]="service.taskClassSelector" [options]="service.taskClassOptions"></p-dropdown>
 <ng-container *ngIf="service.tabelColumns$ | async as tableColumns">
-    <p-table styleClass="p-datatable-sm" [value]="service.tableContent?.content ?? []" [paginator]="true"
-             [totalRecords]="service.tableContent?.totalElements ?? 0" paginatorDropdownAppendTo="body"
-             currentPageReportTemplate="Найдено {totalRecords} задач" [showCurrentPageReport]="true"
-             [multiSortMeta]="[{field:'created', order: -1}]"
-             [rowsPerPageOptions]="[50,100,250]" [rows]="100" [(first)]="service.tableOffset"
-             [lazy]="true" (onLazyLoad)="service.tableLazyLoad$.next($event)" sortMode="multiple">
+    <p-table #registryTable (onLazyLoad)="service.tableLazyLoad$.next($event)" [(first)]="service.tableOffset"
+             [lazyLoadOnInit]="true" (onPage)="scrollTop()"
+             [lazy]="true" [loading]="service.tableContentLoading"
+             [multiSortMeta]="[{field:'created', order: -1}]" [paginator]="true"
+             [rowsPerPageOptions]="[50,100,250]" [rows]="100"
+             [showCurrentPageReport]="true"
+             [totalRecords]="service.tableContent?.totalElements ?? 0" [value]="service.tableContent?.content ?? []"
+             currentPageReportTemplate="Найдено {totalRecords} задач"
+             paginatorDropdownAppendTo="body" sortMode="multiple" styleClass="p-datatable-sm">
+        <ng-template pTemplate="caption">
+            <div class="flex gap-2">
+                <p-dropdown (onChange)="registryTable.reset()" [formControl]="service.taskStatusSelector"
+                            [options]="service.taskStatusOptions"></p-dropdown>
+                <p-dropdown (onChange)="registryTable.reset()" [formControl]="service.taskClassSelector"
+                            [options]="service.taskClassOptions"></p-dropdown>
+                <p-selectButton [options]="service.tagFilterModeOptions" [formControl]="service.tagFilterModeSelector"></p-selectButton>
+                <app-task-tag-filter-input *ngIf="service.isTagMode$ | async" [formControl]="service.tagsSelector"></app-task-tag-filter-input>
+                <div class="flex-grow-1"></div>
+                <span class="p-input-icon-left">
+                    <i class="mdi-search"></i>
+                    <input pInputText placeholder="Поиск" type="text" [delay]="1000" (delayInput)="registryTable.filterGlobal($event, 'contains')"/>
+                </span>
+                <button pButton label="Обновить" icon="mdi-update" [loading]="service.tableContentLoading"
+                        (click)="service.updateContent$.next(true)"></button>
+            </div>
+        </ng-template>
         <ng-template pTemplate="header">
             <tr>
-                <th [pSortableColumn]="column.isSort ? column.field : ''" *ngFor="let column of tableColumns">
-                    <div class="flex align-items-center">
-                        <span>{{column.title}}</span>
-                        <p-columnFilter *ngIf="column.filterType" [type]="column.filterType" [field]="column.field" display="menu"></p-columnFilter>
-                        <p-sortIcon [field]="column.field" *ngIf="column.isSort"></p-sortIcon>
-                    </div>
-                </th>
+                <ng-container *ngFor="let column of tableColumns">
+                    <th [pSortableColumnDisabled]="!column.isSort" [pSortableColumn]="column.field" class="text-sm">
+                        <div class="flex align-items-center">
+                            <span>{{column.title}}</span>
+                            <ng-container *ngIf="column.filterType">
+                                <ng-container *ngIf="isStandardFilterType(column.filterType)">
+                                    <p-columnFilter [field]="column.field" [type]="column.filterType"
+                                                    display="menu"></p-columnFilter>
+                                </ng-container>
+                                <ng-container *ngIf="!isStandardFilterType(column.filterType)">
+                                    <p-columnFilter [field]="column.field"
+                                                    [showApplyButton]="false"
+                                                    [showMatchModes]="false" display="menu" matchMode="equals">
+                                        <ng-template let-filter="filterCallback" let-value pTemplate="filter">
+                                            <ng-container [ngSwitch]="column.filterType">
+                                                <p-dropdown (onChange)="filter($event.value)"
+                                                            *ngSwitchCase="'taskType'" [ngModel]="value"
+                                                            [options]="(service.taskTypesList$ | async) ?? []"
+                                                            [showClear]="true" placeholder="Выберете тип задачи">
+                                                </p-dropdown>
+                                                <p-dropdown (onChange)="filter($event.value)"
+                                                            *ngSwitchCase="'taskDir'" [ngModel]="value"
+                                                            [options]="(service.taskCategoriesList$ | async) ?? []"
+                                                            [showClear]="true" placeholder="Выберете категорию задачи">
+                                                </p-dropdown>
+                                                <p-dropdown (onChange)="filter($event.value)"
+                                                            *ngSwitchCase="'employee'" [filter]="true"
+                                                            [ngModel]="value"
+                                                            [options]="(service.employeesList$ | async) ?? []"
+                                                            [showClear]="true" placeholder="Выберете сотрудника">
+                                                </p-dropdown>
+                                                <input (delayInput)="filter($event)" *ngSwitchCase="'address'"
+                                                       [delay]="1500"
+                                                       [ngModel]="value"
+                                                       appDelayedInput pInputText
+                                                       placeholder="Адрес..."/>
+                                                <p-dropdown (onChange)="filter($event.value)"
+                                                            *ngSwitchCase="'conType'" [ngModel]="value"
+                                                            [options]="(service.connectionTypesList$ | async) ?? []"
+                                                            [showClear]="true" placeholder="Выберете тип подключения">
+                                                </p-dropdown>
+                                                <p-dropdown (onChange)="filter($event.value)"
+                                                            *ngSwitchCase="'conSrv'" [ngModel]="value"
+                                                            [options]="(service.connectionServicesList$ | async) ?? []"
+                                                            [showClear]="true"
+                                                            placeholder="Выберете подключаемый сервис">
+                                                </p-dropdown>
+                                                <p-dropdown (onChange)="filter($event.value)"
+                                                            *ngSwitchCase="'equipment'" [ngModel]="value"
+                                                            [options]="(service.equipmentsList$ | async) ?? []"
+                                                            [showClear]="true" placeholder="Выберете оборудование">
+                                                </p-dropdown>
+                                                <input (delayInput)="filter($event)" *ngSwitchCase="'passport'"
+                                                       [delay]="1500"
+                                                       [ngModel]="value"
+                                                       appDelayedInput pInputText
+                                                       placeholder="Паспорт..."/>
+                                            </ng-container>
+                                        </ng-template>
+                                    </p-columnFilter>
+                                </ng-container>
+                            </ng-container>
+                            <p-sortIcon [field]="column.field"></p-sortIcon>
+                        </div>
+                    </th>
+                </ng-container>
             </tr>
         </ng-template>
-        <ng-template pTemplate="body" let-data>
-            <tr>
-                <ng-container *ngIf="isNotLargeText(data)">
-                    <td *ngFor="let column of tableColumns" [attr.rowspan]="data[column.field]?.rowSpan">
-                        <ng-container [ngSwitch]="data[column.field]?.type">
+        <ng-template let-data pTemplate="body">
+            <tr class="hover:bg-bluegray-50 cursor-pointer" [routerLink]="['/task', data.taskId]">
+                <td *ngFor="let column of tableColumns" [attr.rowspan]="data.main[column.field]?.rowSpan" class="text-sm">
+                    <ng-container [ngSwitch]="data.main[column.field]?.type">
+                        <ng-container *ngIf="column.field === 'currentStage.label'">
+                            <div class="flex flex-column gap-2">
+                                <span>
+                                    {{data.main[column.field]?.value}}
+                                </span>
+                                <div class="flex flex-wrap gap-2" *ngIf="data.tags.length > 0">
+                                    <span *ngFor="let tag of data.tags"
+                                          [ngStyle]="{'color': tag.color}" class="font-bold">
+                                        {{tag.name}}
+                                    </span>
+                                </div>
+                            </div>
+                        </ng-container>
+                        <ng-container *ngIf="column.field !== 'currentStage.label'">
                             <span *ngSwitchCase="CellType.STRING">
-                                {{data[column.field]?.value}}
+                                {{data.main[column.field]?.value}}
                             </span>
                             <span *ngSwitchCase="CellType.DATE">
-                                {{data[column.field]?.value | date: 'dd-MM-yyyy HH:mm'}}
+                                <ng-container *ngIf="data.main[column.field]?.value">
+                                    {{data.main[column.field]?.value | date: 'dd-MM-yyyy HH:mm'}}
+                                </ng-container>
+                                <ng-container *ngIf="!data.main[column.field]?.value">
+                                    -
+                                </ng-container>
                             </span>
                             <span *ngSwitchCase="CellType.LOGIN">
-                                {{data[column.field]?.value}}
+                                <app-billing-login [loginData]="data.main[column.field]?.value" [popup]="true"></app-billing-login>
+                            </span>
+                            <span *ngSwitchCase="CellType.PHONE">
+                                <app-dial-buttons-list [phoneData]="data.main[column.field]?.value"></app-dial-buttons-list>
                             </span>
                         </ng-container>
-                    </td>
-                </ng-container>
-                <ng-container *ngIf="!isNotLargeText(data)">
-                    <td [attr.colspan]="data['largeText']?.colSpan"
-                        class="white-space-nowrap text-overflow-ellipsis overflow-hidden max-w-0">
-                        {{data['largeText']?.value}}
-                    </td>
-                </ng-container>
+                    </ng-container>
+                </td>
+            </tr>
+            <tr *ngFor="let additionalRow of data.additional">
+                <td [attr.colspan]="additionalRow['largeText']?.colSpan"
+                    class="white-space-nowrap text-overflow-ellipsis overflow-hidden max-w-0 text-sm">
+                    {{additionalRow['largeText']?.value}}
+                </td>
+            </tr>
+            <tr>
+                <td [attr.colspan]="tableColumns.length" [style.height]="'.5rem'" class="bg-gray-100 p-0" ></td>
             </tr>
         </ng-template>
     </p-table>
 </ng-container>
+
+<ng-template #filterTemplate let-column="column">
+    <ng-container *ngIf="column.filterType">
+        <ng-container *ngIf="isStandardFilterType(column.filterType)">
+            <p-columnFilter [field]="column.field" [type]="column.filterType" display="menu"></p-columnFilter>
+        </ng-container>
+        <ng-container *ngIf="!isStandardFilterType(column.filterType)">
+            <ng-container [ngSwitch]="column.filterType">
+                <p-columnFilter *ngSwitchCase="'taskType'" [field]="column.field" display="menu" matchMode="equals">
+                    <ng-template let-filter="filterCallback" let-value pTemplate="filter">
+                        <p-dropdown (onChange)="filter($event.value)" [ngModel]="value"
+                                    [options]="(service.taskTypesList$ | async) ?? []" [showClear]="true"
+                                    optionLabel="name" optionValue="value"
+                                    placeholder="Выберете тип задачи">
+                        </p-dropdown>
+                    </ng-template>
+                </p-columnFilter>
+            </ng-container>
+        </ng-container>
+    </ng-container>
+</ng-template>

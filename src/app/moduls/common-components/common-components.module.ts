@@ -66,7 +66,6 @@ import {TinyButtonComponent} from "../../components/controls/tiny-button/tiny-bu
 import {TaskLinkComponent} from "../../components/controls/task-link/task-link.component";
 import {TaskTagsViewComponent} from "../../components/panels/task-tags-view/task-tags-view.component";
 import {MultiSelectModule} from "primeng/multiselect";
-import {TaskTagListItemComponent} from "../../components/controls/task-tag-item/task-tag-list-item.component";
 import {ConfirmPopupModule} from "primeng/confirmpopup";
 import {ColorPickerModule} from "primeng/colorpicker";
 import {AutoFocusModule} from "primeng/autofocus";
@@ -251,6 +250,8 @@ import {NgTerminalModule} from "ng-terminal";
 import {BindingsTableComponent} from "../../components/acp/bindings-table/bindings-table.component";
 import {CommutatorsTableComponent} from "../../components/acp/commutators-table/commutators-table.component";
 import {ThumbnailPreviewComponent} from "../../components/content/thumbnail-preview/thumbnail-preview.component";
+import {DelayedInputDirective} from "../../directives/delayed-input.directive";
+import {MainBootstrap} from "../../pages/bootstaps/main-bootstrap/main-bootstrap.component";
 
 
 @NgModule({
@@ -276,6 +277,7 @@ import {ThumbnailPreviewComponent} from "../../components/content/thumbnail-prev
         TaskListElementComponent,
         SelectFieldToViewButtonComponent,
         MainBootstrapComponent,
+        MainBootstrap,
         IntersectionObserverDirective,
         FreeDragDirective,
         ScrollControllerDirective,
@@ -292,7 +294,6 @@ import {ThumbnailPreviewComponent} from "../../components/content/thumbnail-prev
         TinyButtonComponent,
         TaskLinkComponent,
         TaskTagsViewComponent,
-        TaskTagListItemComponent,
         LazyEndlessPageListComponent,
         TaskTagFilterInputComponent,
         TaskStatusChooserComponent,
@@ -377,7 +378,8 @@ import {ThumbnailPreviewComponent} from "../../components/content/thumbnail-prev
         TerminalDialogComponent,
         BindingsTableComponent,
         CommutatorsTableComponent,
-        ThumbnailPreviewComponent
+        ThumbnailPreviewComponent,
+        DelayedInputDirective
     ],
     exports: [
         AccountPanelComponent,
@@ -401,6 +403,7 @@ import {ThumbnailPreviewComponent} from "../../components/content/thumbnail-prev
         TaskListElementComponent,
         SelectFieldToViewButtonComponent,
         MainBootstrapComponent,
+        MainBootstrap,
         IntersectionObserverDirective,
         FreeDragDirective,
         ScrollControllerDirective,
@@ -417,7 +420,6 @@ import {ThumbnailPreviewComponent} from "../../components/content/thumbnail-prev
         TinyButtonComponent,
         TaskLinkComponent,
         TaskTagsViewComponent,
-        TaskTagListItemComponent,
         LazyEndlessPageListComponent,
         TaskTagFilterInputComponent,
         TaskStatusChooserComponent,
@@ -499,7 +501,8 @@ import {ThumbnailPreviewComponent} from "../../components/content/thumbnail-prev
         TerminalDialogComponent,
         BindingsTableComponent,
         CommutatorsTableComponent,
-        ThumbnailPreviewComponent
+        ThumbnailPreviewComponent,
+        DelayedInputDirective
     ],
     imports: [
         CommonPipesModule,

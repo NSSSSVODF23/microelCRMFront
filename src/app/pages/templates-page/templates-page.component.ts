@@ -2,10 +2,10 @@ import {Component, OnDestroy, OnInit} from '@angular/core';
 import {ApiService} from "../../services/api.service";
 import {ClientEquipment, LoadingState, TaskTag, Wireframe} from "../../types/transport-interfaces";
 import {RealTimeUpdateService} from "../../services/real-time-update.service";
-import {SubscriptionsHolder} from "../../util";
+import {DynamicValueFactory, SubscriptionsHolder} from "../../util";
 import {ConfirmationService} from "primeng/api";
 import {FormControl, FormGroup, Validators} from "@angular/forms";
-import {map, merge, of, shareReplay, switchMap, tap} from "rxjs";
+import {combineLatest, debounceTime, map, merge, of, shareReplay, startWith, switchMap, tap} from "rxjs";
 import { AccessFlag } from 'src/app/types/access-flag';
 import {PersonalityService} from "../../services/personality.service";
 
@@ -13,9 +13,22 @@ import {PersonalityService} from "../../services/personality.service";
     templateUrl: './templates-page.component.html',
     styleUrls: ['./templates-page.component.scss']
 })
-export class TemplatesPageComponent implements OnInit, OnDestroy {
+export class TemplatesPageComponent implements OnInit {
 
     AccessFlag = AccessFlag;
+    LoadingState = LoadingState;
+
+    deletedTemplatesSwitcher = new FormControl(false);
+    templatesFilters$ = combineLatest([this.deletedTemplatesSwitcher.valueChanges.pipe(startWith(false))]);
+
+    templates$ = DynamicValueFactory.ofWithFilter(
+        this.templatesFilters$,
+        this.api.getWireframes.bind(this.api),
+        'wireframeId',
+        this.rt.wireframeCreated(),
+        this.rt.wireframeUpdated(),
+        this.rt.wireframeDeleted(),
+    )
 
     templateItems: Wireframe[] = [];
     availableTags: TaskTag[] = [];
@@ -30,83 +43,42 @@ export class TemplatesPageComponent implements OnInit, OnDestroy {
     });
     isTagSaving = false;
 
-    subscription: SubscriptionsHolder = new SubscriptionsHolder();
-    deletedTemplatesSwitcher = new FormControl(false);
+    tagsNameQueryControl = new FormControl('');
     deletedTagsSwitcher = new FormControl(false);
-
-    templateLoadingState: LoadingState = LoadingState.LOADING;
-    tagLoadingState: LoadingState = LoadingState.LOADING;
-    equipmentLoadingState = LoadingState.LOADING;
-
-    templateLoadingHandler = {
-        next: (response: Wireframe[]) => {
-            this.templateLoadingState = response.length > 0 ? LoadingState.READY : LoadingState.EMPTY;
-            this.templateItems = response
-        },
-        error: () => {
-            this.templateLoadingState = LoadingState.ERROR
-        }
-    }
-    tagLoadingHandler = {
-        next: (response: TaskTag[]) => {
-            this.tagLoadingState = response.length > 0 ? LoadingState.READY : LoadingState.EMPTY;
-            this.availableTags = response
-        },
-        error: () => {
-            this.tagLoadingState = LoadingState.ERROR
-        }
-    }
+    tagFilters$ = combineLatest(
+        [
+            this.tagsNameQueryControl.valueChanges.pipe(debounceTime(500), startWith('')),
+            this.deletedTagsSwitcher.valueChanges.pipe(startWith(false))
+        ]
+    );
+    tags$ = DynamicValueFactory.ofWithFilter(
+        this.tagFilters$,
+        this.api.getTaskTags.bind(this.api),
+        'taskTagId',
+        this.rt.taskTagCreated(),
+        this.rt.taskTagUpdated(),
+        this.rt.taskTagDeleted(),
+    )
 
     equipmentsFilterForm = new FormGroup({
         query: new FormControl(''),
         isDeleted: new FormControl(false)
     });
-    changeEquipmentFilters$ = this.equipmentsFilterForm.valueChanges.pipe(shareReplay(1));
-    equipmentsLoading$ = merge(this.changeEquipmentFilters$, of({query: '', isDeleted: false})).pipe(
-        tap(() => this.equipmentLoadingState = LoadingState.LOADING),
-        switchMap((filters) => this.api.getClientEquipments(filters.query, filters.isDeleted)),
-        tap({
-            next: (value) => this.equipmentLoadingState = value.length > 0 ? LoadingState.READY : LoadingState.EMPTY,
-            error: () => this.equipmentLoadingState = LoadingState.ERROR
-        }),
-        shareReplay(1)
-    );
-    equipmentsCreating$ = this.rt.clientEquipmentsCreated().pipe(
-        switchMap((create) => this.equipmentsLoading$.pipe(
-            map(equipments => {
-                const index = equipments.findIndex(e => e.clientEquipmentId === create.clientEquipmentId);
-                if (index === -1)
-                    equipments.unshift(create);
-                return equipments
-            })
-        ))
+    changeEquipmentFilters$ = this.equipmentsFilterForm.valueChanges
+        .pipe(
+            debounceTime(500),
+            map(({query,isDeleted})=>[query, isDeleted]),
+            shareReplay(1),
+            startWith(['', false])
+        );
+    equipments$ = DynamicValueFactory.ofWithFilter(
+        this.changeEquipmentFilters$,
+        this.api.getClientEquipments.bind(this.api),
+        'clientEquipmentId',
+        this.rt.clientEquipmentsCreated(),
+        this.rt.clientEquipmentsUpdated(),
+        this.rt.clientEquipmentsDeleted()
     )
-    equipmentsUpdating$ = this.rt.clientEquipmentsUpdated().pipe(
-        switchMap((update) => this.equipmentsLoading$.pipe(
-            map(equipments => {
-                const index = equipments.findIndex(e => e.clientEquipmentId === update.clientEquipmentId);
-                if (index !== -1)
-                    equipments[index] = update;
-                return equipments
-            })
-        ))
-    );
-    equipmentDeleting$ = this.rt.clientEquipmentsDeleted().pipe(
-        switchMap((del) => this.equipmentsLoading$.pipe(
-            map(equipments => {
-                const index = equipments.findIndex(e => e.clientEquipmentId === del.clientEquipmentId);
-                if (this.equipmentsFilterForm.value.isDeleted) {
-                    equipments[index] = del;
-                } else {
-                    if (index !== -1)
-                        equipments.splice(index, 1);
-                }
-                return equipments
-            })
-        ))
-    )
-
-    equipments$ = merge(this.equipmentsLoading$, this.equipmentsCreating$, this.equipmentsUpdating$, this.equipmentDeleting$).pipe(shareReplay(1));
     showEquipmentDialog = false;
     isEquipmentCreating = false;
     editionEquipmentId?: number;
@@ -123,30 +95,6 @@ export class TemplatesPageComponent implements OnInit, OnDestroy {
 
     ngOnInit(): void {
 
-        this.subscription.addSubscription('crTag', this.rt.taskTagCreated().subscribe(this.tagCreated.bind(this)));
-        this.subscription.addSubscription('updTag', this.rt.taskTagUpdated().subscribe(this.tagUpdated.bind(this)));
-        this.subscription.addSubscription('delTag', this.rt.taskTagDeleted().subscribe(this.tagDeleted.bind(this)));
-
-        this.subscription.addSubscription("crTemp", this.rt.wireframeCreated().subscribe(this.templateCreated.bind(this)));
-        this.subscription.addSubscription("updTemp", this.rt.wireframeUpdated().subscribe(this.templateUpdated.bind(this)));
-        this.subscription.addSubscription("delTemp", this.rt.wireframeDeleted().subscribe(this.templateDeleted.bind(this)));
-
-        this.api.getWireframes(false).subscribe(this.templateLoadingHandler);
-        this.subscription.addSubscription('swDelTemp', this.deletedTemplatesSwitcher.valueChanges.subscribe(value => {
-            this.templateLoadingState = LoadingState.LOADING;
-            this.api.getWireframes(value ?? false).subscribe(this.templateLoadingHandler);
-        }));
-
-        this.api.getTaskTags().subscribe(this.tagLoadingHandler);
-        this.subscription.addSubscription('swDelTag', this.deletedTagsSwitcher.valueChanges.subscribe(value => {
-            this.tagLoadingState = LoadingState.LOADING;
-            this.api.getTaskTags(null,value ?? false).subscribe(this.tagLoadingHandler);
-        }));
-
-    }
-
-    ngOnDestroy(): void {
-        this.subscription.unsubscribeAll();
     }
 
     tagCreated(tag: TaskTag) {
@@ -239,6 +187,14 @@ export class TemplatesPageComponent implements OnInit, OnDestroy {
         })
         this.editTagDialogVisible = true;
         this.isTagSaving = false;
+    }
+
+    confirmDeleteTag(event: any, tagId: any) {
+        this.confirmation.confirm({
+            header: "Подтверждение",
+            message: "Удалить тег?",
+            accept: () => this.api.deleteTaskTag(tagId).subscribe()
+        })
     }
 
     openCreateEquipmentDialog() {

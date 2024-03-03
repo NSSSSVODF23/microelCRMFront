@@ -1,13 +1,10 @@
-<div #wrapperElem class="flexed column wrapper">
-    <div #titleElem (click)="toggle()" [routerLink]="link" class="title flexed gap6 hcenter"
-         [routerLinkActiveOptions]="{ exact }" routerLinkActive="active">
-        <span [class]="icon"></span> {{caption}}
-        <div class="stretched"></div>
-        <app-colored-tag *ngIf="badge" [caption]="badge" color="var(--mc-500)"></app-colored-tag>
-        <span *ngIf="hasChild()" [ngClass]="{rotated:_isExtended}" class="material-icons-round title-expanded-icon">expand_more</span>
-    </div>
-    <app-sub-extended-menu-item *ngFor="let el of elements" [caption]="el.label" [children]="el.children"
-                                [isExtended]="el.extended" [link]="el.link"
-                                [nLevel]="el.nestingLevel"></app-sub-extended-menu-item>
+<div #rla="routerLinkActive" #titleElem (click)="toggle()" [pTooltip]="onlyIcon ? caption : ''"
+     [ngClass]="[!rla.isActive ? 'hover:bg-bluegray-50 hover:text-bluegray-500 cursor-pointer border-white' : 'border-primary']"
+     [routerLinkActiveOptions]="{ exact }" [routerLink]="link"
+     class="flex gap-2 align-items-center px-3 py-2 white-space-nowrap text-bluegray-300 select-none outline-none
+     transition-colors transition-duration-150 text-xl border-right-2"
+     routerLinkActive="text-primary bg-primary-50">
+    <span [class]="icon"></span>
+    <span *ngIf="!onlyIcon && caption" appTicker class="overflow-hidden max-w-7rem white-space-nowrap">{{caption}}</span>
 </div>
-<p-contextMenu appendTo="body" [model]="contextOptions" [target]="wrapperElem"></p-contextMenu>
+<p-contextMenu [model]="contextOptions" [target]="titleElem" appendTo="body"></p-contextMenu>

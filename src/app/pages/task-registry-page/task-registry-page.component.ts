@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, OnInit, ViewChild} from '@angular/core';
 import {TaskRegistryService} from "../../services/task-registry.service";
 import {DynamicTableCell, DynamicTableCellType} from "../../types/transport-interfaces";
 
@@ -10,6 +10,7 @@ export class TaskRegistryPage implements OnInit {
 
     CellType = DynamicTableCellType
 
+
     constructor(readonly service: TaskRegistryService) {
     }
 
@@ -18,5 +19,13 @@ export class TaskRegistryPage implements OnInit {
 
     isNotLargeText(value: {[key:string]:DynamicTableCell}){
       return !Object.keys(value).includes("largeText");
+    }
+
+    isStandardFilterType(filterType: any) {
+        return filterType === 'text' || filterType === 'number' || filterType === 'date' || filterType === 'boolean';
+    }
+
+    scrollTop() {
+        window.scroll(0,0)
     }
 }

@@ -440,7 +440,7 @@
 .ql-snow .ql-toolbar .ql-picker-item:hover,
 .ql-snow.ql-toolbar .ql-picker-item.ql-selected,
 .ql-snow .ql-toolbar .ql-picker-item.ql-selected {
-  color: var(--mc-900);
+  color: var(--primary-400);
 }
 .ql-snow.ql-toolbar button:hover .ql-fill,
 .ql-snow .ql-toolbar button:hover .ql-fill,
@@ -470,7 +470,7 @@
 .ql-snow .ql-toolbar .ql-picker-item:hover .ql-stroke.ql-fill,
 .ql-snow.ql-toolbar .ql-picker-item.ql-selected .ql-stroke.ql-fill,
 .ql-snow .ql-toolbar .ql-picker-item.ql-selected .ql-stroke.ql-fill {
-  fill: var(--mc-900);
+  fill: var(--primary-400);
 }
 .ql-snow.ql-toolbar button:hover .ql-stroke,
 .ql-snow .ql-toolbar button:hover .ql-stroke,
@@ -500,7 +500,7 @@
 .ql-snow .ql-toolbar .ql-picker-item:hover .ql-stroke-miter,
 .ql-snow.ql-toolbar .ql-picker-item.ql-selected .ql-stroke-miter,
 .ql-snow .ql-toolbar .ql-picker-item.ql-selected .ql-stroke-miter {
-  stroke: var(--mc-900);
+  stroke: var(--primary-400);
 }
 @media (pointer: coarse) {
   .ql-snow.ql-toolbar button:hover:not(.ql-active),
@@ -555,20 +555,20 @@
 }
 .ql-snow .ql-stroke {
   fill: none;
-  stroke: var(--mc-400);
+  stroke: var(--bluegray-500);
   stroke-linecap: round;
   stroke-linejoin: round;
   stroke-width: 2;
 }
 .ql-snow .ql-stroke-miter {
   fill: none;
-  stroke: var(--mc-400);
+  stroke: var(--bluegray-500);
   stroke-miterlimit: 10;
   stroke-width: 2;
 }
 .ql-snow .ql-fill,
 .ql-snow .ql-stroke.ql-fill {
-  fill: var(--mc-400);
+  fill: var(--bluegray-500);
 }
 .ql-snow .ql-empty {
   fill: none;
@@ -847,9 +847,9 @@
   background-color: #000;
 }
 .ql-toolbar.ql-snow {
-  //border: 1px solid var(--mc-100);
+  border: 1px solid var(--bluegray-100);
   border-radius: .3rem .3rem 0 0;
-  background-color: var(--mc-0);
+  background-color: var(--bluegray-50);
   box-sizing: border-box;
   font-family: 'Helvetica Neue', 'Helvetica', 'Arial', sans-serif;
   //color: var(--mc-500);
@@ -945,6 +945,6 @@
   color: #06c;
 }
 .ql-container.ql-snow {
-  border: 1px solid var(--mc-0);
+  border: 1px solid var(--bluegray-100);
   border-radius: 0 0 .3rem .3rem;
 }

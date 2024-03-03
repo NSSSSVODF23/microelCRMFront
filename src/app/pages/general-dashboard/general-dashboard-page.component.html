@@ -1,6 +1,6 @@
 <div appExtendPageHeight class="flex justify-content-center">
     <div class="responsive-wrapper flex gap-3">
-        <app-main-menu-panel></app-main-menu-panel>
+<!--        <app-main-menu-panel></app-main-menu-panel>-->
         <div class="grid h-fit w-full">
             <ng-container *ngIf="wireframes$ | async as wireframes; else empty">
                 <app-dashboard-task-statistic-panel *ngFor="let wireframe of wireframes" [wireframe]="wireframe" class="col-4"></app-dashboard-task-statistic-panel>

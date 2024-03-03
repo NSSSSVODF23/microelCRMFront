@@ -117,6 +117,14 @@ export class SalaryEstimationPageComponent implements OnInit, OnDestroy {
         return workLog.workLogId;
     };
 
+    getUncompletedMessage(workLog: WorkLog) {
+        const reportAwaitingWriting = workLog.workReports.filter(report => report.awaitingWriting);
+        if (reportAwaitingWriting.length > 0) {
+            return `Не написали отчеты: ${reportAwaitingWriting.map(report => report.author.fullName).join(', ')}`;
+        }
+        return '';
+    }
+
     ngOnInit(): void {
         this.loadUncalculatedWorkLogs()
         this.subscriptions.addSubscription('wp', this.worksPickerForm.valueChanges.subscribe(value => {

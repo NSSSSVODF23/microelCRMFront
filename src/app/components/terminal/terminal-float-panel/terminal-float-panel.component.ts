@@ -1,6 +1,6 @@
 import {Component, OnInit} from '@angular/core';
 import {AutoUnsubscribe, FromEvent} from "../../../decorators";
-import {debounceTime, filter, map, merge, Observable} from "rxjs";
+import {debounceTime, filter, map, merge, Observable, ReplaySubject} from "rxjs";
 import {TelnetTerminalsService} from "../../../services/telnet-terminals.service";
 
 @Component({
@@ -12,9 +12,9 @@ import {TelnetTerminalsService} from "../../../services/telnet-terminals.service
 export class TerminalFloatPanelComponent implements OnInit {
 
     @FromEvent('wrapper-panel', 'mouseenter')
-    panelMouseEnter$!: Observable<MouseEvent>;
+    panelMouseEnter$ = new ReplaySubject<MouseEvent>(1);
     @FromEvent('wrapper-panel', 'mouseleave')
-    panelMouseLeave$!: Observable<MouseEvent>;
+    panelMouseLeave$ = new ReplaySubject<MouseEvent>(1);
 
     panelPosition: Partial<CSSStyleDeclaration> = {
         transform: 'translate(-50%, 75%)',

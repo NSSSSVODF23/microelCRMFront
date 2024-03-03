@@ -1,8 +1,7 @@
-<div appExtendPageHeight class="flex px-3 gap-3">
-    <app-main-menu-panel></app-main-menu-panel>
-    <div class="flex flex-grow-1 gap-3 mb-3">
-        <div class="flex flex-column flex-grow-1 gap-3">
-            <div #searchPanelElement class="flex bg-white border-round border-1 py-2 pr-2 pl-3 gap-2 align-items-center"
+<div class="flex flex-grow-1">
+    <div class="flex flex-column flex-grow-1">
+        <div class="sticky top-0 z-1 flex flex-column flex-grow-1">
+            <div #searchPanelElement class="flex bg-white border-bottom-1 py-2 pr-2 pl-3 gap-2 align-items-center"
                  [formGroup]="cacheService.filterForm"
                  [ngClass]="isSearchInputFocused ? 'border-primary' : 'border-bluegray-100'">
                 <input #searchPhraseInput placeholder="Поиск..." class="border-0 flex-grow-1 h-full outline-none border-none" formControlName="searchPhrase"
@@ -19,22 +18,22 @@
                           styleClass="p-button-sm p-button-secondary"></p-button>
             </div>
             <ng-container *ngIf="cacheService.applyingAllFilters$ | async as applyingFilters">
-                <div *ngIf="applyingFilters.length > 0" class="flex flex-wrap gap-2 align-items-center">
+                <div *ngIf="applyingFilters.length > 0" class="flex flex-wrap bg-white gap-2 align-items-center p-2 border-bottom-1 border-bluegray-100">
                     <span class="text-sm text-bluegray-400 font-bold">Примененные фильтры:</span>
                     <p-chip *ngFor="let filter of applyingFilters" [label]="filter.label" [removable]="true" (onRemove)="cacheService.clearFilter(filter.value, filter.type)"></p-chip>
                 </div>
             </ng-container>
-            <div class="flex flex-column flex-grow-1">
-                <router-outlet></router-outlet>
-            </div>
         </div>
-        <div class="flex flex-column border-round border-1 bg-white border-bluegray-100 h-fit sticky-type-selector">
-            <span class="text-lg text-bluegray-600 font-bold p-3 bg-white sticky top-0 z-5">Каталог</span>
-            <div class="flex flex-column gap-1 relative px-3 pb-3">
-                <app-catalog-menu-item label="Все задачи" [contentTemplate]="tasksStatusItemsTemplate" [isEmpty]="false"
-                                       [counter]="cacheService.getTasksCounter()"
-                                       [isCounterLoading]="cacheService.getTasksLoadingCounter()" link="/tasks/search"></app-catalog-menu-item>
-            </div>
+        <div class="flex flex-column flex-grow-1">
+            <router-outlet></router-outlet>
+        </div>
+    </div>
+    <div class="flex flex-column bg-white overflow-x-visible w-fit h-screen border-left-1 border-bluegray-100 sticky top-0">
+        <span class="text-lg text-bluegray-600 font-bold p-3 bg-white sticky top-0 z-5">Каталог</span>
+        <div class="flex flex-column gap-1 relative px-3 pb-3">
+            <app-catalog-menu-item label="Все задачи" [contentTemplate]="tasksStatusItemsTemplate" [isEmpty]="false"
+                                   [counter]="cacheService.getTasksCounter()"
+                                   [isCounterLoading]="cacheService.getTasksLoadingCounter()" link="/tasks/search"></app-catalog-menu-item>
         </div>
     </div>
 </div>

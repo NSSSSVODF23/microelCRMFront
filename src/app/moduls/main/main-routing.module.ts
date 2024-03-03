@@ -1,5 +1,5 @@
-import {EnvironmentInjector, Injector, NgModule} from '@angular/core';
-import {CanActivateFn, RouterModule, Routes} from '@angular/router';
+import {NgModule} from '@angular/core';
+import {RouterModule, Routes} from '@angular/router';
 import {TaskCreationPageComponent} from "../../pages/task-creation-page/task-creation-page.component";
 import {TaskPageComponent} from "../../pages/task-page/task-page.component";
 import {TemplatesPageComponent} from "../../pages/templates-page/templates-page.component";
@@ -7,7 +7,6 @@ import {
     WireframeConstructorPageComponent
 } from "../../pages/wireframe-constructor-page/wireframe-constructor-page.component";
 import {EmployeesPageComponent} from "../../pages/employees-page/employees-page.component";
-import {MainBootstrapComponent} from "../../pages/main-bootstrap/main-bootstrap.component";
 import {GeneralDashboardPageComponent} from "../../pages/general-dashboard/general-dashboard-page.component";
 import {TestingPageComponent} from "../../pages/testing-page/testing-page.component";
 import {TaskCalendarPageComponent} from "../../pages/task-calendar-page/task-calendar-page.component";
@@ -56,22 +55,20 @@ import {
     EmployeeWorkStatisticsPage
 } from "../../pages/statistics/children/employee-work-statistics-page/employee-work-statistics-page.component";
 import {TopologyBootstrapPage} from "../../pages/topology/topology-bootstrap-page/topology-bootstrap-page.component";
-import {
-    TopologyHousesPage
-} from "../../pages/topology/children/topology-houses-page/topology-houses-page.component";
+import {TopologyHousesPage} from "../../pages/topology/children/topology-houses-page/topology-houses-page.component";
 import {
     TopologyCommutatorsPage
 } from "../../pages/topology/children/topology-commutators-page/topology-commutators-page.component";
 import {
     TopologySessionsPage
 } from "../../pages/topology/children/topology-sessions-page/topology-sessions-page.component";
-import {
-    TopologyHousePage
-} from "../../pages/topology/children/topology-house-page/topology-house-page.component";
+import {TopologyHousePage} from "../../pages/topology/children/topology-house-page/topology-house-page.component";
 import {TaskRegistryPage} from "../../pages/task-registry-page/task-registry-page.component";
+import {MainBootstrap} from "../../pages/bootstaps/main-bootstrap/main-bootstrap.component";
+import {CatalogRedirectGuard} from "../../guards/catalog-redirect.guard";
 
 const routes: Routes = [{
-    path: '', component: MainBootstrapComponent, children: [
+    path: '', component: MainBootstrap, children: [
         {path: '', component: GeneralDashboardPageComponent},
         {path: 'tasks/registry', component: TaskRegistryPage},
         {
@@ -83,7 +80,7 @@ const routes: Routes = [{
                 path: ':status/:class/:type', component: CatalogSearchTasksListViewComponent
             }]
         },
-        {path: 'tasks/catalog', pathMatch: 'full', redirectTo: 'tasks/catalog/active'},
+        {path: 'tasks', pathMatch: 'full', redirectTo: 'tasks/catalog/active'},
         {
             path: 'tasks/catalog', component: TaskCatalogPageComponent, children: [{
                 path: 'scheduled/:status',
@@ -106,7 +103,9 @@ const routes: Routes = [{
                 component: CatalogTasksListViewComponent,
                 data: {scheduled: SchedulingType.PLANNED, pageType: 'actual-time'}
             }, {
-                path: 'term/:status', component: CatalogTasksListViewComponent, data: {scheduled: SchedulingType.DEADLINE}
+                path: 'term/:status',
+                component: CatalogTasksListViewComponent,
+                data: {scheduled: SchedulingType.DEADLINE}
             }, {
                 path: 'term/:status/:class',
                 component: CatalogTasksListViewComponent,
@@ -143,54 +142,128 @@ const routes: Routes = [{
                 path: ':status/:class/:type/close-time/:closeTime/:tag',
                 component: CatalogTasksListViewComponent,
                 data: {pageType: 'close-time'}
-            }]
+            }], canActivate: [CatalogRedirectGuard]
         },
         {path: 'tasks/calendar', component: TaskCalendarPageComponent},
         {path: 'task/create', component: TaskCreationPageComponent},
         {path: 'task/:id', component: TaskPageComponent},
-        {path: 'tasks/templates', component: TemplatesPageComponent, canActivate:[accessCanActivate(AccessFlag.EDIT_TASK_TEMPLATES, AccessFlag.EDIT_TASK_TAGS, AccessFlag.EDIT_DEVICES)]},
-        {path: 'tasks/templates/constructor', component: WireframeConstructorPageComponent, canActivate:[accessCanActivate(AccessFlag.EDIT_TASK_TEMPLATES)]},
-        {path: 'employees', component: EmployeesPageComponent, canActivate:[accessCanActivate(AccessFlag.MANAGE_EMPLOYEES)]},
+        {
+            path: 'tasks/templates',
+            component: TemplatesPageComponent,
+            canActivate: [accessCanActivate(AccessFlag.EDIT_TASK_TEMPLATES, AccessFlag.EDIT_TASK_TAGS, AccessFlag.EDIT_DEVICES)]
+        },
+        {
+            path: 'tasks/templates/constructor',
+            component: WireframeConstructorPageComponent,
+            canActivate: [accessCanActivate(AccessFlag.EDIT_TASK_TEMPLATES)]
+        },
+        {
+            path: 'employees',
+            component: EmployeesPageComponent,
+            canActivate: [accessCanActivate(AccessFlag.MANAGE_EMPLOYEES)]
+        },
         {path: 'testing', component: TestingPageComponent},
         {path: 'parser/tracker', component: ParseTaskPageComponent},
         {path: 'parser/address', component: ParseAddressPageComponent},
-        {path: 'salary/table', component: SalaryTablePageComponent, canActivate:[accessCanActivate(AccessFlag.COUNT_SALARY)]},
+        {path: 'salary', pathMatch: 'full', redirectTo: 'salary/table'},
+        {
+            path: 'salary/table',
+            component: SalaryTablePageComponent,
+            canActivate: [accessCanActivate(AccessFlag.COUNT_SALARY)]
+        },
         {path: 'salary/paid-actions', redirectTo: '/salary/paid-actions/1?includeDeleted=false', pathMatch: 'full'},
-        {path: 'salary/paid-actions/:page', component: PaidActionsPageComponent, canActivate:[accessCanActivate(AccessFlag.EDIT_PRICE)]},
-        {path: 'salary/works', component: WorksPageComponent, canActivate:[accessCanActivate(AccessFlag.EDIT_PRICE)]},
-        {path: 'salary/estimation', component: SalaryEstimationPageComponent, canActivate:[accessCanActivate(AccessFlag.COUNT_SALARY)]},
-        {path: 'salary/estimation/bypass', component: BypassWorkCalculationComponent, canActivate:[accessCanActivate(AccessFlag.COUNT_SALARY)]},
-        {path: 'clients/billing/search', component: BillingSearchUserPageComponent, canActivate:[accessCanActivate(AccessFlag.BILLING)]},
-        {path: 'clients/billing/user/:login', component: BillingUserPageComponent, canActivate:[accessCanActivate(AccessFlag.BILLING)]},
-        {path: 'addresses/list', component: AddressesListPageComponent, canActivate:[accessCanActivate(AccessFlag.EDIT_ADDRESS_BOOK, AccessFlag.EDIT_HOUSE_ADDRESS_BOOK)]},
-        {path: 'system/billing', component: BillingSettingsPageComponent, canActivate:[accessCanActivate(AccessFlag.MANAGE_SYSTEM_SETTINGS)]},
-        {path: 'system/telegram', component: TelegramSettingsPageComponent, canActivate:[accessCanActivate(AccessFlag.MANAGE_SYSTEM_SETTINGS)]},
-        {path: 'system/acp', component: AcpSettingsPageComponent, canActivate:[accessCanActivate(AccessFlag.MANAGE_SYSTEM_SETTINGS)]},
-        {path: 'files', component: FilesPageComponent, canActivate:[accessCanActivate(AccessFlag.READ_WRITE_FILES)]},
+        {
+            path: 'salary/paid-actions/:page',
+            component: PaidActionsPageComponent,
+            canActivate: [accessCanActivate(AccessFlag.EDIT_PRICE)]
+        },
+        {path: 'salary/works', component: WorksPageComponent, canActivate: [accessCanActivate(AccessFlag.EDIT_PRICE)]},
+        {
+            path: 'salary/estimation',
+            component: SalaryEstimationPageComponent,
+            canActivate: [accessCanActivate(AccessFlag.COUNT_SALARY)]
+        },
+        {
+            path: 'salary/estimation/bypass',
+            component: BypassWorkCalculationComponent,
+            canActivate: [accessCanActivate(AccessFlag.COUNT_SALARY)]
+        },
+        {
+            path: 'clients/billing/search',
+            component: BillingSearchUserPageComponent,
+            canActivate: [accessCanActivate(AccessFlag.BILLING)]
+        },
+        {
+            path: 'clients/billing/user/:login',
+            component: BillingUserPageComponent,
+            canActivate: [accessCanActivate(AccessFlag.BILLING)]
+        },
+        {path: 'addresses', pathMatch: 'full', redirectTo: 'addresses/list'},
+        {
+            path: 'addresses/list',
+            component: AddressesListPageComponent,
+            canActivate: [accessCanActivate(AccessFlag.EDIT_ADDRESS_BOOK, AccessFlag.EDIT_HOUSE_ADDRESS_BOOK)]
+        },
+        {path: 'system', pathMatch: 'full', redirectTo: 'system/billing'},
+        {
+            path: 'system/billing',
+            component: BillingSettingsPageComponent,
+            canActivate: [accessCanActivate(AccessFlag.MANAGE_SYSTEM_SETTINGS)]
+        },
+        {
+            path: 'system/telegram',
+            component: TelegramSettingsPageComponent,
+            canActivate: [accessCanActivate(AccessFlag.MANAGE_SYSTEM_SETTINGS)]
+        },
+        {
+            path: 'system/acp',
+            component: AcpSettingsPageComponent,
+            canActivate: [accessCanActivate(AccessFlag.MANAGE_SYSTEM_SETTINGS)]
+        },
+        {path: 'files', component: FilesPageComponent, canActivate: [accessCanActivate(AccessFlag.READ_WRITE_FILES)]},
+        {path: 'contracts', pathMatch: 'full', redirectTo: 'contracts/inspection'},
         {
             path: 'contracts',
             component: ContractsBootstrapPageComponent,
             children: [
-                {path: 'inspection', component: ContractsInspectionPageComponent, canActivate:[accessCanActivate(AccessFlag.VIEW_CONTRACTS)]},
-                {path: 'types', component: ContractTypesPageComponent, canActivate:[accessCanActivate(AccessFlag.MANAGE_CONTRACTS_TYPES)]}
+                {
+                    path: 'inspection',
+                    component: ContractsInspectionPageComponent,
+                    canActivate: [accessCanActivate(AccessFlag.VIEW_CONTRACTS)]
+                },
+                {
+                    path: 'types',
+                    component: ContractTypesPageComponent,
+                    canActivate: [accessCanActivate(AccessFlag.MANAGE_CONTRACTS_TYPES)]
+                }
             ]
         },
+        {path: 'statistics', pathMatch: 'full', redirectTo: 'statistics/employee-works'},
         {
             path: 'statistics',
             component: StatisticsBootstrapPage,
             children: [
                 {path: 'employee-works', component: EmployeeWorkStatisticsPage},
             ],
-            canActivate:[accessCanActivate(AccessFlag.VIEW_STATISTICS)]
+            canActivate: [accessCanActivate(AccessFlag.VIEW_STATISTICS)]
         },
+        {path: 'topology', pathMatch: 'full', redirectTo: 'topology/houses'},
         {
             path: 'topology',
             component: TopologyBootstrapPage,
             children: [
                 {path: 'houses', component: TopologyHousesPage},
                 {path: 'house/:id', component: TopologyHousePage},
-                {path: 'commutators', component: TopologyCommutatorsPage, canActivate:[accessCanActivate(AccessFlag.VIEW_SWITCH, AccessFlag.EDIT_SWITCH)]},
-                {path: 'sessions', component: TopologySessionsPage, canActivate:[accessCanActivate(AccessFlag.BILLING)]},
+                {
+                    path: 'commutators',
+                    component: TopologyCommutatorsPage,
+                    canActivate: [accessCanActivate(AccessFlag.VIEW_SWITCH, AccessFlag.EDIT_SWITCH)]
+                },
+                {
+                    path: 'sessions',
+                    component: TopologySessionsPage,
+                    canActivate: [accessCanActivate(AccessFlag.BILLING)]
+                },
             ],
             // canActivate:[accessCanActivate(AccessFlag.VIEW_STATISTICS)]
         }
@@ -202,9 +275,4 @@ const routes: Routes = [{
     imports: [RouterModule.forChild(routes)], exports: [RouterModule],
 })
 export class MainRoutingModule {
-    static injector: EnvironmentInjector;
-
-    constructor(injector: EnvironmentInjector) {
-        MainRoutingModule.injector = injector;
-    }
 }

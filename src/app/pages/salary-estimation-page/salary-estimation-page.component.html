@@ -1,118 +1,87 @@
-<div appExtendPageHeight class="flex">
-    <div class="flex gap-3 flex-grow-1 px-3 mb-3">
-        <app-main-menu-panel></app-main-menu-panel>
-        <div class="flexed column gap10 stretched">
-            <div class="flexed column gap10 stretched panel p10">
-                <ng-container *ngIf="!selectedWorkLog">
-                    <ng-container *ngTemplateOutlet="uncalculatedListTemp"></ng-container>
-                </ng-container>
-                <ng-container *ngIf="selectedWorkLog">
-                    <ng-container *ngTemplateOutlet="selectedWorkTemp"></ng-container>
-                </ng-container>
-            </div>
-            <ng-container *ngIf="selectedWorkLog">
-                <div class="flexed column gap15 stretched panel p20">
-                    <ng-container *ngIf="worksPickerForm$ | async as pickerValue">
-                        <div class="flexed gap10 hcenter spbtw">
+<div class="flex flex-column flex-grow-1">
+    <ng-container *ngIf="!selectedWorkLog">
+        <ng-container *ngTemplateOutlet="uncalculatedListTemp"></ng-container>
+    </ng-container>
+    <ng-container *ngIf="selectedWorkLog">
+        <ng-container *ngTemplateOutlet="selectedWorkTemp"></ng-container>
+    </ng-container>
+    <ng-container *ngIf="selectedWorkLog">
+        <div class="flexed column gap15 stretched p20">
+            <ng-container *ngIf="worksPickerForm$ | async as pickerValue">
+                <div class="flexed gap10 hcenter spbtw">
                             <span class="caption size-huge">
                                 Распределение по сотрудникам
                             </span>
-                            <p-button (onClick)="sumDistr?.equalize()" icon="mdi-equalizer" label="Равные доли"
-                                      styleClass="p-button-text p-button-secondary"></p-button>
-                        </div>
-                        <app-employee-sum-distribution #sumDistr (onRemoveFactorAction)="onRemoveFactorAction($event)"
-                                                       [actionPicker]="worksPickerForm$"
-                                                       [employees]="selectedWorkLog.employees"
-                                                       [formControl]="employeeRatioForm"></app-employee-sum-distribution>
-                    </ng-container>
-                    <div class="flex gap-3 align-items-center align-self-end">
-                        <div class="flex gap-2 align-items-center" [formGroup]="paidWorkForm">
-                            <span class="text-sm text-bluegray-400 font-bold white-space-nowrap">Платная работа</span>
-                            <p-inputSwitch class="line-height-0" formControlName="isPaidWork"></p-inputSwitch>
-                            <p-inputNumber formControlName="amountOfMoneyTaken" class="touched-error" *ngIf="paidWorkForm.value.isPaidWork"
-                                           placeholder="Сумма" mode="currency" currency="RUB"></p-inputNumber>
-                        </div>
-                        <ng-container *ngIf="recalculate$ | async as recalculate">
-                            <p-button (onClick)="sendCalculation()" *ngIf="recalculate === 'CALCULATE'" [loading]="isSendingCalculation"
-                                      icon="mdi-currency_exchange" label="Рассчитать"></p-button>
-                            <p-button (onClick)="openRecalculationConformationDialog()" *ngIf="recalculate === 'RECALCULATE'" [loading]="isSendingCalculation"
-                                      icon="mdi-currency_exchange" label="Пересчитать"></p-button>
-                        </ng-container>
-                    </div>
+                    <p-button (onClick)="sumDistr?.equalize()" icon="mdi-equalizer" label="Равные доли"
+                              styleClass="p-button-text p-button-secondary"></p-button>
                 </div>
+                <app-employee-sum-distribution #sumDistr (onRemoveFactorAction)="onRemoveFactorAction($event)"
+                                               [actionPicker]="worksPickerForm$"
+                                               [employees]="selectedWorkLog.employees"
+                                               [formControl]="employeeRatioForm"></app-employee-sum-distribution>
             </ng-container>
+            <div class="flex gap-3 align-items-center align-self-end">
+                <div class="flex gap-2 align-items-center" [formGroup]="paidWorkForm">
+                    <span class="text-sm text-bluegray-400 font-bold white-space-nowrap">Платная работа</span>
+                    <p-inputSwitch class="line-height-0" formControlName="isPaidWork"></p-inputSwitch>
+                    <p-inputNumber formControlName="amountOfMoneyTaken" class="touched-error" *ngIf="paidWorkForm.value.isPaidWork"
+                                   placeholder="Сумма" mode="currency" currency="RUB"></p-inputNumber>
+                </div>
+                <ng-container *ngIf="recalculate$ | async as recalculate">
+                    <p-button (onClick)="sendCalculation()" *ngIf="recalculate === 'CALCULATE'" [loading]="isSendingCalculation"
+                              icon="mdi-currency_exchange" label="Рассчитать"></p-button>
+                    <p-button (onClick)="openRecalculationConformationDialog()" *ngIf="recalculate === 'RECALCULATE'" [loading]="isSendingCalculation"
+                              icon="mdi-currency_exchange" label="Пересчитать"></p-button>
+                </ng-container>
+            </div>
         </div>
-    </div>
+    </ng-container>
 </div>
 
 <ng-template #uncalculatedListTemp>
-    <div class="caption size-huge wt-tiny f-color-600">Список не рассчитанных</div>
-    <ng-container [ngSwitch]="loadingState">
-        <ng-container *ngSwitchCase="'LOADING'">
-            <div class="stretched relative">
-                <p-progressSpinner class="custom-spinner custom-spinner-8xl custom-spinner-primary center-of-content" strokeWidth="1"></p-progressSpinner>
-            </div>
-        </ng-container>
-        <ng-container *ngSwitchCase="'ERROR'">
-            <div class="stretched relative">
-                <div class="flexed column vcenter center-of-content caption size-huge f-color-danger wt-bold">
-                    <span class="mds-error"></span>
-                    <span>Ошибка загрузки</span>
-                </div>
-            </div>
-        </ng-container>
-        <ng-container *ngSwitchCase="'READY'">
-            <div class="flexed column">
-                <div *ngFor="let work of uncalculatedWorkLogs; trackBy: trackByWorkLog"
-                     class="flexed gap3 p10 split-line">
-                    <div class="flexed column gap3">
-                        <div class="flexed gap5 hcenter">
-                            <span class="caption size-small wt-bold f-color-600">#{{work.workLogId}}</span>
-                            <span class="caption">Работа по задаче <app-task-link
-                                    [task]="work.task"></app-task-link>
-                            </span>
-                        </div>
-                        <div class="flexed gap5 hcenter">
-                            <span class="caption size-small wt-bold f-color-600">Назначена: {{work.created | date:"EEEE, dd MMMM yyyy HH:mm" | titlecase}}</span>
-                            <app-employee-label [employee]="work.creator" [size]="1.2"></app-employee-label>
-                        </div>
-                        <div class="flexed gap5 hcenter">
-                            <span class="caption size-small wt-bold f-color-600">Завершена: {{work.closed | date:"EEEE, dd MMMM yyyy HH:mm" | titlecase}}</span>
-                            <app-avatar-list [employees]="work.employees" [size]="1.2"></app-avatar-list>
-                        </div>
+    <div class="flex align-items-center px-5 py-4 border-bottom-1 border-bluegray-100">
+        <span class="text-2xl text-bluegray-500 font-semibold">
+            Список не посчитанных работ
+        </span>
+    </div>
+    <p-table [value]="uncalculatedWorkLogs" dataKey="workLogId" [loading]="loadingState === 'LOADING'">
+        <ng-template pTemplate="header">
+            <tr>
+                <th>ID</th>
+                <th>Задача</th>
+                <th>Админ</th>
+                <th>Монтажники</th>
+                <th>Назначена</th>
+                <th>Завершена</th>
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-workLog>
+            <tr (click)="!workLog.isReportsUncompleted && selectWork(workLog)"
+                [pTooltip]="workLog.isReportsUncompleted ? getUncompletedMessage(workLog) : ''"
+                tooltipPosition="bottom"
+                [ngClass]="workLog.isReportsUncompleted ? 'opacity-50' : 'cursor-pointer hover:bg-bluegray-50'">
+                <td>{{workLog.workLogId}}</td>
+                <td><app-task-link [task]="workLog.task"></app-task-link></td>
+                <td><app-employee-label [employee]="workLog.creator"></app-employee-label></td>
+                <td>
+                    <div class="flex flex-wrap gap-2">
+                        <app-employee-label *ngFor="let employee of workLog.employees" [employee]="employee"></app-employee-label>
                     </div>
-                    <div class="stretched"></div>
-                    <div class="flex gap-3 align-items-center">
-                        <span *ngIf="work.isReportsUncompleted" class="text-red-400 text-sm font-bold">
-                            Не написали отчеты:
-                            <ng-container *ngFor="let report of work.workReports">
-                                <ng-container *ngIf="report.awaitingWriting">
-                                    {{report.author.fullName}}
-                                </ng-container>
-                            </ng-container>
-                        </span>
-                        <p-button (onClick)="selectWork(work)" label="Расcчитать" [disabled]="work.isReportsUncompleted"
-                                  styleClass="p-button-outlined p-button-success"></p-button>
-                    </div>
-                </div>
-            </div>
-        </ng-container>
-        <ng-container *ngSwitchCase="'EMPTY'">
-            <div class="stretched relative">
-                <div class="flexed column vcenter center-of-content caption size-huge f-color-400 wt-bold">
-                    <span class="mds-release_alert"></span>
-                    <span>Пока нет работ</span>
-                </div>
-            </div>
-        </ng-container>
-    </ng-container>
+                </td>
+                <td>{{workLog.created | date:"EEEE, dd MMMM yyyy HH:mm" | titlecase}}</td>
+                <td>{{workLog.closed | date:"EEEE, dd MMMM yyyy HH:mm" | titlecase}}</td>
+            </tr>
+        </ng-template>
+    </p-table>
 </ng-template>
 
 <ng-template #selectedWorkTemp>
-    <div class="flexed hcenter gap10">
+    <div class="flex align-items-center px-5 py-4 gap-3 border-bottom-1 border-bluegray-100">
         <p-button (onClick)="unselectWork()" [disabled]="isSendingCalculation" icon="mdi-arrow_back"
                   styleClass="p-button-text p-button-icon"></p-button>
-        <span class="caption wt-tiny f-color-600 size-huge">Работа по задаче #{{selectedWorkLog?.task?.taskId}}</span>
+        <span class="text-2xl text-bluegray-500 font-semibold">
+            Работа по задаче #{{selectedWorkLog?.task?.taskId}}
+        </span>
         <span *ngIf="selectedWorkLog?.isForceClosed" class="caption f-color-danger wt-bold size-big">(Принудительно закрыта)</span>
     </div>
     <div class="flexed column p-sides-20 gap10">

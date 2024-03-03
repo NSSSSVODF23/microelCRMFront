@@ -1,3 +1,7 @@
+:host {
+  flex-grow: 1;
+}
+
 .subscriber-item {
   display: grid;
   grid: auto-flow / 1fr;
@@ -10,7 +14,7 @@
     background-color: var(--mc-0);
   }
 
-  &:hover .caption{
+  &:hover .caption {
     color: var(--mc-500);
   }
 }

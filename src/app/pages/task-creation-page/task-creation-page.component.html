@@ -1,13 +1,13 @@
-<div appExtendPageHeight class="flexed gap10 column" [style.padding]="'0 2rem 2rem 2rem'">
+<div appExtendPageHeight class="flex flex-column">
     <ng-container *ngIf="openMode != 'billing' else selectedTemplatePanel">
         <ng-container *ngIf="isTemplateSelected; then selectedTemplatePanel else unselectedTemplatePanel"></ng-container>
     </ng-container>
-    <div *ngIf="isTemplateSelected" @flow class="stage-view">
-        <div [@swipeChild]="currentStepFields.length" [formGroup]="currentStepForm" class="flex flex-column p-3 gap-3">
+    <div *ngIf="isTemplateSelected" @flow class="flex flex-grow-1">
+        <div [@swipeChild]="currentStepFields.length" [formGroup]="currentStepForm" class="flex flex-column h-fit flex-grow-1 p-4 gap-3">
             <app-task-template-input *ngFor="let field of currentStepFields; let i = index" [formControlName]="field.id" [field]="field"
                                      class="flex-grow-1" (focusin)="currentFieldFocus = i" (focusout)="currentFieldFocus = undefined"></app-task-template-input>
         </div>
-        <div class="flex flex-column gap-3 mt-3">
+        <div class="flex flex-column gap-3 flex-grow-1 p-4 border-left-1 border-bluegray-100">
             <div class="flex flex-wrap gap-3 align-items-end">
                 <div class="flex flex-column gap-1" *ngIf="types.length>0">
                     <span class="font-semibold text-lg text-bluegray-400">Тип задачи</span>
@@ -82,7 +82,7 @@
 </ng-template>
 
 <ng-template #unselectedTemplatePanel>
-    <div class="flexed gap10 column">
+    <div class="flex flex-column gap-3 p-5">
         <span class="header400">Класс задачи</span>
         <div class="flexed gap5 hcenter">
             <p-dropdown [(ngModel)]="selectedTemplate" [disabled]="isTemplateSelected"
@@ -96,10 +96,10 @@
 </ng-template>
 
 <ng-template #selectedTemplatePanel>
-    <div class="flex align-items-center gap-2">
+    <div class="flex align-items-center gap-3 px-5 py-3 border-bottom-1 border-bluegray-100">
         <div class="flex flex-column">
-            <span class="text-bluegray-500">Класс</span>
-            <span class="text-bluegray-500 text-lg font-bold">{{selectedTemplate?.name}}</span>
+            <span class="text-bluegray-500 text-lg">Класс</span>
+            <span class="text-bluegray-500 text-xl font-semibold">{{selectedTemplate?.name}}</span>
         </div>
         <app-button (onClick)="unselectTemplateForTask()" [disabled]="!isTemplateSelected" icon="published_with_changes"
                     label="Изменить выбор"

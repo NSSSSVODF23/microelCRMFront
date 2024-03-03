@@ -1,15 +1,19 @@
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {ApiService} from "../../../services/api.service";
-import {Employee, FileData, FileSuggestion} from "../../../types/transport-interfaces";
+import {Comment, Employee, FileData, FileSuggestion} from "../../../types/transport-interfaces";
+import {AutoUnsubscribe, OnChangeObservable} from "../../../decorators";
+import {ReplaySubject, shareReplay, switchMap} from "rxjs";
 
 @Component({
     selector: 'app-appoint-installers-dialog',
     templateUrl: './appoint-installers-dialog.component.html',
     styleUrls: ['./appoint-installers-dialog.component.scss']
 })
+@AutoUnsubscribe()
 export class AppointInstallersDialogComponent implements OnInit {
 
     @Input() taskId?: number | undefined;
+    @OnChangeObservable('taskId') onTaskIdChange = new ReplaySubject<number>(1);
     @Input() visible = false;
     @Output() visibleChange = new EventEmitter<boolean>();
 
@@ -22,6 +26,21 @@ export class AppointInstallersDialogComponent implements OnInit {
     appointmentRequested = false;
     loadingFiles: FileData[] = [];
     serverFiles: FileSuggestion[] = [];
+
+    commentsSelectDialogVisible = false;
+    selectedTaskComments: number[] = [];
+    taskComments: Comment[] = [];
+    taskCommentsSub = this.onTaskIdChange
+        .pipe(
+            switchMap(taskId => this.api.getComments(taskId, 0, 100)),
+            shareReplay(1)
+        )
+        .subscribe(
+            comments => {
+                this.selectedTaskComments = comments.content.map(com=>com.commentId);
+                this.taskComments = comments.content
+            }
+        )
 
     constructor(private api: ApiService) {
     }
@@ -77,6 +96,7 @@ export class AppointInstallersDialogComponent implements OnInit {
             deferredReport: this.deferredReport,
             files: this.loadingFiles,
             serverFiles: this.serverFiles,
+            comments: this.selectedTaskComments,
         }).subscribe({
             next: () => {
                 this.appointmentRequested = false;

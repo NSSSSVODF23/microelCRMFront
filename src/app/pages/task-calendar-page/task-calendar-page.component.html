@@ -1,21 +1,10 @@
-<div appExtendPageHeight class="flexed vcenter">
-    <div class="responsive-wrapper flexed gap10">
-        <app-main-menu-panel></app-main-menu-panel>
-        <div class="flexed gap10 stretched">
-            <ng-container *ngTemplateOutlet="calendar"></ng-container>
-        </div>
-    </div>
+<div class="flex flex-grow-1 h-screen p-3">
+    <full-calendar [events]="taskEvent" [options]="calendarOptions" class="flex-grow-1"></full-calendar>
 </div>
 
-<ng-template #calendar>
-    <div class="stretched">
-        <full-calendar [events]="taskEvent" [options]="calendarOptions"></full-calendar>
-    </div>
-</ng-template>
-
-<p-overlayPanel #taskPanel showTransitionOptions="0ms" hideTransitionOptions="0ms" [dismissable]="true" appendTo="body">
-    <app-task-list-element *ngIf="hoveredTask" [style]="{width:'40vw',minWidth:'min-content'}" [isHover]="false"
-                           [item]="(api.getTask(hoveredTask, true) | async)??undefined"></app-task-list-element>
+<p-overlayPanel #taskPanel [dismissable]="true" appendTo="body">
+    <app-task-list-element [style]="{width:'40vw',minWidth:'min-content'}" [isHover]="false"
+                           [item]="previewTask"></app-task-list-element>
 </p-overlayPanel>
 
 <p-contextMenu #eventMenu [model]="eventMenuModel" appendTo="body"></p-contextMenu>

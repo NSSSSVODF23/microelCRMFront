@@ -17,6 +17,9 @@
 <router-outlet></router-outlet>
 
 <app-notifications-popup-panel></app-notifications-popup-panel>
+<p-confirmDialog></p-confirmDialog>
+<app-media-viewer></app-media-viewer>
+<app-chat-panel #chatPanelEl></app-chat-panel>
 
 <ng-template #commutatorPullRemoteUpdates>
     <ng-container *ngIf="commutatorRemoteUpdatePool$ | async as commutatorRemoteUpdatePool">
@@ -66,12 +69,6 @@
         </div>
     </ng-template>
 </p-sidebar>
-
-<p-confirmDialog></p-confirmDialog>
-
-<app-media-viewer></app-media-viewer>
-
-<app-chat-panel #chatPanelEl></app-chat-panel>
 
 <p-toast key="darktoast" position="bottom-center">
     <ng-template let-message pTemplate="message">

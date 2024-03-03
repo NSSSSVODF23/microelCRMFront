@@ -1,30 +1,28 @@
-<div appExtendPageHeight class="flex justify-content-center">
-    <div class="flex flex-column flex-grow-1 gap-3 mx-3 mb-3">
-        <ng-container [ngSwitch]="loadingState">
-            <ng-container *ngSwitchCase="'LOADING'">
-                <div class="flexed hcenter vcenter stretched panel">
-                    <p-progressSpinner class="custom-spinner custom-spinner-8xl custom-spinner-primary"
-                                       strokeWidth="1"></p-progressSpinner>
-                </div>
-            </ng-container>
-            <ng-container *ngSwitchCase="'ERROR'">
-                <div class="flexed hcenter vcenter stretched panel">
-                    <div class="flexed column vcenter caption f-color-danger size-huge wt-tiny">
-                        <span class="mds-error"></span>
-                        <span>Произошла ошибка</span>
-                    </div>
-                </div>
-            </ng-container>
-            <ng-container *ngSwitchCase="'READY'">
-                <ng-container *ngTemplateOutlet="infoViewTemp"></ng-container>
-            </ng-container>
+<div class="flex flex-column flex-grow-1">
+    <ng-container [ngSwitch]="loadingState">
+        <ng-container *ngSwitchCase="'LOADING'">
+            <div class="flexed hcenter vcenter stretched panel">
+                <p-progressSpinner class="custom-spinner custom-spinner-8xl custom-spinner-primary"
+                                   strokeWidth="1"></p-progressSpinner>
+            </div>
         </ng-container>
-    </div>
+        <ng-container *ngSwitchCase="'ERROR'">
+            <div class="flexed hcenter vcenter stretched panel">
+                <div class="flexed column vcenter caption f-color-danger size-huge wt-tiny">
+                    <span class="mds-error"></span>
+                    <span>Произошла ошибка</span>
+                </div>
+            </div>
+        </ng-container>
+        <ng-container *ngSwitchCase="'READY'">
+            <ng-container *ngTemplateOutlet="infoViewTemp"></ng-container>
+        </ng-container>
+    </ng-container>
 </div>
 
 <ng-template #infoViewTemp>
-    <div class="flex flex-column flex-grow-1 h-min panel">
-        <div class="flexed gap10 p10 hcenter terminator-bottom">
+    <div class="flex flex-column flex-grow-1">
+        <div class="flex gap-3 p-3 align-items-center border-bottom-1 border-bluegray-100">
             <p-button (onClick)="customNav.backOrDefault(['/clients','billing','search'])" icon="mdi-arrow_back"
                       styleClass="p-button-secondary p-button-text p-button-icon"></p-button>
             <span class="caption size-huge wt-tiny f-color-600 with-icon">
@@ -104,7 +102,7 @@
         </div>
     </div>
     <ng-container *ngIf="tasks$ | async as tasks">
-        <div class="flex flex-column flex-grow-1 h-min panel">
+        <div class="flex flex-column flex-grow-1">
             <div class="flex align-items-center p-4 gap-2 border-bluegray-50 border-bottom-1 text-lg font-light text-bluegray-400">
                 <span class="mdi-history"></span>
                 <span class="flex-grow-1">История задач</span>

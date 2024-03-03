@@ -402,7 +402,8 @@ export class ApiService {
 
     assignInstallersToTask(taskId: number, targetInstallers: {
         installers: Employee[], gangLeader?: string,
-        deferredReport: boolean, description: string, files?: FileData[], serverFiles?: FileSuggestion[]
+        deferredReport: boolean, description: string, files?: FileData[], serverFiles?: FileSuggestion[],
+        comments: number[]
     }) {
         return this.sendPost("api/private/task/" + taskId + "/assign-installers", targetInstallers);
     }
@@ -960,6 +961,10 @@ export class ApiService {
         });
     }
 
+    getCommutatorsTable(paging: any){
+        return this.sendPost<Page<SwitchBaseInfo>>('api/private/acp/commutators/table', paging);
+    }
+
     getCommutator(swId: number) {
         return this.sendGet<SwitchWithAddress>('api/private/acp/commutator/' + swId);
     }
@@ -1134,6 +1139,10 @@ export class ApiService {
 
     getBindingsByCommutator(id: number, page: number, filter?: DhcpBindingFilter) {
         return this.sendPost<Page<DhcpBinding>>(`api/private/acp/commutator/${id}/bindings/${page}`, filter);
+    }
+
+    getBindingsTable(paging: any) {
+        return this.sendPost<Page<DhcpBinding>>('api/private/acp/bindings/table', paging);
     }
 
     getActiveBindingByLogin(login: string) {
@@ -1335,8 +1344,8 @@ export class ApiService {
     /**
      * Получить контент таблицы реестра задач
      */
-    getTaskRegistryTableContent(taskStatus: TaskStatus, taskClass: number, paging: any) {
-        return this.sendPost<Page<{[key:string]:DynamicTableCell}>>(`api/private/task/registry/content/${taskStatus}/${taskClass}`, paging);
+    getTaskRegistryTableContent(taskStatus: TaskStatus, taskClass: number, tagMode: string, tags: number[], paging: any) {
+        return this.sendPost<Page<{[key:string]:DynamicTableCell}>>(`api/private/task/registry/content/${taskStatus}/${taskClass}`, {tagMode, tags, paging});
     }
 
     // Результаты запросов на сервер кэшируются по таймауту, чтобы не было доп нагрузки на сервер
@@ -1421,6 +1430,7 @@ export class ApiService {
     private generateHash(uri: string, query: any) {
         return cyrb53(uri + JSON.stringify(query), 0);
     }
+
 
 
 }

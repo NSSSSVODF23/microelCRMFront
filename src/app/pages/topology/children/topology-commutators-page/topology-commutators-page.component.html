@@ -1,65 +1,153 @@
-<div *ngIf="commutatorPage$ | async as commutatorPage; else loading" class="flex gap-3">
-    <div class="flex flex-column flex-grow-1 panel">
-        <div class="flex align-items-center gap-2 border-bluegray-100 border-bottom-1
-         text-bluegray-400 text-lg font-bold px-3 py-2">
-            <span class="mdi-dns"></span>
-            <div class="flex flex-grow-1 align-items-center gap-2">
-                <span>Коммутаторы</span>
-                <p-button (onClick)="openCreateCommutatorDialog()" icon="mdi-add" [disabled]="!personality.isHasAccess(AccessFlag.EDIT_SWITCH)"
-                          label="Создать" styleClass="p-button-text p-button-success"></p-button>
-            </div>
-            <span *ngIf="commutatorPage.totalElements"
-                  class="text-sm text-primary-400">Найдено: {{commutatorPage.totalElements}} {{commutatorPage.totalElements | decline:'коммутатор':'коммутатора':'коммутаторов'}}</span>
-        </div>
-        <ng-container [ngSwitch]="commutatorPage.loadingState">
-            <ng-container *ngSwitchCase="'LOADING'">
-                <ng-container *ngTemplateOutlet="loading"></ng-container>
-            </ng-container>
-            <ng-container *ngSwitchCase="'READY'">
-                <div class="flex flex-column flex-grow-1">
-                    <ng-container *ngFor="let commutator of commutatorPage.value; trackBy: trackByCommutator"
-                                  [ngTemplateOutletContext]="{commutator: commutator}"
-                                  [ngTemplateOutlet]="commutatorItem"></ng-container>
-                </div>
-                <p-paginator (onPageChange)="changeCommutatorPage.next($event.page)"
-                             [first]="pageNum * 15"
-                             [rows]="15"
-                             [totalRecords]="commutatorPage.totalElements"></p-paginator>
-            </ng-container>
-            <ng-container *ngSwitchCase="'ERROR'">
-                <div class="flex flex-column flex-grow-1 text-red-400 font-bold text-lg align-items-center justify-content-center">
-                    <span class="mds-error"></span>
-                    <span>Ошибка загрузки</span>
-                </div>
-            </ng-container>
-            <ng-container *ngSwitchCase="'EMPTY'">
-                <div class="flex flex-column flex-grow-1 text-bluegray-400 font-bold text-lg align-items-center justify-content-center">
-                    <span class="mds-dns"></span>
-                    <span>Коммутаторов не найденно</span>
-                </div>
-            </ng-container>
-        </ng-container>
+<div class="flex flex-column flex-grow-1">
+    <div class="flex align-items-center px-5 py-4">
+        <span class="text-2xl text-bluegray-500 font-semibold">
+            Коммутаторы
+        </span>
     </div>
-    <div [formGroup]="commutatorFilterForm"
-         [style.top]="'calc(var(--top-panel-height) + 1.5rem)'"
-         class="flex flex-column p-3 gap-3 align-items-end h-min panel sticky">
-    <span class="text-bluegray-400 text-lg font-bold flex align-items-center align-self-start"><span
-            class="mdi-filter_alt"></span> Фильтры</span>
-        <div [formGroup]="commutatorFilterForm" class="flex flex-column gap-3">
-            <input [appPreventInput]="commutatorPage.loadingState === 'LOADING'" formControlName="name"
-                   pInputText
-                   placeholder="Имя" type="text"/>
-            <input [appPreventInput]="commutatorPage.loadingState === 'LOADING'" formControlName="ip" pInputText
-                   placeholder="IP-адрес" type="text"/>
-            <app-address-input-alt [appPreventInput]="commutatorPage.loadingState === 'LOADING'"
-                               [isAcpConnected]="true" [isHouseOnly]="true"
-                               formControlName="address"></app-address-input-alt>
-        </div>
-        <p-button (onClick)="commutatorFilterForm.reset()" icon="mdi-filter_alt_off"
-                  label="Сбросить"
-                  styleClass="p-button-secondary p-button-text"></p-button>
-    </div>
+    <p-table #registryTable (onLazyLoad)="service.tableLazyLoad$.next($event)" [(first)]="service.tableOffset"
+             [lazyLoadOnInit]="true" (onPage)="scrollTop()"
+             [lazy]="true" [loading]="service.tableContentLoading"
+             [multiSortMeta]="[{field:'name', order: 1}]" [paginator]="true"
+             [rowsPerPageOptions]="[25,50,100]" [rows]="25"
+             [showCurrentPageReport]="true"
+             [totalRecords]="service.tableContent?.totalElements ?? 0" [value]="service.tableContent?.content ?? []"
+             currentPageReportTemplate="Найдено {totalRecords} коммутаторов"
+             paginatorDropdownAppendTo="body" sortMode="multiple" styleClass="p-datatable-sm">
+        <ng-template pTemplate="caption">
+            <p-button (onClick)="openCreateCommutatorDialog()" icon="mdi-add" [disabled]="!personality.isHasAccess(AccessFlag.EDIT_SWITCH)"
+                      label="Создать" styleClass="p-button-text p-button-success"></p-button>
+            <p-button type="button" icon="mdi-update" label="Обновить" styleClass="p-button-text"
+                      (onClick)="service.updateContent$.next(true)"></p-button>
+        </ng-template>
+        <ng-template pTemplate="header">
+            <tr>
+                <th [pSortableColumn]="'name'">
+                    <div class="flex align-items-center">
+                        <span>Название</span>
+                        <p-columnFilter field="name" type="text" display="menu"></p-columnFilter>
+                        <p-sortIcon field="name"></p-sortIcon>
+                    </div>
+                </th>
+                <th [pSortableColumn]="'ipaddr'">
+                    <div class="flex align-items-center">
+                        <span>IP Адрес</span>
+                        <p-columnFilter field="ipaddr" type="text" display="menu"></p-columnFilter>
+                        <p-sortIcon field="ipaddr"></p-sortIcon>
+                    </div>
+                </th>
+                <th [pSortableColumn]="'swtype'">
+                    <div class="flex align-items-center">
+                        <span>Тип</span>
+                        <p-columnFilter field="swtype" type="text" display="menu"></p-columnFilter>
+                        <p-sortIcon field="swtype"></p-sortIcon>
+                    </div>
+                </th>
+                <th [pSortableColumn]="'swmodelId'">
+                    <div class="flex align-items-center">
+                        <span>Модель</span>
+                        <p-columnFilter field="swmodelId" type="text" display="menu"></p-columnFilter>
+                        <p-sortIcon field="swmodelId"></p-sortIcon>
+                    </div>
+                </th>
+                <th [pSortableColumn]="'buildId'">
+                    <div class="flex align-items-center">
+                        <span>Адрес</span>
+                        <p-columnFilter field="buildId" type="text" display="menu"></p-columnFilter>
+                        <p-sortIcon field="buildId"></p-sortIcon>
+                    </div>
+                </th>
+                <th></th>
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-rowData>
+            <tr>
+                <td>{{rowData.name}}</td>
+                <td>{{rowData.ip}}</td>
+                <td>L{{rowData.type+1}}</td>
+                <td>{{rowData.model}}</td>
+                <td>{{rowData.address}}</td>
+                <td>
+                    <span class="flex flex-wrap gap-2">
+                        <span class="text-primary font-bold hover:text-primary-700 cursor-pointer" (click)="service.openCommutatorWeb(rowData.ip)">
+                            Web
+                        </span>
+                        <span class="text-primary font-bold hover:text-primary-700 cursor-pointer" (click)="service.openTelnetTerminal(rowData.name, rowData.ip)">
+                            Telnet
+                        </span>
+                        <span class="text-primary font-bold hover:text-primary-700 cursor-pointer" (click)="openCommutatorViewDialog(rowData)">
+                            Просмотр
+                        </span>
+                        <span class="text-primary font-bold hover:text-primary-700 cursor-pointer" (click)="openContextMenu(rowData); contextMenu.toggle($event)">
+                            Редактировать
+                        </span>
+                    </span>
+                </td>
+            </tr>
+        </ng-template>
+    </p-table>
 </div>
+<!--<div *ngIf="commutatorPage$ | async as commutatorPage; else loading" class="flex gap-3">-->
+<!--    <div class="flex flex-column flex-grow-1 panel">-->
+<!--        <div class="flex align-items-center gap-2 border-bluegray-100 border-bottom-1-->
+<!--         text-bluegray-400 text-lg font-bold px-3 py-2">-->
+<!--            <span class="mdi-dns"></span>-->
+<!--            <div class="flex flex-grow-1 align-items-center gap-2">-->
+<!--                <span>Коммутаторы</span>-->
+<!--                <p-button (onClick)="openCreateCommutatorDialog()" icon="mdi-add" [disabled]="!personality.isHasAccess(AccessFlag.EDIT_SWITCH)"-->
+<!--                          label="Создать" styleClass="p-button-text p-button-success"></p-button>-->
+<!--            </div>-->
+<!--            <span *ngIf="commutatorPage.totalElements"-->
+<!--                  class="text-sm text-primary-400">Найдено: {{commutatorPage.totalElements}} {{commutatorPage.totalElements | decline:'коммутатор':'коммутатора':'коммутаторов'}}</span>-->
+<!--        </div>-->
+<!--        <ng-container [ngSwitch]="commutatorPage.loadingState">-->
+<!--            <ng-container *ngSwitchCase="'LOADING'">-->
+<!--                <ng-container *ngTemplateOutlet="loading"></ng-container>-->
+<!--            </ng-container>-->
+<!--            <ng-container *ngSwitchCase="'READY'">-->
+<!--                <div class="flex flex-column flex-grow-1">-->
+<!--                    <ng-container *ngFor="let commutator of commutatorPage.value; trackBy: trackByCommutator"-->
+<!--                                  [ngTemplateOutletContext]="{commutator: commutator}"-->
+<!--                                  [ngTemplateOutlet]="commutatorItem"></ng-container>-->
+<!--                </div>-->
+<!--                <p-paginator (onPageChange)="changeCommutatorPage.next($event.page)"-->
+<!--                             [first]="pageNum * 15"-->
+<!--                             [rows]="15"-->
+<!--                             [totalRecords]="commutatorPage.totalElements"></p-paginator>-->
+<!--            </ng-container>-->
+<!--            <ng-container *ngSwitchCase="'ERROR'">-->
+<!--                <div class="flex flex-column flex-grow-1 text-red-400 font-bold text-lg align-items-center justify-content-center">-->
+<!--                    <span class="mds-error"></span>-->
+<!--                    <span>Ошибка загрузки</span>-->
+<!--                </div>-->
+<!--            </ng-container>-->
+<!--            <ng-container *ngSwitchCase="'EMPTY'">-->
+<!--                <div class="flex flex-column flex-grow-1 text-bluegray-400 font-bold text-lg align-items-center justify-content-center">-->
+<!--                    <span class="mds-dns"></span>-->
+<!--                    <span>Коммутаторов не найденно</span>-->
+<!--                </div>-->
+<!--            </ng-container>-->
+<!--        </ng-container>-->
+<!--    </div>-->
+<!--    <div [formGroup]="commutatorFilterForm"-->
+<!--         [style.top]="'calc(var(&#45;&#45;top-panel-height) + 1.5rem)'"-->
+<!--         class="flex flex-column p-3 gap-3 align-items-end h-min panel sticky">-->
+<!--    <span class="text-bluegray-400 text-lg font-bold flex align-items-center align-self-start"><span-->
+<!--            class="mdi-filter_alt"></span> Фильтры</span>-->
+<!--        <div [formGroup]="commutatorFilterForm" class="flex flex-column gap-3">-->
+<!--            <input [appPreventInput]="commutatorPage.loadingState === 'LOADING'" formControlName="name"-->
+<!--                   pInputText-->
+<!--                   placeholder="Имя" type="text"/>-->
+<!--            <input [appPreventInput]="commutatorPage.loadingState === 'LOADING'" formControlName="ip" pInputText-->
+<!--                   placeholder="IP-адрес" type="text"/>-->
+<!--            <app-address-input-alt [appPreventInput]="commutatorPage.loadingState === 'LOADING'"-->
+<!--                               [isAcpConnected]="true" [isHouseOnly]="true"-->
+<!--                               formControlName="address"></app-address-input-alt>-->
+<!--        </div>-->
+<!--        <p-button (onClick)="commutatorFilterForm.reset()" icon="mdi-filter_alt_off"-->
+<!--                  label="Сбросить"-->
+<!--                  styleClass="p-button-secondary p-button-text"></p-button>-->
+<!--    </div>-->
+<!--</div>-->
 
 <ng-template #loading>
     <div class="flex flex-grow-1 align-items-center justify-content-center">

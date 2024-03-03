@@ -24,8 +24,8 @@
 </ng-template>
 
 <ng-template #houseTemplate let-building="building">
-    <div class="flex flex-column flex-grow-1 h-fit bg-white border-round shadow-1">
-        <div class="flex flex-column p-3">
+    <div class="flex flex-column flex-grow-1 h-fit bg-white">
+        <div class="flex flex-column px-5 py-4 border-bottom-1 border-bluegray-100">
             <span class="text-bluegray-500 text-xl font-semibold">
                 {{building.fullName}}
             </span>
@@ -34,7 +34,7 @@
                 Uplink: {{building.uplink?.fullName}}
             </span>
         </div>
-        <div class="flex flex-column gap-2 p-4 pt-1">
+        <div class="flex flex-column gap-2 p-4">
             <div class="flex gap-2">
                 <ng-container *ngTemplateOutlet="downlinksListTemplate; context:{building}"></ng-container>
                 <ng-container *ngTemplateOutlet="networksTableTemplate; context:{building}"></ng-container>

@@ -29,6 +29,7 @@ import {DynamicPageContent, DynamicValueFactory, SubscriptionsHolder} from "../.
 import {ApiService} from "../../../../services/api.service";
 import {RealTimeUpdateService} from "../../../../services/real-time-update.service";
 import {PersonalityService} from "../../../../services/personality.service";
+import {CommutatorListService} from "../../../../services/page-cache/commutator-list.service";
 
 @Component({
     templateUrl: './topology-commutators-page.component.html',
@@ -95,8 +96,12 @@ export class TopologyCommutatorsPage implements OnInit, OnDestroy {
     selectedToViewCommutator?: Switch;
     private subscriptions = new SubscriptionsHolder();
 
-    constructor(private api: ApiService, private rt: RealTimeUpdateService,
+    constructor(private api: ApiService, private rt: RealTimeUpdateService, readonly service: CommutatorListService,
                 readonly personality: PersonalityService,private confirm: ConfirmationService) {
+    }
+
+    scrollTop() {
+        window.scroll(0,0)
     }
 
     get commutatorFormErrors() {

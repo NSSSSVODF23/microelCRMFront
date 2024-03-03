@@ -1948,5 +1948,6 @@ export interface DynamicTableCell {
 export enum DynamicTableCellType{
     STRING = "STRING",
     DATE = "DATE",
-    LOGIN = "LOGIN"
+    LOGIN = "LOGIN",
+    PHONE = "PHONE",
 }

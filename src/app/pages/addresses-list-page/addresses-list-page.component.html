@@ -1,49 +1,44 @@
-<div [limited]="true" appExtendPageHeight class="flexed vcenter">
-    <div [style]="{marginBottom: '1rem'}" class="responsive-wrapper flexed gap10">
-        <app-main-menu-panel></app-main-menu-panel>
-        <div class="flex p-3 flex-grow-1 gap-2 panel overflow-hidden">
-            <ng-container [ngSwitch]="loadingState">
-                <ng-container *ngSwitchCase="'LOADING'">
-                    <ng-container *ngTemplateOutlet="loadingTemp"></ng-container>
+<div [limited]="true" appExtendPageHeight class="flex flex-grow-1">
+    <ng-container [ngSwitch]="loadingState">
+        <ng-container *ngSwitchCase="'LOADING'">
+            <ng-container *ngTemplateOutlet="loadingTemp"></ng-container>
+        </ng-container>
+        <ng-container *ngSwitchCase="'ERROR'">
+            <ng-container *ngTemplateOutlet="errorTemp"></ng-container>
+        </ng-container>
+        <ng-container *ngSwitchCase="'READY'">
+            <ng-container [ngSwitch]="viewMode">
+                <ng-container *ngSwitchCase="'city'">
+                    <ng-container *ngTemplateOutlet="cityList"></ng-container>
                 </ng-container>
-                <ng-container *ngSwitchCase="'ERROR'">
-                    <ng-container *ngTemplateOutlet="errorTemp"></ng-container>
+                <ng-container *ngSwitchCase="'street'">
+                    <ng-container *ngTemplateOutlet="streetList"></ng-container>
                 </ng-container>
-                <ng-container *ngSwitchCase="'READY'">
-                    <ng-container [ngSwitch]="viewMode">
-                        <ng-container *ngSwitchCase="'city'">
-                            <ng-container *ngTemplateOutlet="cityList"></ng-container>
-                        </ng-container>
-                        <ng-container *ngSwitchCase="'street'">
-                            <ng-container *ngTemplateOutlet="streetList"></ng-container>
-                        </ng-container>
-                        <ng-container *ngSwitchCase="'house'">
-                            <ng-container *ngTemplateOutlet="houseList"></ng-container>
-                        </ng-container>
-                        <ng-container *ngSwitchCase="'houseView'">
-                            <ng-container *ngTemplateOutlet="houseView"></ng-container>
-                        </ng-container>
-                    </ng-container>
+                <ng-container *ngSwitchCase="'house'">
+                    <ng-container *ngTemplateOutlet="houseList"></ng-container>
+                </ng-container>
+                <ng-container *ngSwitchCase="'houseView'">
+                    <ng-container *ngTemplateOutlet="houseView"></ng-container>
                 </ng-container>
             </ng-container>
-        </div>
-    </div>
+        </ng-container>
+    </ng-container>
 </div>
 
 <ng-template #cityList>
-    <div class="flex gap-3 flex-grow-1">
-        <div class="flex flex-column gap-2 terminator-right">
-            <div class="flex gap-3 px-3 align-items-center">
-                <span class="caption size-big">
+    <div class="flex flex-grow-1">
+        <div class="flex flex-column gap-2 p-4 border-right-1 border-bluegray-100">
+            <div class="flex gap-3 align-items-center">
+                <span class="text-bluegray-500 text-2xl">
                     Населенные пункты
                 </span>
                 <div class="flex-grow-1"></div>
                 <p-button (onClick)="openDialogCreateCity()" icon="mdi-add" [loading]="(beginRequest$|async) ?? false"
                           styleClass="p-button-outlined p-button-success p-button-icon" [disabled]="!personality.isHasAccess(AccessFlag.EDIT_ADDRESS_BOOK)"></p-button>
             </div>
-            <div class="list-view pr-3">
+            <div class="list-view">
                 <div (click)="selectCity(city)" *ngFor="let city of cities; trackBy: trackByCity"
-                     class="flexed gap5 p10 h-min hcenter caption wt-bold f-color-600 border-round-md active-element"
+                     class="flex gap-2 p-3 h-min align-items-center text-xl font-bold text-bluegray-500 border-round-md active-element"
                      pRipple>
                     <span class="mdi-location_city"></span>
                     <span>{{city.name}}</span>
@@ -60,19 +55,19 @@
 </ng-template>
 
 <ng-template #streetList>
-    <div class="flex gap-3 flex-grow-1">
-        <div class="flex flex-column gap-2 terminator-right">
-            <div class="flex gap-3 pr-3 align-items-center">
+    <div class="flex flex-grow-1">
+        <div class="flex flex-column gap-2 p-4 border-right-1 border-bluegray-100">
+            <div class="flex gap-3 align-items-center">
                 <p-button (onClick)="back()" icon="mdi-arrow_back_ios_new" [loading]="(beginRequest$|async) ?? false"
                           styleClass="p-button-text p-button-secondary p-button-icon"></p-button>
-                <span class="caption size-big">
+                <span class="text-bluegray-500 text-2xl">
                     Улицы
                 </span>
                 <div class="flex-grow-1"></div>
                 <p-button (onClick)="openDialogCreateStreet()" [loading]="(beginRequest$|async) ?? false"
                           icon="mdi-add" styleClass="p-button-outlined p-button-success p-button-icon"  [disabled]="!personality.isHasAccess(AccessFlag.EDIT_ADDRESS_BOOK)"></p-button>
             </div>
-            <div class="pr-3">
+            <div>
                 <div class="p-inputgroup">
                     <span class="p-inputgroup-addon">
                         <span class="mdi-search"></span>
@@ -81,25 +76,25 @@
                            placeholder="Название улицы..." type="text">
                 </div>
             </div>
-            <div [ngClass]="{'cover-element': streetFiltering}" class="list-view pr-3">
+            <div [ngClass]="{'cover-element': streetFiltering}" class="list-view">
                 <div (click)="selectStreet(street)" *ngFor="let street of streets; trackBy: trackByStreet"
-                     class="flexed gap5 p10 h-min hcenter caption wt-bold f-color-600 border-round-md active-element"
+                     class="flex gap-2 p-3 h-min align-items-center text-xl font-bold text-bluegray-500 border-round-md active-element"
                      pRipple>
                     <span class="mdi-streetview"></span>
                     <span>{{street.nameWithPrefix}}</span>
                 </div>
             </div>
         </div>
-        <div class="flexed column stretched gap10">
-            <div class="flexed gap5 pb-2 px-2 hcenter terminator-bottom">
-                <span class="caption size-big">
+        <div class="flex flex-column flex-grow-1">
+            <div class="flex gap-3 p-4 align-items-center border-bottom-1 border-bluegray-100">
+                <span class="text-bluegray-500 text-2xl">
                     Город: {{selectedCity?.name}}
                 </span>
-                <div class="stretched"></div>
+                <div class="flex-grow-1"></div>
                 <p-button label="Удалить" (onClick)="deleteCity()" [loading]="(beginRequest$|async) ?? false"
                           styleClass="p-button-text p-button-danger" icon="mdi-delete" [disabled]="!personality.isHasAccess(AccessFlag.EDIT_ADDRESS_BOOK)"></p-button>
             </div>
-            <div [formGroup]="cityEditingForm" class="flex flex-column gap-2 p-3">
+            <div [formGroup]="cityEditingForm" class="flex flex-column gap-2 p-5">
                 <div class="input-label-wrapper">
                     <label class="caption size-small wt-bold f-color-500">Название города</label>
                     <input pInputText formControlName="name" type="text">
@@ -113,19 +108,19 @@
 </ng-template>
 
 <ng-template #houseList>
-    <div class="flex gap-3 flex-grow-1">
-        <div class="flex flex-column gap-2 terminator-right">
-            <div class="flex gap-3 pr-3 align-items-center">
+    <div class="flex flex-grow-1">
+        <div class="flex flex-column gap-2 p-4 border-right-1 border-bluegray-100">
+            <div class="flex gap-3 align-items-center">
                 <p-button (onClick)="back()" icon="mdi-arrow_back_ios_new" [loading]="(beginRequest$|async) ?? false"
                           styleClass="p-button-text p-button-secondary p-button-icon"></p-button>
-                <span class="caption size-big">
+                <span class="text-bluegray-500 text-2xl">
                     Дома
                 </span>
                 <div class="flex-grow-1"></div>
                 <p-button (onClick)="openDialogCreateHouse()" icon="mdi-add" [loading]="(beginRequest$|async) ?? false"
                           styleClass="p-button-outlined p-button-success p-button-icon" [disabled]="!personality.isHasAccess(AccessFlag.EDIT_HOUSE_ADDRESS_BOOK)"></p-button>
             </div>
-            <div class="list-view pr-3">
+            <div class="list-view">
                 <div (click)="selectHouse(house)" *ngFor="let house of houses; trackBy: trackByHouse"
                      class="flexed gap5 p10 h-min hcenter caption wt-bold f-color-600 border-round-md active-element"
                      pRipple>
@@ -134,16 +129,16 @@
                 </div>
             </div>
         </div>
-        <div class="flexed column stretched gap10">
-            <div class="flexed gap5 pb-2 px-2 hcenter terminator-bottom">
-                    <span class="caption size-big">
-                        Улица: {{selectedStreet?.streetName}}
-                    </span>
-                <div class="stretched"></div>
+        <div class="flex flex-column flex-grow-1">
+            <div class="flex gap-3 p-4 align-items-center border-bottom-1 border-bluegray-100">
+                <span class="text-bluegray-500 text-2xl">
+                    Улица: {{selectedStreet?.streetName}}
+                </span>
+                <div class="flex-grow-1"></div>
                 <p-button label="Удалить" (onClick)="deleteStreet()" [loading]="(beginRequest$|async) ?? false"
                           styleClass="p-button-text p-button-danger" icon="mdi-delete" [disabled]="!personality.isHasAccess(AccessFlag.EDIT_ADDRESS_BOOK)"></p-button>
             </div>
-            <div [formGroup]="streetEditingForm" class="flex flex-column gap-2 p-3">
+            <div [formGroup]="streetEditingForm" class="flex flex-column gap-2 p-5">
                 <div class="input-label-wrapper">
                     <label class="caption size-small wt-bold f-color-500">Тип</label>
                     <p-dropdown [options]="streetPrefixes" formControlName="prefix"></p-dropdown>
@@ -169,25 +164,25 @@
 </ng-template>
 
 <ng-template #houseView>
-    <div class="flex flex-column gap-3 flex-grow-1">
-        <div class="flex align-items-center gap-3 terminator-bottom pb-2">
+    <div class="flex flex-column flex-grow-1">
+        <div class="flex gap-3 p-4 align-items-center border-bottom-1 border-bluegray-100">
             <p-button (onClick)="back()" icon="mdi-arrow_back_ios_new" [loading]="(beginRequest$|async) ?? false"
                       styleClass="p-button-text p-button-secondary p-button-icon"></p-button>
-            <span class="caption size-big flex-grow-1">
+            <span class="text-bluegray-500 text-2xl flex-grow-1">
                 Дом: {{selectedHouse?.addressName}}
             </span>
             <p-button label="Удалить" (onClick)="deleteHouse()" [loading]="(beginRequest$|async) ?? false"
                       [disabled]="!personality.isHasAccess(AccessFlag.EDIT_ADDRESS_BOOK)"
                       styleClass="p-button-text p-button-danger" icon="mdi-delete"></p-button>
         </div>
-        <div class="flex gap-3">
+        <div class="flex gap-3 pt-5 px-5">
             <p-button (onClick)="this.manualHouseNavigation$.next(-1)" label="Пред. (Alt+B)" icon="mdi-arrow_back" [loading]="(beginRequest$|async) ?? false"
                       styleClass="p-button-text p-button-info"></p-button>
             <div class="flex-grow-1"></div>
             <p-button (onClick)="this.manualHouseNavigation$.next(1)" label="След. (Alt+N)" icon="mdi-arrow_forward" iconPos="right" [loading]="(beginRequest$|async) ?? false"
                       styleClass="p-button-text p-button-info"></p-button>
         </div>
-        <div class="flex flex-column gap-3 flex-grow-1 p-3" [formGroup]="houseEditingForm" [@swipe]="animationState$ | async" (@swipe.done)="animationEnd$.next(true)">
+        <div class="flex flex-column gap-3 flex-grow-1 p-5" [formGroup]="houseEditingForm" [@swipe]="animationState$ | async" (@swipe.done)="animationEnd$.next(true)">
             <div class="flex gap-1 flex-column">
                 <label class="caption size-small wt-bold f-color-500">Номер дома</label>
                 <p-inputNumber formControlName="houseNum"></p-inputNumber>

@@ -1,9 +1,9 @@
-<div class="flex flex-column gap-3">
-    <div class="flex gap-3 border-round-2xl bg-white shadow-1 align-items-center py-2 px-3 sticky top-under-panel">
+<div class="flex flex-column">
+    <div class="flex gap-3 border-bottom-1 border-bluegray-100 bg-white align-items-center p-4 sticky top-0">
         <span class="text-2xl text-bluegray-500 font-semibold">Топология домов</span>
         <input id="searchInput" pInputText placeholder="Найти дом..."/>
     </div>
-    <div *ngIf="topology$ | async as topology; else topologyLoadingTemplate" class="flex flex-column gap-1 cursor-default p-3 bg-white border-round-2xl shadow-1">
+    <div *ngIf="topology$ | async as topology; else topologyLoadingTemplate" class="flex flex-column gap-1 cursor-default p-5 bg-white border-round-2xl shadow-1">
         <div *ngFor="let street of topology"
              [ngClass]="{highlighted: street.highlighted}" class="flex align-items-center gap-2 text-sm topology">
             <span class="white-space-nowrap font-bold">

@@ -104,12 +104,12 @@ html, body {
   color: var(--text-color) !important;
 }
 
-html:not(.whited), body:not(.whited) {
-  background-color: var(--bgc-001) !important;
-  color: var(--text-color) !important;
-  //line-height: 1 !important;
-  //overflow-x: hidden;
-}
+//html:not(.whited), body:not(.whited) {
+//  background-color: var(--bgc-001) !important;
+//  color: var(--text-color) !important;
+//  //line-height: 1 !important;
+//  //overflow-x: hidden;
+//}
 
 .button {
   display: flex;
@@ -1727,6 +1727,11 @@ markdown > p:last-child {
   }
 }
 
+.object-fit-cover{
+  object-fit: cover;
+  object-position: center;
+}
+
 .cover-element {
   position: relative;
 
@@ -1833,4 +1838,9 @@ pre {
   .key {
     color: #dd00ff;
   }
+}
+
+.registry-table {
+  border-collapse: separate !important;
+  border-spacing: 0 15px !important;
 }

@@ -3,38 +3,38 @@ import {ApiService} from "./api.service";
 import {RealTimeUpdateService} from "./real-time-update.service";
 import {FormControl} from "@angular/forms";
 import {
-    BehaviorSubject, buffer, bufferToggle, bufferWhen,
+    BehaviorSubject,
     combineLatest,
     debounceTime,
-    distinctUntilChanged, filter,
+    distinctUntilChanged,
+    filter,
     first,
-    fromEvent, interval,
+    fromEvent,
     lastValueFrom,
     map,
     merge,
     mergeMap,
     Observable,
-    of, sample,
+    of,
+    sample,
     shareReplay,
-    startWith, Subject,
+    startWith,
+    Subject,
     switchMap,
     tap
 } from "rxjs";
 import {
-    DateRange,
     LoadingState,
     SchedulingType,
     TagListItem,
-    Task, TaskFiltrationConditions,
-    TaskTag,
+    Task,
+    TaskFiltrationConditions,
     TaskTypeDirectory,
-    TimeFrame,
-    Wireframe
+    TimeFrame
 } from "../types/transport-interfaces";
 import {Data, Params} from "@angular/router";
 import {MenuItem} from "primeng/api";
 import {TaskFilterOptions} from "../types/service-interfaces";
-import {bufferUntil} from "../types/rxjs-pipes";
 
 export type PageType = 'dir' | 'close-time' | 'actual-time' | 'term-time';
 
@@ -73,16 +73,18 @@ export class TasksCatalogPageCacheService {
 
     pageControl = new FormControl(0);
     taskLoadingState = LoadingState.READY;
+    hasCachedRoute = false;
     lastRoute$ = combineLatest([this.status$, this.class$, this.type$, this.pageType$,
         this.directory$, this.tag$, this.closeTime$, this.actualTime$, this.termTime$, this.scheduling$])
         .pipe(
             debounceTime(1),
             distinctUntilChanged((a, b) => JSON.stringify(a) === JSON.stringify(b)),
             tap(() => {
+                this.hasCachedRoute = true;
                 this.pageControl.setValue(0);
                 this.taskLoadingState = LoadingState.LOADING;
             }),
-            shareReplay(1)
+            shareReplay(1),
         );
     page$ = this.pageControl.valueChanges.pipe(startWith(0), distinctUntilChanged(), tap(() => {
         window.scrollTo({top: 0});
@@ -92,7 +94,7 @@ export class TasksCatalogPageCacheService {
     isTaskEdit = false;
     taskEditStopSubject = new Subject();
 
-    directTasksMoved$ = this.rt.taskMoved().pipe(filter(()=>!this.isTaskEdit));
+    directTasksMoved$ = this.rt.taskMoved().pipe(filter(() => !this.isTaskEdit));
     delayedTasksMoved$ = this.rt.taskMoved().pipe(sample(this.taskEditStopSubject));
     tasksMoved$ = merge(this.directTasksMoved$, this.delayedTasksMoved$).pipe(startWith(null));
 
@@ -150,7 +152,7 @@ export class TasksCatalogPageCacheService {
                 if (tag) {
                     return this.api.getTaskTag(tag).pipe(map(tagInfo => ({wireframes, route, tagInfo})))
                 }
-                return of({wireframes, route, tagInfo:null});
+                return of({wireframes, route, tagInfo: null});
             }),
             map(({wireframes, route, tagInfo}) => {
                 const BREADCRUMBS = [] as MenuItem[];
@@ -203,7 +205,7 @@ export class TasksCatalogPageCacheService {
                             })
                             if (tagInfo) {
                                 BREADCRUMBS.push({
-                                    label: "#"+tagInfo.name,
+                                    label: "#" + tagInfo.name,
                                     routerLink: TasksCatalogPageCacheService.convertToPath([status, cls, type, pageType, dir, tag, null, null, null, schedulingType], true)
                                 })
                             }
@@ -215,7 +217,7 @@ export class TasksCatalogPageCacheService {
                             })
                             if (tagInfo) {
                                 BREADCRUMBS.push({
-                                    label: "#"+tagInfo.name,
+                                    label: "#" + tagInfo.name,
                                     routerLink: TasksCatalogPageCacheService.convertToPath([status, cls, type, pageType, null, tag, closeTime, null, null, schedulingType], true)
                                 })
                             }
@@ -227,7 +229,7 @@ export class TasksCatalogPageCacheService {
                             })
                             if (tagInfo) {
                                 BREADCRUMBS.push({
-                                    label: "#"+tagInfo.name,
+                                    label: "#" + tagInfo.name,
                                     routerLink: TasksCatalogPageCacheService.convertToPath([status, cls, type, pageType, null, tag, null, actualTime, null, schedulingType], true)
                                 })
                             }
@@ -239,7 +241,7 @@ export class TasksCatalogPageCacheService {
                             })
                             if (tagInfo) {
                                 BREADCRUMBS.push({
-                                    label: "#"+tagInfo.name,
+                                    label: "#" + tagInfo.name,
                                     routerLink: TasksCatalogPageCacheService.convertToPath([status, cls, type, pageType, null, tag, null, null, termTime, schedulingType], true)
                                 })
                             }
@@ -264,11 +266,11 @@ export class TasksCatalogPageCacheService {
         fromEvent(window, 'dragend').subscribe((event) => {
             this.highlightCatalogs = undefined;
         });
-        setInterval(()=>{
+        setInterval(() => {
             lastValueFrom(this.tasks$.pipe(first())).then(tasks => {
                 // Отчищаем кэшированных наблюдателей обновления задач
-                for (const taskId of this.taskUpdatersMap.keys()){
-                    if(!tasks.content.find(t => t.taskId === taskId)) {
+                for (const taskId of this.taskUpdatersMap.keys()) {
+                    if (!tasks.content.find(t => t.taskId === taskId)) {
                         this.taskUpdatersMap.delete(taskId);
                     }
                 }
@@ -324,7 +326,7 @@ export class TasksCatalogPageCacheService {
         if (this.taskCountersMap.has(key))
             return this.taskCountersMap.get(key);
         const observable = merge(
-            this.rt.updateTaskCount(status??'', cls, type, pageType, directory, tag, dateOfClose, actualFrom, actualTo, schedulingType),
+            this.rt.updateTaskCount(status ?? '', cls, type, pageType, directory, tag, dateOfClose, actualFrom, actualTo, schedulingType),
             this.api.getCountTasks(TasksCatalogPageCacheService.filterOptionsToCondition(filter))
         ).pipe(map(c => c.toString()), shareReplay(1));
 
@@ -332,24 +334,24 @@ export class TasksCatalogPageCacheService {
         return observable;
     }
 
-    static filterOptionsToCondition(filterOptions: TaskFilterOptions){
+    static filterOptionsToCondition(filterOptions: TaskFilterOptions) {
         const CONDITION = {} as TaskFiltrationConditions;
         const {status, cls, type, directory, dateOfClose, actualFrom, actualTo, schedulingType} = filterOptions;
-        if(status)
+        if (status)
             CONDITION.status = [status];
-        if(cls)
+        if (cls)
             CONDITION.template = [cls];
-        if(type)
+        if (type)
             CONDITION.stage = type;
-        if(directory)
+        if (directory)
             CONDITION.directory = directory;
-        if(dateOfClose)
+        if (dateOfClose)
             CONDITION.dateOfClose = dateOfClose;
-        if(actualFrom)
+        if (actualFrom)
             CONDITION.actualFrom = actualFrom;
-        if(actualTo)
+        if (actualTo)
             CONDITION.actualTo = actualTo;
-        if(schedulingType)
+        if (schedulingType)
             CONDITION.schedulingType = schedulingType;
         return CONDITION;
     }
@@ -436,8 +438,8 @@ export class TasksCatalogPageCacheService {
         this.taskEditStopSubject.next(null);
     }
 
-    getTaskUpdater(taskId: number){
-        if(this.taskUpdatersMap.has(taskId)){
+    getTaskUpdater(taskId: number) {
+        if (this.taskUpdatersMap.has(taskId)) {
             return this.taskUpdatersMap.get(taskId);
         }
         const observable = this.rt.taskUpdated(taskId).pipe(shareReplay(1));

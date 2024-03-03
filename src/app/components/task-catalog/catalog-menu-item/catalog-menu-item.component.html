@@ -3,7 +3,7 @@
         <span class="hover:text-primary cursor-pointer" (click)="toggleExpand()" *ngIf="!isEmpty"
               [ngClass]="{'mdi-expand_more': !expand, 'mdi-expand_less': expand}"></span>
         <div *ngIf="isEmpty" [style]="{width:'20px'}"></div>
-        <span #dropEl class="flex-grow-1 px-2 py-1 border-round-sm cursor-pointer" [pDroppable]="droppable ?? ''" [pDroppableDisabled]="!droppable" (onDrop)="onDrop.emit({$event, dropEl})"
+        <span #dropEl class="flex-grow-1 px-2 py-1 border-round-sm cursor-pointer white-space-nowrap" [pDroppable]="droppable ?? ''" [pDroppableDisabled]="!droppable" (onDrop)="onDrop.emit({$event, dropEl})"
               (click)="(autoExpand && setExpand(true)); onClick.emit()" [ngClass]="[rla.isActive ? 'hover:text-white hover:bg-primary-700' : 'hover:text-primary hover:bg-white', droppable? 'droppable' : '']"
               [routerLink]="link" routerLinkActive="text-write bg-primary cursor-default" #rla="routerLinkActive">
             {{label}}

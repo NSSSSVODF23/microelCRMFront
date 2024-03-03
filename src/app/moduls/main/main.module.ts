@@ -1,4 +1,4 @@
-import {Injector, LOCALE_ID, NgModule, SecurityContext} from '@angular/core';
+import {LOCALE_ID, NgModule, SecurityContext} from '@angular/core';
 
 import {MainRoutingModule} from './main-routing.module';
 import {TasksPageComponent} from "../../pages/tasks-page/tasks-page.component";
@@ -16,15 +16,22 @@ import {InputSwitchModule} from "primeng/inputswitch";
 import {RouterOutlet} from "@angular/router";
 import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {
-    AsyncPipe, CurrencyPipe,
-    DatePipe, DecimalPipe, JsonPipe, KeyValuePipe,
+    AsyncPipe,
+    CurrencyPipe,
+    DatePipe,
+    DecimalPipe,
+    JsonPipe,
+    KeyValuePipe,
     NgClass,
     NgForOf,
     NgIf,
     NgStyle,
     NgSwitch,
-    NgSwitchCase, NgSwitchDefault,
-    NgTemplateOutlet, SlicePipe, TitleCasePipe
+    NgSwitchCase,
+    NgSwitchDefault,
+    NgTemplateOutlet,
+    SlicePipe,
+    TitleCasePipe
 } from "@angular/common";
 import {TabViewModule} from "primeng/tabview";
 import {DialogModule} from "primeng/dialog";
@@ -126,18 +133,14 @@ import {
 } from "../../pages/statistics/children/employee-work-statistics-page/employee-work-statistics-page.component";
 import {ChartModule} from "primeng/chart";
 import {TopologyBootstrapPage} from "../../pages/topology/topology-bootstrap-page/topology-bootstrap-page.component";
-import {
-    TopologyHousesPage
-} from "../../pages/topology/children/topology-houses-page/topology-houses-page.component";
+import {TopologyHousesPage} from "../../pages/topology/children/topology-houses-page/topology-houses-page.component";
 import {
     TopologySessionsPage
 } from "../../pages/topology/children/topology-sessions-page/topology-sessions-page.component";
 import {
     TopologyCommutatorsPage
 } from "../../pages/topology/children/topology-commutators-page/topology-commutators-page.component";
-import {
-    TopologyHousePage
-} from "../../pages/topology/children/topology-house-page/topology-house-page.component";
+import {TopologyHousePage} from "../../pages/topology/children/topology-house-page/topology-house-page.component";
 import {NgTerminalModule} from "ng-terminal";
 import {TaskRegistryPage} from "../../pages/task-registry-page/task-registry-page.component";
 
@@ -145,6 +148,7 @@ const mapConfig: YaConfig = {
     apikey: '008574e5-f34b-4270-b3d5-91aaabd036e8',
     lang: 'ru_RU',
 };
+
 @NgModule({
     declarations: [
         TasksPageComponent,

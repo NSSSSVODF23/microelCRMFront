@@ -53,15 +53,6 @@ export class AccountPanelComponent implements OnInit,OnDestroy {
     imageCropped(event: ImageCroppedEvent) {
         this.croppedImage = event.base64;
     }
-    imageLoaded(image: LoadedImage) {
-        // show cropper
-    }
-    cropperReady() {
-        // cropper ready
-    }
-    loadImageFailed() {
-        // show message
-    }
 
     saveAvatar() {
         if(!this.croppedImage) return;

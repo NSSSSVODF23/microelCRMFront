@@ -405,6 +405,13 @@ export class TaskPageComponent implements OnInit, OnDestroy {
 
     editCommentChanged(event: Comment) {
         this.commentInputForm.patchValue({text: event.message})
+        this.commentEditor?.quillEditor.focus();
+        window.scroll(0,0);
+    }
+
+    replyCommentChanged(event: Comment) {
+        this.commentEditor?.quillEditor.focus();
+        window.scroll(0,0);
     }
 
     ngOnDestroy(): void {

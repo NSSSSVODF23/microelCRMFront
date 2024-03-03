@@ -1,4 +1,4 @@
-<div appExtendPageHeight class="flex gap-5 px-5">
+<div appExtendPageHeight class="flex">
     <ng-container [ngSwitch]="loadingState">
         <ng-container *ngSwitchCase="'LOADING'">
             <p-progressSpinner class="custom-spinner custom-spinner-8xl custom-spinner-primary center-of-page"
@@ -18,8 +18,8 @@
             </div>
         </ng-container>
         <ng-container *ngSwitchCase="'READY'">
-            <div class="flex flex-column flex-grow-1 gap-3">
-                <p-menubar [model]="managementMenu" [style]="{border: 'none'}" styleClass="bg-transparent p-0">
+            <div class="flex flex-column flex-grow-1">
+                <p-menubar [model]="managementMenu" [style]="{border: 'none'}" styleClass="bg-white" class=" border-bottom-1 border-bluegray-100 p-0">
                     <ng-template pTemplate="start">
                         <div class="flexed gap10 p5 indent1 hcenter">
                             <p-button (onClick)="customNav.backOrDefault(['/tasks','catalog'])" icon="mdi-arrow_back"
@@ -50,186 +50,93 @@
                         </ng-container>
                     </ng-template>
                 </p-menubar>
-                <div class="flex gap-3">
-                    <div class="flex flex-column flex-grow-1 gap-3">
-                        <div class="input-label-wrapper w max-fit">
-                            <label>Теги</label>
-                            <app-task-tag-inline-selector [formControl]="installedTags"></app-task-tag-inline-selector>
-                        </div>
+                <div class="flex">
+                    <div class="flex flex-column flex-grow-1 gap-3 p-4">
+                        <app-task-tag-inline-selector [formControl]="installedTags"></app-task-tag-inline-selector>
                         <app-task-fields-table-view [task]="currentTask"></app-task-fields-table-view>
                     </div>
-                </div>
-                <div [hidden]="!journalVisible" class="flex flex-column gap-4 mb-8">
-                    <span class="text-bluegray-400 text-3xl font-semibold flex gap-3 align-items-center">
-                        <span>
-                            Комментарии
-                        </span>
-                        <p-dropdown [(ngModel)]="taskJournalSorting" [options]="taskJournalSortingOptions"></p-dropdown>
-                        <p-toggleButton [(ngModel)]="taskEventsVisible" offIcon="mdi-visibility_off"
-                                        offLabel="Cобытия" onIcon="mdi-visibility"
-                                        onLabel="Cобытия"></p-toggleButton>
+                    <div class="flex flex-column gap-3 text-bluegray-500 font-bold border-left-1 border-bluegray-100 p-5">
+                        <div class="flex align-items-center gap-2">
+                            <div class="flex align-items-center">
+                                <span class="mdi-flag"></span>
+                                <span>
+                                    Статус
+                                </span>
+                            </div>
+                            <span [class]="taskStatusColor">
+                        {{currentTask | taskStatus}}
                     </span>
-                    <app-task-journal (editCommentChange)="editCommentChanged($event)"
-                                      (onFirstLoad)="journalVisible = $event" [(editComment)]="editComment"
-                                      [(replyComment)]="replyComment" [showEvents]="taskEventsVisible" [sortingType]="taskJournalSorting"
-                                      [taskId]="taskId"
-                                      class="indent1"></app-task-journal>
-                </div>
-                <div *ngIf="!isTaskClose()" [formGroup]="commentInputForm"
-                     class="fixed left-0 bottom-0 flex flex-column gap-3 justify-content-center w-full">
-                    <div *ngIf="replyComment" [style.padding]="'1rem 1.5rem'"
-                         class="flexed hcenter gap15 panel caption size-small wt-bold f-color-primary mx-3">
-                        <i class="mdi-reply"></i>
-                        <div class="flexed column">
-                            <app-employee-label [employee]="replyComment.creator" [size]="2"></app-employee-label>
-                            <div class="caption indent2">
-                                {{replyComment.simpleText}}
-                            </div>
                         </div>
-                        <div class="stretched">
-                        </div>
-                        <p-button (onClick)="replyComment = undefined" [disabled]="commentInputForm.disabled"
-                                  icon="mdi-cancel" styleClass="p-button-icon p-button-text"></p-button>
-                    </div>
-                    <div *ngIf="editComment" [style.padding]="'1rem 1.5rem'"
-                         class="flexed hcenter gap15 panel caption size-small wt-bold f-color-primary mx-3">
-                        <i class="mdi-edit"></i>
-                        <div class="flexed column gap3">
-                            <span>Редактирование</span>
-                            <div class="caption">
-                                {{editComment.simpleText}}
+                        <div class="flex align-items-center gap-2">
+                            <div class="flex align-items-center">
+                                <span class="mdi-person"></span>
+                                <span>
+                            Автор
+                        </span>
                             </div>
+                            <span>
+                        <app-employee-label [employee]="currentTask?.creator"></app-employee-label>
+                    </span>
                         </div>
-                        <div class="stretched">
+                        <div class="flex align-items-center gap-2">
+                            <div class="flex align-items-center">
+                                <span class="mdi-event"></span>
+                                <span>
+                            Создана
+                        </span>
+                            </div>
+                            <span class="white-space-nowrap">
+                        {{currentTask?.created | date:'dd MMM yyyy HH:mm' | titlecase}}
+                    </span>
                         </div>
-                        <p-button (onClick)="editComment = undefined; commentInputForm.reset({text: '', files: []})"
-                                  [disabled]="commentInputForm.disabled" icon="mdi-cancel"
-                                  styleClass="p-button-icon p-button-text"></p-button>
-                    </div>
-                    <ng-container *ngIf="!isTaskClose()" [ngSwitch]="commentEditorMode">
-                        <ng-container *ngSwitchCase="'simple'">
-                            <div @fadeIn [style.padding]="'.5rem 1rem'"
-                                 class="flex align-items-center gap-2 shadow-1 bg-white">
-                                <p-button (onClick)="commentEditorMode = 'extended'" [disabled]="commentInputForm.disabled"
-                                          icon="mdi-text_fields" pTooltip="Расширенный редактор"
-                                          styleClass="p-button-icon p-button-text"></p-button>
-                                <textarea (keydown)="sendCommentByEnter($event)" (paste)="pasteFiles($event)"
-                                          [disabled]="isTaskClose()" appTextareaAutoresize
-                                          class="borderless-text-field stretched"
-                                          formControlName="text" placeholder="Новый комментарий..."></textarea>
-                                <app-file-input #fileInput *ngIf="!editComment" [short]="true"
-                                                formControlName="files"></app-file-input>
-                                <p-button (onClick)="sendComment()" [disabled]="commentInputForm.disabled"
-                                          icon="mdi-send"
-                                          styleClass="p-button-icon p-button-text p-button-rounded"></p-button>
+                        <div *ngIf="currentTask?.responsible" class="flex align-items-center gap-2">
+                            <div class="flex align-items-center">
+                                <span class="mdi-person"></span>
+                                <span>
+                            Ответственный
+                        </span>
                             </div>
-                        </ng-container>
-                        <ng-container *ngSwitchCase="'extended'">
-                            <div @fadeIn [style.padding]="'1rem 1rem'" class="flex flex-column gap-2 shadow-1 bg-white">
-                        <span class="flexed hcenter gap5">
-                            <p-button (onClick)="commentEditorMode = 'simple'; clearCommentText()" [disabled]="commentInputForm.disabled" icon="mdi-short_text"
-                                      label="Строка ввода"
-                                      pTooltip="Строка ввода"
-                                      styleClass="p-button-icon p-button-text"></p-button>
-                            <div class="stretched"></div>
-                            <app-file-input #fileInput *ngIf="!editComment" formControlName="files"></app-file-input>
-                            <p-button (onClick)="sendComment()" [disabled]="commentInputForm.disabled"
-                                      icon="mdi-send" label="Отправить" styleClass=" p-button-text"></p-button>
+                            <span>
+                        <app-employee-label [employee]="currentTask?.responsible"></app-employee-label>
+                    </span>
+                        </div>
+                        <div *ngIf="activeWorkLog" class="flex flex-column gap-2">
+                            <div class="flex align-items-center">
+                                <span class="mdi-groups"></span>
+                                <span>
+                            Назначены монтажники
                         </span>
-                                <quill-editor #commentEditor (keydown)="sendCommentByEnter($event)"
-                                              (onContentChanged)="empInsertPanel.setQuillEvent($event)"
-                                              (paste)="pasteFiles($event)" [disabled]="isTaskClose()"
-                                              [formats]="quillFormats"
-                                              [modules]="quillModules"
-                                              [styles]="{maxHeight:'30vh', minHeight:'10rem', overflow:'auto'}" class="input" formControlName="text"
-                                              placeholder="Новый комментарий..."></quill-editor>
                             </div>
-                        </ng-container>
-                    </ng-container>
-                </div>
-            </div>
-            <div [style.top]="'10rem'" class="flex flex-column gap-3 text-bluegray-500 font-bold sticky h-fit">
-                <div class="flex align-items-center gap-2">
-                    <div class="flex align-items-center">
-                        <span class="mdi-flag"></span>
-                        <span>
-                                Статус
-                            </span>
-                    </div>
-                    <span [class]="taskStatusColor">
-                            {{currentTask | taskStatus}}
+                            <span class="ml-4 flex flex-column gap-2">
+                        <app-employee-label *ngFor="let employee of activeWorkLog.employees"
+                                            [employee]="employee"></app-employee-label>
+                    </span>
+                        </div>
+                        <div *ngIf="isTaskHasObservers()" class="flex flex-column gap-2">
+                            <div class="flex align-items-center">
+                                <span class="mdi-groups"></span>
+                                <span>
+                            Наблюдатели
                         </span>
-                </div>
-                <div class="flex align-items-center gap-2">
-                    <div class="flex align-items-center">
-                        <span class="mdi-person"></span>
-                        <span>
-                                Автор
-                            </span>
-                    </div>
-                    <span>
-                            <app-employee-label [employee]="currentTask?.creator"></app-employee-label>
+                            </div>
+                            <span class="ml-4 flex flex-column gap-2">
+                        <app-department-label *ngFor="let department of currentTask?.departmentsObservers"
+                                              [department]="department"></app-department-label>
+                        <app-employee-label *ngFor="let employee of currentTask?.employeesObservers"
+                                            [employee]="employee"></app-employee-label>
+                    </span>
+                        </div>
+                        <div *ngIf="isTaskHasParent() || isTaskHasChilds()" class="flex flex-column gap-2">
+                            <div class="flex align-items-center">
+                                <span class="mdi-account_tree"></span>
+                                <span>
+                            Связанные задачи
                         </span>
-                </div>
-                <div class="flex align-items-center gap-2">
-                    <div class="flex align-items-center">
-                        <span class="mdi-event"></span>
-                        <span>
-                                Создана
-                            </span>
-                    </div>
-                    <span class="white-space-nowrap">
-                            {{currentTask?.created | date:'dd MMM yyyy HH:mm' | titlecase}}
-                        </span>
-                </div>
-                <div *ngIf="currentTask?.responsible" class="flex align-items-center gap-2">
-                    <div class="flex align-items-center">
-                        <span class="mdi-person"></span>
-                        <span>
-                                Ответственный
-                            </span>
-                    </div>
-                    <span>
-                            <app-employee-label [employee]="currentTask?.responsible"></app-employee-label>
-                        </span>
-                </div>
-                <div *ngIf="activeWorkLog" class="flex flex-column gap-2">
-                    <div class="flex align-items-center">
-                        <span class="mdi-groups"></span>
-                        <span>
-                                Назначены монтажники
-                            </span>
-                    </div>
-                    <span class="ml-4 flex flex-column gap-2">
-                            <app-employee-label *ngFor="let employee of activeWorkLog.employees"
-                                                [employee]="employee"></app-employee-label>
-                        </span>
-                </div>
-                <div *ngIf="isTaskHasObservers()" class="flex flex-column gap-2">
-                    <div class="flex align-items-center">
-                        <span class="mdi-groups"></span>
-                        <span>
-                                Наблюдатели
-                            </span>
-                    </div>
-                    <span class="ml-4 flex flex-column gap-2">
-                            <app-department-label *ngFor="let department of currentTask?.departmentsObservers"
-                                                  [department]="department"></app-department-label>
-                            <app-employee-label *ngFor="let employee of currentTask?.employeesObservers"
-                                                [employee]="employee"></app-employee-label>
-                        </span>
-                </div>
-                <div *ngIf="isTaskHasParent() || isTaskHasChilds()" class="flex flex-column gap-2">
-                    <div class="flex align-items-center">
-                        <span class="mdi-account_tree"></span>
-                        <span>
-                                Связанные задачи
-                            </span>
-                        <app-tiny-button (onClick)="openTaskChainDialog()" icon="account_tree"
-                                         pTooltip="Показать схему"
-                                         tooltipPosition="bottom"></app-tiny-button>
-                    </div>
-                    <span class="ml-4">
+                                <app-tiny-button (onClick)="openTaskChainDialog()" icon="account_tree"
+                                                 pTooltip="Показать схему"
+                                                 tooltipPosition="bottom"></app-tiny-button>
+                            </div>
+                            <span class="ml-4">
                             <div *ngIf="isTaskHasParent()" class="flexed hcenter gap3">
                                 <span class="caption size-small f-color-500">Родительская:</span>
                                 <app-task-link [taskId]="currentTask?.parent ?? 0"></app-task-link>
@@ -252,6 +159,70 @@
                                 </div>
                             </div>
                         </span>
+                        </div>
+                    </div>
+                </div>
+                <div [hidden]="!journalVisible" class="flex flex-column gap-3 border-top-1 border-bluegray-100">
+                    <div class="pt-3 px-4 text-bluegray-400 flex gap-3 align-items-center">
+                        <span class="text-xl font-semibold">
+                            Комментарии
+                        </span>
+                        <p-dropdown [(ngModel)]="taskJournalSorting" [options]="taskJournalSortingOptions"></p-dropdown>
+                        <p-toggleButton [(ngModel)]="taskEventsVisible" offIcon="mdi-visibility_off"
+                                        offLabel="Cобытия" onIcon="mdi-visibility"
+                                        onLabel="Cобытия"></p-toggleButton>
+                    </div>
+                    <div @fadeIn class="flex flex-column px-3" [formGroup]="commentInputForm">
+                        <div *ngIf="replyComment" class="flex align-items-center gap-3 p-3
+                         border-top-1 border-left-1 border-right-1 border-bluegray-100 border-round-top">
+                            <i class="mdi-reply text-primary"></i>
+                            <div class="flex align-items-center gap-3">
+                                <app-employee-label [employee]="replyComment.creator" [size]="2"></app-employee-label>
+                                <div class="caption">
+                                    {{replyComment.simpleText}}
+                                </div>
+                            </div>
+                            <div class="stretched">
+                            </div>
+                            <p-button (onClick)="replyComment = undefined" [disabled]="commentInputForm.disabled"
+                                      icon="mdi-cancel" styleClass="p-button-icon p-button-text"></p-button>
+                        </div>
+                        <div *ngIf="editComment" class="flex align-items-center gap-3 p-3
+                         border-top-1 border-left-1 border-right-1 border-bluegray-100 border-round-top">
+                            <i class="mdi-edit text-primary"></i>
+                            <div class="flex align-items-center gap-3">
+                                <span>Редактирование</span>
+                                <div class="caption">
+                                    {{editComment.simpleText}}
+                                </div>
+                            </div>
+                            <div class="stretched">
+                            </div>
+                            <p-button (onClick)="editComment = undefined; commentInputForm.reset({text: '', files: []})"
+                                      [disabled]="commentInputForm.disabled" icon="mdi-cancel"
+                                      styleClass="p-button-icon p-button-text"></p-button>
+                        </div>
+                        <quill-editor #commentEditor (keydown)="sendCommentByEnter($event)"
+                                      (onContentChanged)="empInsertPanel.setQuillEvent($event)"
+                                      (paste)="pasteFiles($event)" [disabled]="isTaskClose()"
+                                      [formats]="quillFormats"
+                                      [modules]="quillModules"
+                                      class="flex flex-column"
+                                      formControlName="text"
+                                      placeholder="Новый комментарий..."></quill-editor>
+                        <span class="flex gap-2 mt-2">
+                            <p-button (onClick)="sendComment()" [disabled]="commentInputForm.disabled"
+                                      icon="mdi-send" label="Отправить"></p-button>
+                            <app-file-input #fileInput *ngIf="!editComment" formControlName="files"></app-file-input>
+                        </span>
+                    </div>
+                    <div class="flex px-4 py-3 border-top-1 border-bluegray-100">
+                        <app-task-journal (editCommentChange)="editCommentChanged($event)" (replyCommentChange)="replyCommentChanged($event)"
+                                          (onFirstLoad)="journalVisible = $event" [(editComment)]="editComment"
+                                          [(replyComment)]="replyComment" [showEvents]="taskEventsVisible"
+                                          [sortingType]="taskJournalSorting"
+                                          [taskId]="taskId"></app-task-journal>
+                    </div>
                 </div>
             </div>
         </ng-container>
@@ -260,7 +231,8 @@
 
 <app-attachments-history-dialog [(show)]="showFilesHistory" [taskId]="taskId"></app-attachments-history-dialog>
 
-<app-appoint-installers-dialog [(visible)]="showAppointInstallersMenu" [taskId]="taskId"></app-appoint-installers-dialog>
+<app-appoint-installers-dialog [(visible)]="showAppointInstallersMenu"
+                               [taskId]="taskId"></app-appoint-installers-dialog>
 
 <!--Диалог назначения наблюдателей-->
 <p-dialog [(visible)]="showChangeObserversDialog" [breakpoints]="{'960px': '75vw', '640px': '100vw'}"
@@ -417,7 +389,7 @@
 <app-task-scheduling-dialog [(visible)]="schedulingTaskDialogVisible" [schedulingType]="schedulingTaskType"
                             [taskId]="taskId"></app-task-scheduling-dialog>
 
-<app-force-close-dialog [taskId]="taskId" [(visible)]="forceCloseWorkLogDialogVisible"></app-force-close-dialog>
+<app-force-close-dialog [(visible)]="forceCloseWorkLogDialogVisible" [taskId]="taskId"></app-force-close-dialog>
 
 <app-work-logs-dialog #workLogsDialogEl></app-work-logs-dialog>
 
@@ -455,7 +427,8 @@
 </ng-template>
 
 <p-overlayPanel #oldTrackerPanel [dismissable]="true" appendTo="body">
-    <div *ngIf="!!this.currentTask?.currentStage?.oldTrackerBind else oldTrackerBindWarningTemp" [formGroup]="oldTrackerBindInfoForm"
+    <div *ngIf="!!this.currentTask?.currentStage?.oldTrackerBind else oldTrackerBindWarningTemp"
+         [formGroup]="oldTrackerBindInfoForm"
          class="flex flex-column gap-3">
         <div *ngIf="currentOldTrackerClass$ | async as currentOldTrackerClass" class="flex flex-column gap-1">
             <span class="text-bluegray-400 text-sm font-bold">Класс задач в старом трекере</span>
@@ -469,7 +442,10 @@
                 {{oldTrackerBindInfoForm.controls.id.errors['error']}}
             </span>
         </div>
-        <p-button (onClick)="bindTaskToTask()" *ngIf="oldTrackerBindInfoForm.controls.id.dirty && oldTrackerBindInfoForm.value.id && !isChangeOldTrackerBindDisabled" @fadeIn [disabled]="oldTrackerBindInfoForm.controls.id.invalid || oldTrackerBindInfoForm.controls.id.pending"
+        <p-button (onClick)="bindTaskToTask()"
+                  *ngIf="oldTrackerBindInfoForm.controls.id.dirty && oldTrackerBindInfoForm.value.id && !isChangeOldTrackerBindDisabled"
+                  @fadeIn
+                  [disabled]="oldTrackerBindInfoForm.controls.id.invalid || oldTrackerBindInfoForm.controls.id.pending"
                   [loading]="isTaskInConnectionProcess"
                   icon="mdi-add_link"
                   label="Привязать" styleClass="p-button-success w-full"></p-button>
@@ -479,7 +455,9 @@
                         formControlName="taskStageId"
                         optionLabel="name" optionValue="id" placeholder="Выбрать"></p-dropdown>
         </div>
-        <p-button (onClick)="changeTaskStageInOldTracker()" *ngIf="oldTrackerBindInfoForm.controls.taskStageId.dirty && oldTrackerBindInfoForm.value.taskStageId && isChangeOldTrackerBindDisabled" @fadeIn [loading]="isTaskInStageChangeProcess"
+        <p-button (onClick)="changeTaskStageInOldTracker()"
+                  *ngIf="oldTrackerBindInfoForm.controls.taskStageId.dirty && oldTrackerBindInfoForm.value.taskStageId && isChangeOldTrackerBindDisabled"
+                  @fadeIn [loading]="isTaskInStageChangeProcess"
                   icon="mdi-redo"
                   label="Изменить этап" styleClass="p-button-success w-full"></p-button>
     </div>

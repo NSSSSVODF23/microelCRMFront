@@ -1,12 +1,14 @@
+:host{
+    flex-grow: 1;
+}
 .stage-view{
   display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  padding: 0 2rem;
-  width: 100%;
+  flex-grow: 1;
+  //flex-direction: column;
+  //width: 100%;
   //min-width: max-content;
-  max-width: 54rem;
-  align-self: center;
+  //max-width: 54rem;
+  //align-self: center;
 }
 .stub-when-creating-a-task{
   position: fixed;

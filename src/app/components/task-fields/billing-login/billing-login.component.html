@@ -1,2 +1,41 @@
-<a class="select-none cursor-pointer hover:text-primary-700 no-underline" [ngClass]="loginColor$ | async" (contextmenu)="$event.stopPropagation()"
-      [routerLink]="['/clients','billing','user',loginData]" (click)="$event.stopPropagation()">{{loginData}}</a>
+<ng-container [ngSwitch]="popup">
+    <ng-container *ngSwitchCase="true">
+        <a class="select-none cursor-pointer hover:text-primary-700 no-underline" (contextmenu)="$event.stopPropagation()"
+           (mouseenter)="mouseEnter$.next($event)" (mouseleave)="mouseLeave$.next($event)"
+           [routerLink]="['/clients','billing','user',loginData]" (click)="$event.stopPropagation()">{{loginData}}</a>
+        <p-overlayPanel #popupPanel>
+            <ng-template pTemplate="content">
+                <ng-container [ngSwitch]="isNotFound">
+                    <div *ngSwitchCase="true">
+                        <div class="text-bluegray-500 flex flex-column gap-2">
+                            <span class="font-bold">Оборудование не найденно</span>
+                        </div>
+                    </div>
+                    <ng-container *ngSwitchCase="false">
+                        <div class="text-bluegray-500 flex flex-column gap-2" *ngIf="loginBinding$ | async as loginBinding; else loadingTemplate">
+                            <span class="font-bold" [ngClass]="loginBinding.statusColor">{{loginBinding.statusName}}</span>
+                            <span>{{loginBinding.name}}</span>
+                            <span>{{loginBinding.ip}}</span>
+                            <span>{{loginBinding.mac}}</span>
+                            <span>{{loginBinding.elapsedTime | date:'dd-MM-yyyy HH:mm'}}</span>
+                        </div>
+                    </ng-container>
+                </ng-container>
+            </ng-template>
+        </p-overlayPanel>
+    </ng-container>
+    <ng-container *ngSwitchCase="false">
+        <a class="select-none cursor-pointer hover:text-primary-700 no-underline" [ngClass]="loginColor$ | async" (contextmenu)="$event.stopPropagation()"
+           [routerLink]="['/clients','billing','user',loginData]" (click)="$event.stopPropagation()">{{loginData}}</a>
+    </ng-container>
+</ng-container>
+
+<ng-template #loadingTemplate>
+    <div class="text-bluegray-500 flex flex-column gap-2">
+        <p-skeleton width="4rem" height="1.2rem"></p-skeleton>
+        <p-skeleton width="5rem" height="1.2rem"></p-skeleton>
+        <p-skeleton width="6rem" height="1.2rem"></p-skeleton>
+        <p-skeleton width="7.5rem" height="1.2rem"></p-skeleton>
+        <p-skeleton width="8rem" height="1.2rem"></p-skeleton>
+    </div>
+</ng-template>

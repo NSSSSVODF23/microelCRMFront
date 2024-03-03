@@ -5,7 +5,7 @@ import timeGridPlugin from '@fullcalendar/timegrid';
 import listPlugin from '@fullcalendar/list';
 import interactionPlugin, {EventResizeDoneArg} from '@fullcalendar/interaction';
 import {ApiService} from "../../services/api.service";
-import {fromEvent, map} from "rxjs";
+import {debounceTime, fromEvent, map, of, Subject, switchMap, tap} from "rxjs";
 import {Task} from "../../types/transport-interfaces";
 import {SubscriptionsHolder, Utils} from "../../util";
 import {OverlayPanel} from "primeng/overlaypanel";
@@ -16,6 +16,7 @@ import {ContextMenu} from "primeng/contextmenu";
 import {
     TaskSelectingDialogComponent
 } from "../../components/panels/task-linking-dialog/task-selecting-dialog.component";
+import {AutoUnsubscribe} from "../../decorators";
 
 enum ScheduleType {
     RANGE = 'RANGE',
@@ -27,6 +28,7 @@ enum ScheduleType {
     templateUrl: './task-calendar-page.component.html',
     styleUrls: ['./task-calendar-page.component.scss']
 })
+@AutoUnsubscribe()
 export class TaskCalendarPageComponent implements OnInit, OnDestroy {
 
     @ViewChild('taskPanel') taskPanel?: OverlayPanel;
@@ -36,10 +38,44 @@ export class TaskCalendarPageComponent implements OnInit, OnDestroy {
     @ViewChild('eventMenu') eventMenu?: ContextMenu;
     eventMenuModel: MenuItem[] = [];
     @ViewChild('scheduleTaskDialog') scheduleTaskDialog?: TaskSelectingDialogComponent;
+    taskPreviewVisible$ = new Subject<EventHoveringArg | null>();
+    previewTask?: Task;
+    taskPreviewVisibleSub = this.taskPreviewVisible$
+        .pipe(
+            debounceTime(200),
+            switchMap(event => {
+                if (event) {
+                    return this.api.getTask(parseInt(event.event.id))
+                        .pipe(
+                            map(task => {
+                              return {task, event: event.jsEvent, el: event.el}
+                            })
+                        )
+                }else {
+                    return of(null)
+                }
+            })
+        )
+        .subscribe((eventWithTask) => {
+            if(eventWithTask){
+                this.previewTask = eventWithTask.task;
+                if(this.taskPanel?.overlayVisible){
+                    this.taskPanel.target = eventWithTask.el;
+                    this.taskPanel.align();
+                }else{
+                    this.taskPanel?.show(eventWithTask.event, eventWithTask.el);
+                }
+            }else{
+                this.taskPanel?.hide();
+            }
+        })
+    mouseDownSub = fromEvent(window, 'mousedown').subscribe(()=>this.taskPreviewVisible$.next(null));
+
     private currentCalendarRange = {
         start: 0,
         end: 0
     }
+
     calendarOptions: CalendarOptions = {
         initialView: 'dayGridMonth',
         locale: 'ru',
@@ -54,8 +90,8 @@ export class TaskCalendarPageComponent implements OnInit, OnDestroy {
             right: 'dayGridMonth,listWeek,timeGridDay'
         },
         editable: true,
-        eventMouseEnter: this.openPreviewTaskPanel.bind(this),
-        eventMouseLeave: this.hidePreviewTaskPanel.bind(this),
+        eventMouseEnter: (event) => this.taskPreviewVisible$.next(event),
+        eventMouseLeave: () => this.taskPreviewVisible$.next(null),
         eventDrop: this.scheduleMove.bind(this),
         eventResize: this.scheduleResizing.bind(this),
         eventClick: this.openContextOfTask.bind(this),
@@ -93,7 +129,7 @@ export class TaskCalendarPageComponent implements OnInit, OnDestroy {
 
     ngOnInit(): void {
         this.subscriptionsHolder.addSubscription("updTsk", this.rt.taskUpdated().subscribe(this.updateCalendar.bind(this)));
-        this.subscriptionsHolder.addSubscription("hidePv", fromEvent(window, 'mousedown').subscribe(this.hidePreviewTaskPanel.bind(this)));
+        // this.subscriptionsHolder.addSubscription("hidePv", );
     }
 
     ngOnDestroy() {
@@ -208,17 +244,17 @@ export class TaskCalendarPageComponent implements OnInit, OnDestroy {
         return tasks.map(this.taskToEvent.bind(this));
     }
 
-    private openPreviewTaskPanel(event: EventHoveringArg) {
-        if (this.hideTimer) clearTimeout(this.hideTimer);
-        this.hoveredTask = parseInt(event.event.id);
-        this.taskPanel?.show(event.jsEvent, event.el);
-    }
-
-    private hidePreviewTaskPanel() {
-        this.hideTimer = setTimeout(() => {
-            this.taskPanel?.hide();
-        })
-    }
+    // private openPreviewTaskPanel(event: EventHoveringArg) {
+    //     if (this.hideTimer) clearTimeout(this.hideTimer);
+    //     this.hoveredTask = parseInt(event.event.id);
+    //     this.taskPanel?.show(event.jsEvent, event.el);
+    // }
+    //
+    // private hidePreviewTaskPanel() {
+    //     this.hideTimer = setTimeout(() => {
+    //         this.taskPanel?.hide();
+    //     })
+    // }
 
     private scheduleMove(event: EventDropArg) {
         this.api.moveScheduledTask(parseInt(event.event.id), event.delta).subscribe()

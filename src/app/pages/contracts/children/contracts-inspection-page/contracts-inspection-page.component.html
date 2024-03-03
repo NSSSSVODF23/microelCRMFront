@@ -1,9 +1,12 @@
-<div class="bg-white p-3 flex gap-3 shadow-1 sticky top-under-panel border-round mb-3 z-1" [formGroup]="filterControls">
+<div class="flex align-items-center px-5 py-4 bg-white gap-3 sticky top-0 z-1 border-bottom-1 border-bluegray-100" [formGroup]="filterControls">
+    <span class="text-2xl text-bluegray-500 font-semibold">
+        Коммутаторы
+    </span>
     <input pInputText id="searchInput" formControlName="searchQuery" placeholder="Логин / Адрес / Монтажник..." class="flex-grow-1"/>
     <button pButton id="searchButton" icon="mdi-search" label="Поиск"></button>
     <button pButton id="clearButton" icon="mdi-clear" label="Отчистить" class="p-button-secondary p-button-text"></button>
 </div>
-<div class="flex flex-column gap-2 relative h-full" *ngIf="workLogs$ | async as workLogs" [ngSwitch]="workLogs.loadingState">
+<div class="flex flex-column gap-2 relative flex-grow-1" *ngIf="workLogs$ | async as workLogs" [ngSwitch]="workLogs.loadingState">
     <div class="flex align-items-center justify-content-center flex-grow-1" *ngSwitchCase="LoadingState.LOADING">
         <p-progressSpinner class="custom-spinner custom-spinner-primary custom-spinner-8xl" strokeWidth="2"></p-progressSpinner>
     </div>
@@ -23,6 +26,6 @@
     <div *ngIf="workLogs.loadingState === LoadingState.READY" class="flex-grow-1"></div>
     <p-paginator [hidden]="workLogs.loadingState !== LoadingState.READY"
                  [first]="(pageControl.value ?? 0)*15"
-                 (onPageChange)="pageControl.setValue($event.page)" class="sticky bottom-1rem"
-                 [totalRecords]="workLogs.totalElements" [alwaysShow]="true" [rows]="15" styleClass="shadow-1"></p-paginator>
+                 (onPageChange)="pageControl.setValue($event.page)" class="sticky bottom-0 border-top-1 border-bluegray-100"
+                 [totalRecords]="workLogs.totalElements" [alwaysShow]="true" [rows]="15" styleClass="border-noround"></p-paginator>
 </div>

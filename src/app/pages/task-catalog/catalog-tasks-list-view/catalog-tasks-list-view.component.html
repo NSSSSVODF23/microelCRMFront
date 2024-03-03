@@ -6,7 +6,7 @@
 
     <ng-container *ngSwitchCase="'READY'">
         <ng-container *ngIf="cacheService.tasks$ | async as tasksPage">
-            <div class="flex flex-column gap-1 border-round-md shadow-1 overflow-hidden bg-bluegray-100 h-fit mb-3">
+            <div class="flex flex-column">
                 <div *ngFor="let item of tasksPage.content" class="flex relative" (onDragStart)="cacheService.taskMovingStart(item)"
                      [pDraggable]="item.currentStage?.stageId ?? ''">
                     <app-task-list-element (onStartEdit)="cacheService.taskEditStart($event)"
@@ -30,10 +30,10 @@
     </div>
 </ng-container>
 <div class="flex-grow-1"></div>
-<div class="sticky bottom1" *ngIf="cacheService.tasks$ | async as tasksPage" [hidden]="cacheService.taskLoadingState !== 'READY'">
+<div class="sticky bottom-0" *ngIf="cacheService.tasks$ | async as tasksPage" [hidden]="cacheService.taskLoadingState !== 'READY'">
     <p-paginator #paginator (onPageChange)="cacheService.pageControl.setValue($event.page)" [alwaysShow]="true"
                  [rows]="15" [showCurrentPageReport]="true"
                  [totalRecords]="tasksPage.totalElements" [first]="(cacheService.pageControl.value ?? 0)*15"
                  currentPageReportTemplate="Показано с {first} по {last} из {totalRecords} задач"
-                 styleClass="panel"></p-paginator>
+                 styleClass="border-top-1 border-bluegray-100 border-noround"></p-paginator>
 </div>

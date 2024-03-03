@@ -12,7 +12,7 @@ import {
     count,
     tap,
     pairwise,
-    switchMap, map, filter, shareReplay, debounceTime
+    switchMap, map, filter, shareReplay, debounceTime, ReplaySubject
 } from "rxjs";
 import {RealTimeUpdateService} from "../../../../services/real-time-update.service";
 import {FormControl, FormGroup} from "@angular/forms";
@@ -32,11 +32,11 @@ export class ContractsInspectionPageComponent implements OnInit {
     filterControls = new FormGroup({searchQuery: new FormControl<string>("")});
 
     @FromEvent("searchInput", "keydown")
-    searchInputKeyDown$!: Observable<KeyboardEvent>;
+    searchInputKeyDown$ = new ReplaySubject<KeyboardEvent>(1);
     @FromEvent("searchButton", "click")
-    clickSearchButton$!: Observable<Event>;
+    clickSearchButton$ = new ReplaySubject<Event>(1);
     @FromEvent("clearButton", "click")
-    clickClearButton$!: Observable<Event>
+    clickClearButton$ = new ReplaySubject<Event>(1);
 
     enterDown$ = this.searchInputKeyDown$.pipe(filter(e => e.key === "Enter"), startWith(null));
     search$ = this.clickSearchButton$.pipe(startWith(null));

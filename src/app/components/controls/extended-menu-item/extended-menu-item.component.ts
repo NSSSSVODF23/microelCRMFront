@@ -22,6 +22,7 @@ export class ExtendedMenuItemComponent implements OnInit, AfterViewInit {
     @Input() link?: string[];
     @Input() badge?: string;
     @Input() exact = false;
+    @Input() onlyIcon = false;
     animationTimer?: any;
 
     constructor(readonly route: ActivatedRoute) {

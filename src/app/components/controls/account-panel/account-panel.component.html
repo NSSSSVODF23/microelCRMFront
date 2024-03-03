@@ -31,10 +31,7 @@
             <input #fileInput (change)="this.imageChangedEvent = $event" type="file" [style.display]="'none'" accept="image/jpeg, image/png, image/jpg, image/bmp"/>
         </div>
         <image-cropper
-                (cropperReady)="cropperReady()"
                 (imageCropped)="imageCropped($event)"
-                (imageLoaded)="imageLoaded($event)"
-                (loadImageFailed)="loadImageFailed()"
                 [aspectRatio]="1"
                 [cropperMinWidth]="64"
                 [cropperMinHeight]="64"
