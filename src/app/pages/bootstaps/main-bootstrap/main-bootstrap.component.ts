@@ -32,6 +32,5 @@ export class MainBootstrap implements OnInit {
 
     ngOnInit(): void {
         this.isTaskCreationPage = this.router.url === "/task/create";
-        this.route.url.subscribe(console.log)
     }
 }

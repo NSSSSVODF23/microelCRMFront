@@ -8,7 +8,7 @@ export const routes: Routes = [
         if(Storage.loadOrDefault("isOffsite", false)){
             return import('./moduls/installers/installers.module').then(m=>m.InstallersModule)
         }else{
-            return  import('./moduls/main/main.module').then(m => m.MainModule)
+            return import('./moduls/main/main.module').then(m => m.MainModule)
         }
     }, canActivate:[AuthGuard], canActivateChild:[AuthGuard]},
     {path: 'login', loadChildren: () => import('./moduls/login/login.module').then(m => m.LoginModule)},

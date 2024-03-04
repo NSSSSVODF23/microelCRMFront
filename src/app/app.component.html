@@ -17,3 +17,25 @@
         </div>
     </ng-template>
 </p-toast>
+
+<p-toast key="darktoast" position="bottom-center">
+    <ng-template let-message pTemplate="message">
+        <div class="flex gap-3 flex-grow-1 h-full align-items-center">
+            <span *ngIf="message.icon" [class]="message.icon+' text-xl'"></span>
+            <span class="font-bold">
+                {{message.detail}}
+            </span>
+        </div>
+    </ng-template>
+</p-toast>
+
+<p-toast key="redtoast" position="bottom-center">
+    <ng-template let-message pTemplate="message">
+        <div class="flex gap-3 flex-grow-1 h-full align-items-center">
+            <span *ngIf="message.icon" [class]="message.icon+' text-xl'"></span>
+            <span class="font-bold">
+                {{message.detail}}
+            </span>
+        </div>
+    </ng-template>
+</p-toast>

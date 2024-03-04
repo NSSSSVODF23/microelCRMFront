@@ -65,7 +65,8 @@ export class CountingLivesInputComponent implements OnInit, OnDestroy, ControlVa
     getCalculation() {
         if (this.addressCounterLivesForm.invalid) return;
         this.isLoading = true;
-        this.api.getCountingLivesCalculation(this.addressCounterLivesForm.value).subscribe({
+        const {address, startApart, endApart} = this.addressCounterLivesForm.value;
+        this.api.getCountingLivesCalculation({address:address!, startApart: startApart!, endApart: endApart!}).subscribe({
             next: (res) => {
                 this.isLoading = false;
                 this.control.setValue(this.control.value + " " + res.result);

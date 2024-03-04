@@ -1161,7 +1161,7 @@ export class ApiService {
         return this.sendPost<{ [key: string]: AcpUserBrief }>(`api/private/acp/user/brief-info/bulk`, login);
     }
 
-    getCountingLivesCalculation(form: { [key: string]: any }) {
+    getCountingLivesCalculation(form: { address: Address, startApart: number, endApart: number }) {
         return this.sendPost<{ result: string }>(`api/private/billing/counting-lives`, form)
     }
 

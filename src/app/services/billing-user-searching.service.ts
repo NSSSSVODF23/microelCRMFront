@@ -1,5 +1,5 @@
 import {Injectable} from '@angular/core';
-import {BillingUserItemData, LoadingState} from "../types/transport-interfaces";
+import {Address, BillingUserItemData, LoadingState} from "../types/transport-interfaces";
 import {FormControl, FormGroup} from "@angular/forms";
 import {
     catchError,
@@ -14,9 +14,11 @@ import {
     tap,
     first,
     map,
-    mergeMap, combineLatest, debounceTime
+    mergeMap, combineLatest, debounceTime, interval
 } from "rxjs";
 import {ApiService} from "./api.service";
+import {Utils} from "../util";
+import {MessageService} from "primeng/api";
 
 type FiltrationValue = {mode: string | null, isActive: boolean | null, query: string | null};
 
@@ -37,6 +39,18 @@ export class BillingUserSearchingService {
     changeUsers$ = this.changeUsersSubject.asObservable();
     enterSearch = new Subject<boolean>();
 
+    aliveCountingControl = new FormControl<Address | null>(null);
+    aliveCountingChange$ = this.aliveCountingControl.valueChanges
+        .pipe(
+            filter((value) => (value !== null && !!value.houseNum)),
+        );
+    aliveCountingSub = this.aliveCountingChange$
+        .pipe(
+            switchMap(address=>this.api.getCountingLivesCalculation({address: address!, startApart: 1, endApart: 500}))
+        )
+        .subscribe((value)=>{
+            Utils.copyToClipboard(value.result, this.toast, 'Живые скопированы', 'Не удалось скопировать живых');
+        });
     enterDown$ = this.enterSearch.pipe(startWith(true));
     modeChange$ = this.filtrationForm.controls.mode.valueChanges.pipe(startWith('address'));
     activeChange$ = this.filtrationForm.controls.isActive.valueChanges.pipe(startWith(false));
@@ -93,7 +107,7 @@ export class BillingUserSearchingService {
         }
     }
 
-    constructor(private api: ApiService) {
+    constructor(private api: ApiService, private toast: MessageService) {
         this.users$.subscribe((users) => this.changeUsersSubject.next(users))
         // this.modeChange$.subscribe(() => {
         //     this.filtrationForm.patchValue({query: ''})
