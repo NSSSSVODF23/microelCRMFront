@@ -37,7 +37,7 @@
             </tr>
         </ng-template>
         <ng-template let-user pTemplate="body">
-            <tr>
+            <tr [routerLink]="['/clients','billing','user',user.uname]" class="cursor-pointer hover:bg-bluegray-50">
                 <td>{{user.uname}}</td>
                 <td>{{user.addr}}</td>
                 <td>{{user.fio}}</td>
