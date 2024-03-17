@@ -1,0 +1,19 @@
+<p-overlayPanel #panel appendTo="body">
+    <ng-template pTemplate="content">
+        <div class="flex gap-2">
+            <p-autoComplete [suggestions]="service.ontSuggestions" [delay]="1200" appendTo="body" [showClear]="true"
+                            (completeMethod)="service.getOntSuggestions($event.query)" [formControl]="ontControl"
+                            [showEmptyMessage]="true" emptyMessage="Не найдено терминалов" field="mac">
+                <ng-template let-value pTemplate="item">
+                    <div class="flex gap-1">
+                        <span>{{value.description}}</span>
+                        <span>{{value.mac}}</span>
+                        <span>{{value.isOnline ? 'В сети' : 'Не в сети'}}</span>
+                    </div>
+                </ng-template>
+            </p-autoComplete>
+            <p-button label="Назначить" icon="mdi-save"
+                      (onClick)="service.assignOnt(ontControl.value); panel.hide()"></p-button>
+        </div>
+    </ng-template>
+</p-overlayPanel>

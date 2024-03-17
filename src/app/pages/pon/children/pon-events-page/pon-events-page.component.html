@@ -1,0 +1,62 @@
+<div class="flex flex-column">
+    <div class="flex px-5 py-4 align-items-center border-bottom-1 border-bluegray-100">
+        <span class="text-2xl font-semibold text-bluegray-500">
+            Лог событий
+        </span>
+    </div>
+    <div class="flex flex-column">
+        <ng-container *ngFor="let groupedEvent of groupedEvents">
+            <ng-container *ngIf="groupedEvent.events.length === 1">
+                <ng-container [ngTemplateOutlet]="eventTemplate" [ngTemplateOutletContext]="{event: groupedEvent.events[0]}"></ng-container>
+            </ng-container>
+            <ng-container *ngIf="groupedEvent.events.length > 1">
+                <ng-container [ngTemplateOutlet]="groupedEventTemplate" [ngTemplateOutletContext]="{events: groupedEvent.events}"></ng-container>
+            </ng-container>
+        </ng-container>
+    </div>
+</div>
+
+<ng-template #groupedEventTemplate let-events="events">
+    <div class="flex p-3 gap-3 terminated animation-duration-300 fadein" [ngClass]="eventClass(events[0])">
+        <span>
+            {{eventMessage(events[0].isOnline, events.length)}}
+        </span>
+        <div class="flex flex-column gap-2">
+            <span *ngFor="let event of events">
+                {{event.terminal.description ? event.terminal.description : event.terminal.mac}}
+            </span>
+        </div>
+        <span>
+            {{events[0].terminal.olt.name}}
+        </span>
+        <span>
+            Порт: {{events[0].terminal.port}}
+        </span>
+        <span>
+            {{events[0].timestamp | date: 'dd-MM-yyyy HH:mm:ss'}}
+        </span>
+    </div>
+</ng-template>
+
+<ng-template #eventTemplate let-event="event">
+    <div class="flex align-items-center p-3 gap-3 terminated animation-duration-1000 fadein" [ngClass]="eventClass(event)">
+        <span>
+            {{eventMessage(event.isOnline, 1)}}
+        </span>
+        <span>
+            {{event.terminal.description ? event.terminal.description : event.terminal.mac}}
+        </span>
+        <span>
+            {{event.terminal.olt.name}}
+        </span>
+        <span>
+            Порт: {{event.terminal.port}}
+        </span>
+        <span>
+            Позиция: {{event.terminal.position}}
+        </span>
+        <span>
+            {{event.timestamp | date: 'dd-MM-yyyy HH:mm:ss'}}
+        </span>
+    </div>
+</ng-template>

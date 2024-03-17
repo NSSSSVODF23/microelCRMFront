@@ -7,7 +7,7 @@ import {
     DhcpLog,
     DhcpLogsRequest,
     LoadingState,
-    NCLHistoryWrapper,
+    NCLHistoryWrapper, Ont,
     UserEvents, UserTariff
 } from "../../types/transport-interfaces";
 import {DynamicValueFactory, SubscriptionsHolder, Utils} from "../../util";
@@ -37,6 +37,7 @@ import {AccessFlag} from "../../types/access-flag";
 import {PersonalityService} from "../../services/personality.service";
 import {AutoUnsubscribe} from "../../decorators";
 import {co} from "@fullcalendar/core/internal-common";
+import {OntManagementService} from "../../services/pon/ont-management.service";
 
 @Component({
     templateUrl: './billing-user-page.component.html',
@@ -314,11 +315,37 @@ export class BillingUserPageComponent implements OnInit, OnDestroy {
         comment: new FormControl<string>(""),
     });
 
+    updateOnt$ = this.login$
+        .pipe(
+            switchMap(login=>{
+                return merge(
+                    this.rt.receiveUpdatedOnt().pipe(filter(ont => ont.userLogin === login)),
+                    this.rt.receiveNewOntStatusChangeEvents().pipe(
+                        map(events => {
+                            let foundEvent = events.find(event => event.terminal.userLogin === login);
+                            if(!!foundEvent){
+                                return foundEvent.terminal;
+                            }
+                            return null;
+                        }),
+                        filter(ont => !!ont),
+                    )
+                )
+            })
+        );
+
+    ont$ = this.login$
+        .pipe(
+            switchMap(login => merge(this.api.getOntByLogin(login), this.updateOnt$)),
+            tap(onu=>this.ontNotFound = !onu)
+        );
+    ontNotFound = false;
+
     constructor(private api: ApiService, private rt: RealTimeUpdateService,
                 private route: ActivatedRoute, readonly customNav: CustomNavigationService,
                 readonly taskCreation: TaskCreatorService, readonly toast: MessageService,
                 private confirm: ConfirmationService, private blockUiService: BlockUiService,
-                readonly personality: PersonalityService) {
+                readonly personality: PersonalityService, readonly ontMgmt: OntManagementService) {
     }
 
     get isEndTariffDateAfter() {
@@ -927,6 +954,20 @@ export class BillingUserPageComponent implements OnInit, OnDestroy {
                     }
                 }
             })
+    }
+
+    ontStatusName(ont: Ont) {
+        return ont.isOnline ? 'В сети' : 'Не в сети';
+    }
+
+    ontStatusClass(ont: Ont) {
+        return ont.isOnline ? 'text-green-500' : 'text-red-600';
+    }
+
+    signalColor(ont: Ont) {
+        if(ont.curRxSignal > -25.5) return 'text-green-500';
+        if(ont.curRxSignal > -28.5) return 'text-orange-400';
+        return 'text-red-600';
     }
 
     private block(message: string = '') {

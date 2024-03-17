@@ -113,6 +113,23 @@ export class MainMenuService {
             ]
         },
         {
+            caption: "PON",
+            icon: "mdi-device_hub",
+            link: ["/pon"],
+            children: [
+                {
+                    caption: "Терминалы",
+                    icon: "mdi-memory",
+                    link: ["/pon", "terminals"]
+                },
+                {
+                    caption: "События",
+                    icon: "mdi-fact_check",
+                    link: ["/pon", "events"]
+                },
+            ]
+        },
+        {
             caption: "Сотрудники",
             icon: "mdi-account_circle",
             link: ["/employees"],

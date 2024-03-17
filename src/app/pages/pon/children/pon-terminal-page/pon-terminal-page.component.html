@@ -1,0 +1,75 @@
+<div class="flex flex-column flex-grow-1" *ngIf="terminal$ | async as terminal">
+    <div class="flex px-5 py-4 align-items-center gap-3 border-bottom-1 border-bluegray-100">
+        <p-button (onClick)="customNav.backOrDefault(['/pon','terminals'])" icon="mdi-arrow_back"
+                  styleClass="p-button-secondary p-button-text p-button-icon"></p-button>
+        <span class="text-2xl font-semibold text-bluegray-500">
+            {{terminal.description ? terminal.description : terminal.mac}}
+        </span>
+        <div class="flex gap-1 ml-3">
+            <p-button label="Переименовать" (onClick)="ontMgmt.openRename$.next({event:$event, id: terminal.id, oldName: terminal.description})"
+                      icon="mdi-drive_file_rename_outline" styleClass="p-button-sm p-button-success p-button-text"></p-button>
+            <p-button label="Назначить логин" (onClick)="ontMgmt.openAssignLogin$.next({event:$event, id: terminal.id, oldLogin: terminal.userLogin})"
+                      icon="mdi-face" styleClass="p-button-sm p-button-success p-button-text"></p-button>
+            <p-button label="Перезагрузить" icon="mdi-restart_alt" (onClick)="ontMgmt.reboot(terminal.id)" styleClass="p-button-sm p-button-danger p-button-text"></p-button>
+        </div>
+    </div>
+    <div class="flex flex-wrap align-items-center gap-3 px-5 py-4 border-bottom-1 border-bluegray-100">
+        <div class="flex flex-column gap-1 text-xl font-semibold" [ngClass]="terminal.isOnline ? 'text-green-500' : 'text-red-600'">
+            {{terminal.isOnline ? 'В сети' : 'Не в сети'}}
+        </div>
+        <div class="flex flex-column gap-1 text-xl font-semibold" *ngIf="terminal.curRxSignal" [ngClass]="signalColor(terminal.curRxSignal)">
+            {{terminal.curRxSignal | number: '1.2-2'}} dBm
+        </div>
+        <div class="flex flex-column gap-1 text-bluegray-500">
+            <span class="text-bluegray-300 font-semibold text-sm">Mac ONU</span>
+            <span>{{terminal.mac}}</span>
+        </div>
+        <div class="flex flex-column gap-1 text-bluegray-500">
+            <span class="text-bluegray-300 font-semibold text-sm">Привязанный логин</span>
+            <span [ngClass]="{'text-bluegray-300': !terminal.userLogin}">{{terminal.userLogin ? terminal.userLogin : 'Отсутствует'}}</span>
+        </div>
+        <div class="flex flex-column gap-1 text-bluegray-500">
+            <span class="text-bluegray-300 font-semibold text-sm">Порт OLT</span>
+            <span>{{terminal.port}}</span>
+        </div>
+        <div class="flex flex-column gap-1 text-bluegray-500">
+            <span class="text-bluegray-300 font-semibold text-sm">Позиция OLT</span>
+            <span>{{terminal.position}}</span>
+        </div>
+        <div class="flex flex-column gap-1 text-bluegray-500">
+            <span class="text-bluegray-300 font-semibold text-sm">OLT</span>
+            <span class="hover:text-primary-600 hover:bg-primary-50 cursor-pointer text-primary-400 px-2" (click)="copyIp(terminal.olt.ip)" >
+                {{terminal.olt.name ? terminal.olt.name : terminal.olt.ip}}
+            </span>
+        </div>
+        <div class="flex flex-column gap-1 text-bluegray-500">
+            <span class="text-bluegray-300 font-semibold text-sm">Создан</span>
+            <span>{{terminal.created | date:'dd-MM-yyyy HH:mm'}}</span>
+        </div>
+        <div class="flex flex-column gap-1 text-bluegray-500">
+            <span class="text-bluegray-300 font-semibold text-sm">Обновлен</span>
+            <span>{{terminal.updated | date:'dd-MM-yyyy HH:mm:ss'}}</span>
+        </div>
+        <div class="flex flex-column gap-1 text-bluegray-500">
+            <span class="text-bluegray-300 font-semibold text-sm">Аптайм</span>
+            <span>{{terminal.uptime | date:'dd-MM-yyyy HH:mm:ss'}}</span>
+        </div>
+    </div>
+    <div class="flex gap-2 px-5 pt-4 align-items-center">
+        <span class="text-bluegray-500 font-bold">Период графика</span>
+        <app-data-range-input [formControl]="chartDateRange"></app-data-range-input>
+        <p-button (onClick)="updateChart$.next(true)" icon="mdi-refresh" label="Обновить" styleClass="p-button-primary p-button-text"></p-button>
+        <p-button (onClick)="resetZoom()" icon="mdi-aspect_ratio" label="Сбросить масштаб" styleClass="p-button-secondary p-button-text"></p-button>
+    </div>
+    <div class="flex flex-grow-1 justify-content-center" *ngIf="chartData$ | async as chartData else chartLoadingTemplate">
+        <p-chart #signalChart [data]="{datasets:chartData}" [options]="chartOptions" type="line" width="calc(95vw - 200px)" height="70vh" *ngIf="!isChartLoading"></p-chart>
+        <ng-container *ngIf="isChartLoading" [ngTemplateOutlet]="chartLoadingTemplate"></ng-container>
+    </div>
+</div>
+
+<ng-template #chartLoadingTemplate>
+    <div class="flex align-items-center justify-content-center w-full" [style]="{height: '70vh'}">
+        <p-progressSpinner class="custom-spinner custom-spinner-8xl custom-spinner-primary"
+                           strokeWidth="1"></p-progressSpinner>
+    </div>
+</ng-template>

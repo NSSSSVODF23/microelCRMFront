@@ -1,41 +1,4 @@
 <router-outlet></router-outlet>
+
 <p-toast></p-toast>
-
-<p-toast position="bottom-right" key="chatMessage">
-    <ng-template let-message pTemplate="message">
-        <div class="flexed column stretched gap5">
-            <div class="flexed hcenter">
-                <app-employee-label [employee]="message.data.author"></app-employee-label>
-            </div>
-            <div class="flexed column" [style]="{marginLeft: '2rem'}">
-                <span *ngIf="message.data.descriptionOfAttachment" class="caption size-small wt-bold f-color-primary">{{message.data.descriptionOfAttachment}}</span>
-                <span *ngIf="message.data.text">{{message.data.text}}</span>
-            </div>
-            <div class="flexed vend caption size-tiny wt-bold f-color-500">
-                <span>{{message.data.sendAt | date: 'dd-MM-yyyy HH:mm'}}</span>
-            </div>
-        </div>
-    </ng-template>
-</p-toast>
-
-<p-toast key="darktoast" position="bottom-center">
-    <ng-template let-message pTemplate="message">
-        <div class="flex gap-3 flex-grow-1 h-full align-items-center">
-            <span *ngIf="message.icon" [class]="message.icon+' text-xl'"></span>
-            <span class="font-bold">
-                {{message.detail}}
-            </span>
-        </div>
-    </ng-template>
-</p-toast>
-
-<p-toast key="redtoast" position="bottom-center">
-    <ng-template let-message pTemplate="message">
-        <div class="flex gap-3 flex-grow-1 h-full align-items-center">
-            <span *ngIf="message.icon" [class]="message.icon+' text-xl'"></span>
-            <span class="font-bold">
-                {{message.detail}}
-            </span>
-        </div>
-    </ng-template>
-</p-toast>
+<p-confirmDialog></p-confirmDialog>

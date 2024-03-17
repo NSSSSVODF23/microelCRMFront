@@ -60,22 +60,20 @@ export function OnElementInit(selector: string) {
 export function RouteParam(paramName?: string) {
     return function (prototype: any, name: string) {
         const originalAfterViewInit = prototype.ngAfterViewInit ? prototype.ngAfterViewInit : () => {};
-        // const originalOnDestroy = prototype.ngOnDestroy ? prototype.ngOnDestroy : () => {};
-        // const subject = new Subject<String>();
-        // let sub: Subscription;
-        // Object.defineProperty(prototype, name, {value: subject.pipe(shareReplay(1))});
+        const originalOnDestroy = prototype.ngOnDestroy ? prototype.ngOnDestroy : () => {};
+        let sub: Subscription;
         prototype.ngAfterViewInit = function () {
-            this.route.params.pipe(
+            sub = this.route.params.pipe(
                 filter((p:{[key:string]:string}) => p[paramName?paramName:name] !== undefined),
                 map((p:{[key:string]:string}) => p[paramName?paramName:name]),
                 distinctUntilChanged(),
             ).subscribe(this[name]);
             originalAfterViewInit.apply(this, arguments);
         }
-        // prototype.ngOnDestroy = function () {
-        //     sub?.unsubscribe();
-        //     originalOnDestroy.apply(this, arguments);
-        // }
+        prototype.ngOnDestroy = function () {
+            sub?.unsubscribe();
+            originalOnDestroy.apply(this, arguments);
+        }
     }
 }
 

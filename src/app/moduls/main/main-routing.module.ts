@@ -66,6 +66,10 @@ import {TopologyHousePage} from "../../pages/topology/children/topology-house-pa
 import {TaskRegistryPage} from "../../pages/task-registry-page/task-registry-page.component";
 import {MainBootstrap} from "../../pages/bootstaps/main-bootstrap/main-bootstrap.component";
 import {CatalogRedirectGuard} from "../../guards/catalog-redirect.guard";
+import {PonBootstrapPage} from "../../pages/pon/pon-bootstrap-page/pon-bootstrap-page.component";
+import {PonTerminalsPage} from "../../pages/pon/children/pon-terminals-page/pon-terminals-page.component";
+import {PonEventsPage} from "../../pages/pon/children/pon-events-page/pon-events-page.component";
+import {PonTerminalPage} from "../../pages/pon/children/pon-terminal-page/pon-terminal-page.component";
 
 const routes: Routes = [{
     path: '', component: MainBootstrap, children: [
@@ -254,6 +258,7 @@ const routes: Routes = [{
             children: [
                 {path: 'houses', component: TopologyHousesPage},
                 {path: 'house/:id', component: TopologyHousePage},
+                {path: 'pon/:id', component: TopologyHousePage},
                 {
                     path: 'commutators',
                     component: TopologyCommutatorsPage,
@@ -264,6 +269,17 @@ const routes: Routes = [{
                     component: TopologySessionsPage,
                     canActivate: [accessCanActivate(AccessFlag.BILLING)]
                 },
+            ],
+            // canActivate:[accessCanActivate(AccessFlag.VIEW_STATISTICS)]
+        },
+        {path: 'pon', pathMatch: 'full', redirectTo: 'pon/terminals'},
+        {
+            path: 'pon',
+            component: PonBootstrapPage,
+            children: [
+                {path: 'terminals', component: PonTerminalsPage},
+                {path: 'events', component: PonEventsPage},
+                {path: 'terminal/:id', component: PonTerminalPage},
             ],
             // canActivate:[accessCanActivate(AccessFlag.VIEW_STATISTICS)]
         }

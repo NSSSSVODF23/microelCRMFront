@@ -19,8 +19,17 @@ import {
 } from './pages/bootstaps/module-loading-bootstrap/module-loading-bootstrap.component';
 import {ProgressSpinnerModule} from "primeng/progressspinner";
 import {ButtonModule} from "primeng/button";
+import moment from 'moment';
+import 'moment/locale/ru';
+import { Chart } from 'chart.js';
+import zoomPlugin from 'chartjs-plugin-zoom';
+import annotationPlugin from 'chartjs-plugin-annotation';
+import {ConfirmDialogModule} from "primeng/confirmdialog";
 
+moment.locale('ru');
 registerLocaleData(localeRu, 'ru');
+Chart.register(zoomPlugin);
+Chart.register(annotationPlugin);
 
 
 @NgModule({
@@ -39,6 +48,7 @@ registerLocaleData(localeRu, 'ru');
         CommonComponentsModule,
         ProgressSpinnerModule,
         ButtonModule,
+        ConfirmDialogModule,
     ],
     exports: [BrowserAnimationsModule, RouterOutlet, FormsModule, HttpClientModule],
     bootstrap: [AppComponent]

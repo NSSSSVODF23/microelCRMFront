@@ -1951,3 +1951,58 @@ export enum DynamicTableCellType{
     LOGIN = "LOGIN",
     PHONE = "PHONE",
 }
+
+export interface Ont {
+    id: number;
+    mac: string;
+    name: string;
+    description: string;
+    userLogin: string;
+    port: number;
+    position: number;
+    olt: Olt;
+    isOnline: boolean;
+    curRxSignal: number;
+    curTxSignal: number;
+    created: string;
+    updated: string;
+    uptime: string;
+    isDeleted: boolean;
+}
+
+export interface Olt {
+    id: number;
+    name: string;
+    ip: string;
+    port: number;
+    trapPort: number;
+    community: string;
+    externalCommutatorId: number;
+    isDeleted: boolean;
+    model: string;
+}
+
+export interface OntSignalSnapshot {
+    id: number;
+    isOnline: boolean;
+    rxSignal: number;
+    txSignal: number;
+    timestamp: string;
+}
+
+export interface Event {
+    id: number;
+    message: string;
+    timestamp: string;
+    groupId: string;
+}
+
+export interface OntStatusChangeEvent extends Event {
+    terminal: Ont;
+    isOnline: boolean;
+}
+
+export interface OltWorker {
+    id: string;
+    name: string;
+}

@@ -143,6 +143,10 @@ import {
 import {TopologyHousePage} from "../../pages/topology/children/topology-house-page/topology-house-page.component";
 import {NgTerminalModule} from "ng-terminal";
 import {TaskRegistryPage} from "../../pages/task-registry-page/task-registry-page.component";
+import {PonBootstrapPage} from "../../pages/pon/pon-bootstrap-page/pon-bootstrap-page.component";
+import {PonTerminalsPage} from "../../pages/pon/children/pon-terminals-page/pon-terminals-page.component";
+import {PonEventsPage} from "../../pages/pon/children/pon-events-page/pon-events-page.component";
+import {PonTerminalPage} from "../../pages/pon/children/pon-terminal-page/pon-terminal-page.component";
 
 const mapConfig: YaConfig = {
     apikey: '008574e5-f34b-4270-b3d5-91aaabd036e8',
@@ -190,7 +194,11 @@ const mapConfig: YaConfig = {
         TopologyHousePage,
         TopologySessionsPage,
         TopologyCommutatorsPage,
-        TaskRegistryPage
+        TaskRegistryPage,
+        PonBootstrapPage,
+        PonTerminalsPage,
+        PonEventsPage,
+        PonTerminalPage
     ],
     imports: [
         CommonComponentsModule,

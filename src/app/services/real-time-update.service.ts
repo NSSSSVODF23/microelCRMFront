@@ -16,7 +16,7 @@ import {
     DhcpBinding,
     Employee,
     House,
-    INotification,
+    INotification, OntStatusChangeEvent,
     PaidAction,
     PaidWork,
     PingMonitoring,
@@ -35,8 +35,8 @@ import {
     TreeNodeMoveEvent,
     TreeNodeUpdateEvent, TypesOfContracts,
     Wireframe,
-    WireframeTaskCounter,
-    WorkLog
+    WireframeTaskCounter, OltWorker,
+    WorkLog, Ont
 } from "../types/transport-interfaces";
 import {cyrb53} from "../util";
 import {OldTracker, SimpleMessage} from "../types/parsing-interfaces";
@@ -499,5 +499,21 @@ export class RealTimeUpdateService {
 
     telnetConnectionMessage(login: string) {
         return this.watchUnicast<TelnetConnectionCredentials>(login, 'remote', 'telnet', 'connection-message')
+    }
+
+    receiveNewOntStatusChangeEvents() {
+        return this.watch<OntStatusChangeEvent[]>('pon', 'events', 'new', 'ont', 'status-change')
+    }
+
+    receiveNewWorkersInQueue() {
+        return this.watch<OltWorker>('pon', 'worker', 'new')
+    }
+
+    receiveSpentWorkersInQueue() {
+        return this.watch<OltWorker>('pon', 'worker', 'spent')
+    }
+
+    receiveUpdatedOnt() {
+        return this.watch<Ont>('pon', 'ont', 'update')
     }
 }

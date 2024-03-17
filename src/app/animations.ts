@@ -129,3 +129,17 @@ export const swipe =trigger('swipe', [
     transition('default <=> left', animate('200ms ease-out')),
     transition('right <=> left', animate('0s')),
 ])
+
+// Fast fade in and slow fade out
+export const fadeFast = trigger("fadeFast", [
+    transition(':enter', [
+        style({opacity: 0}),  // initial
+        animate('0.15s',
+            style({opacity: 1}))  // final
+    ]),
+    transition(':leave', [
+        style({opacity: 1}),  // initial
+        animate('5s',
+            style({opacity: 0}))  // final
+    ])
+]);

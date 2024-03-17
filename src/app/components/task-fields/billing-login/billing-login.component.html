@@ -1,6 +1,6 @@
 <ng-container [ngSwitch]="popup">
     <ng-container *ngSwitchCase="true">
-        <a class="select-none cursor-pointer hover:text-primary-700 no-underline" (contextmenu)="$event.stopPropagation()"
+        <a class="select-none cursor-pointer text-primary-400 hover:text-primary-700 no-underline" (contextmenu)="$event.stopPropagation()"
            (mouseenter)="mouseEnter$.next($event)" (mouseleave)="mouseLeave$.next($event)"
            [routerLink]="['/clients','billing','user',loginData]" (click)="$event.stopPropagation()">{{loginData}}</a>
         <p-overlayPanel #popupPanel>

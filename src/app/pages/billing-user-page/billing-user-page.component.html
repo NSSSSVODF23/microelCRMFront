@@ -210,6 +210,60 @@
                         *ngTemplateOutlet="infoRowTemplate; context: {label: 'IP', value: activeBinding.ipaddr}"></ng-container>
                 <ng-container
                         *ngTemplateOutlet="infoRowTemplate; context: {label: 'Активность', value: activeBinding.leaseStart | date: 'dd-MM-yyyy HH:mm:ss' | titlecase, help: 'Момент времени, когда оборудование отправило запрос серверу.'}"></ng-container>
+                <p-button label="Назначить ONU" styleClass="p-button-success p-button-outlined p-button-sm" *ngIf="ontNotFound"
+                          (onClick)="ontMgmt.openAssignOnt$.next({event: $event, login: currentLogin??'', ont: null})"></p-button>
+            </div>
+        </ng-container>
+        <ng-container *ngIf="ont$ | async as ont">
+            <div class="flex flex-column gap-2 p-3">
+                <ng-container
+                        *ngTemplateOutlet="infoRowTemplate; context: {label: 'Mac Onu', value: ont.mac}"></ng-container>
+                <span class="flex align-items-center gap-1 text-bluegray-500">
+                    <span class="text-bluegray-400 font-bold">
+                        Имя Onu:
+                    </span>
+                    <span class="text-lg max-w-18rem">
+                        {{ont.description ? ont.description : '-'}}
+                    </span>
+                    <span class="text-bluegray-400 font-semibold hover:text-primary-400 cursor-pointer"
+                          (click)="ontMgmt.openRename$.next({event: $event, id: ont.id, oldName: ont.description})">
+                        Переименовать
+                    </span>
+                </span>
+                <ng-container
+                        *ngTemplateOutlet="infoRowTemplate; context: {label: 'OLT', value: ont.olt.ip}"></ng-container>
+                <ng-container
+                        *ngTemplateOutlet="infoRowTemplate; context: {label: 'Порт', value: ont.port}"></ng-container>
+                <ng-container
+                        *ngTemplateOutlet="infoRowTemplate; context: {label: 'Позиция', value: ont.position}"></ng-container>
+                <span class="flex align-items-center gap-1 text-bluegray-500">
+                    <span class="text-bluegray-400 font-bold">
+                        Статус:
+                    </span>
+                    <span [ngClass]="ontStatusClass(ont)" class="text-lg max-w-18rem">
+                        {{ontStatusName(ont)}}
+                    </span>
+                    <span class="text-bluegray-400 font-semibold hover:text-red-500 cursor-pointer"
+                          (click)="ontMgmt.reboot(ont.id)" *ngIf="ont.isOnline">
+                        Перезагрузить
+                    </span>
+                </span>
+                <ng-container *ngIf="ont.curRxSignal" [ngTemplateOutlet]="infoRowTemplate"
+                              [ngTemplateOutletContext]="{label: 'Сигнал', value: ((ont.curRxSignal | number:'1.2-2')+ ' dBm'), valueClass: signalColor(ont)}"></ng-container>
+                <ng-container *ngTemplateOutlet="infoRowTemplate; context: {label: 'Аптайм', value: ont.uptime | date:'dd-MM-yyyy HH:mm'}"></ng-container>
+                <span class="flex align-items-center gap-1 text-bluegray-500">
+                    <span class="text-bluegray-400 font-bold">
+                        Обновлена:
+                    </span>
+                    <span class="text-lg max-w-18rem">
+                        {{ont.updated | date:'dd-MM-yyyy HH:mm'}}
+                    </span>
+                    <span class="text-bluegray-400 font-semibold hover:text-primary-400 cursor-pointer">
+                        Обновить
+                    </span>
+                </span>
+                <p-button label="Изменить ONU" styleClass="p-button-success p-button-outlined p-button-sm"
+                          (onClick)="ontMgmt.openAssignOnt$.next({event: $event, login: currentLogin??'', ont: ont})"></p-button>
             </div>
         </ng-container>
         <p-button (onClick)="isAuthDialogVisible = true"
@@ -246,11 +300,11 @@
 </ng-template>
 
 <ng-template #infoRowTemplate let-help="help" let-label="label" let-value="value" let-valueClass="valueClass">
-    <span class="flex align-items-center gap-1">
+    <span class="flex align-items-center gap-1 text-bluegray-500s">
         <span class="text-bluegray-400 font-bold">
             {{label}}:
         </span>
-        <span [ngClass]="valueClass" class="text-bluegray-500 text-lg max-w-18rem">
+        <span [ngClass]="valueClass" class="text-lg max-w-18rem">
             {{value ?? '-'}}
         </span>
         <span *ngIf="help" [pTooltip]="help"

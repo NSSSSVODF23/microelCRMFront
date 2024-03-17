@@ -1,0 +1,19 @@
+<p-overlayPanel #panel appendTo="body">
+    <ng-template pTemplate="content">
+        <div class="flex gap-2">
+            <p-autoComplete [suggestions]="service.userSuggestions" [delay]="1200" appendTo="body" [showClear]="true"
+                            (completeMethod)="service.getUserSuggestions($event.query)" [formControl]="loginControl"
+                            [showEmptyMessage]="true" emptyMessage="Не найдено абонентов" field="uname">
+                <ng-template let-value pTemplate="item">
+                    <div class="flex gap-1">
+                        <span [style.color]="value.stateColor">{{value.stateName}}</span>
+                        <span>{{value.addr}}</span>
+                        <span>{{value.uname}}</span>
+                    </div>
+                </ng-template>
+            </p-autoComplete>
+            <p-button label="Назначить" icon="mdi-save"
+                      (onClick)="service.assignLogin(loginControl.value?.uname ?? null); panel.hide()"></p-button>
+        </div>
+    </ng-template>
+</p-overlayPanel>

@@ -38,7 +38,6 @@ import {DialogModule} from "primeng/dialog";
 import {TabViewModule} from "primeng/tabview";
 import {BadgeModule} from "primeng/badge";
 import {ProgressSpinnerModule} from "primeng/progressspinner";
-import {MainBootstrapComponent} from "../../pages/main-bootstrap/main-bootstrap.component";
 import {ToastModule} from "primeng/toast";
 import {InputTextModule} from "primeng/inputtext";
 import {InputMaskModule} from "primeng/inputmask";
@@ -252,6 +251,13 @@ import {CommutatorsTableComponent} from "../../components/acp/commutators-table/
 import {ThumbnailPreviewComponent} from "../../components/content/thumbnail-preview/thumbnail-preview.component";
 import {DelayedInputDirective} from "../../directives/delayed-input.directive";
 import {MainBootstrap} from "../../pages/bootstaps/main-bootstrap/main-bootstrap.component";
+import {RenameOntPopupComponent} from "../../components/pon/rename-ont-popup/rename-ont-popup.component";
+import {
+    OntAssignLoginPopupComponent
+} from "../../components/pon/ont-assign-login-popup/ont-assign-login-popup.component";
+import {
+    LoginAssignOntPopupComponent
+} from "../../components/pon/login-assign-ont-popup/login-assign-ont-popup.component";
 
 
 @NgModule({
@@ -276,7 +282,6 @@ import {MainBootstrap} from "../../pages/bootstaps/main-bootstrap/main-bootstrap
         MediaViewerComponent,
         TaskListElementComponent,
         SelectFieldToViewButtonComponent,
-        MainBootstrapComponent,
         MainBootstrap,
         IntersectionObserverDirective,
         FreeDragDirective,
@@ -379,7 +384,10 @@ import {MainBootstrap} from "../../pages/bootstaps/main-bootstrap/main-bootstrap
         BindingsTableComponent,
         CommutatorsTableComponent,
         ThumbnailPreviewComponent,
-        DelayedInputDirective
+        DelayedInputDirective,
+        RenameOntPopupComponent,
+        OntAssignLoginPopupComponent,
+        LoginAssignOntPopupComponent
     ],
     exports: [
         AccountPanelComponent,
@@ -402,7 +410,6 @@ import {MainBootstrap} from "../../pages/bootstaps/main-bootstrap/main-bootstrap
         MediaViewerComponent,
         TaskListElementComponent,
         SelectFieldToViewButtonComponent,
-        MainBootstrapComponent,
         MainBootstrap,
         IntersectionObserverDirective,
         FreeDragDirective,
@@ -502,7 +509,9 @@ import {MainBootstrap} from "../../pages/bootstaps/main-bootstrap/main-bootstrap
         BindingsTableComponent,
         CommutatorsTableComponent,
         ThumbnailPreviewComponent,
-        DelayedInputDirective
+        DelayedInputDirective,
+        RenameOntPopupComponent,
+        OntAssignLoginPopupComponent
     ],
     imports: [
         CommonPipesModule,

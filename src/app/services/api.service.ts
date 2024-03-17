@@ -19,7 +19,8 @@ import {
     DefaultObservers,
     Department,
     DhcpBinding,
-    DhcpLogsRequest, DynamicTableCell,
+    DhcpLogsRequest,
+    DynamicTableCell,
     DynamicTableColumn,
     Employee,
     EmployeeStatus,
@@ -38,6 +39,9 @@ import {
     ModelItem,
     NCLHistoryWrapper,
     NetworkRemoteControl,
+    Olt,
+    Ont,
+    OntStatusChangeEvent,
     Page,
     PaidAction,
     PaidActionFilter,
@@ -82,15 +86,15 @@ import {
     UserTariff,
     Wireframe,
     WireframeDashboardStatistic,
+    OltWorker,
     WorkingDay,
-    WorkLog
+    WorkLog, DateRange
 } from "../types/transport-interfaces";
 import {MessageService, TreeNode} from "primeng/api";
 import {cyrb53, Storage, Utils} from "../util";
 import {Duration} from "@fullcalendar/core";
 import {AddressCorrecting, OldTracker} from "../types/parsing-interfaces";
 import {DhcpBindingFilter} from "../types/service-interfaces";
-import _default from "chart.js/dist/plugins/plugin.tooltip";
 import EmployeeWorkStatisticsTable = Statistics.EmployeeWorkStatisticsTable;
 import EmployeeWorkStatisticsForm = Statistics.EmployeeWorkStatisticsForm;
 
@@ -961,7 +965,7 @@ export class ApiService {
         });
     }
 
-    getCommutatorsTable(paging: any){
+    getCommutatorsTable(paging: any) {
         return this.sendPost<Page<SwitchBaseInfo>>('api/private/acp/commutators/table', paging);
     }
 
@@ -1197,7 +1201,6 @@ export class ApiService {
         return this.sendPatch(`api/private/files/rename`, {id, name});
     }
 
-
     filesCreateDirectory(name: string, parentDirectoryId?: number | null) {
         return this.sendPost(`api/private/files/create-directory`, {parentDirectoryId, name});
     }
@@ -1345,7 +1348,112 @@ export class ApiService {
      * Получить контент таблицы реестра задач
      */
     getTaskRegistryTableContent(taskStatus: TaskStatus, taskClass: number, tagMode: string, tags: number[], paging: any) {
-        return this.sendPost<Page<{[key:string]:DynamicTableCell}>>(`api/private/task/registry/content/${taskStatus}/${taskClass}`, {tagMode, tags, paging});
+        return this.sendPost<Page<{ [key: string]: DynamicTableCell }>>(`api/private/task/registry/content/${taskStatus}/${taskClass}`, {
+            tagMode,
+            tags,
+            paging
+        });
+    }
+
+    /**
+     * Получить контент таблицы оптических терминалов
+     */
+    getOntTable(paging: any) {
+        return this.sendPost<Page<Ont>>(`api/private/pon/ont/table`, paging);
+    }
+
+    /**
+     * Получить список оптических коммутаторов
+     */
+    getOltList() {
+        return this.sendGet<Olt[]>(`api/private/pon/olt/list`);
+    }
+
+    /**
+     * Получить события изменения статуса ONT
+     * @param offset Смещение выборки из базы данных
+     * @param oltId Идентификатор коммутатора
+     * @param port Номер порта
+     */
+    getOntStatusChangeEvents(offset: number, oltId: number | null, port: number | null) {
+        return this.sendGet<Page<OntStatusChangeEvent>>(`api/private/pon/event/ont/status-change/${offset}`, {
+            oltId,
+            port
+        });
+    }
+
+    /**
+     * Получить очередь обработчиков задач для коммутаторов OLT
+     */
+    getWorkerQueue() {
+        return this.sendGet<OltWorker[]>(`api/private/pon/worker-queue`);
+    }
+
+    /**
+     * Получить график сигнала оптического терминала
+     * @param id Идентификатор оптического терминала
+     * @param timeRange Диапазон времени для графика сигнала (from, to)
+     */
+    getOntSignalChart(id: number, timeRange: DateRange) {
+        return this.sendPost<any[]>(`api/private/pon/ont/${id}/signal-chart`, timeRange);
+    }
+
+    /**
+     * Получить информацию об оптическом терминале
+     * @param id Идентификатор оптического терминала
+     */
+    getOnt(id: number) {
+        return this.sendGet<Ont>(`api/private/pon/ont/${id}`);
+    }
+
+    /**
+     * Переименовать оптический терминал
+     * @param id Идентификатор оптического терминала
+     * @param name Новое имя оптического терминала
+     */
+    renameOnt(id: number, name: string) {
+        return this.sendPatch(`api/private/pon/ont/${id}/rename?name=${name}`, {});
+    }
+
+    /**
+     * Назначить логин пользователя к оптическому терминалу
+     * @param id Идентификатор оптического терминала
+     * @param login Логин пользователя
+     */
+    assignLoginToOnt(id: number, login: string) {
+        return this.sendPatch(`api/private/pon/ont/${id}/assign-login?login=${login}`, {});
+    }
+
+    /**
+     * Перезагрузить оптический терминал
+     * @param id Идентификатор оптического терминала
+     */
+    rebootOnt(id: number) {
+        return this.sendPost(`api/private/pon/ont/${id}/reboot`, {});
+    }
+
+    /**
+     * Получить список для автозаполнения пользователей по логину или адресу
+     * @param query Строка для поиска пользователей
+     */
+    getUserSuggestions(query: string) {
+        return this.sendGet<BillingUserItemData[]>(`api/private/billing/suggestions/user`, {query});
+    }
+
+    /**
+     * Получить список для автозаполнения оптических терминалов
+     * @param query Строка для поиска оптических терминалов
+     */
+    getOntSuggestions(query: string) {
+        return this.sendGet<Ont[]>(`api/private/pon/suggestions/ont`, {query});
+    }
+
+    /**
+     * Получить оптический терминал по логину пользователя
+     * @param login Логин пользователя
+     */
+    getOntByLogin(login: string) {
+        return this.sendGet<Ont | null>(`api/private/pon/ont/login/${login}`);
     }
 
     // Результаты запросов на сервер кэшируются по таймауту, чтобы не было доп нагрузки на сервер
@@ -1430,7 +1538,6 @@ export class ApiService {
     private generateHash(uri: string, query: any) {
         return cyrb53(uri + JSON.stringify(query), 0);
     }
-
 
 
 }
