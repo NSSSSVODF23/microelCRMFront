@@ -18,9 +18,9 @@ import {DateRange, TimeFrame} from "../../../../types/transport-interfaces";
 import {FormControl} from "@angular/forms";
 import {CustomNavigationService} from "../../../../services/custom-navigation.service";
 import {Utils} from "../../../../util";
-import {ConfirmationService, MessageService} from "primeng/api";
-import {Chart} from "chart.js";
+import {MessageService} from "primeng/api";
 import {UIChart} from "primeng/chart";
+import "chartjs-adapter-moment";
 import {OntManagementService} from "../../../../services/pon/ont-management.service";
 import {RealTimeUpdateService} from "../../../../services/real-time-update.service";
 
