@@ -10,6 +10,8 @@
                       icon="mdi-drive_file_rename_outline" styleClass="p-button-sm p-button-success p-button-text"></p-button>
             <p-button label="Назначить логин" (onClick)="ontMgmt.openAssignLogin$.next({event:$event, id: terminal.id, oldLogin: terminal.userLogin})"
                       icon="mdi-face" styleClass="p-button-sm p-button-success p-button-text"></p-button>
+            <p-button label="Обновить терминал" (onClick)="ontMgmt.update(terminal.id)" [loading]="ontMgmt.isUpdatingOnt(terminal.id)"
+                      icon="mdi-update" styleClass="p-button-sm p-button-info p-button-text"></p-button>
             <p-button label="Перезагрузить" icon="mdi-restart_alt" (onClick)="ontMgmt.reboot(terminal.id)" styleClass="p-button-sm p-button-danger p-button-text"></p-button>
         </div>
     </div>

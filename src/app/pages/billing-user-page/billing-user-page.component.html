@@ -258,7 +258,8 @@
                     <span class="text-lg max-w-18rem">
                         {{ont.updated | date:'dd-MM-yyyy HH:mm'}}
                     </span>
-                    <span class="text-bluegray-400 font-semibold hover:text-primary-400 cursor-pointer">
+                    <span class="text-bluegray-400 font-semibold hover:text-primary-400 cursor-pointer"
+                          (click)="ontMgmt.update(ont.id)" *ngIf="!ontMgmt.isUpdatingOnt(ont.id)">
                         Обновить
                     </span>
                 </span>

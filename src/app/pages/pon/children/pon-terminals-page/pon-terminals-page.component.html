@@ -2,17 +2,17 @@
 
 <div class="flex flex-column flex-grow-1 h-full">
     <div class="flex px-5 py-4 align-items-center gap-3 border-bottom-1 border-bluegray-100">
-        <span class="text-2xl font-semibold text-bluegray-500">
+        <span class="text-2xl font-semibold text-bluegray-500 white-space-nowrap">
             Оптические терминалы
         </span>
-        <div class="flex gap-3 flex-grow-1">
+        <div class="flex gap-3 flex-grow-1 align-items-center">
             <div class="flex gap-1">
                 <input (delayInput)="tableEl.filterGlobal($event, 'contains')" [delay]="1000" pInputText
                        [(ngModel)]="service.globalFilter" placeholder="Найти...">
                 <p-button icon="mdi-close" styleClass="p-button-text p-button-icon p-button-secondary"
                           (onClick)="tableEl.filterGlobal(null, 'contains'); service.globalFilter=null"></p-button>
             </div>
-            <div class="flex gap-2 align-items-center text-bluegray-400 overflow-hidden" *ngIf="service.workersQueue.length>0">
+            <div class="flex flex-wrap h-2rem gap-2 align-items-center text-bluegray-400 overflow-hidden" *ngIf="service.workersQueue.length>0">
                 <span class="text-bluegray-500 font-semibold">Обновляется:</span>
                 <span @fadeFast *ngFor="let worker of service.workersQueue" class="white-space-nowrap">
                     {{worker.name}}

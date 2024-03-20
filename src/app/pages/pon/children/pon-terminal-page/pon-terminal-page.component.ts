@@ -99,9 +99,9 @@ export class PonTerminalPage implements OnInit {
     signalForUpdate$ = merge(this.rt.receiveNewOntStatusChangeEvents(), this.rt.receiveUpdatedOnt())
         .pipe(
             map(eventsOrOnt => {
-                if(Array.isArray(eventsOrOnt)){
+                if (Array.isArray(eventsOrOnt)) {
                     return eventsOrOnt.map(event => event.terminal);
-                }else{
+                } else {
                     return [eventsOrOnt];
                 }
             })
@@ -110,10 +110,10 @@ export class PonTerminalPage implements OnInit {
     updateTerminal$ = combineLatest([this.terminalId$, this.signalForUpdate$])
         .pipe(
             map(([id, events]) => {
-                let filter = events.filter(event=>event.id === parseInt(id));
-                if(filter.length > 0) {
+                let filter = events.filter(event => event.id === parseInt(id));
+                if (filter.length > 0) {
                     return filter[0];
-                }else{
+                } else {
                     return null
                 }
             }),
@@ -133,7 +133,7 @@ export class PonTerminalPage implements OnInit {
             tap(() => this.isChartLoading = true),
             switchMap(([id, dateRange]) => this.api.getOntSignalChart(parseInt(id), dateRange ?? {timeFrame: TimeFrame.THIS_WEEK} as DateRange)),
             tap((dataSets) => {
-                if(dataSets.length > 0) {
+                if (dataSets.length > 0) {
                     for (const dataSet of dataSets) {
                         dataSet.fill = 'origin';
                     }
@@ -151,8 +151,8 @@ export class PonTerminalPage implements OnInit {
     }
 
     signalColor(signal: number) {
-        if(signal > -25.5) return 'text-green-500';
-        if(signal > -28.5) return 'text-orange-400';
+        if (signal > -25.5) return 'text-green-500';
+        if (signal > -28.5) return 'text-orange-400';
         return 'text-red-600';
     }
 

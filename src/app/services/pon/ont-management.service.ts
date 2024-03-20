@@ -4,6 +4,7 @@ import {filter, first, ReplaySubject, switchMap, tap} from "rxjs";
 import {BlockUiService} from "../block-ui.service";
 import {BillingUserItemData, Ont} from "../../types/transport-interfaces";
 import {ConfirmationService} from "primeng/api";
+import {RealTimeUpdateService} from "../real-time-update.service";
 
 @Injectable({
     providedIn: 'root'
@@ -15,8 +16,10 @@ export class OntManagementService {
     openAssignOnt$ = new ReplaySubject<{ event: Event, login: string, ont: Ont | null } | null>(1);
     userSuggestions: BillingUserItemData[] = [];
     ontSuggestions: Ont[] = [];
+    updatingOntIds: number[] = [];
 
-    constructor(private api: ApiService, private blockUi: BlockUiService, private confirmService: ConfirmationService) {
+    constructor(private api: ApiService, private rt: RealTimeUpdateService,
+                private blockUi: BlockUiService, private confirmService: ConfirmationService) {
     }
 
     hideAll() {
@@ -84,5 +87,33 @@ export class OntManagementService {
                 this.api.rebootOnt(id).subscribe();
             }
         })
+    }
+
+    update(id: number) {
+        this.api.updateOnt(id)
+            .pipe(
+                switchMap((workerId)=> {
+                    this.updatingOntIds.push(id);
+                    return this.rt.receiveSpentWorkersInQueue()
+                        .pipe(
+                            filter(worker => worker.id === workerId),
+                            first()
+                        )
+                })
+            )
+            .subscribe(
+                {
+                    next: () => {
+                        this.updatingOntIds.splice(this.updatingOntIds.indexOf(id), 1);
+                    },
+                    error: () => {
+                        this.updatingOntIds.splice(this.updatingOntIds.indexOf(id), 1);
+                    }
+                }
+            );
+    }
+
+    isUpdatingOnt(id: number) {
+        return this.updatingOntIds.includes(id);
     }
 }

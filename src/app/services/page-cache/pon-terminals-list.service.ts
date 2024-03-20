@@ -75,8 +75,15 @@ export class PonTerminalsListService {
         this.updateOnt$.subscribe(updatedOnt => {
             let target = this.tableContent?.content.find(ont => ont.id === updatedOnt.id);
             if (target) {
+                target.isOnline = updatedOnt.isOnline;
                 target.description = updatedOnt.description;
                 target.userLogin = updatedOnt.userLogin;
+                target.curRxSignal = updatedOnt.curRxSignal;
+                target.curTxSignal = updatedOnt.curTxSignal;
+                target.port = updatedOnt.port;
+                target.position = updatedOnt.position;
+                target.updated = updatedOnt.updated;
+                target.uptime = updatedOnt.uptime;
             }
         });
         this.removeWorker$.subscribe( spentWorker =>{

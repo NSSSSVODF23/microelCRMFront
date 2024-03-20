@@ -74,6 +74,14 @@ export class PonTerminalsPage implements OnInit {
                 }
             },
             {
+                label: 'Обновить терминал',
+                icon: 'mdi-update',
+                disabled: this.ontMgmt.isUpdatingOnt(ont.id),
+                command: () => {
+                    this.ontMgmt.update(ont.id)
+                }
+            },
+            {
                 label: 'Перезагрузить',
                 icon: 'mdi-restart_alt',
                 command: () => {
