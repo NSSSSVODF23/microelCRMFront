@@ -3,6 +3,7 @@ import {OverlayPanel} from "primeng/overlaypanel";
 import {OntManagementService} from "../../../services/pon/ont-management.service";
 import {AutoUnsubscribe} from "../../../decorators";
 import {FormControl} from "@angular/forms";
+import {AutoComplete} from "primeng/autocomplete";
 
 @Component({
     selector: 'app-ont-assign-login-popup',
@@ -13,6 +14,7 @@ import {FormControl} from "@angular/forms";
 export class OntAssignLoginPopupComponent implements OnInit {
 
     @ViewChild('panel') panel?: OverlayPanel;
+    @ViewChild('inputEl') inputEl?: AutoComplete;
     loginControl = new FormControl<{ uname: string } | null>(null);
 
 
@@ -32,4 +34,9 @@ export class OntAssignLoginPopupComponent implements OnInit {
     }
 
 
+    onShow() {
+        setTimeout(
+            ()=>this.inputEl?.focusInput()
+        )
+    }
 }

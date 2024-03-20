@@ -1,7 +1,7 @@
-<p-overlayPanel #panel appendTo="body">
+<p-overlayPanel #panel appendTo="body" (onShow)="onShow()">
     <ng-template pTemplate="content">
         <div class="flex gap-2">
-            <p-autoComplete [suggestions]="service.ontSuggestions" [delay]="1200" appendTo="body" [showClear]="true"
+            <p-autoComplete #inputEl [suggestions]="service.ontSuggestions" [delay]="1200" appendTo="body" [showClear]="true"
                             (completeMethod)="service.getOntSuggestions($event.query)" [formControl]="ontControl"
                             [showEmptyMessage]="true" emptyMessage="Не найдено терминалов" field="mac">
                 <ng-template let-value pTemplate="item">

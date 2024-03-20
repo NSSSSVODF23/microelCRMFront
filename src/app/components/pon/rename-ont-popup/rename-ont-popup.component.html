@@ -1,7 +1,7 @@
 <p-overlayPanel #panel appendTo="body">
     <ng-template pTemplate="content">
         <div class="flex gap-2">
-            <input pInputText [formControl]="nameControl">
+            <input pInputText [formControl]="nameControl" [autofocus]="true">
             <p-button label="Изменить" icon="mdi-save" (onClick)="service.rename(nameControl.value); panel.hide()"></p-button>
         </div>
     </ng-template>
