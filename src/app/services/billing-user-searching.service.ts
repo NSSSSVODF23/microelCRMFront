@@ -3,18 +3,18 @@ import {Address, BillingUserItemData, LoadingState} from "../types/transport-int
 import {FormControl, FormGroup} from "@angular/forms";
 import {
     catchError,
+    combineLatest,
+    debounceTime,
     filter,
+    map,
     merge,
     of,
-    repeat,
-    shareReplay,
+    repeatWhen,
     startWith,
     Subject,
     switchMap,
-    tap,
-    first,
-    map,
-    mergeMap, combineLatest, debounceTime, interval
+    takeUntil,
+    tap
 } from "rxjs";
 import {ApiService} from "./api.service";
 import {Utils} from "../util";
@@ -33,7 +33,7 @@ export class BillingUserSearchingService {
     PAGE_SIZE: number = 10;
     userLoadingState: LoadingState = LoadingState.EMPTY;
     filtrationForm = new FormGroup({
-        mode: new FormControl('address'), query: new FormControl(''), isActive: new FormControl(true)
+        query: new FormControl(''), isActive: new FormControl(true)
     })
     changeUsersSubject = new Subject<BillingUserItemData[]>();
     changeUsers$ = this.changeUsersSubject.asObservable();
@@ -51,20 +51,24 @@ export class BillingUserSearchingService {
         .subscribe((value)=>{
             Utils.copyToClipboard(value.result, this.toast, 'Живые скопированы', 'Не удалось скопировать живых');
         });
-    enterDown$ = this.enterSearch.pipe(startWith(true));
-    modeChange$ = this.filtrationForm.controls.mode.valueChanges.pipe(startWith('address'));
-    activeChange$ = this.filtrationForm.controls.isActive.valueChanges.pipe(startWith(false));
 
-    enterSearch$ = combineLatest([this.enterDown$, this.modeChange$, this.activeChange$])
+    enterDown$ = this.enterSearch.pipe(filter(()=>this.userLoadingState!==LoadingState.LOADING), startWith(true));
+    // modeChange$ = this.filtrationForm.controls.mode.valueChanges.pipe(startWith('address'));
+    activeChange$ = this.filtrationForm.controls.isActive.valueChanges.pipe(filter(()=>this.userLoadingState!==LoadingState.LOADING), startWith(false));
+    queryChange$ = this.filtrationForm.controls.query.valueChanges
+        .pipe(
+            filter((q)=>(this.userLoadingState!==LoadingState.LOADING && !!q && q.length > 3)),
+            debounceTime(1300),
+            takeUntil(merge(this.enterSearch, this.filtrationForm.controls.isActive.valueChanges)),
+            repeatWhen(completed => completed)
+        );
+
+    queryChangeSub = this.queryChange$.subscribe(console.log)
+
+    enterSearch$ = combineLatest([this.enterDown$, this.queryChange$, this.activeChange$])
         .pipe(
             debounceTime(100),
             map(()=>this.filtrationForm.value),
-            map((value)=>{
-                if(value.query){
-                    value.query = value.query.trim();
-                }
-                return value;
-            })
         );
 
     users$ = this.enterSearch$.pipe(
@@ -73,15 +77,7 @@ export class BillingUserSearchingService {
             }),
             switchMap((value) => {
                 if (!value.query) return of([] as BillingUserItemData[]);
-                switch (value.mode) {
-                    case 'login':
-                        return this.api.getBillingUsersByLogin(value.query, !value.isActive);
-                    case 'fio':
-                        return this.api.getBillingUsersByFio(value.query, !value.isActive);
-                    case 'address':
-                        return this.api.getBillingUsersByAddress(value.query, !value.isActive);
-                }
-                return of([] as BillingUserItemData[]);
+                return this.api.searchBillingUsers(value.query, !value.isActive)
             }),
             catchError((err, caught) => {
                 this.userLoadingState = LoadingState.ERROR;

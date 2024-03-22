@@ -9,9 +9,9 @@
         </div>
         <div [formGroup]="busService.filtrationForm" class="flex flex-column gap-1 p-4 border-top-1 border-bluegray-100">
             <div class="flex gap-3 align-items-end">
-                <app-label label="Режим поиска">
-                    <p-selectButton [options]="filterModeItems" formControlName="mode"></p-selectButton>
-                </app-label>
+<!--                <app-label label="Режим поиска">-->
+<!--                    <p-selectButton [options]="filterModeItems" formControlName="mode"></p-selectButton>-->
+<!--                </app-label>-->
                 <p-toggleButton formControlName="isActive" offLabel="Только активные" onLabel="Все"></p-toggleButton>
                 <div class="p-inputgroup w-fit flex-grow-1">
                     <input #mainInput (keydown.enter)="busService.enterSearch.next(true)" (focus)="mainInput.select()"
@@ -51,8 +51,14 @@
                     <app-colored-tag *ngIf="user.utype === '11'"
                                      caption="Бизнес" color="var(--warm-600)"></app-colored-tag>
                 </td>
-                <td>{{user.coment}}</td>
+                <td class="max-w-0">
+                    <div appTicker class="white-space-nowrap overflow-hidden w-full">
+                        {{user.coment}}
+                    </div>
+                </td>
             </tr>
         </ng-template>
     </p-table>
 </div>
+
+<p-scrollTop></p-scrollTop>

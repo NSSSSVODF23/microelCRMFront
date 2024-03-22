@@ -116,7 +116,13 @@
                     </div>
                 </td>
                 <td>
-                    <app-billing-login [popup]="true" [loginData]="ont.userLogin" *ngIf="ont.userLogin"></app-billing-login>
+                    <ng-container *ngIf="logins(ont) as logins">
+                        <div *ngIf="logins.length>1" class="text-primary-400 cursor-pointer hover:text-primary-600"
+                             (click)="openLoginsMenu($event, loginsMenu, logins)">
+                            {{logins.length}} шт.
+                        </div>
+                        <app-billing-login *ngIf="logins.length===1" [popup]="true" [loginData]="logins[0]"></app-billing-login>
+                    </ng-container>
                 </td>
                 <td>{{ont.mac}}</td>
                 <td [ngClass]="signalTextClass(ont.curRxSignal)"
@@ -133,3 +139,7 @@
         </ng-template>
     </p-table>
 </div>
+
+<p-menu #loginsMenu [model]="loginItems" appendTo="body" [popup]="true"></p-menu>
+
+<p-scrollTop></p-scrollTop>

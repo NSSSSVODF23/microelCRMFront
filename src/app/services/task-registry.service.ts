@@ -5,13 +5,12 @@ import {ApiService} from "./api.service";
 import {
     BehaviorSubject,
     combineLatest, delay,
-    distinctUntilChanged,
+    distinctUntilChanged, filter,
     map,
     of,
     ReplaySubject,
     shareReplay,
     startWith,
-    Subject,
     switchMap,
     tap
 } from "rxjs";
@@ -22,6 +21,8 @@ type DropdownOption = { label: string, value: any };
     providedIn: 'root'
 })
 export class TaskRegistryService {
+
+    isFirstLoad = true;
 
     taskStatusSelector = new FormControl<TaskStatus>(TaskStatus.ACTIVE);
     taskStatusOptions: DropdownOption[] = [
@@ -77,12 +78,15 @@ export class TaskRegistryService {
 
     tableLazyLoad$ = new ReplaySubject<any>(1);
     updateContent$ = new BehaviorSubject(true);
+    previousPaging = "";
     tableLazyLoadDistinctChanges$ = this.tableLazyLoad$
         .pipe(
             delay(1),
-            distinctUntilChanged((previous, current)=> {
-                return JSON.stringify(previous) === JSON.stringify(current)
-            })
+            filter(paging => {
+                let b = paging !== this.previousPaging;
+                this.previousPaging = paging;
+                return b;
+            }),
         )
 
     tableContent?: Page<{ [key: string]: DynamicTableCell }>;
@@ -124,6 +128,10 @@ export class TaskRegistryService {
 
     tableContentLoading = false;
 
+    filterCache: any;
+    sortCache: any;
+    globalFilter: string | null = null;
+
     constructor(private api: ApiService) {
         this.api.getWireframes().subscribe(wireframes => {
             this.taskClassOptions = wireframes.map(wf => ({label: wf.name, value: wf.wireframeId}));
@@ -134,11 +142,15 @@ export class TaskRegistryService {
                 tap(() => this.tableContentLoading = true),
                 switchMap(([[taskStatus, taskClass, {mode, tags}], paging]) => {
                     delete paging.filters['global'];
+                    paging.globalFilter = this.globalFilter;
+                    this.filterCache = paging.filters;
+                    this.sortCache = paging.multiSortMeta;
                     return this.api.getTaskRegistryTableContent(taskStatus!, taskClass!, mode!, tags!, paging)
                 }),
             ).subscribe(loadedPage => {
                 this.tableContent = loadedPage;
                 this.tableContentLoading = false;
+                this.isFirstLoad = false;
             })
     }
 }

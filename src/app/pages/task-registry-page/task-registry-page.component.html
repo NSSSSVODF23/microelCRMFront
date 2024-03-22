@@ -1,8 +1,9 @@
 <ng-container *ngIf="service.tabelColumns$ | async as tableColumns">
     <p-table #registryTable (onLazyLoad)="service.tableLazyLoad$.next($event)" [(first)]="service.tableOffset"
-             [lazyLoadOnInit]="true" (onPage)="scrollTop()"
+             (onPage)="scrollTop()" [lazyLoadOnInit]="service.isFirstLoad"
              [lazy]="true" [loading]="service.tableContentLoading"
-             [multiSortMeta]="[{field:'created', order: -1}]" [paginator]="true"
+             [filters]="service.filterCache ?? {}"
+             [multiSortMeta]="service.sortCache ?? [{field:'created', order: -1}]" [paginator]="true"
              [rowsPerPageOptions]="[50,100,250]" [rows]="100"
              [showCurrentPageReport]="true"
              [totalRecords]="service.tableContent?.totalElements ?? 0" [value]="service.tableContent?.content ?? []"
@@ -167,3 +168,5 @@
         </ng-container>
     </ng-container>
 </ng-template>
+
+<p-scrollTop></p-scrollTop>

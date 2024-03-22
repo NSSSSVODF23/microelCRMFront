@@ -143,6 +143,8 @@ export class PonTerminalPage implements OnInit {
             }),
         );
 
+    logins$ = this.terminal$.pipe(map(terminal => terminal?.userLogin ? terminal.userLogin.split(',') : []));
+
     constructor(private api: ApiService, private rt: RealTimeUpdateService, private route: ActivatedRoute,
                 readonly customNav: CustomNavigationService, private toast: MessageService, readonly ontMgmt: OntManagementService) {
     }

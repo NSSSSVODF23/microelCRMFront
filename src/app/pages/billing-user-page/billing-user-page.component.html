@@ -1,13 +1,13 @@
 <div class="flex flex-column flex-grow-1">
     <ng-container [ngSwitch]="loadingState">
         <ng-container *ngSwitchCase="'LOADING'">
-            <div class="flexed hcenter vcenter stretched panel">
+            <div class="flex h-screen align-items-center justify-content-center">
                 <p-progressSpinner class="custom-spinner custom-spinner-8xl custom-spinner-primary"
                                    strokeWidth="1"></p-progressSpinner>
             </div>
         </ng-container>
         <ng-container *ngSwitchCase="'ERROR'">
-            <div class="flexed hcenter vcenter stretched panel">
+            <div class="flex h-screen align-items-center justify-content-center">
                 <div class="flexed column vcenter caption f-color-danger size-huge wt-tiny">
                     <span class="mds-error"></span>
                     <span>Произошла ошибка</span>
@@ -216,8 +216,15 @@
         </ng-container>
         <ng-container *ngIf="ont$ | async as ont">
             <div class="flex flex-column gap-2 p-3">
-                <ng-container
-                        *ngTemplateOutlet="infoRowTemplate; context: {label: 'Mac Onu', value: ont.mac}"></ng-container>
+                <span class="flex align-items-center gap-1 text-bluegray-500">
+                    <span class="text-bluegray-400 font-bold">
+                        Mac Onu:
+                    </span>
+                    <span class="text-lg max-w-18rem text-primary-400 cursor-pointer hover:text-primary-600"
+                          [routerLink]="['/pon','terminal',ont.id]" pTooltip="Открыть страницу терминала">
+                        {{ont.mac}}
+                    </span>
+                </span>
                 <span class="flex align-items-center gap-1 text-bluegray-500">
                     <span class="text-bluegray-400 font-bold">
                         Имя Onu:
@@ -263,8 +270,8 @@
                         Обновить
                     </span>
                 </span>
-                <p-button label="Изменить ONU" styleClass="p-button-success p-button-outlined p-button-sm"
-                          (onClick)="ontMgmt.openAssignOnt$.next({event: $event, login: currentLogin??'', ont: ont})"></p-button>
+<!--                <p-button label="Изменить ONU" styleClass="p-button-success p-button-outlined p-button-sm"-->
+<!--                          (onClick)="ontMgmt.openAssignOnt$.next({event: $event, login: currentLogin??'', ont: ont})"></p-button>-->
             </div>
         </ng-container>
         <p-button (onClick)="isAuthDialogVisible = true"

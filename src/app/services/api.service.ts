@@ -800,6 +800,10 @@ export class ApiService {
         return this.sendGet<SalaryTable>('api/private/salary/table', filter);
     }
 
+    searchBillingUsers(query: string, isActive: boolean) {
+        return this.sendGet<BillingUserItemData[]>(`api/private/billing/users/search`, {query, isActive});
+    }
+
     getBillingUsersByLogin(login: string, isActive: boolean) {
         return this.sendGet<BillingUserItemData[]>(`api/private/billing/users/by-login`, {login, isActive});
     }

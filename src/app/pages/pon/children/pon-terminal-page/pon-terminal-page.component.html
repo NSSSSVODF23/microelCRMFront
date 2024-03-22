@@ -1,61 +1,72 @@
 <div class="flex flex-column flex-grow-1" *ngIf="terminal$ | async as terminal">
-    <div class="flex px-5 py-4 align-items-center gap-3 border-bottom-1 border-bluegray-100">
-        <p-button (onClick)="customNav.backOrDefault(['/pon','terminals'])" icon="mdi-arrow_back"
-                  styleClass="p-button-secondary p-button-text p-button-icon"></p-button>
-        <span class="text-2xl font-semibold text-bluegray-500">
-            {{terminal.description ? terminal.description : terminal.mac}}
-        </span>
-        <div class="flex gap-1 ml-3">
-            <p-button label="Переименовать" (onClick)="ontMgmt.openRename$.next({event:$event, id: terminal.id, oldName: terminal.description})"
-                      icon="mdi-drive_file_rename_outline" styleClass="p-button-sm p-button-success p-button-text"></p-button>
-            <p-button label="Назначить логин" (onClick)="ontMgmt.openAssignLogin$.next({event:$event, id: terminal.id, oldLogin: terminal.userLogin})"
-                      icon="mdi-face" styleClass="p-button-sm p-button-success p-button-text"></p-button>
-            <p-button label="Обновить терминал" (onClick)="ontMgmt.update(terminal.id)" [loading]="ontMgmt.isUpdatingOnt(terminal.id)"
-                      icon="mdi-update" styleClass="p-button-sm p-button-info p-button-text"></p-button>
-            <p-button label="Перезагрузить" icon="mdi-restart_alt" (onClick)="ontMgmt.reboot(terminal.id)" styleClass="p-button-sm p-button-danger p-button-text"></p-button>
+    <div class="flex border-bottom-1 border-bluegray-100 h-min">
+        <div class="flex flex-column flex-grow-1">
+            <div class="flex px-5 py-4 align-items-center gap-3 border-bottom-1 border-bluegray-100">
+                <p-button (onClick)="customNav.backOrDefault(['/pon','terminals'])" icon="mdi-arrow_back"
+                          styleClass="p-button-secondary p-button-text p-button-icon"></p-button>
+                <span class="text-2xl font-semibold text-bluegray-500">
+                    {{terminal.description ? terminal.description : terminal.mac}}
+                </span>
+                <div class="flex gap-1 ml-3">
+                    <p-button label="Переименовать" (onClick)="ontMgmt.openRename$.next({event:$event, id: terminal.id, oldName: terminal.description})"
+                              icon="mdi-drive_file_rename_outline" styleClass="p-button-sm p-button-success p-button-text"></p-button>
+                    <p-button label="Назначить логин" *ngIf="!terminal.userLogin"
+                              (onClick)="ontMgmt.openAssignLogin$.next({event:$event, id: terminal.id, oldLogin: terminal.userLogin})"
+                              icon="mdi-face" styleClass="p-button-sm p-button-success p-button-text"></p-button>
+                    <p-button label="Обновить терминал" (onClick)="ontMgmt.update(terminal.id)" [loading]="ontMgmt.isUpdatingOnt(terminal.id)"
+                              icon="mdi-update" styleClass="p-button-sm p-button-info p-button-text"></p-button>
+                    <p-button label="Перезагрузить" icon="mdi-restart_alt" (onClick)="ontMgmt.reboot(terminal.id)" styleClass="p-button-sm p-button-danger p-button-text"></p-button>
+                </div>
+            </div>
+            <div class="flex flex-wrap align-items-center gap-3 px-5 py-4">
+                <div class="flex flex-column gap-1 text-xl font-semibold" [ngClass]="terminal.isOnline ? 'text-green-500' : 'text-red-600'">
+                    {{terminal.isOnline ? 'В сети' : 'Не в сети'}}
+                </div>
+                <div class="flex flex-column gap-1 text-xl font-semibold" *ngIf="terminal.curRxSignal" [ngClass]="signalColor(terminal.curRxSignal)">
+                    {{terminal.curRxSignal | number: '1.2-2'}} dBm
+                </div>
+                <div class="flex flex-column gap-1 text-bluegray-500">
+                    <span class="text-bluegray-300 font-semibold text-sm">Mac ONU</span>
+                    <span>{{terminal.mac}}</span>
+                </div>
+                <div class="flex flex-column gap-1 text-bluegray-500">
+                    <span class="text-bluegray-300 font-semibold text-sm">Порт OLT</span>
+                    <span>{{terminal.port}}</span>
+                </div>
+                <div class="flex flex-column gap-1 text-bluegray-500">
+                    <span class="text-bluegray-300 font-semibold text-sm">Позиция OLT</span>
+                    <span>{{terminal.position}}</span>
+                </div>
+                <div class="flex flex-column gap-1 text-bluegray-500">
+                    <span class="text-bluegray-300 font-semibold text-sm">OLT</span>
+                    <span class="hover:text-primary-600 hover:bg-primary-50 cursor-pointer text-primary-400 px-2" (click)="copyIp(terminal.olt.ip)" >
+                        {{terminal.olt.name ? terminal.olt.name : terminal.olt.ip}}
+                    </span>
+                </div>
+                <div class="flex flex-column gap-1 text-bluegray-500">
+                    <span class="text-bluegray-300 font-semibold text-sm">Создан</span>
+                    <span>{{terminal.created | date:'dd-MM-yyyy HH:mm'}}</span>
+                </div>
+                <div class="flex flex-column gap-1 text-bluegray-500">
+                    <span class="text-bluegray-300 font-semibold text-sm">Обновлен</span>
+                    <span>{{terminal.updated | date:'dd-MM-yyyy HH:mm:ss'}}</span>
+                </div>
+                <div class="flex flex-column gap-1 text-bluegray-500">
+                    <span class="text-bluegray-300 font-semibold text-sm">Аптайм</span>
+                    <span>{{terminal.uptime | date:'dd-MM-yyyy HH:mm:ss'}}</span>
+                </div>
+            </div>
         </div>
-    </div>
-    <div class="flex flex-wrap align-items-center gap-3 px-5 py-4 border-bottom-1 border-bluegray-100">
-        <div class="flex flex-column gap-1 text-xl font-semibold" [ngClass]="terminal.isOnline ? 'text-green-500' : 'text-red-600'">
-            {{terminal.isOnline ? 'В сети' : 'Не в сети'}}
-        </div>
-        <div class="flex flex-column gap-1 text-xl font-semibold" *ngIf="terminal.curRxSignal" [ngClass]="signalColor(terminal.curRxSignal)">
-            {{terminal.curRxSignal | number: '1.2-2'}} dBm
-        </div>
-        <div class="flex flex-column gap-1 text-bluegray-500">
-            <span class="text-bluegray-300 font-semibold text-sm">Mac ONU</span>
-            <span>{{terminal.mac}}</span>
-        </div>
-        <div class="flex flex-column gap-1 text-bluegray-500">
-            <span class="text-bluegray-300 font-semibold text-sm">Привязанный логин</span>
-            <span [ngClass]="{'text-bluegray-300': !terminal.userLogin}">{{terminal.userLogin ? terminal.userLogin : 'Отсутствует'}}</span>
-        </div>
-        <div class="flex flex-column gap-1 text-bluegray-500">
-            <span class="text-bluegray-300 font-semibold text-sm">Порт OLT</span>
-            <span>{{terminal.port}}</span>
-        </div>
-        <div class="flex flex-column gap-1 text-bluegray-500">
-            <span class="text-bluegray-300 font-semibold text-sm">Позиция OLT</span>
-            <span>{{terminal.position}}</span>
-        </div>
-        <div class="flex flex-column gap-1 text-bluegray-500">
-            <span class="text-bluegray-300 font-semibold text-sm">OLT</span>
-            <span class="hover:text-primary-600 hover:bg-primary-50 cursor-pointer text-primary-400 px-2" (click)="copyIp(terminal.olt.ip)" >
-                {{terminal.olt.name ? terminal.olt.name : terminal.olt.ip}}
-            </span>
-        </div>
-        <div class="flex flex-column gap-1 text-bluegray-500">
-            <span class="text-bluegray-300 font-semibold text-sm">Создан</span>
-            <span>{{terminal.created | date:'dd-MM-yyyy HH:mm'}}</span>
-        </div>
-        <div class="flex flex-column gap-1 text-bluegray-500">
-            <span class="text-bluegray-300 font-semibold text-sm">Обновлен</span>
-            <span>{{terminal.updated | date:'dd-MM-yyyy HH:mm:ss'}}</span>
-        </div>
-        <div class="flex flex-column gap-1 text-bluegray-500">
-            <span class="text-bluegray-300 font-semibold text-sm">Аптайм</span>
-            <span>{{terminal.uptime | date:'dd-MM-yyyy HH:mm:ss'}}</span>
-        </div>
+        <ng-container *ngIf="logins$ | async as logins">
+            <div class="flex flex-column border-bluegray-100 border-left-1" *ngIf="logins.length > 0">
+                <div class="bg-bluegray-50 text-bluegray-500 font-bold px-3 py-2 border-bottom-1 border-bluegray-100">Привязанные логины</div>
+                <div class="overflow-y-auto" [style.height]="'123px'">
+                    <div class="px-3 py-2 split-line" *ngFor="let login of logins">
+                        <app-billing-login [loginData]="login"></app-billing-login>
+                    </div>
+                </div>
+            </div>
+        </ng-container>
     </div>
     <div class="flex gap-2 px-5 pt-4 align-items-center">
         <span class="text-bluegray-500 font-bold">Период графика</span>

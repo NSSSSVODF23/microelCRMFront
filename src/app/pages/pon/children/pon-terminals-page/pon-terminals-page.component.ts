@@ -8,6 +8,7 @@ import {ContextMenu} from "primeng/contextmenu";
 import {AutoUnsubscribe} from "../../../../decorators";
 import {fromEvent} from "rxjs";
 import {Table} from "primeng/table";
+import {Menu} from "primeng/menu";
 
 @Component({
     templateUrl: './pon-terminals-page.component.html',
@@ -26,6 +27,7 @@ export class PonTerminalsPage implements OnInit {
         .subscribe(() => {
             this.ontMgmt.hideAll()
         })
+    loginItems: MenuItem[] = [];
 
     constructor(readonly service: PonTerminalsListService, readonly ontMgmt: OntManagementService) {
     }
@@ -69,6 +71,7 @@ export class PonTerminalsPage implements OnInit {
             {
                 label: 'Назначить логин',
                 icon: 'mdi-face',
+                disabled: !!ont.userLogin,
                 command: () => {
                     this.ontMgmt.openAssignLogin$.next({event, id: ont.id, oldLogin: ont.userLogin});
                 }
@@ -91,5 +94,19 @@ export class PonTerminalsPage implements OnInit {
         ];
         event.preventDefault();
         cm.show(event);
+    }
+
+    logins(ont: Ont) {
+        if (!ont.userLogin) return null;
+        return ont.userLogin.split(",")
+    }
+
+    openLoginsMenu(event: MouseEvent, menuEl: Menu, logins: string[]) {
+        event.stopPropagation();
+        this.loginItems = logins.map(login => ({
+            label: login,
+            routerLink: ['/clients', 'billing', 'user', login]
+        }));
+        menuEl.toggle(event);
     }
 }
