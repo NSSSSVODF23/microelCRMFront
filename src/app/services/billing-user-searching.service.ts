@@ -33,7 +33,9 @@ export class BillingUserSearchingService {
     PAGE_SIZE: number = 10;
     userLoadingState: LoadingState = LoadingState.EMPTY;
     filtrationForm = new FormGroup({
-        query: new FormControl(''), isActive: new FormControl(true)
+        query: new FormControl(''),
+        mode: new FormControl('address'),
+        isActive: new FormControl(true)
     })
     changeUsersSubject = new Subject<BillingUserItemData[]>();
     changeUsers$ = this.changeUsersSubject.asObservable();
@@ -53,7 +55,7 @@ export class BillingUserSearchingService {
         });
 
     enterDown$ = this.enterSearch.pipe(filter(()=>this.userLoadingState!==LoadingState.LOADING), startWith(true));
-    // modeChange$ = this.filtrationForm.controls.mode.valueChanges.pipe(startWith('address'));
+    modeChange$ = this.filtrationForm.controls.mode.valueChanges.pipe(startWith('address'));
     activeChange$ = this.filtrationForm.controls.isActive.valueChanges.pipe(filter(()=>this.userLoadingState!==LoadingState.LOADING), startWith(false));
     queryChange$ = this.filtrationForm.controls.query.valueChanges
         .pipe(
@@ -63,9 +65,7 @@ export class BillingUserSearchingService {
             repeatWhen(completed => completed)
         );
 
-    queryChangeSub = this.queryChange$.subscribe(console.log)
-
-    enterSearch$ = combineLatest([this.enterDown$, this.queryChange$, this.activeChange$])
+    enterSearch$ = combineLatest([this.enterDown$, this.modeChange$, this.activeChange$])
         .pipe(
             debounceTime(100),
             map(()=>this.filtrationForm.value),
@@ -77,7 +77,15 @@ export class BillingUserSearchingService {
             }),
             switchMap((value) => {
                 if (!value.query) return of([] as BillingUserItemData[]);
-                return this.api.searchBillingUsers(value.query, !value.isActive)
+                switch (value.mode) {
+                    case 'login':
+                        return this.api.getBillingUsersByLogin(value.query, !value.isActive);
+                    case 'fio':
+                        return this.api.getBillingUsersByFio(value.query, !value.isActive);
+                    case 'address':
+                        return this.api.getBillingUsersByAddress(value.query, !value.isActive);
+                }
+                return of([] as BillingUserItemData[]);
             }),
             catchError((err, caught) => {
                 this.userLoadingState = LoadingState.ERROR;
