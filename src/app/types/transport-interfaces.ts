@@ -2006,3 +2006,28 @@ export interface OltWorker {
     id: string;
     name: string;
 }
+
+export interface AutoTariff {
+    autoTariffId: number;
+    externalId: number;
+    name: string;
+    cost: number;
+    description: string;
+    isService: boolean;
+    targetClass: Wireframe;
+    targetType: TaskStage;
+    created: EmployeeIntervention;
+    updated: EmployeeIntervention;
+    deleted: EmployeeIntervention;
+    isDeleted: boolean;
+}
+
+export interface AutoTariffForm {
+    externalId: number;
+    name: string;
+    cost: number;
+    description: string;
+    isService: boolean;
+    targetClassId: number;
+    targetType: string;
+}

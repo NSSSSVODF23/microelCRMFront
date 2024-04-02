@@ -1,18 +1,40 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
 import {ApiService} from "../../services/api.service";
-import {ClientEquipment, LoadingState, TaskTag, Wireframe} from "../../types/transport-interfaces";
+import {
+    AutoTariff,
+    AutoTariffForm,
+    ClientEquipment,
+    LoadingState,
+    TaskStage,
+    TaskTag,
+    UserTariff,
+    Wireframe
+} from "../../types/transport-interfaces";
 import {RealTimeUpdateService} from "../../services/real-time-update.service";
 import {DynamicValueFactory, SubscriptionsHolder} from "../../util";
 import {ConfirmationService} from "primeng/api";
-import {FormControl, FormGroup, Validators} from "@angular/forms";
-import {combineLatest, debounceTime, map, merge, of, shareReplay, startWith, switchMap, tap} from "rxjs";
+import {FormArray, FormControl, FormGroup, Validators} from "@angular/forms";
+import {combineLatest, debounceTime, lastValueFrom, map, merge, of, shareReplay, startWith, switchMap, tap} from "rxjs";
 import { AccessFlag } from 'src/app/types/access-flag';
 import {PersonalityService} from "../../services/personality.service";
+import {AutoTariffListService} from "../../services/page-cache/auto-tariff-list.service";
+import {AutoUnsubscribe} from "../../decorators";
+
+type AutoTariffFormTemplate = {
+    externalId: FormControl<number | null>,
+    name: FormControl<string | null>,
+    cost: FormControl<number | null>,
+    description: FormControl<string | null>,
+    isService: FormControl<boolean | null>,
+    targetClassId: FormControl<number | null>,
+    targetType: FormControl<string | null>,
+}
 
 @Component({
     templateUrl: './templates-page.component.html',
     styleUrls: ['./templates-page.component.scss']
 })
+@AutoUnsubscribe()
 export class TemplatesPageComponent implements OnInit {
 
     AccessFlag = AccessFlag;
@@ -89,7 +111,51 @@ export class TemplatesPageComponent implements OnInit {
         price: new FormControl(0, [Validators.required]),
     })
 
-    constructor(readonly api: ApiService, readonly rt: RealTimeUpdateService,
+    showAutoTariffDialog = false;
+    editionAutoTariffId?: number;
+    billingTariffs$ = this.api.getBillingUserTariffs("bond");
+    billingServices$ = this.api.getBillingUserServices("bond");
+    taskClasses$ = this.api.getWireframes(false);
+    autoTariffForm = new FormArray<FormGroup<AutoTariffFormTemplate>>([]);
+    selectedClassControl = new FormControl<Wireframe | null>(null);
+    selectedTypeControl = new FormControl<string | null>(null);
+    taskTypes$ = this.selectedClassControl.valueChanges.pipe(startWith(null), map(classItem => classItem ? classItem.stages ?? [] : []), shareReplay(1));
+    selectedBillingTariffControl = new FormControl<UserTariff | UserTariff[] | null>(null);
+    selectedTariffTypeControl = new FormControl<string>('tariff');
+    changeTariffSub = this.selectedBillingTariffControl.valueChanges.subscribe(tariffs=>{
+        if(Array.isArray(tariffs)){
+            this.autoTariffForm.clear();
+            if(!tariffs) return;
+            tariffs.forEach(tariff => this.autoTariffForm.push(this.newAutoTariffForm(tariff)));
+        }else{
+            let controls = this.autoTariffForm.at(0)?.controls;
+            if(!controls) return;
+            controls.externalId.setValue(tariffs?.id ?? null)
+            controls.name.setValue(tariffs?.name ?? null)
+            controls.cost.setValue(tariffs?.cost ?? null)
+            controls.description.setValue(tariffs?.description ?? null)
+            controls.isService.setValue(this.selectedTariffTypeControl.value === 'service')
+        }
+    });
+    changeClassControlSub = this.selectedClassControl.valueChanges.subscribe(taskClass => {
+        this.autoTariffForm.controls.forEach(tariffForm => {
+            tariffForm.get('targetClassId')?.setValue(taskClass?.wireframeId ?? null);
+            tariffForm.get('targetType')?.setValue(null);
+        })
+    });
+    changeTypeControlSub = this.selectedTypeControl.valueChanges.subscribe(stageId => {
+        this.autoTariffForm.controls.forEach(tariffForm => {
+            tariffForm.get('targetType')?.setValue(stageId ?? null);
+        })
+    });
+    changeTariffTypeControlSub = this.selectedTariffTypeControl.valueChanges.subscribe(type => {
+        this.autoTariffForm.controls.forEach(tariffForm => {
+            tariffForm.get('isService')?.setValue(type === 'service')
+        })
+    });
+    isAutoTariffInProcess = false;
+
+    constructor(readonly api: ApiService, readonly rt: RealTimeUpdateService, readonly autoTariffService: AutoTariffListService,
                 readonly personality: PersonalityService, readonly confirmation: ConfirmationService) {
     }
 
@@ -254,6 +320,65 @@ export class TemplatesPageComponent implements OnInit {
             error: () => {
                 this.isEquipmentCreating = false;
             }
+        })
+    }
+
+    openAutoTariffDialog(autoTariff?: AutoTariff) {
+        this.autoTariffForm.clear();
+        this.selectedClassControl.reset(autoTariff?.targetClass ?? null);
+        this.selectedTypeControl.reset(autoTariff?.targetType?.stageId ?? null);
+        this.selectedTariffTypeControl.reset(autoTariff?.isService ? 'service' : 'tariff');
+        this.selectedBillingTariffControl.reset(autoTariff ? {
+            id: autoTariff.externalId, name: autoTariff.name, cost: autoTariff.cost, description: autoTariff.description
+        } : []);
+        if(!!autoTariff) this.autoTariffForm.push(new FormGroup<AutoTariffFormTemplate>({
+            externalId: new FormControl(autoTariff.externalId),
+            name: new FormControl(autoTariff.name),
+            cost: new FormControl(autoTariff.cost),
+            description: new FormControl(autoTariff.description),
+            isService: new FormControl(autoTariff.isService),
+            targetClassId: new FormControl(autoTariff.targetClass?.wireframeId ?? null),
+            targetType: new FormControl(autoTariff.targetType?.stageId ?? null),
+        }))
+        this.editionAutoTariffId = autoTariff?.autoTariffId;
+        this.showAutoTariffDialog = true;
+    }
+
+    newAutoTariffForm(tariff: UserTariff) {
+        return new FormGroup<AutoTariffFormTemplate>({
+            externalId: new FormControl(tariff.id, [Validators.required]),
+            name: new FormControl(tariff.name, [Validators.required]),
+            cost: new FormControl(tariff.cost, [Validators.required]),
+            description: new FormControl(tariff.description),
+            isService: new FormControl(this.selectedTariffTypeControl.value === "service"),
+            targetClassId: new FormControl(this.selectedClassControl.value?.wireframeId ?? null, [Validators.required]),
+            targetType: new FormControl(this.selectedTypeControl.value ?? null, [Validators.required]),
+        })
+    }
+
+    async createTariffs() {
+        this.isAutoTariffInProcess = true;
+        for (const form of this.autoTariffForm.value) {
+            await lastValueFrom(this.api.createAutoTariff(form as AutoTariffForm))
+        }
+        this.isAutoTariffInProcess = false;
+        this.showAutoTariffDialog = false;
+    }
+
+    async editTariff(){
+        if(!this.editionAutoTariffId) return;
+        this.isAutoTariffInProcess = true;
+        await lastValueFrom(this.api.updateAutoTariff(this.editionAutoTariffId, this.autoTariffForm.at(0).value as AutoTariffForm))
+        this.isAutoTariffInProcess = false;
+        this.showAutoTariffDialog = false;
+    }
+
+    confirmDeleteAutoTariff(event: Event, autoTariffId: number) {
+        event.stopPropagation();
+        this.confirmation.confirm({
+            header: "Подтверждение",
+            message: "Удалить авто-тариф?",
+            accept: () => this.api.deleteAutoTariff(autoTariffId).subscribe()
         })
     }
 

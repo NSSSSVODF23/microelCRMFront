@@ -88,7 +88,7 @@ import {
     WireframeDashboardStatistic,
     OltWorker,
     WorkingDay,
-    WorkLog, DateRange
+    WorkLog, DateRange, AutoTariff, AutoTariffForm
 } from "../types/transport-interfaces";
 import {MessageService, TreeNode} from "primeng/api";
 import {cyrb53, Storage, Utils} from "../util";
@@ -1466,6 +1466,39 @@ export class ApiService {
      */
     getOntByLogin(login: string) {
         return this.sendGet<Ont | null>(`api/private/pon/ont/login/${login}`);
+    }
+
+    /**
+     * Получить страницу автоматически включаемых тарифов
+     * @param paging
+     */
+    getAutoTariffList(paging: any) {
+        return this.sendPost<Page<AutoTariff>>(`api/private/auto-tariff/list`, paging);
+    }
+
+    /**
+     * Создать автоматически включаемый тариф
+     * @param form Форма с информацией для создания
+     */
+    createAutoTariff(form: AutoTariffForm) {
+        return this.sendPost<AutoTariff>(`api/private/auto-tariff/create`, form);
+    }
+
+    /**
+     * Редактировать автоматически включаемый тариф
+     * @param id Идентификатор редактируемого тарифа
+     * @param form Форма с информацией для редактирования
+     */
+    updateAutoTariff(id: number, form: AutoTariffForm) {
+        return this.sendPatch<AutoTariff>(`api/private/auto-tariff/${id}`, form);
+    }
+
+    /**
+     * Удалить автоматически включаемый тариф
+     * @param id Идентификатор удаляемого тарифа
+     */
+    deleteAutoTariff(id: number) {
+        return this.sendDelete(`api/private/auto-tariff/${id}`);
     }
 
     // Результаты запросов на сервер кэшируются по таймауту, чтобы не было доп нагрузки на сервер

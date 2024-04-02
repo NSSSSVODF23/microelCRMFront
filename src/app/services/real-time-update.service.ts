@@ -516,4 +516,8 @@ export class RealTimeUpdateService {
     receiveUpdatedOnt() {
         return this.watch<Ont>('pon', 'ont', 'update')
     }
+
+    receiveUpdateAutoTariff(){
+        return this.watch<any>('auto-tariff', 'update')
+    }
 }
