@@ -7,9 +7,9 @@
     <div [formGroup]="cache.filtrationForm" class="flex gap-3 p-3 bg-bluegray-50 border-bottom-1 border-bluegray-100">
         <div class="p-inputgroup w-max">
             <span class="p-inputgroup-addon"><i class="mdi-calendar_month"></i></span>
-            <p-calendar [readonlyInput]="true" appendTo="body" dateFormat="MM yy"
-                        formControlName="date" inputStyleClass="border-noround-left"
-                        view="month" [firstDayOfWeek]="1"></p-calendar>
+            <p-calendar [firstDayOfWeek]="1" [readonlyInput]="true" appendTo="body"
+                        dateFormat="MM yy" formControlName="date"
+                        inputStyleClass="border-noround-left" view="month"></p-calendar>
         </div>
         <div *ngIf="cache.positions$|async as pos" class="flex gap-2 align-items-center">
                         <span class="caption wt-black f-color-500 size-small with-icon">
@@ -20,17 +20,21 @@
                         placeholder="Должность"></p-dropdown>
         </div>
         <div class="flex-grow-1"></div>
-        <p-menu #otchetMenu [popup]="true" [model]="(cache.accountingMenuItems$ | async) ?? []" appendTo="body"></p-menu>
-        <button type="button" pButton label="Отчеты за месяц" (click)="otchetMenu.toggle($event)"></button>
+        <p-menu #otchetMenu [model]="(cache.accountingMenuItems$ | async) ?? []" [popup]="true"
+                appendTo="body"></p-menu>
+        <button (click)="otchetMenu.toggle($event)" label="Отчеты за месяц" pButton type="button"></button>
         <p-toggleButton [formControl]="cache.ndflSwitch" offLabel="БЕЗ НДФЛ" onLabel="С НДФЛ"></p-toggleButton>
     </div>
     <ng-container *ngIf="cache.salaryTable$|async as salaryTable">
         <ng-container *ngIf="cache.tableLoadingState==='READY'">
-            <p-table [columns]="salaryTable.headers" [value]="salaryTable.payload" [scrollable]="true" scrollHeight="50rem" scrollDirection="horizontal"
+            <p-table [columns]="salaryTable.headers" [scrollable]="true" [value]="salaryTable.payload"
+                     scrollDirection="horizontal" scrollHeight="50rem"
                      styleClass="p-datatable-sm">
                 <ng-template let-columns pTemplate="header">
                     <tr>
-                        <th *ngFor="let name of columns; let i = index" class="caption size-tiny" pFrozenColumn [frozen]="i === 0 || i === columns.length-1" [alignFrozen]="i === columns.length-1 ? 'right' : ''">
+                        <th *ngFor="let name of columns; let i = index" [alignFrozen]="i === columns.length-1 ? 'right' : ''" [frozen]="i === 0 || i === columns.length-1"
+                            class="caption size-tiny"
+                            pFrozenColumn>
                             {{name}}
                         </th>
                     </tr>
@@ -46,7 +50,7 @@
                             class="caption size-tiny f-inline cursor-pointer hover:text-primary-400">
                             {{((cache.ndflValue$|async) ? cell.sumWithNDFL : cell.sumWithoutNDFL) | number: '1.0-2'}}
                         </td>
-                        <td class="caption size-tiny" pFrozenColumn alignFrozen="right">
+                        <td alignFrozen="right" class="caption size-tiny" pFrozenColumn>
                             {{(cache.ndflValue$|async) ? salaryTable.totalSum[i].sumWithNDFL : salaryTable.totalSum[i].sumWithoutNDFL}}
                         </td>
                     </tr>
@@ -62,10 +66,12 @@
     <ng-container *ngIf="cache.tableLoadingState!=='READY'" [ngSwitch]="cache.tableLoadingState">
         <div *ngSwitchCase="'LOADING'" [style.width]="'64rem'"
              class="flex align-items-center justify-content-center p-3">
-            <p-progressSpinner class="custom-spinner custom-spinner-8xl custom-spinner-primary" strokeWidth="1"></p-progressSpinner>
+            <p-progressSpinner class="custom-spinner custom-spinner-8xl custom-spinner-primary"
+                               strokeWidth="1"></p-progressSpinner>
         </div>
     </ng-container>
-    <div *ngIf="cache.selectedDay$|async as selectedDay" class="flex flex-column p-3 gap-3 border-top-1 border-bluegray-100">
+    <div *ngIf="cache.selectedDay$|async as selectedDay"
+         class="flex flex-column p-3 gap-3 border-top-1 border-bluegray-100">
         <div class="flex align-items-center gap-3">
             <app-employee-label [employee]="selectedDay.employee"></app-employee-label>
             <span class="caption text-sm text-bluegray-400">{{selectedDay.date | date: 'EEEE, dd MMMM yyyy' | titlecase}}</span>
@@ -80,40 +86,24 @@
                         <tr class="text-sm">
                             <th>
                             </th>
-                            <th>
-                                ИД
-                            </th>
-                            <th>
-                                Задача
-                            </th>
-                            <th>
-                                Отчёт
-                            </th>
-                            <th>
-                                Доля
-                            </th>
-                            <th>
-                                Считал
-                            </th>
-                            <th>
-                                Платная?
-                            </th>
-                            <th>
-                                Сумма
-                            </th>
-                            <th>
-                                Сумма без НДФЛ
-                            </th>
-                            <th>
-                                Пересчитать
-                            </th>
+                            <th>ИД</th>
+                            <th>Задача</th>
+                            <th>Отчёт</th>
+                            <th>Отдана</th>
+                            <th>Закрыта</th>
+                            <th>Доля</th>
+                            <th>Считал</th>
+                            <th>Платная?</th>
+                            <th>Сумма</th>
+                            <th>Сумма без НДФЛ</th>
+                            <th>Пересчитать</th>
                         </tr>
                     </ng-template>
                     <ng-template let-expanded="expanded" let-rowData pTemplate="body">
                         <tr class="text-bluegray-500">
                             <td>
-                                <button [icon]="expanded ? 'pi pi-chevron-down' : 'pi pi-chevron-right'"
-                                        [pRowToggler]="rowData" *ngIf="rowData.lastEdit"
+                                <button *ngIf="rowData.lastEdit"
+                                        [icon]="expanded ? 'pi pi-chevron-down' : 'pi pi-chevron-right'" [pRowToggler]="rowData"
                                         class="p-button-text p-button-rounded p-button-plain" pButton
                                         pRipple
                                         type="button"></button>
@@ -125,10 +115,12 @@
                                 <app-task-link [task]="rowData.workLog.task"></app-task-link>
                             </td>
                             <td>
-                                        <span [style.max-width]="'20rem'" appTooltip class="text-max-lines-3 text-sm">
-                                            {{cache.getReport(rowData.workLog, selectedDay.employee.login)}}
-                                        </span>
+                                <span [style.max-width]="'20rem'" appTooltip class="text-max-lines-3 text-sm">
+                                    {{cache.getReport(rowData.workLog, selectedDay.employee.login)}}
+                                </span>
                             </td>
+                            <td>{{rowData.workLog.created | date:'dd-MM-yyyy HH:mm'}}</td>
+                            <td>{{rowData.workLog.closed | date:'dd-MM-yyyy HH:mm'}}</td>
                             <td>
                                 {{rowData.ratio * 100 | number:'1.2-2'}}%
                             </td>
@@ -158,17 +150,18 @@
                             </td>
                         </tr>
                     </ng-template>
-                    <ng-template pTemplate="rowexpansion" let-rowData>
+                    <ng-template let-rowData pTemplate="rowexpansion">
                         <tr>
                             <td colspan="9">
                                 <div class="flex flex-column">
-                                    <div class="grid split-line py-3" *ngFor="let intervention of rowData.editedBy">
+                                    <div *ngFor="let intervention of rowData.editedBy" class="grid split-line py-3">
                                         <div class="col-10 gap-2 flex flex-column">
                                             <div class="flex align-items-center font-bold text-bluegray-500">
                                                 <span class="mdi-autorenew"></span>
                                                 <span>Пересчитан</span>
                                             </div>
-                                            <span class="text-sm text-primary-400 ml-3" [style.max-width]="'50rem'">{{intervention.description}}</span>
+                                            <span [style.max-width]="'50rem'"
+                                                  class="text-sm text-primary-400 ml-3">{{intervention.description}}</span>
                                         </div>
                                         <div class="col-2">
                                             <app-employee-label [employee]="intervention.employee"></app-employee-label>
@@ -184,7 +177,8 @@
             <div *ngIf="cache.calculatedLoadingState !== 'READY'"
                  class="flex align-items-center justify-content-center p-3 border-round-md border-1 border-bluegray-100 overflow-hidden">
                 <ng-container [ngSwitch]="cache.calculatedLoadingState">
-                    <p-progressSpinner *ngSwitchCase="'LOADING'" class="custom-spinner custom-spinner-8xl custom-spinner-primary"
+                    <p-progressSpinner *ngSwitchCase="'LOADING'"
+                                       class="custom-spinner custom-spinner-8xl custom-spinner-primary"
                                        strokeWidth="1"></p-progressSpinner>
                     <div *ngSwitchCase="'ERROR'"
                          class="flex flex-column text-danger align-items-center text-xl">

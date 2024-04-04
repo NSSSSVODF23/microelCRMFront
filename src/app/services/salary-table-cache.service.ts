@@ -99,6 +99,13 @@ export class SalaryTableCacheService {
         mergeMap((day) => {
             if (day) {
                 return this.api.getWorkingDay(day[0], day[1])
+                    .pipe(
+                        tap(workingDay => {
+                            workingDay.calculations.sort((a, b) => {
+                                return new Date(a.workLog.created).getTime() - new Date(b.workLog.created).getTime();
+                            })
+                        })
+                    )
             } else return of(null)
         }),
         tap(()=>{
