@@ -258,6 +258,7 @@ import {
 import {
     LoginAssignOntPopupComponent
 } from "../../components/pon/login-assign-ont-popup/login-assign-ont-popup.component";
+import {PonBoxComponent} from "../../components/pon/scheme/elements/pon-box/pon-box.component";
 
 
 @NgModule({
@@ -387,7 +388,8 @@ import {
         DelayedInputDirective,
         RenameOntPopupComponent,
         OntAssignLoginPopupComponent,
-        LoginAssignOntPopupComponent
+        LoginAssignOntPopupComponent,
+        PonBoxComponent
     ],
     exports: [
         AccountPanelComponent,
@@ -511,7 +513,8 @@ import {
         ThumbnailPreviewComponent,
         DelayedInputDirective,
         RenameOntPopupComponent,
-        OntAssignLoginPopupComponent
+        OntAssignLoginPopupComponent,
+        PonBoxComponent
     ],
     imports: [
         CommonPipesModule,

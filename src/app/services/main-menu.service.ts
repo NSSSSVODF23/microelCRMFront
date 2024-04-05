@@ -127,6 +127,11 @@ export class MainMenuService {
                     icon: "mdi-fact_check",
                     link: ["/pon", "events"]
                 },
+                {
+                    caption: "Схемы",
+                    icon: "mdi-schema",
+                    link: ["/pon", "scheme"]
+                },
             ]
         },
         {

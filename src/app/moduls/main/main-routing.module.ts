@@ -70,6 +70,7 @@ import {PonBootstrapPage} from "../../pages/pon/pon-bootstrap-page/pon-bootstrap
 import {PonTerminalsPage} from "../../pages/pon/children/pon-terminals-page/pon-terminals-page.component";
 import {PonEventsPage} from "../../pages/pon/children/pon-events-page/pon-events-page.component";
 import {PonTerminalPage} from "../../pages/pon/children/pon-terminal-page/pon-terminal-page.component";
+import {PonSchemePage} from "../../pages/pon/children/pon-scheme-page/pon-scheme-page.component";
 
 const routes: Routes = [{
     path: '', component: MainBootstrap, children: [
@@ -279,6 +280,7 @@ const routes: Routes = [{
             children: [
                 {path: 'terminals', component: PonTerminalsPage},
                 {path: 'events', component: PonEventsPage},
+                {path: 'scheme', component: PonSchemePage},
                 {path: 'terminal/:id', component: PonTerminalPage},
             ],
             // canActivate:[accessCanActivate(AccessFlag.VIEW_STATISTICS)]

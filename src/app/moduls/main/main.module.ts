@@ -147,6 +147,7 @@ import {PonBootstrapPage} from "../../pages/pon/pon-bootstrap-page/pon-bootstrap
 import {PonTerminalsPage} from "../../pages/pon/children/pon-terminals-page/pon-terminals-page.component";
 import {PonEventsPage} from "../../pages/pon/children/pon-events-page/pon-events-page.component";
 import {PonTerminalPage} from "../../pages/pon/children/pon-terminal-page/pon-terminal-page.component";
+import {PonSchemePage} from "../../pages/pon/children/pon-scheme-page/pon-scheme-page.component";
 
 const mapConfig: YaConfig = {
     apikey: '008574e5-f34b-4270-b3d5-91aaabd036e8',
@@ -198,7 +199,8 @@ const mapConfig: YaConfig = {
         PonBootstrapPage,
         PonTerminalsPage,
         PonEventsPage,
-        PonTerminalPage
+        PonTerminalPage,
+        PonSchemePage
     ],
     imports: [
         CommonComponentsModule,
@@ -281,7 +283,7 @@ const mapConfig: YaConfig = {
         BlockUIModule,
         ChipModule,
         ChartModule,
-        NgTerminalModule
+        NgTerminalModule,
     ],
     providers: [MessageService, {provide: LOCALE_ID, useValue: 'ru'}, ConfirmationService]
 })

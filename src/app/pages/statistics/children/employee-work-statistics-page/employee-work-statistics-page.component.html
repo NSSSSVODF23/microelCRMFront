@@ -1,4 +1,4 @@
-<div class="flex flex-column bg-white border-round shadow-1 w-full h-full text-bluegray-500">
+<div class="flex flex-column bg-white w-full h-full text-bluegray-500">
     <ng-container *ngTemplateOutlet="titleTemplate"></ng-container>
     <ng-container *ngTemplateOutlet="contentTemplate"></ng-container>
 </div>
@@ -28,7 +28,7 @@
                     <th rowspan="2">Монтажник</th>
                     <th colspan="4">Задача</th>
                     <th colspan="4">Тайминги среднее</th>
-                    <th colspan="3">Деньги среднее</th>
+                    <th colspan="4">Деньги</th>
                 </tr>
                 <tr>
                     <th>Класс</th>
@@ -42,6 +42,7 @@
                     <th>За смену</th>
                     <th>За час</th>
                     <th>За задачу</th>
+                    <th>Всего</th>
                 </tr>
             </ng-template>
             <ng-template pTemplate="body" let-employeeRow>
@@ -92,6 +93,21 @@
         <td>{{employeeRow.taskType.money.quantityPerShift | currency:'RUB'}}</td>
         <td>{{employeeRow.taskType.money.quantityPerHour | currency:'RUB'}}</td>
         <td>{{employeeRow.taskType.money.quantityPerTask | currency:'RUB'}}</td>
+        <td>{{employeeRow.taskType.money.quantityAll | currency:'RUB'}}</td>
+    </tr>
+    <tr *ngIf="!employeeRow.taskType && employeeRow.paidTask">
+        <td *ngIf="employeeRow.className" class="font-bold">{{employeeRow.className}}</td>
+        <td></td>
+        <td class="font-bold">{{employeeRow.paidTask.taskCount}}</td>
+        <td class="font-bold">{{employeeRow.paidTask.taskQuantityPerShift}}</td>
+        <td class="font-bold"><app-duration [ms]="employeeRow.paidTask.timings.givenAndReceived"></app-duration></td>
+        <td class="font-bold"><app-duration [ms]="employeeRow.paidTask.timings.givenAndClosed"></app-duration></td>
+        <td class="font-bold"><app-duration [ms]="employeeRow.paidTask.timings.receivedAndClosed"></app-duration></td>
+        <td class="font-bold"><app-duration [ms]="employeeRow.paidTask.timings.delayBetween"></app-duration></td>
+        <td class="font-bold">{{employeeRow.paidTask.money.quantityPerShift | currency:'RUB'}}</td>
+        <td class="font-bold">{{employeeRow.paidTask.money.quantityPerHour | currency:'RUB'}}</td>
+        <td class="font-bold">{{employeeRow.paidTask.money.quantityPerTask | currency:'RUB'}}</td>
+        <td class="font-bold">{{employeeRow.paidTask.money.quantityAll | currency:'RUB'}}</td>
     </tr>
     <tr *ngIf="!employeeRow.taskType && employeeRow.total">
         <td *ngIf="employeeRow.className" class="font-bold">{{employeeRow.className}}</td>
@@ -105,6 +121,7 @@
         <td class="font-bold">{{employeeRow.total.money.quantityPerShift | currency:'RUB'}}</td>
         <td class="font-bold">{{employeeRow.total.money.quantityPerHour | currency:'RUB'}}</td>
         <td class="font-bold">{{employeeRow.total.money.quantityPerTask | currency:'RUB'}}</td>
+        <td class="font-bold">{{employeeRow.total.money.quantityAll | currency:'RUB'}}</td>
     </tr>
 </ng-template>
 
