@@ -1,5 +1,5 @@
 import {Component, OnInit} from '@angular/core';
-import {DateRange} from "../../../../types/transport-interfaces";
+import {DateRange, WorkLog} from "../../../../types/transport-interfaces";
 import {FromEvent} from "../../../../decorators";
 import {filter, Observable, ReplaySubject, shareReplay, switchMap, tap} from "rxjs";
 import {ApiService} from "../../../../services/api.service";
@@ -67,10 +67,18 @@ export class EmployeeWorkStatisticsPage implements OnInit {
         }
     };
 
+    zeroWorkLogDialogVisible = false;
+    zeroWorkLogList: WorkLog[] = [];
+
     constructor(private api: ApiService, private blockService: BlockUiService) {
     }
 
     ngOnInit(): void {
+    }
+
+    openZeroWorkLogDialog(workLogs: WorkLog[]) {
+        this.zeroWorkLogDialogVisible = true;
+        this.zeroWorkLogList = workLogs;
     }
 
     private amountTimeMapping(value: number) {
@@ -92,5 +100,4 @@ export class EmployeeWorkStatisticsPage implements OnInit {
         }
         return stringValue;
     }
-
 }

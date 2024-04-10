@@ -26,21 +26,23 @@
             <ng-template pTemplate="header">
                 <tr>
                     <th rowspan="2">Монтажник</th>
-                    <th colspan="4">Задача</th>
+                    <th colspan="5">Задача</th>
                     <th colspan="4">Тайминги среднее</th>
-                    <th colspan="4">Деньги</th>
+                    <th colspan="5">Деньги</th>
                 </tr>
                 <tr>
                     <th>Класс</th>
                     <th>Тип</th>
                     <th>Кол-во</th>
                     <th>Ср. за смену</th>
+                    <th>Затр. время</th>
                     <th>Отд./Прин.</th>
                     <th>Отд./Закр.</th>
                     <th>Прин./Закр.</th>
                     <th>Δ Между задачами</th>
                     <th>За смену</th>
-                    <th>За час</th>
+                    <th>За час (смен.)</th>
+                    <th>За час (факт.)</th>
                     <th>За задачу</th>
                     <th>Всего</th>
                 </tr>
@@ -86,26 +88,48 @@
         <td>{{employeeRow.taskType.name}}</td>
         <td>{{employeeRow.taskType.count}}</td>
         <td>{{employeeRow.taskType.quantityPerShift}}</td>
+        <td><app-duration [ms]="employeeRow.taskType.timings.timeSpentOnTasks"></app-duration></td>
         <td><app-duration [ms]="employeeRow.taskType.timings.givenAndReceived"></app-duration></td>
         <td><app-duration [ms]="employeeRow.taskType.timings.givenAndClosed"></app-duration></td>
         <td><app-duration [ms]="employeeRow.taskType.timings.receivedAndClosed"></app-duration></td>
         <td></td>
         <td>{{employeeRow.taskType.money.quantityPerShift | currency:'RUB'}}</td>
         <td>{{employeeRow.taskType.money.quantityPerHour | currency:'RUB'}}</td>
+        <td>{{employeeRow.taskType.money.quantityPerHourActual | currency:'RUB'}}</td>
         <td>{{employeeRow.taskType.money.quantityPerTask | currency:'RUB'}}</td>
         <td>{{employeeRow.taskType.money.quantityAll | currency:'RUB'}}</td>
+    </tr>
+    <tr *ngIf="!employeeRow.taskType && employeeRow.zeroTask">
+        <td *ngIf="employeeRow.className" class="font-bold">{{employeeRow.className}}</td>
+        <td></td>
+        <td class="font-bold">{{employeeRow.zeroTask.taskCount}}</td>
+        <td class="font-bold">{{employeeRow.zeroTask.taskQuantityPerShift}}</td>
+        <td class="font-bold"><app-duration [ms]="employeeRow.zeroTask.timings.timeSpentOnTasks"></app-duration></td>
+        <td class="font-bold"><app-duration [ms]="employeeRow.zeroTask.timings.givenAndReceived"></app-duration></td>
+        <td class="font-bold"><app-duration [ms]="employeeRow.zeroTask.timings.givenAndClosed"></app-duration></td>
+        <td class="font-bold"><app-duration [ms]="employeeRow.zeroTask.timings.receivedAndClosed"></app-duration></td>
+        <td class="font-bold"><app-duration [ms]="employeeRow.zeroTask.timings.delayBetween"></app-duration></td>
+        <td class="font-bold" [attr.colspan]="5">
+            <div class="hover:text-primary-600 cursor-pointer"
+                 *ngIf="employeeRow.zeroTask.workLogs && employeeRow.zeroTask.workLogs.length > 0"
+                 (click)="openZeroWorkLogDialog(employeeRow.zeroTask.workLogs)">
+                Открыть список задач
+            </div>
+        </td>
     </tr>
     <tr *ngIf="!employeeRow.taskType && employeeRow.paidTask">
         <td *ngIf="employeeRow.className" class="font-bold">{{employeeRow.className}}</td>
         <td></td>
         <td class="font-bold">{{employeeRow.paidTask.taskCount}}</td>
         <td class="font-bold">{{employeeRow.paidTask.taskQuantityPerShift}}</td>
+        <td class="font-bold"><app-duration [ms]="employeeRow.paidTask.timings.timeSpentOnTasks"></app-duration></td>
         <td class="font-bold"><app-duration [ms]="employeeRow.paidTask.timings.givenAndReceived"></app-duration></td>
         <td class="font-bold"><app-duration [ms]="employeeRow.paidTask.timings.givenAndClosed"></app-duration></td>
         <td class="font-bold"><app-duration [ms]="employeeRow.paidTask.timings.receivedAndClosed"></app-duration></td>
         <td class="font-bold"><app-duration [ms]="employeeRow.paidTask.timings.delayBetween"></app-duration></td>
         <td class="font-bold">{{employeeRow.paidTask.money.quantityPerShift | currency:'RUB'}}</td>
         <td class="font-bold">{{employeeRow.paidTask.money.quantityPerHour | currency:'RUB'}}</td>
+        <td class="font-bold">{{employeeRow.paidTask.money.quantityPerHourActual | currency:'RUB'}}</td>
         <td class="font-bold">{{employeeRow.paidTask.money.quantityPerTask | currency:'RUB'}}</td>
         <td class="font-bold">{{employeeRow.paidTask.money.quantityAll | currency:'RUB'}}</td>
     </tr>
@@ -114,12 +138,14 @@
         <td></td>
         <td class="font-bold">{{employeeRow.total.taskCount}}</td>
         <td class="font-bold">{{employeeRow.total.taskQuantityPerShift}}</td>
+        <td class="font-bold"><app-duration [ms]="employeeRow.total.timings.timeSpentOnTasks"></app-duration></td>
         <td class="font-bold"><app-duration [ms]="employeeRow.total.timings.givenAndReceived"></app-duration></td>
         <td class="font-bold"><app-duration [ms]="employeeRow.total.timings.givenAndClosed"></app-duration></td>
         <td class="font-bold"><app-duration [ms]="employeeRow.total.timings.receivedAndClosed"></app-duration></td>
         <td class="font-bold"><app-duration [ms]="employeeRow.total.timings.delayBetween"></app-duration></td>
         <td class="font-bold">{{employeeRow.total.money.quantityPerShift | currency:'RUB'}}</td>
         <td class="font-bold">{{employeeRow.total.money.quantityPerHour | currency:'RUB'}}</td>
+        <td class="font-bold">{{employeeRow.total.money.quantityPerHourActual | currency:'RUB'}}</td>
         <td class="font-bold">{{employeeRow.total.money.quantityPerTask | currency:'RUB'}}</td>
         <td class="font-bold">{{employeeRow.total.money.quantityAll | currency:'RUB'}}</td>
     </tr>
@@ -140,3 +166,22 @@
         <button pButton label="Сформировать" id="submitButton"></button>
     </div>
 </ng-template>
+
+<p-dialog appendTo="body" header="Список нулевых задач"
+          [(visible)]="zeroWorkLogDialogVisible" [modal]="true">
+    <ng-template pTemplate="content">
+        <div class="flex flex-column">
+            <div class="flex flex-column border-1 border-bluegray-100" *ngFor="let workLog of zeroWorkLogList">
+                <app-task-list-element [inlined]="true" [isCommentInput]="false" [item]="workLog.task"></app-task-list-element>
+                <div class="p-3">
+                    <app-label label="Цель задачи" *ngIf="workLog.targetDescription">
+                        {{workLog.targetDescription}}
+                    </app-label>
+                    <app-label label="Отчет">
+                        {{workLog.report}}
+                    </app-label>
+                </div>
+            </div>
+        </div>
+    </ng-template>
+</p-dialog>

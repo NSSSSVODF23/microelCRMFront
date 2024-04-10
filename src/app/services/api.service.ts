@@ -97,6 +97,8 @@ import {AddressCorrecting, OldTracker} from "../types/parsing-interfaces";
 import {DhcpBindingFilter} from "../types/service-interfaces";
 import EmployeeWorkStatisticsTable = Statistics.EmployeeWorkStatisticsTable;
 import EmployeeWorkStatisticsForm = Statistics.EmployeeWorkStatisticsForm;
+import {PonForm} from "../pon/scheme/froms";
+import {PonData} from "../pon/scheme/elements";
 
 
 @Injectable({
@@ -1499,6 +1501,46 @@ export class ApiService {
      */
     deleteAutoTariff(id: number) {
         return this.sendDelete(`api/private/auto-tariff/${id}`);
+    }
+
+    /**
+     * Создать оптическую схему
+     * @param form Форма с информацией для создания схемы
+     */
+    createPonScheme(form: PonForm.Scheme){
+        return this.sendPost<PonData.PonScheme>("api/private/pon/scheme/create", form);
+    }
+
+    /**
+     * Редактировать оптическую схему
+     * @param id Идентификатор редактируемой схемы
+     * @param form Форма с информацией для редактирования схемы
+     */
+    updatePonScheme(id: number, form: PonForm.Scheme){
+        return this.sendPatch<PonData.PonScheme>(`api/private/pon/scheme/${id}/update`, form);
+    }
+
+    /**
+     * Удалить оптическую схему по идентификатору
+     * @param id Идентификатор удаляемой схемы
+     */
+    deletePonScheme(id: number){
+        return this.sendDelete(`api/private/pon/scheme/${id}/delete`);
+    }
+
+    /**
+     * Получить оптическую схему по идентификатору
+     * @param id Идентификатор оптической схемы
+     */
+    getPonScheme(id: number){
+        return this.sendGet<PonData.PonScheme>(`api/private/pon/scheme/${id}`);
+    }
+
+    /**
+     * Получить все оптические схемы
+     */
+    getPonSchemes(){
+        return this.sendGet<PonData.PonScheme[]>(`api/private/pon/scheme/list`);
     }
 
     // Результаты запросов на сервер кэшируются по таймауту, чтобы не было доп нагрузки на сервер

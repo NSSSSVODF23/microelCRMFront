@@ -89,8 +89,7 @@
                             <th>ИД</th>
                             <th>Задача</th>
                             <th>Отчёт</th>
-                            <th>Отдана</th>
-                            <th>Закрыта</th>
+                            <th>Отдана/Закрыта</th>
                             <th>Доля</th>
                             <th>Считал</th>
                             <th>Платная?</th>
@@ -119,8 +118,16 @@
                                     {{cache.getReport(rowData.workLog, selectedDay.employee.login)}}
                                 </span>
                             </td>
-                            <td>{{rowData.workLog.created | date:'dd-MM-yyyy HH:mm'}}</td>
-                            <td>{{rowData.workLog.closed | date:'dd-MM-yyyy HH:mm'}}</td>
+                            <td>
+                                <div class="flex flex-column">
+                                    <span>
+                                        {{rowData.workLog.created | date:'dd-MM-yyyy HH:mm'}}
+                                    </span>
+                                    <span>
+                                        {{rowData.workLog.closed | date:'dd-MM-yyyy HH:mm'}}
+                                    </span>
+                                </div>
+                            </td>
                             <td>
                                 {{rowData.ratio * 100 | number:'1.2-2'}}%
                             </td>

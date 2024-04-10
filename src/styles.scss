@@ -1844,3 +1844,12 @@ pre {
   border-collapse: separate !important;
   border-spacing: 0 15px !important;
 }
+
+.active-button.p-menuitem>.p-menuitem-link>.p-menuitem-text{
+  color: white !important;
+}
+
+.active-button.p-menuitem>.p-menuitem-link{
+  background-color: var(--primary-400) !important;
+}
+
