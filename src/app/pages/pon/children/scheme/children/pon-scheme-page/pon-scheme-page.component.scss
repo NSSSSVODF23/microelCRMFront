@@ -1,0 +1,8 @@
+:host{
+  flex-grow: 1;
+}
+
+.content {
+  display: grid;
+  grid-template: 1fr / 1fr max-content;
+}

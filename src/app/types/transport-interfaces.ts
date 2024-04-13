@@ -209,6 +209,15 @@ export interface Employee {
     base1783Credentials?: Credentials;
 }
 
+export interface EmployeeFiltrationForm {
+    positionId?: number | null;
+    departmentId?: number | null;
+    logins?: string[] | null;
+    deleted?: boolean | null;
+    offsite?: boolean | null;
+    stringQuery?: string | null;
+}
+
 export interface Credentials {
     username: string;
     password: string;
@@ -1848,6 +1857,7 @@ export namespace Statistics{
 
     export interface EmployeeWorkStatisticsForm{
         period: DateRange;
+        employees: string[];
     }
 
     export interface EmployeeWorkStatisticsTable{

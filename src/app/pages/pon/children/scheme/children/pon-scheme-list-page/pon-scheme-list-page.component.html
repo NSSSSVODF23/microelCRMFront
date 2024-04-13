@@ -1,0 +1,73 @@
+<div class="flex flex-column flex-grow-1">
+    <div class="px-5 py-4 border-bottom-1 border-bluegray-100 flex align-items-center">
+        <span class="text-bluegray-500 text-2xl font-semibold">
+            Оптические схемы
+        </span>
+        <div class="flex-grow-1"></div>
+        <p-button (onClick)="ponSchemeService.openCreateDialog()" icon="mdi-add" label="Создать"
+                  styleClass="p-button-success"></p-button>
+    </div>
+    <div class="flex flex-wrap align-content-start flex-grow-1 p-5 gap-3 relative">
+        <ng-container *ngIf="ponSchemeService.ponSchemeList$ | async as ponSchemeList">
+            <ng-container *ngIf="ponSchemeList.length === 0" [ngTemplateOutlet]="emptyListTemplate"></ng-container>
+            <ng-container *ngFor="let scheme of ponSchemeList" [ngTemplateOutletContext]="{scheme}"
+                          [ngTemplateOutlet]="schemeListItemTemplate"></ng-container>
+        </ng-container>
+    </div>
+</div>
+
+<p-dialog [(visible)]="ponSchemeService.ponSchemeDialogVisible" [header]="ponSchemeService.editableSchemeId ? 'Редактировать схему' : 'Создать схему'"
+          [modal]="true"
+          appendTo="body" contentStyleClass="flex flex-column gap-3">
+    <ng-template [formGroup]="ponSchemeService.ponSchemeForm" pTemplate="content">
+        <app-label label="Имя схемы">
+            <input formControlName="name" pInputText>
+        </app-label>
+        <app-label label="Описание">
+            <textarea formControlName="description" pInputTextarea [autoResize]="true" [cols]="50" [rows]="5"></textarea>
+        </app-label>
+        <div class="flex justify-content-end">
+            <ng-container *ngIf="!ponSchemeService.editableSchemeId">
+                <p-button (onClick)="ponSchemeService.createScheme()" [disabled]="ponSchemeService.ponSchemeForm.invalid"
+                          label="Создать" [loading]="ponSchemeService.modifySchemeInProcess"></p-button>
+            </ng-container>
+            <ng-container *ngIf="ponSchemeService.editableSchemeId">
+                <p-button (onClick)="ponSchemeService.editScheme()" [disabled]="ponSchemeService.ponSchemeForm.invalid"
+                          label="Редактировать" [loading]="ponSchemeService.modifySchemeInProcess"></p-button>
+            </ng-container>
+        </div>
+    </ng-template>
+</p-dialog>
+
+<ng-template #schemeListItemTemplate let-scheme="scheme">
+    <div class="scheme-item" [ngClass]="{selected: scheme.id === ponSchemeService.selectedPonScheme}"
+         (click)="ponSchemeService.selectScheme(scheme)" (dblclick)="ponSchemeService.openViewScheme(scheme)">
+        <div class="scheme-thumbnail">
+            <div class="menu">
+                <p-button icon="mdi-more_vert" (onClick)="openSchemeMenu(scheme, $event, menuEl)"
+                          styleClass="p-button-icon p-button-text p-button-secondary"></p-button>
+            </div>
+        </div>
+        <div class="scheme-caption">
+            <span class="name">{{scheme.name}}</span>
+            <ng-container *ngIf="!scheme.edited">
+                <span class="caption">({{scheme.creator}}) {{scheme.created | date: 'dd-MM-yyyy HH:mm'}}</span>
+            </ng-container>
+            <ng-container *ngIf="scheme.edited">
+                <span class="caption">({{scheme.lastEditor}}) {{scheme.edited | date: 'dd-MM-yyyy HH:mm'}}</span>
+            </ng-container>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #emptyListTemplate>
+    <div class="flex flex-column gap-3 justify-content-center align-items-center absolute
+     top-50 left-50 -translate-50 text-bluegray-300 font-bold text-2xl">
+        <span class="mds-flowsheet"></span>
+        <span>Оптических схем не найдено</span>
+        <p-button (onClick)="ponSchemeService.openCreateDialog()" icon="mdi-add" label="Создать"
+                  styleClass="p-button-success p-button-outlined"></p-button>
+    </div>
+</ng-template>
+
+<p-menu #menuEl [popup]="true" appendTo="body" [model]="schemeMenuOptions"></p-menu>

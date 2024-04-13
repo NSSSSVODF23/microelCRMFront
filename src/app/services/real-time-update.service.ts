@@ -43,6 +43,7 @@ import {OldTracker, SimpleMessage} from "../types/parsing-interfaces";
 import {PageType, TasksCatalogPageCacheService} from "./tasks-catalog-page-cache.service";
 import {RxStompState} from "@stomp/rx-stomp";
 import {BlockIcon, BlockMessage, BlockUiService, BlockZIndex} from "./block-ui.service";
+import {PonData} from "../pon/scheme/elements";
 
 @Injectable({
     providedIn: 'root'
@@ -519,5 +520,9 @@ export class RealTimeUpdateService {
 
     receiveUpdateAutoTariff(){
         return this.watch<any>('auto-tariff', 'update')
+    }
+
+    receiveSchemeChange(){
+        return this.watch<PonData.SchemeChangeEvent>('pon', 'scheme', 'change');
     }
 }

@@ -70,7 +70,13 @@ import {PonBootstrapPage} from "../../pages/pon/pon-bootstrap-page/pon-bootstrap
 import {PonTerminalsPage} from "../../pages/pon/children/pon-terminals-page/pon-terminals-page.component";
 import {PonEventsPage} from "../../pages/pon/children/pon-events-page/pon-events-page.component";
 import {PonTerminalPage} from "../../pages/pon/children/pon-terminal-page/pon-terminal-page.component";
-import {PonSchemePage} from "../../pages/pon/children/pon-scheme-page/pon-scheme-page.component";
+import {PonSchemePage} from "../../pages/pon/children/scheme/children/pon-scheme-page/pon-scheme-page.component";
+import {
+    SchemeBootstrapPage
+} from "../../pages/pon/children/scheme/scheme-bootstrap-page/scheme-bootstrap-page.component";
+import {
+    PonSchemeListPage
+} from "../../pages/pon/children/scheme/children/pon-scheme-list-page/pon-scheme-list-page.component";
 
 const routes: Routes = [{
     path: '', component: MainBootstrap, children: [
@@ -280,7 +286,15 @@ const routes: Routes = [{
             children: [
                 {path: 'terminals', component: PonTerminalsPage},
                 {path: 'events', component: PonEventsPage},
-                {path: 'scheme', component: PonSchemePage},
+                {path: 'scheme', pathMatch: 'full', redirectTo: 'scheme/list'},
+                {
+                    path: 'scheme',
+                    component: SchemeBootstrapPage,
+                    children: [
+                        {path: 'list', component: PonSchemeListPage},
+                        {path: ':id', component: PonSchemePage},
+                    ]
+                },
                 {path: 'terminal/:id', component: PonTerminalPage},
             ],
             // canActivate:[accessCanActivate(AccessFlag.VIEW_STATISTICS)]

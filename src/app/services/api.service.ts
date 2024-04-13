@@ -88,7 +88,7 @@ import {
     WireframeDashboardStatistic,
     OltWorker,
     WorkingDay,
-    WorkLog, DateRange, AutoTariff, AutoTariffForm
+    WorkLog, DateRange, AutoTariff, AutoTariffForm, EmployeeFiltrationForm
 } from "../types/transport-interfaces";
 import {MessageService, TreeNode} from "primeng/api";
 import {cyrb53, Storage, Utils} from "../util";
@@ -265,11 +265,19 @@ export class ApiService {
         if (globalFilter) query['globalFilter'] = globalFilter;
         if (typeof showDeleted === 'boolean' && !showDeleted) query['showDeleted'] = showDeleted;
         if (typeof showOffsite === 'boolean' && !showOffsite) query['showOffsite'] = showOffsite;
-        return this.sendGet('api/private/employees/list', query)
+        return this.sendGet('api/private/employee/list', query)
+    }
+
+    /**
+     * Получить список сотрудников отфильтрованых по фильр-форме
+     * @param form EmployeeFiltrationForm
+     */
+    getEmployeesListFiltered(form: EmployeeFiltrationForm): Observable<Employee[]> {
+        return this.sendPost<Employee[]>('api/private/employee/filter/list', form);
     }
 
     getEmployeesOptionsList(globalFilter?: string): Observable<any[]> {
-        return this.sendGet<any[]>('api/private/employees/list', {globalFilter: globalFilter ?? ""})
+        return this.sendGet<any[]>('api/private/employee/list', {globalFilter: globalFilter ?? ""})
             .pipe(
                 map(
                     (response) => {
@@ -368,7 +376,7 @@ export class ApiService {
     }
 
     getResponsible(): Observable<(Department | Employee)[]> {
-        return zip(this.sendGet<Department[]>("api/private/departments"), this.sendGet<Employee[]>("api/private/employees/list")).pipe(map(arr => arr.flat()), map(arr => arr.filter(i => !i.deleted)))
+        return zip(this.sendGet<Department[]>("api/private/departments"), this.sendGet<Employee[]>("api/private/employee/list")).pipe(map(arr => arr.flat()), map(arr => arr.filter(i => !i.deleted)))
     }
 
     getActiveTaskInStage(offset: number, limit: number, templateId: number, stageId: string): Observable<Page<Task>> {
@@ -403,7 +411,7 @@ export class ApiService {
     }
 
     getInstallersEmployees() {
-        return this.sendGet<Employee[]>("api/private/employees/installers");
+        return this.sendGet<Employee[]>("api/private/employee/installers");
     }
 
     assignInstallersToTask(taskId: number, targetInstallers: {

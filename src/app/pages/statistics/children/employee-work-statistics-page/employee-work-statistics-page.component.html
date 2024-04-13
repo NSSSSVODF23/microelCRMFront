@@ -21,7 +21,7 @@
 </ng-template>
 
 <ng-template #statisticsTableTemplate>
-    <div class="flex flex-column gap-3" *ngIf="statisticsTable$ | async as statisticsTable; else emptyTableTemplate">
+    <div class="flex flex-column gap-3" *ngIf="statisticsTable; else emptyTableTemplate">
         <p-table [value]="statisticsTable.rows">
             <ng-template pTemplate="header">
                 <tr>
@@ -161,9 +161,11 @@
 </ng-template>
 
 <ng-template #periodStatisticsFormTemplate>
-    <div class="flex gap-2 p-2 border-round-xl border-1 border-bluegray-100">
-        <app-data-range-input [(ngModel)]="statisticsPeriod"></app-data-range-input>
-        <button pButton label="Сформировать" id="submitButton"></button>
+    <div class="flex gap-2" [formGroup]="statisticsForm">
+        <p-dropdown [options]="(positions$ | async) ?? []" [formControl]="positionControl"></p-dropdown>
+        <p-multiSelect appendTo="body" [options]="(employees$ | async) ?? []" formControlName="employees" selectedItemsLabel="{0} монтажников выбрано"></p-multiSelect>
+        <app-data-range-input formControlName="period"></app-data-range-input>
+        <button pButton label="Сформировать" (click)="getStatistics()" [disabled]="statisticsForm.invalid"></button>
     </div>
 </ng-template>
 

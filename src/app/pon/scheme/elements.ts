@@ -1,5 +1,4 @@
 import Konva from "konva";
-import {Employee} from "../../types/transport-interfaces";
 
 export namespace PonType {
     export enum FiberColor {
@@ -35,6 +34,13 @@ export namespace PonType {
         IN = "IN",
         OUT = "OUT"
     }
+
+    export enum EventType {
+        CREATE = "CREATE",
+        UPDATE = "UPDATE",
+        EDIT = "EDIT",
+        DELETE = "DELETE"
+    }
 }
 
 export namespace PonData {
@@ -43,6 +49,12 @@ export namespace PonData {
         id: number;
         name: string;
         description: string;
+        created: string;
+        updated: string;
+        edited?: string;
+        deleted?: string;
+        creator: string;
+        lastEditor: string;
         isEditing: boolean;
     }
 
@@ -96,6 +108,11 @@ export namespace PonData {
         type: PonType.BoxType;
         name: string;
         simplexes: Partial<Simplex>[];
+    }
+
+    export interface SchemeChangeEvent {
+        type: PonType.EventType;
+        scheme: PonScheme;
     }
 }
 
@@ -479,7 +496,7 @@ export namespace PonElements {
             points: [0, 0, 0, 0],
             stroke: 'black',
             strokeWidth: 2,
-            tension: 0.3
+            // tension: 0.3
         });
         private inCp?: PonElements.ConnectionPoint;
         private outCp?: PonElements.ConnectionPoint;
@@ -609,8 +626,19 @@ export namespace PonFunc {
     }
 
     export function calculateBondPath(cp1: PonElements.ConnectionPoint, cp2: PonElements.ConnectionPoint){
+        const stagePosition = cp1.point.getStage()?.getAbsolutePosition();
+        const scale = cp1.point.getStage()?.scale();
+        if (!stagePosition || !scale) return [];
         const pos1 = cp1.point.getAbsolutePosition();
+        pos1.x -= stagePosition.x;
+        pos1.y -= stagePosition.y;
+        pos1.x /= scale.x;
+        pos1.y /= scale.y;
         const pos2 = cp2.point.getAbsolutePosition();
+        pos2.x -= stagePosition.x;
+        pos2.y -= stagePosition.y;
+        pos2.x /= scale.x;
+        pos2.y /= scale.y;
 
         const thirdx = (pos2.x-pos1.x)/3;
         const thirdy = (pos2.y-pos1.y)/6;
@@ -625,8 +653,19 @@ export namespace PonFunc {
     }
 
     export function calculateBondPathToPoint(cp1: PonElements.ConnectionPoint, point: {x:number, y: number}){
+        const stagePosition = cp1.point.getStage()?.getAbsolutePosition();
+        const scale = cp1.point.getStage()?.scale();
+        if (!stagePosition || !scale) return [];
         const pos1 = cp1.point.getAbsolutePosition();
+        pos1.x -= stagePosition.x;
+        pos1.y -= stagePosition.y;
+        pos1.x /= scale.x;
+        pos1.y /= scale.y;
         const pos2 = point;
+        pos2.x -= stagePosition.x;
+        pos2.y -= stagePosition.y;
+        pos2.x /= scale.x;
+        pos2.y /= scale.y;
 
         const thirdx = (pos2.x-pos1.x)/3;
         const thirdy = (pos2.y-pos1.y)/6;

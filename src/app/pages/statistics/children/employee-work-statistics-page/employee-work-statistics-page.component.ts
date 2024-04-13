@@ -1,32 +1,61 @@
 import {Component, OnInit} from '@angular/core';
-import {DateRange, WorkLog} from "../../../../types/transport-interfaces";
-import {FromEvent} from "../../../../decorators";
-import {filter, Observable, ReplaySubject, shareReplay, switchMap, tap} from "rxjs";
+import {DateRange, Employee, Statistics, WorkLog} from "../../../../types/transport-interfaces";
+import {AutoUnsubscribe} from "../../../../decorators";
+import {map, Observable, shareReplay, startWith, switchMap} from "rxjs";
 import {ApiService} from "../../../../services/api.service";
 import {BlockUiService} from "../../../../services/block-ui.service";
+import {FormControl, FormGroup, Validators} from "@angular/forms";
 
 @Component({
     templateUrl: './employee-work-statistics-page.component.html',
     styleUrls: ['./employee-work-statistics-page.component.scss']
 })
+@AutoUnsubscribe()
 export class EmployeeWorkStatisticsPage implements OnInit {
 
-    statisticsPeriod: DateRange | null = null;
-    // statisticsPeriod: DateRange | null = {start: new Date(2021, 0, 1), end: new Date(2024, 1, 31)};
-    @FromEvent('submitButton', 'click')
-    submit$ = new ReplaySubject<PointerEvent>(1);
+    statisticsForm = new FormGroup({
+        employees: new FormControl<string[] | null>(null, [Validators.required]),
+        period: new FormControl<DateRange | null>(null, [Validators.required])
+    });
 
-    statisticsTable$ = this.submit$
+    positionControl = new FormControl<number | null>(null);
+
+    positions$: Observable<{ label: string, value: number | null }[]> = this.api.getPositions()
         .pipe(
-            filter(() => !!this.statisticsPeriod),
-            tap(() => this.blockService.wait({message: 'Формирование статистики'})),
-            switchMap(() => this.api.getEmployeeWorkStatistics({period: this.statisticsPeriod!})),
-            tap({
-                next: () => this.blockService.unblock(),
-                error: () => this.blockService.unblock(),
+            map(positions => {
+                return positions.map(position => {
+                    return {
+                        label: position.name,
+                        value: position.positionId
+                    }
+                })
+            }),
+            map(list => [{label: 'Все', value: null}, ...list]),
+            shareReplay(1)
+        );
+
+    employees$: Observable<{ label: string, value: string }[]> = this.positionControl.valueChanges
+        .pipe(
+            startWith(null),
+            switchMap(positionId => this.api.getEmployeesListFiltered({positionId, offsite: true, deleted: false})),
+            map((employees: Employee[]) => {
+                return employees.map(employee => {
+                    return {
+                        label: employee.fullName ?? "Неизвестный",
+                        value: employee.login
+                    }
+                })
             }),
             shareReplay(1)
-        )
+        );
+
+    employeesChangeSub = this.employees$.subscribe(employees => {
+        this.statisticsForm.patchValue({
+            employees: employees.map(employee => employee.value)
+        });
+    });
+
+    statisticsTable?: Statistics.EmployeeWorkStatisticsTable;
 
     timingsChartOptions = {
         scales: {
@@ -79,6 +108,18 @@ export class EmployeeWorkStatisticsPage implements OnInit {
     openZeroWorkLogDialog(workLogs: WorkLog[]) {
         this.zeroWorkLogDialogVisible = true;
         this.zeroWorkLogList = workLogs;
+    }
+
+    getStatistics() {
+        this.blockService.wait({message: 'Формирование статистики'})
+        this.api.getEmployeeWorkStatistics(this.statisticsForm.value as Statistics.EmployeeWorkStatisticsForm)
+            .subscribe({
+                next: (statistics) => {
+                    this.statisticsTable = statistics;
+                    this.blockService.unblock();
+                },
+                error: () => this.blockService.unblock()
+            })
     }
 
     private amountTimeMapping(value: number) {

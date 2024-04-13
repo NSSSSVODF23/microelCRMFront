@@ -1,0 +1,25 @@
+<div class="flex flex-column h-screen">
+    <p-menubar #menubarElement [model]="menuBarOptions" styleClass="border-0 border-noround">
+        <ng-template pTemplate="start">
+            <div class="flex align-items-center gap-3 pr-3">
+                <p-button (onClick)="nav.backOrDefault(['/pon', 'scheme', 'list'])" icon="mdi-arrow_back"
+                          styleClass="p-button-secondary p-button-text p-button-icon"></p-button>
+                <span class="text-bluegray-400 font-bold">{{schemeName$ | async}}</span>
+            </div>
+        </ng-template>
+    </p-menubar>
+    <div class="content" [style.height]="'calc(100vh - 54.5px)'">
+        <div #mainViewElement class="overflow-hidden">
+            <div id="container" class="border-top-1 border-bluegray-100"></div>
+        </div>
+        <div #sidebarElement class="flex border-left-1 border-top-1 border-bluegray-100">
+            <div class="flex flex-column">
+                <div class="bg-bluegray-50 border-bottom-1 border-bluegray-100 px-3 py-2">
+                    <span class="text-bluegray-400 font-bold text-sm">Объекты</span>
+                </div>
+                <p-tree [value]="objectsMenu" selectionMode="single" [(selection)]="selectedObject" styleClass="border-0 border-noround"></p-tree>
+            </div>
+        </div>
+    </div>
+</div>
+

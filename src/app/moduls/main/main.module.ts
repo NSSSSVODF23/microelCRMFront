@@ -147,7 +147,13 @@ import {PonBootstrapPage} from "../../pages/pon/pon-bootstrap-page/pon-bootstrap
 import {PonTerminalsPage} from "../../pages/pon/children/pon-terminals-page/pon-terminals-page.component";
 import {PonEventsPage} from "../../pages/pon/children/pon-events-page/pon-events-page.component";
 import {PonTerminalPage} from "../../pages/pon/children/pon-terminal-page/pon-terminal-page.component";
-import {PonSchemePage} from "../../pages/pon/children/pon-scheme-page/pon-scheme-page.component";
+import {PonSchemePage} from "../../pages/pon/children/scheme/children/pon-scheme-page/pon-scheme-page.component";
+import {
+    SchemeBootstrapPage
+} from "../../pages/pon/children/scheme/scheme-bootstrap-page/scheme-bootstrap-page.component";
+import {
+    PonSchemeListPage
+} from "../../pages/pon/children/scheme/children/pon-scheme-list-page/pon-scheme-list-page.component";
 
 const mapConfig: YaConfig = {
     apikey: '008574e5-f34b-4270-b3d5-91aaabd036e8',
@@ -200,6 +206,8 @@ const mapConfig: YaConfig = {
         PonTerminalsPage,
         PonEventsPage,
         PonTerminalPage,
+        SchemeBootstrapPage,
+        PonSchemeListPage,
         PonSchemePage
     ],
     imports: [
