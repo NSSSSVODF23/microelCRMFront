@@ -1,5 +1,5 @@
 import Konva from "konva";
-import {PonElements, PonFunc} from "./elements";
+import {PonData, PonElements, PonFunc} from "./elements";
 import {Observable, Subject, Subscription} from "rxjs";
 
 export namespace PonEditor {
@@ -63,6 +63,36 @@ export namespace PonEditor {
             this.elements.push(element);
             this.bindHandlers(element);
             this.layer.add(element.getUI());
+        }
+
+        createElement(elementClass: any) {
+            this.appendElement(elementClass.create(0, 0, 12));
+        }
+
+        loadNode(elementClass: any, nodeData: PonData.PonNode) {
+            this.appendElement(new elementClass(nodeData));
+        }
+
+        getElementsData() {
+            return this.elements.map(element => element.getData());
+        }
+
+        loadNodes(data: PonData.PonNode[]) {
+            data.forEach(node => {
+                switch (node.dtype) {
+                    case "Box":
+                        this.loadNode(PonElements.Box, node);
+                        break;
+                    case "ConnectionPoint":
+                        this.loadNode(PonElements.ConnectionPoint, node);
+                        break;
+                    case "Cable":
+                        // this.loadNode(PonElements.Cable, node);
+                        break;
+                    case "Simplex":
+                        this.loadNode(PonElements.Simplex, node);
+                }
+            });
         }
 
         destroy() {
@@ -133,6 +163,11 @@ export namespace PonEditor {
                     break;
                 case ToolMode.Move:
                     if (this.controlState === ControlState.Moving && this.movingElement) {
+                        const position = this.movingElement.getUI().getPosition();
+                        position.x = position.x - (position.x % 10);
+                        position.y = position.y - (position.y % 10);
+                        this.movingElement.getUI().setPosition(position);
+                        this.movingElement.changePosition(position);
                         this.controlState = ControlState.None;
                         this.movingElement = undefined;
                     }

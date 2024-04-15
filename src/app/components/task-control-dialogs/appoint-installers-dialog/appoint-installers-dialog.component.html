@@ -41,9 +41,10 @@
             <app-button (onClick)="resetListAppointedInstallers()"
                         [disabled]="targetInstallers.length === 0 || appointmentRequested"
                         icon="delete" label="Сбросить" model="p-button-text p-button-secondary"></app-button>
-            <app-button (onClick)="sendListAppointedInstallers()" [disabled]="targetInstallers.length === 0"
-                        [loading]="appointmentRequested"
-                        icon="assignment" label="Назначить"></app-button>
+            <p-splitButton (onClick)="sendListAppointedInstallers()"
+                           [disabled]="targetInstallers.length === 0 || appointmentRequested"
+                           [model]="appointedInstallersOptions"
+                           appendTo="body" icon="mdi-assignment" label="Назначить"></p-splitButton>
         </div>
     </ng-template>
 </p-dialog>
@@ -62,5 +63,18 @@
                     </div>
                 </ng-template>
             </p-listbox>
+    </ng-template>
+</p-dialog>
+
+<p-dialog [(visible)]="scheduleAppointDialogVisible" header="Отложенное назначение задачи"
+          [dismissableMask]="true" [draggable]="true" [modal]="true" [resizable]="false" (onHide)="resetDate()"
+          appendTo="body" contentStyleClass="flex flex-column gap-3 pt-1">
+    <ng-template pTemplate="content">
+        <p-calendar [firstDayOfWeek]="1" [formControl]="scheduleDateControl"
+                    [inline]="true" [selectOtherMonths]="true" class="w-fit align-self-center"></p-calendar>
+        <app-time-picker [formControl]="scheduleTimeControl"></app-time-picker>
+        <app-button (onClick)="sendListAppointedInstallers(scheduleTimeControl.value)"
+                    [loading]="appointmentRequested"
+                    [label]="'Отдать в ' + (scheduleTimeControl.value | date:'dd-MM-yyyy HH:mm')"></app-button>
     </ng-template>
 </p-dialog>

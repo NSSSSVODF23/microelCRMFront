@@ -60,6 +60,7 @@ export namespace PonData {
 
     export interface PonNode {
         id: number;
+        dtype: string;
         x: number;
         y: number;
         z: number;
@@ -119,6 +120,9 @@ export namespace PonData {
 export namespace PonElements {
 
     export abstract class Element {
+
+        abstract getData(): any;
+
         abstract getUI(): Konva.Group;
 
         abstract getChild(): Element[];
@@ -126,6 +130,8 @@ export namespace PonElements {
         abstract highlight(): void;
 
         abstract unhighlight(): void;
+
+        abstract changePosition(position: {x: number, y: number}): void;
 
         abstract onMouseEnter(callback: (event: Konva.KonvaEventObject<MouseEvent>, element: Element) => void): void;
 
@@ -150,23 +156,21 @@ export namespace PonElements {
 
     export class ConnectionPoint extends Element {
 
-        private data: Partial<PonData.ConnectionPoint> = {};
-        private node = new Konva.Group({});
         readonly point = new Konva.Circle({
             x: 0,
             y: 0,
             radius: 8,
             fill: 'gray',
         });
+        private data: Partial<PonData.ConnectionPoint> = {};
+        private node = new Konva.Group({});
         private bond?: Partial<PonElements.Bond>;
 
         constructor(data?: Partial<PonData.ConnectionPoint>) {
             super();
-            if (data) {
-                this.data = data;
-            }
             this.node.add(this.point);
             this.data = data ?? {};
+            this.data.dtype = "ConnectionPoint";
             this.node.move({
                 x: this.data.x ?? 0,
                 y: this.data.y ?? 0,
@@ -178,12 +182,17 @@ export namespace PonElements {
             return this.bond;
         }
 
-        setBond(bond: PonElements.Bond){
+        setBond(bond: PonElements.Bond) {
             this.bond = bond;
         }
 
-        getData(){
+        getData() {
             return this.data;
+        }
+
+        override changePosition(position: { x: number; y: number }) {
+            this.data.x = position.x;
+            this.data.y = position.y;
         }
 
         override highlight() {
@@ -270,6 +279,7 @@ export namespace PonElements {
         constructor(data?: Partial<PonData.ConnectionPoint>) {
             super();
             this.data = data ?? {};
+            this.data.dtype = "Simplex";
             this.inPoint = new ConnectionPoint({
                 type: PonType.ConnectionPointType.IN,
                 x: 10,
@@ -294,6 +304,15 @@ export namespace PonElements {
             return new Simplex(data);
         }
 
+        override changePosition(position: { x: number; y: number }) {
+            this.data.x = position.x;
+            this.data.y = position.y;
+        }
+
+        override getData(): any {
+            return this.data;
+        }
+
         override highlight() {
         }
 
@@ -306,7 +325,7 @@ export namespace PonElements {
         }
 
         override getChild(): PonElements.Element[] {
-            if(this.inPoint && this.outPoint) return [this.inPoint, this.outPoint];
+            if (this.inPoint && this.outPoint) return [this.inPoint, this.outPoint];
             return [];
         }
 
@@ -380,14 +399,15 @@ export namespace PonElements {
         constructor(data?: Partial<PonData.Box>) {
             super();
             this.data = data ?? {};
+            this.data.dtype = "Box";
             this.title.setText(data?.name ?? 'Без имени');
-            if(data?.x && data?.y){
+            if (data?.x && data?.y) {
                 this.node.move({
                     x: data.x,
                     y: data.y,
                 });
             }
-            if(data?.width && data?.height){
+            if (data?.width && data?.height) {
                 this.node.setSize({width: data.width, height: data.height})
             }
             this.background.setSize({
@@ -427,14 +447,23 @@ export namespace PonElements {
             });
         }
 
+        override changePosition(position: { x: number; y: number }) {
+            this.data.x = position.x;
+            this.data.y = position.y;
+        }
+
+        override getData(): any {
+            return this.data;
+        }
+
         override highlight() {
-            this.title.setAttr('fill','blue');
-            this.background.setAttr('stroke','blue');
+            this.title.setAttr('fill', 'blue');
+            this.background.setAttr('stroke', 'blue');
         }
 
         override unhighlight() {
-            this.title.setAttr('fill','gray');
-            this.background.setAttr('stroke','gray');
+            this.title.setAttr('fill', 'gray');
+            this.background.setAttr('stroke', 'gray');
         }
 
         override getUI(): Konva.Group {
@@ -504,7 +533,7 @@ export namespace PonElements {
         constructor(data?: Partial<PonData.Bond>) {
             super();
             this.data = data ?? {};
-            if(this.data.in && this.data.out){
+            if (this.data.in && this.data.out) {
                 const path = this.data.path ?? [];
                 this.line.setAttrs({
                     points: path,
@@ -513,29 +542,7 @@ export namespace PonElements {
             this.node.add(this.line);
         }
 
-        getInCp() {
-            return this.inCp;
-        }
-
-        getOutCp() {
-            return this.outCp;
-        }
-
-        setConnectionPoints(inCp: PonElements.ConnectionPoint, outCp: PonElements.ConnectionPoint){
-            this.inCp = inCp;
-            this.outCp = outCp;
-        }
-
-        recalculate(){
-            if(this.inCp && this.outCp){
-                const path = PonFunc.calculateBondPath(this.inCp, this.outCp);
-                this.line.setAttrs({
-                    points: path,
-                })
-            }
-        }
-
-        static create(inCp: PonElements.ConnectionPoint, outCp: PonElements.ConnectionPoint){
+        static create(inCp: PonElements.ConnectionPoint, outCp: PonElements.ConnectionPoint) {
             const path = PonFunc.calculateBondPath(inCp, outCp);
             const bond = new Bond({
                 in: inCp.getData() as PonData.ConnectionPoint,
@@ -546,6 +553,37 @@ export namespace PonElements {
             outCp.setBond(bond);
             bond.setConnectionPoints(inCp, outCp);
             return bond;
+        }
+
+        getInCp() {
+            return this.inCp;
+        }
+
+        getOutCp() {
+            return this.outCp;
+        }
+
+        setConnectionPoints(inCp: PonElements.ConnectionPoint, outCp: PonElements.ConnectionPoint) {
+            this.inCp = inCp;
+            this.outCp = outCp;
+        }
+
+        recalculate() {
+            if (this.inCp && this.outCp) {
+                const path = PonFunc.calculateBondPath(this.inCp, this.outCp);
+                this.line.setAttrs({
+                    points: path,
+                })
+            }
+        }
+
+        override changePosition(position: { x: number; y: number }) {
+            // this.data.x = position.x;
+            // this.data.y = position.y;
+        }
+
+        override getData(): any {
+            return this.data;
         }
 
         override highlight() {
@@ -617,7 +655,7 @@ export namespace PonFunc {
      * @param y1 Конец отрезка Y
      * @param radius Радиус окружности
      */
-    export function getCircleIntersection(x0: number, y0: number, x1:number, y1: number, radius: number): { x:number, y: number } {
+    export function getCircleIntersection(x0: number, y0: number, x1: number, y1: number, radius: number): { x: number, y: number } {
         const ang = getAngle(x0, y0, x1, y1);
         return {
             x: x0 + radius * Math.cos(ang),
@@ -625,7 +663,7 @@ export namespace PonFunc {
         };
     }
 
-    export function calculateBondPath(cp1: PonElements.ConnectionPoint, cp2: PonElements.ConnectionPoint){
+    export function calculateBondPath(cp1: PonElements.ConnectionPoint, cp2: PonElements.ConnectionPoint) {
         const stagePosition = cp1.point.getStage()?.getAbsolutePosition();
         const scale = cp1.point.getStage()?.scale();
         if (!stagePosition || !scale) return [];
@@ -640,19 +678,19 @@ export namespace PonFunc {
         pos2.x /= scale.x;
         pos2.y /= scale.y;
 
-        const thirdx = (pos2.x-pos1.x)/3;
-        const thirdy = (pos2.y-pos1.y)/6;
-        const fbX = pos1.x+thirdx;
-        const fbY = pos1.y+thirdy;
-        const sbX = pos2.x-thirdx;
-        const sbY = pos2.y-thirdy;
+        const thirdx = (pos2.x - pos1.x) / 3;
+        const thirdy = (pos2.y - pos1.y) / 6;
+        const fbX = pos1.x + thirdx;
+        const fbY = pos1.y + thirdy;
+        const sbX = pos2.x - thirdx;
+        const sbY = pos2.y - thirdy;
         const {x, y} = PonFunc.getCircleIntersection(pos1.x, pos1.y, fbX, fbY, 10);
         const targetPos = PonFunc.getCircleIntersection(pos2.x, pos2.y, sbX, sbY, 10);
 
         return [x, y, fbX, fbY, sbX, sbY, targetPos.x, targetPos.y];
     }
 
-    export function calculateBondPathToPoint(cp1: PonElements.ConnectionPoint, point: {x:number, y: number}){
+    export function calculateBondPathToPoint(cp1: PonElements.ConnectionPoint, point: { x: number, y: number }) {
         const stagePosition = cp1.point.getStage()?.getAbsolutePosition();
         const scale = cp1.point.getStage()?.scale();
         if (!stagePosition || !scale) return [];
@@ -667,12 +705,12 @@ export namespace PonFunc {
         pos2.x /= scale.x;
         pos2.y /= scale.y;
 
-        const thirdx = (pos2.x-pos1.x)/3;
-        const thirdy = (pos2.y-pos1.y)/6;
-        const fbX = pos1.x+thirdx;
-        const fbY = pos1.y+thirdy;
-        const sbX = pos2.x-thirdx;
-        const sbY = pos2.y-thirdy;
+        const thirdx = (pos2.x - pos1.x) / 3;
+        const thirdy = (pos2.y - pos1.y) / 6;
+        const fbX = pos1.x + thirdx;
+        const fbY = pos1.y + thirdy;
+        const sbX = pos2.x - thirdx;
+        const sbY = pos2.y - thirdy;
         const {x, y} = PonFunc.getCircleIntersection(pos1.x, pos1.y, fbX, fbY, 10);
         const targetPos = PonFunc.getCircleIntersection(pos2.x, pos2.y, sbX, sbY, 10);
 

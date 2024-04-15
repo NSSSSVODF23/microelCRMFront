@@ -17,7 +17,8 @@
                 <div class="bg-bluegray-50 border-bottom-1 border-bluegray-100 px-3 py-2">
                     <span class="text-bluegray-400 font-bold text-sm">Объекты</span>
                 </div>
-                <p-tree [value]="objectsMenu" selectionMode="single" [(selection)]="selectedObject" styleClass="border-0 border-noround"></p-tree>
+                <p-tree [value]="objectsMenu" selectionMode="single" [(selection)]="selectedObject"
+                        styleClass="border-0 border-noround p-2" (onNodeSelect)="stage?.createElement($event.node.data)"></p-tree>
             </div>
         </div>
     </div>

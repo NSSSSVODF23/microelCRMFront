@@ -7,8 +7,10 @@ import {
     debounceTime,
     distinctUntilChanged,
     filter,
+    first,
     fromEvent,
     interval,
+    lastValueFrom,
     map,
     merge,
     Observable,
@@ -60,21 +62,36 @@ export class PonSchemePage implements OnInit, OnDestroy, AfterViewInit {
             label: 'Оборудование',
             children: [
                 {
-                    label: 'Голова'
+                    label: 'Коммутатор',
+                    data: PonElements.Box
                 },
                 {
-                    label: 'Оптический терминал'
+                    label: 'Опт. терминал'
                 }
             ]
         },
         {
-            label: 'Коммутация'
+            label: 'Коммутация',
+            children: [
+                {
+                    label: 'Опт. ящик'
+                },
+                {
+                    label: 'Опт. кросс'
+                },
+                {
+                    label: 'Опт. муфта'
+                }
+            ]
         },
         {
-            label: 'Кабель'
+            label: 'Кабель',
+            children: []
         }
     ];
     selectedObject?: TreeNode;
+
+    elemSub?: Subscription;
 
     @ViewChild('menubarElement') menubarElement?: Menubar;
     @ViewChild('sidebarElement') sidebarElement?: ElementRef<HTMLDivElement>;
@@ -85,7 +102,7 @@ export class PonSchemePage implements OnInit, OnDestroy, AfterViewInit {
             startWith(null),
             debounceTime(100),
             map(() => {
-                if (this.mainViewElement){
+                if (this.mainViewElement) {
                     const mainViewWidth = this.mainViewElement.nativeElement.offsetWidth;
                     const mainViewHeight = this.mainViewElement.nativeElement.offsetHeight;
                     return {width: mainViewWidth, height: mainViewHeight};
@@ -99,8 +116,11 @@ export class PonSchemePage implements OnInit, OnDestroy, AfterViewInit {
 
     ngAfterViewInit(): void {
         this.stage = new PonEditor.Stage("container", this.windowResize$)
-        this.stage.appendElement(PonElements.Box.create(10, 10, 8));
-        this.stage.appendElement(PonElements.Box.create(410, 10, 24));
+        this.elemSub = this.id.pipe(switchMap(id => this.api.getPonSchemeElements(id))).subscribe(elements => {
+            this.stage?.loadNodes(elements);
+        });
+        // this.stage.appendElement(PonElements.Box.create(10, 10, 8));
+        // this.stage.appendElement(PonElements.Box.create(410, 10, 24));
         this.updateMenuSub = this.stage.onChangeToolMode.pipe(startWith(null)).subscribe(this.menuConstructor.bind(this));
     }
 
@@ -109,6 +129,13 @@ export class PonSchemePage implements OnInit, OnDestroy, AfterViewInit {
 
     ngOnDestroy() {
         this.stage?.destroy();
+    }
+
+    saveEditScheme() {
+        const id$ = this.id.pipe(first());
+        lastValueFrom(id$).then(id => {
+            this.api.editPonScheme(id, this.stage?.getElementsData()).subscribe();
+        })
     }
 
     private menuConstructor(mode: ToolMode | null) {
@@ -126,6 +153,12 @@ export class PonSchemePage implements OnInit, OnDestroy, AfterViewInit {
                     this.stage?.setToolMode(ToolMode.Connect);
                 },
                 styleClass: mode === ToolMode.Connect ? 'active-button' : '',
+            },
+            {
+                label: "Сохранить",
+                command: () => {
+                    this.saveEditScheme();
+                }
             }
         ]
     }

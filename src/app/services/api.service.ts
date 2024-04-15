@@ -417,7 +417,7 @@ export class ApiService {
     assignInstallersToTask(taskId: number, targetInstallers: {
         installers: Employee[], gangLeader?: string,
         deferredReport: boolean, description: string, files?: FileData[], serverFiles?: FileSuggestion[],
-        comments: number[]
+        comments: number[], scheduled?: Date | null
     }) {
         return this.sendPost("api/private/task/" + taskId + "/assign-installers", targetInstallers);
     }
@@ -1551,6 +1551,26 @@ export class ApiService {
         return this.sendGet<PonData.PonScheme[]>(`api/private/pon/scheme/list`);
     }
 
+    /**
+     * Сохранить отредактированную оптическую схему
+     * @param id Идентификатор редактируемой схемы
+     * @param elementsData Данные для редактирования
+     */
+    editPonScheme(id: number, elementsData: any[] | undefined) {
+        if (!elementsData || elementsData.length === 0) {
+            throw new Error('Не переданы данные для редактирования');
+        }
+        return this.sendPatch(`api/private/pon/scheme/${id}/edit`, elementsData);
+    }
+
+    /**
+     * Получить элементы оптической схемы по идентификатору схемы
+     * @param id Идентификатор схемы
+     */
+    getPonSchemeElements(id: number){
+        return this.sendGet<PonData.PonNode[]>(`api/private/pon/scheme/${id}/elements`);
+    }
+
     // Результаты запросов на сервер кэшируются по таймауту, чтобы не было доп нагрузки на сервер
 
     private sendGet<T>(uri: string, query?: any) {
@@ -1613,6 +1633,7 @@ export class ApiService {
             }));
     }
 
+
     private sendPatch<T>(uri: string, body: any) {
         return this.client.patch<T>(uri, body)
             .pipe(catchError((err, caught) => {
@@ -1620,7 +1641,6 @@ export class ApiService {
                 throw err;
             }));
     }
-
 
     private sendDelete(uri: string) {
         return this.client.delete(uri)
@@ -1630,9 +1650,8 @@ export class ApiService {
             }));
     }
 
+
     private generateHash(uri: string, query: any) {
         return cyrb53(uri + JSON.stringify(query), 0);
     }
-
-
 }
