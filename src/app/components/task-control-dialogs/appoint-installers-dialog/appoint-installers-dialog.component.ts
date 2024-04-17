@@ -119,6 +119,7 @@ export class AppointInstallersDialogComponent implements OnInit {
 
     sendListAppointedInstallers(scheduled?: Date | null) {
         if (!this.taskId) return;
+
         this.appointmentRequested = true;
         this.api.assignInstallersToTask(this.taskId, {
             installers: this.targetInstallers,

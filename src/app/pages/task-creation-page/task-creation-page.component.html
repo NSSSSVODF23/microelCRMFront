@@ -66,6 +66,8 @@
             <app-button (onClick)="changeCreationStep(-1)" icon="navigate_before"
                         [label]="prevStepName??'Назад'" model="p-button-text p-button-secondary"></app-button>
             <div class="stretched"></div>
+            <p-button (onClick)="createTaskAndOpen()" icon="mdi-open_in_new" styleClass="p-button-info p-button-outlined"
+                        label="Создать и перейти"></p-button>
             <p-button (onClick)="createTaskAndClose()" icon="mdi-add_circle_outline" styleClass="p-button-secondary p-button-outlined"
                         label="Создать и закрыть задачу"></p-button>
             <p-button (onClick)="createTask()" icon="mdi-add_circle_outline"
@@ -73,6 +75,8 @@
         </div>
         <div *ngSwitchCase="'FIN_ONLY'" class="flex gap-3">
             <div class="stretched"></div>
+            <p-button (onClick)="createTaskAndOpen()" icon="mdi-open_in_new" styleClass="p-button-info p-button-outlined"
+                        label="Создать и перейти"></p-button>
             <p-button (onClick)="createTaskAndClose()" icon="mdi-add_circle_outline" styleClass="p-button-secondary p-button-outlined"
                         label="Создать и закрыть задачу"></p-button>
             <p-button (onClick)="createTask()" icon="mdi-add_circle_outline"

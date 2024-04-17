@@ -8,7 +8,7 @@ import {
     TaskTag, TaskTypeDirectory,
     Wireframe
 } from "../../types/transport-interfaces";
-import {ActivatedRoute} from "@angular/router";
+import {ActivatedRoute, Router} from "@angular/router";
 import {FormArray, FormControl, FormGroup} from "@angular/forms";
 import {FormToModelItemConverter, SubscriptionsHolder} from "../../util";
 import {PersonalityService} from "../../services/personality.service";
@@ -73,7 +73,8 @@ export class TaskCreationPageComponent implements OnInit, OnDestroy {
             filter(() => this.currentStepFields.length-1 === this.currentFieldFocus)
         )
 
-    constructor(readonly api: ApiService, readonly route: ActivatedRoute, readonly personality: PersonalityService, readonly toast: MessageService, private taskCreation: TaskCreatorService) {
+    constructor(readonly api: ApiService, readonly route: ActivatedRoute, readonly personality: PersonalityService,
+                readonly toast: MessageService, private taskCreation: TaskCreatorService, private router: Router) {
         document.body.classList.add("whited");
     }
 
@@ -309,6 +310,32 @@ export class TaskCreationPageComponent implements OnInit, OnDestroy {
                 this.isCreatedTask = false;
                 // Закрываем окно создания задачи
                 window.close();
+            },
+            error: () => {
+                // Устанавливаем статус создания задачи
+                this.isCreatedTask = false;
+            }
+        });
+    }
+
+    createTaskAndOpen() {
+        // Если this.taskCreationBody равно null, прерываем создание
+        if (!this.taskCreationBody) {
+            this.toast.add({severity: 'danger', summary: 'Ошибка', detail: 'Не выбран шаблон для создания задачи'});
+            return;
+        }
+        if(!this.taskCreationForm.valid){
+            this.taskCreationForm.markAllAsTouched();
+            return;
+        }
+        // Устанавливаем статус создания задачи
+        this.isCreatedTask = true;
+        // Отправляем запрос на сервер для создания задачи
+        this.api.createTask(this.taskCreationBody).subscribe({
+            next: (task) => {
+                // Устанавливаем статус создания задачи
+                this.isCreatedTask = false;
+                this.router.navigate(['/task', task.taskId]);
             },
             error: () => {
                 // Устанавливаем статус создания задачи

@@ -22,15 +22,16 @@ export class TaskCreatorService {
             map(() => window.open('/task/create', '_blank', this.features)),
             switchMap((w)=> {
                 if(w)
-                    return  fromEvent(w, 'load')
+                    return  fromEvent(w, 'load').pipe(map(()=>w))
                 else
                     return  of(null)
             }),
             delay(200),
-            tap((event)=> {
-                if(event) {
-                    const target: Window = event.currentTarget as Window;
-                    target.postMessage(this.transferObject, '*');
+            tap((win)=> {
+                if(win) {
+                    // console.log(event)
+                    // const target: Window = event.target as Window;
+                    win.postMessage(this.transferObject, '*');
                 }
             })
         ).subscribe()
