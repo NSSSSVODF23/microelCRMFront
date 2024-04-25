@@ -2041,3 +2041,10 @@ export interface AutoTariffForm {
     targetClassId: number;
     targetType: string;
 }
+
+export enum EventType {
+    CREATE = "CREATE",
+    UPDATE = "UPDATE",
+    EDIT = "EDIT",
+    DELETE = "DELETE"
+}

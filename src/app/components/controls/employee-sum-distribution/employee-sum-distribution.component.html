@@ -7,11 +7,12 @@
             <div class="caption size-big">{{employee.fullName}}</div>
             <ng-container [formGroupName]="employee.login">
                 <div class="flexed gap10 hcenter w-full">
-                    <p-slider [max]="1" [min]="0" [step]=".01" class="w-full"
+                    <p-slider [max]="1" [min]="0" [step]="(sliderStep$ | async) ?? 0.01" class="w-full"
                               formControlName="ratio" [disabled]="isDisabled"></p-slider>
                     <span class="caption size-tiny wt-bold f-color-500">
-                                        {{employeeRatioForm.value[employee.login].ratio * 100 | number:'1.2-2'}}%
-                                    </span>
+<!--                        <input class="border-none text-sm text-bluegray-400" [size]="2" [value]="employeeRatioForm.value[employee.login].ratio * 100">-->
+                        {{employeeRatioForm.value[employee.login].ratio * 100 | number:'1.2-2'}}%
+                    </span>
                 </div>
                 <p-inputNumber [disabled]="totalCostOfWork === 0 || isDisabled" formControlName="sum"
                                suffix=" руб."></p-inputNumber>
@@ -30,7 +31,7 @@
                                              model="danger" [disabled]="isDisabled"></app-tiny-button>
                         </div>
                     </div>
-                    <span class="caption">Итог: {{getEmployeeTotalPayment(employee.login)}} руб.</span>
+                    <span class="caption">Итог: {{getEmployeeTotalPayment(employee.login) | number: '1.2-2'}} руб.</span>
                 </div>
 
             </ng-container>
@@ -38,10 +39,10 @@
     </div>
     <div class="flexed vend hcenter gap10">
     <span class="caption wt-bold f-color-500">
-        Распределенная сумма: {{allMoney}} руб.
+        Распределенная сумма: {{allMoney | number: '1.2-2'}} руб.
     </span>
         <span class="caption size-big wt-bold f-color-primary">
-        Итог вместе с коэф.: {{allMoneyWithRatio}} руб.
+        Итог вместе с коэф.: {{allMoneyWithRatio | number: '1.2-2'}} руб.
     </span>
     </div>
 </div>

@@ -1,0 +1,126 @@
+<div class="flex flex-column">
+    <div class="flex gap-3 border-bottom-1 border-bluegray-100 bg-white align-items-center p-4 sticky top-0">
+        <span class="text-2xl text-bluegray-500 font-semibold">Сенсоры</span>
+    </div>
+    <p-tabView class="flex-grow-1" styleClass="tabview-unpadding">
+        <p-tabPanel header="Температура" leftIcon="mdi-thermostat">
+            <ng-template pTemplate="content">
+                <ng-container *ngIf="temperatureSensors$ | async as temperatureSensors">
+                    <p-table [loading]="temperatureSensors.loadingState === 'LOADING'"
+                             [value]="temperatureSensors.value">
+                        <ng-template pTemplate="header">
+                            <tr>
+                                <th>Статус</th>
+                                <th>Имя</th>
+                                <th>Диапазон</th>
+                                <th>Значение</th>
+                                <th>Добавлен</th>
+                                <th>Обновлен</th>
+                                <th></th>
+                            </tr>
+                        </ng-template>
+                        <ng-template let-sensor pTemplate="body">
+                            <tr (click)="openTemperatureSensorDialog($event, sensor)"
+                                class="cursor-pointer hover:bg-bluegray-50">
+                                <td>
+                                    <p-tag [severity]="sensor.active ? 'success' : 'danger'"
+                                           [value]="sensor.active ? 'Активный' : 'Не активный'"></p-tag>
+                                </td>
+                                <td>{{sensor.name}}</td>
+                                <td class="font-bold" [style.color]="sensor.currentRange?.color">{{sensor.currentRange?.name ?? 'Вне диапазона'}}</td>
+                                <td class="font-bold" [style.color]="sensor.currentRange?.color">{{sensor.value | number: '1.2-2'}} °C</td>
+                                <td>{{sensor.created | date: 'dd-MM-yyyy HH:mm'}}</td>
+                                <td>{{sensor.updated | date: 'dd-MM-yyyy HH:mm'}}</td>
+                                <td>
+                                    <p-button (onClick)="deleteTemperatureSensor($event, sensor)" label="Удалить"
+                                              styleClass="p-button-sm p-button-danger"></p-button>
+                                </td>
+                            </tr>
+                        </ng-template>
+                    </p-table>
+                </ng-container>
+            </ng-template>
+        </p-tabPanel>
+    </p-tabView>
+</div>
+
+<p-dialog [(visible)]="temperatureSensorDialogVisible" [dismissableMask]="true"
+          [draggable]="true"
+          [header]="'Датчик температуры: ' + (selectedTemperatureSensor$ | async)?.name" [modal]="true" contentStyleClass="flex gap-3">
+    <ng-template pTemplate="content">
+        <div class="flex flex-column">
+            <div class="flex gap-2 px-5 pt-4 align-items-center">
+                <span class="text-bluegray-500 font-bold">Статистика</span>
+                <app-data-range-input [formControl]="tempSensorChartDateRange"></app-data-range-input>
+                <p-button (onClick)="updateTempSensorChart$.next(true)" icon="mdi-refresh" label="Обновить"
+                          styleClass="p-button-primary p-button-text"></p-button>
+                <p-button (onClick)="resetTempSensorZoom()" icon="mdi-aspect_ratio" label="Сбросить масштаб"
+                          styleClass="p-button-secondary p-button-text"></p-button>
+            </div>
+            <div *ngIf="tempSensorChartData$ | async as chartData else chartLoadingTemplate"
+                 class="flex flex-grow-1 justify-content-center">
+                <p-chart #tempSensorSignalChart *ngIf="!isTempSensorChartLoading"
+                         [data]="{datasets:[chartData]}"
+                         [options]="tempSensorChartOptions$ | async" height="50vh" type="line" width="50vw"></p-chart>
+                <ng-container *ngIf="isTempSensorChartLoading" [ngTemplateOutlet]="chartLoadingTemplate"></ng-container>
+            </div>
+        </div>
+        <div *ngIf="selectedTemperatureSensor$ | async as sensor"
+             class="flex flex-column flex-grow-1 border-1 border-bluegray-100">
+            <div class="h-fit border-bottom-1 border-bluegray-100 bg-bluegray-50 text-bluegray-400 p-3">
+                Диапазоны температур
+            </div>
+            <div class="flex flex-column flex-grow-1 overflow-y-auto">
+                <div *ngFor="let range of sensor.ranges" class="flex gap-2 align-items-center text-bluegray-400 pr-3">
+                    <div [style.background-color]="range.color" class="w-2rem h-2rem"></div>
+                    <span class="font-bold">{{range.name}}</span>
+                    <span>↓ {{range.minTemp}} °C</span>
+                    <span>↑ {{range.maxTemp}} °C</span>
+                    <div class="flex-grow-1"></div>
+                    <div class="flex align-items-center gap-2">
+                        <span (click)="openEditTempRange(range)"
+                              class="text-orange-400 hover:text-orange-600 cursor-pointer select-none font-bold">Изменить</span>
+                        <span (click)="removeTempRange(range)"
+                              class="text-red-400 hover:text-red-600 cursor-pointer select-none font-bold">Удалить</span>
+                    </div>
+                </div>
+                <div class="flex align-items-center justify-content-center mt-3">
+                    <p-button (onClick)="openAppendTempRange()" class="align-self-end" label="Добавить"
+                              styleClass="p-button-sm p-button-success"></p-button>
+                </div>
+            </div>
+        </div>
+    </ng-template>
+</p-dialog>
+
+<p-dialog [(visible)]="tempRangeDialogVisible" [dismissableMask]="true" [draggable]="true"
+          [modal]="true" contentStyleClass="flex flex-column gap-3"
+          [header]="editedTemperatureRange == null ? 'Добавление диапазона' : 'Изменение диапазона'">
+    <ng-template [formGroup]="temperatureRangeForm" pTemplate="content">
+        <app-label label="Цвет">
+            <p-colorPicker formControlName="color"></p-colorPicker>
+        </app-label>
+        <app-label label="Имя диапазона">
+            <input formControlName="name" pInputText/>
+        </app-label>
+        <app-label label="Мин. температура">
+            <input formControlName="minTemp" pInputText/>
+        </app-label>
+        <app-label label="Макс. температура">
+            <input formControlName="maxTemp" pInputText/>
+        </app-label>
+        <p-button (onClick)="appendTempRange()" *ngIf="editedTemperatureRange == null"
+                  [disabled]="temperatureRangeForm.invalid" class="align-self-end"
+                  label="Добавить" styleClass="p-button-sm p-button-success"></p-button>
+        <p-button (onClick)="editTempRange()" *ngIf="editedTemperatureRange != null"
+                  [disabled]="temperatureRangeForm.invalid" class="align-self-end"
+                  label="Сохранить" styleClass="p-button-sm p-button-success"></p-button>
+    </ng-template>
+</p-dialog>
+
+<ng-template #chartLoadingTemplate>
+    <div [style]="{width: '50vw',height: '50vh'}" class="flex align-items-center justify-content-center w-full">
+        <p-progressSpinner class="custom-spinner custom-spinner-8xl custom-spinner-primary"
+                           strokeWidth="1"></p-progressSpinner>
+    </div>
+</ng-template>

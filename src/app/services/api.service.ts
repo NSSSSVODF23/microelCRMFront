@@ -99,7 +99,7 @@ import EmployeeWorkStatisticsTable = Statistics.EmployeeWorkStatisticsTable;
 import EmployeeWorkStatisticsForm = Statistics.EmployeeWorkStatisticsForm;
 import {PonForm} from "../pon/scheme/froms";
 import {PonData} from "../pon/scheme/elements";
-
+import {TemperatureRange, TemperatureSensor} from "../types/sensors-types";
 
 @Injectable({
     providedIn: 'root'
@@ -110,6 +110,88 @@ export class ApiService {
     loggedIn = false;
 
     constructor(readonly client: HttpClient, readonly toast: MessageService) {
+    }
+
+    // Результаты запросов на сервер кэшируются по таймауту, чтобы не было доп нагрузки на сервер
+
+    private sendGet<T>(uri: string, query?: any) {
+        for (let q in query) {
+            if (query[q] === undefined || query[q] === null) {
+                delete query[q];
+            }
+        }
+        // Генерируем хэш запроса на основе конечной точки и параметров запроса
+        const requestHash = this.generateHash(uri, query);
+        // Объявляем результирующий observable
+        let observable: Observable<T> | null = null;
+        // Если запрос не в кэше, создаем его
+        if (!this.requestCacheMap[requestHash]) {
+            observable = this.client.get<T>(uri, {params: query})
+                .pipe(share(), catchError(async (err, caught) => {
+                    this.toast.add({severity: 'error', summary: "Ошибка запроса", detail: err.error.message})
+                    throw err;
+                }));
+            this.requestCacheMap[requestHash] = observable;
+            // После создания запроса создаем таймер удаляющий его из кэша по таймауту
+            setTimeout(() => {
+                delete this.requestCacheMap[requestHash];
+            }, 10000);
+        } else {
+            // Если запрос в кэше, возвращаем его
+            observable = this.requestCacheMap[requestHash];
+        }
+        return observable;
+    }
+
+    // Генерируем хэш запроса по URI и параметрам запроса
+
+    private sendGetSilent<T>(uri: string, query?: any) {
+        for (let q in query) {
+            if (query[q] === undefined || query[q] === null) {
+                delete query[q];
+            }
+        }
+        const requestHash = this.generateHash(uri, query);
+        let observable: Observable<T> | null = null;
+        if (!this.requestCacheMap[requestHash]) {
+            observable = this.client.get<T>(uri, {params: query})
+                .pipe(share());
+            this.requestCacheMap[requestHash] = observable;
+            setTimeout(() => {
+                delete this.requestCacheMap[requestHash];
+            }, 10000);
+        } else {
+            observable = this.requestCacheMap[requestHash];
+        }
+        return observable;
+    }
+
+    private sendPost<T>(uri: string, body: any) {
+        return this.client.post<T>(uri, body)
+            .pipe(catchError(async (err, caught) => {
+                this.toast.add({severity: 'error', summary: "Ошибка запроса", detail: err.error.message})
+                throw err;
+            }));
+    }
+
+    private sendPatch<T>(uri: string, body: any) {
+        return this.client.patch<T>(uri, body)
+            .pipe(catchError((err, caught) => {
+                this.toast.add({severity: 'error', summary: "Ошибка запроса", detail: err.error.message})
+                throw err;
+            }));
+    }
+
+    private sendDelete(uri: string) {
+        return this.client.delete(uri)
+            .pipe(catchError(async (err, caught) => {
+                this.toast.add({severity: 'error', summary: "Ошибка запроса", detail: err.error.message})
+                throw err;
+            }));
+    }
+
+    private generateHash(uri: string, query: any) {
+        return cyrb53(uri + JSON.stringify(query), 0);
     }
 
     getWireframe(id: number) {
@@ -1571,87 +1653,48 @@ export class ApiService {
         return this.sendGet<PonData.PonNode[]>(`api/private/pon/scheme/${id}/elements`);
     }
 
-    // Результаты запросов на сервер кэшируются по таймауту, чтобы не было доп нагрузки на сервер
-
-    private sendGet<T>(uri: string, query?: any) {
-        for (let q in query) {
-            if (query[q] === undefined || query[q] === null) {
-                delete query[q];
-            }
-        }
-        // Генерируем хэш запроса на основе конечной точки и параметров запроса
-        const requestHash = this.generateHash(uri, query);
-        // Объявляем результирующий observable
-        let observable: Observable<T> | null = null;
-        // Если запрос не в кэше, создаем его
-        if (!this.requestCacheMap[requestHash]) {
-            observable = this.client.get<T>(uri, {params: query})
-                .pipe(share(), catchError(async (err, caught) => {
-                    this.toast.add({severity: 'error', summary: "Ошибка запроса", detail: err.error.message})
-                    throw err;
-                }));
-            this.requestCacheMap[requestHash] = observable;
-            // После создания запроса создаем таймер удаляющий его из кэша по таймауту
-            setTimeout(() => {
-                delete this.requestCacheMap[requestHash];
-            }, 10000);
-        } else {
-            // Если запрос в кэше, возвращаем его
-            observable = this.requestCacheMap[requestHash];
-        }
-        return observable;
+    /**
+     * Получить все температурные датчики
+     */
+    getTemperatureSensors(){
+        return this.sendGet<TemperatureSensor[]>("api/private/sensor/temperature");
     }
 
-    // Генерируем хэш запроса по URI и параметрам запроса
-
-    private sendGetSilent<T>(uri: string, query?: any) {
-        for (let q in query) {
-            if (query[q] === undefined || query[q] === null) {
-                delete query[q];
-            }
-        }
-        const requestHash = this.generateHash(uri, query);
-        let observable: Observable<T> | null = null;
-        if (!this.requestCacheMap[requestHash]) {
-            observable = this.client.get<T>(uri, {params: query})
-                .pipe(share());
-            this.requestCacheMap[requestHash] = observable;
-            setTimeout(() => {
-                delete this.requestCacheMap[requestHash];
-            }, 10000);
-        } else {
-            observable = this.requestCacheMap[requestHash];
-        }
-        return observable;
+    /**
+     * Удалить температурный датчик по идентификатору
+     * @param id Идентификатор температурного датчика
+     */
+    deleteTemperatureSensor(id: number){
+        return this.sendDelete(`api/private/sensor/temperature/${id}`);
     }
 
-    private sendPost<T>(uri: string, body: any) {
-        return this.client.post<T>(uri, body)
-            .pipe(catchError(async (err, caught) => {
-                this.toast.add({severity: 'error', summary: "Ошибка запроса", detail: err.error.message})
-                throw err;
-            }));
+    /**
+     * Сохранить температурные диапазоны датчика
+     * @param id Идентификатор температурного датчика
+     * @param ranges Диапазоны температур
+     */
+    patchTemperatureRanges(id: number, ranges: Partial<TemperatureRange>[]){
+        return this.sendPatch(`api/private/sensor/temperature/${id}/ranges`, ranges);
     }
 
-
-    private sendPatch<T>(uri: string, body: any) {
-        return this.client.patch<T>(uri, body)
-            .pipe(catchError((err, caught) => {
-                this.toast.add({severity: 'error', summary: "Ошибка запроса", detail: err.error.message})
-                throw err;
-            }));
+    /**
+     * Получить график сигнала температурного датчика
+     * @param id Идентификатор оптического терминала
+     * @param timeRange Диапазон времени для графика сигнала (from, to)
+     */
+    getTemperatureSensorChart(id: number, timeRange: DateRange) {
+        return this.sendPost<any>(`api/private/sensor/temperature/${id}/chart`, timeRange);
     }
 
-    private sendDelete(uri: string) {
-        return this.client.delete(uri)
-            .pipe(catchError(async (err, caught) => {
-                this.toast.add({severity: 'error', summary: "Ошибка запроса", detail: err.error.message})
-                throw err;
-            }));
+    appendTemperatureRange(id: number, value: Partial<TemperatureRange>) {
+        return this.sendPost(`api/private/sensor/temperature/${id}/range`, value);
     }
 
+    editTemperatureRange(id: number, value: Partial<TemperatureRange>) {
+        return this.sendPatch(`api/private/sensor/temperature/range/${id}`, value);
+    }
 
-    private generateHash(uri: string, query: any) {
-        return cyrb53(uri + JSON.stringify(query), 0);
+    deleteTemperatureRange(id: number) {
+        return this.sendDelete(`api/private/sensor/temperature/range/${id}`);
     }
 }

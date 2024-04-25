@@ -16,7 +16,8 @@ export class TelegramSettingsPageComponent implements OnInit,OnDestroy {
         botToken: new FormControl('', [Validators.required]),
         botName: new FormControl('', [Validators.required]),
         dhcpNotificationChatId: new FormControl(''),
-        ponAlertChatId: new FormControl('')
+        ponAlertChatId: new FormControl(''),
+        sensorsAlertChatId: new FormControl(''),
     });
     subscription?: Subscription;
 

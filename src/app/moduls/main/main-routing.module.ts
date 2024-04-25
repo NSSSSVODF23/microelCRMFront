@@ -77,6 +77,7 @@ import {
 import {
     PonSchemeListPage
 } from "../../pages/pon/children/scheme/children/pon-scheme-list-page/pon-scheme-list-page.component";
+import {TopologySensorsPage} from "../../pages/topology/children/topology-sensors-page/topology-sensors-page.component";
 
 const routes: Routes = [{
     path: '', component: MainBootstrap, children: [
@@ -264,6 +265,7 @@ const routes: Routes = [{
             component: TopologyBootstrapPage,
             children: [
                 {path: 'houses', component: TopologyHousesPage},
+                {path: 'sensors', component: TopologySensorsPage},
                 {path: 'house/:id', component: TopologyHousePage},
                 {path: 'pon/:id', component: TopologyHousePage},
                 {

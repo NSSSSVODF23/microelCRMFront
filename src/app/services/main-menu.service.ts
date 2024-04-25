@@ -109,6 +109,11 @@ export class MainMenuService {
                     caption: "Сессии",
                     icon: "mdi-stream",
                     link: ["/topology", "sessions"]
+                },
+                {
+                    caption: "Сенсоры",
+                    icon: "mdi-sensors",
+                    link: ["/topology", "sensors"]
                 }
             ]
         },

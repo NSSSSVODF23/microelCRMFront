@@ -6,9 +6,9 @@ import {FormControl, FormGroup, Validators} from "@angular/forms";
 import {PonForm} from "../../../pon/scheme/froms";
 import {ConfirmationService} from "primeng/api";
 import {BlockUiService} from "../../block-ui.service";
-import {PonData, PonType} from "../../../pon/scheme/elements";
-import EventType = PonType.EventType;
+import {PonData} from "../../../pon/scheme/elements";
 import {Router} from "@angular/router";
+import {EventType} from "../../../types/transport-interfaces";
 
 @Injectable({
     providedIn: 'root'

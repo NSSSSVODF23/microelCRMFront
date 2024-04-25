@@ -154,6 +154,8 @@ import {
 import {
     PonSchemeListPage
 } from "../../pages/pon/children/scheme/children/pon-scheme-list-page/pon-scheme-list-page.component";
+import {TopologySensorsPage} from "../../pages/topology/children/topology-sensors-page/topology-sensors-page.component";
+import {TagModule} from "primeng/tag";
 
 const mapConfig: YaConfig = {
     apikey: '008574e5-f34b-4270-b3d5-91aaabd036e8',
@@ -200,6 +202,7 @@ const mapConfig: YaConfig = {
         TopologyHousesPage,
         TopologyHousePage,
         TopologySessionsPage,
+        TopologySensorsPage,
         TopologyCommutatorsPage,
         TaskRegistryPage,
         PonBootstrapPage,
@@ -292,6 +295,7 @@ const mapConfig: YaConfig = {
         ChipModule,
         ChartModule,
         NgTerminalModule,
+        TagModule,
     ],
     providers: [MessageService, {provide: LOCALE_ID, useValue: 'ru'}, ConfirmationService]
 })

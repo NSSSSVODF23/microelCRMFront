@@ -44,6 +44,7 @@ import {PageType, TasksCatalogPageCacheService} from "./tasks-catalog-page-cache
 import {RxStompState} from "@stomp/rx-stomp";
 import {BlockIcon, BlockMessage, BlockUiService, BlockZIndex} from "./block-ui.service";
 import {PonData} from "../pon/scheme/elements";
+import {SensorUpdateEvent} from "../types/sensors-types";
 
 @Injectable({
     providedIn: 'root'
@@ -65,6 +66,48 @@ export class RealTimeUpdateService {
             },
             error:()=>this.blockUiService.block(LOST_CONNECTION_MESSAGE),
         })
+    }
+
+    private watchUnicast<T>(...path: string[]): Observable<T> {
+        return this.getObservable<T>('user', ...path);
+    }
+
+    private watch<T>(...path: string[]): Observable<T> {
+        return this.getObservable<T>('api', ...path);
+    }
+
+    // Генерируем хэш наблюдателя по месту назначения
+
+    private getObservable<T>(prefix: string, ...path: string[]): Observable<T> {
+        const destination = `/${prefix}/${path.join('/')}`;
+        // Генерируем хэш запроса на основе конечной точки и параметров запроса
+        const requestHash = this.generateHash(destination);
+        // Объявляем результирующий observable
+        let observable: Observable<T> | null = null;
+        // Если запрос не в кэше, создаем его
+        if (!this.watchCacheMap[requestHash]) {
+            observable = this.stomp.watch(destination)
+                .pipe(
+                    finalize(this.deleteFromCache.bind(this, destination)),
+                    share(),
+                    map(msg => <T>JSON.parse(msg.body)),
+                )
+            this.watchCacheMap[requestHash] = observable;
+        } else {
+            // Если запрос в кэше, возвращаем его
+            observable = this.watchCacheMap[requestHash];
+        }
+        return observable;
+    }
+
+    // Удаляет observable из кэша
+
+    private generateHash(destination: string) {
+        return cyrb53(destination, 0);
+    }
+
+    private deleteFromCache(hash: string) {
+        delete this.watchCacheMap[hash];
     }
 
     commentCreated(taskId: number) {
@@ -398,48 +441,6 @@ export class RealTimeUpdateService {
         return this.watch<SwitchBaseInfo>('acp', "commutator", "base", "delete");
     }
 
-    private watchUnicast<T>(...path: string[]): Observable<T> {
-        return this.getObservable<T>('user', ...path);
-    }
-
-    private watch<T>(...path: string[]): Observable<T> {
-        return this.getObservable<T>('api', ...path);
-    }
-
-    // Генерируем хэш наблюдателя по месту назначения
-
-    private getObservable<T>(prefix: string, ...path: string[]): Observable<T> {
-        const destination = `/${prefix}/${path.join('/')}`;
-        // Генерируем хэш запроса на основе конечной точки и параметров запроса
-        const requestHash = this.generateHash(destination);
-        // Объявляем результирующий observable
-        let observable: Observable<T> | null = null;
-        // Если запрос не в кэше, создаем его
-        if (!this.watchCacheMap[requestHash]) {
-            observable = this.stomp.watch(destination)
-                .pipe(
-                    finalize(this.deleteFromCache.bind(this, destination)),
-                    share(),
-                    map(msg => <T>JSON.parse(msg.body)),
-                )
-            this.watchCacheMap[requestHash] = observable;
-        } else {
-            // Если запрос в кэше, возвращаем его
-            observable = this.watchCacheMap[requestHash];
-        }
-        return observable;
-    }
-
-    // Удаляет observable из кэша
-
-    private generateHash(destination: string) {
-        return cyrb53(destination, 0);
-    }
-
-    private deleteFromCache(hash: string) {
-        delete this.watchCacheMap[hash];
-    }
-
     incomingTaskCountChange(login: string) {
         return this.watchUnicast<WireframeTaskCounter>(login, 'task', 'count', 'change')
     }
@@ -524,5 +525,9 @@ export class RealTimeUpdateService {
 
     receiveSchemeChange(){
         return this.watch<PonData.SchemeChangeEvent>('pon', 'scheme', 'change');
+    }
+
+    receiveSensorUpdateEvent() {
+        return this.watch<SensorUpdateEvent>('sensor', 'event');
     }
 }

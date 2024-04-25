@@ -1,6 +1,7 @@
 import Konva from "konva";
-import {PonData, PonElements, PonFunc} from "./elements";
+import {PonData, PonElements, PonFunc, PonType} from "./elements";
 import {Observable, Subject, Subscription} from "rxjs";
+import PonNodeType = PonType.PonNodeType;
 
 export namespace PonEditor {
 
@@ -25,9 +26,9 @@ export namespace PonEditor {
         private panning = false;
         private layer = new Konva.Layer();
         private auxiliaryLayer = new Konva.Layer();
-        private elements: PonElements.Element[] = [];
+        private elements: PonElements.AbstractElement[] = [];
         private connectingFromPoint?: PonElements.ConnectionPoint;
-        private movingElement?: PonElements.Element;
+        private movingElement?: PonElements.AbstractElement;
         private auxiliaryLine = new Konva.Line({
             stroke: 'red',
             strokeWidth: 2,
@@ -59,7 +60,7 @@ export namespace PonEditor {
             this.onChangeToolMode.next(mode);
         }
 
-        appendElement(element: PonElements.Element) {
+        appendElement(element: PonElements.AbstractElement) {
             this.elements.push(element);
             this.bindHandlers(element);
             this.layer.add(element.getUI());
@@ -79,18 +80,22 @@ export namespace PonEditor {
 
         loadNodes(data: PonData.PonNode[]) {
             data.forEach(node => {
-                switch (node.dtype) {
-                    case "Box":
+                switch (node.type) {
+                    case PonNodeType.BOX:
                         this.loadNode(PonElements.Box, node);
                         break;
-                    case "ConnectionPoint":
+                    case PonNodeType.CONNECTION_POINT:
                         this.loadNode(PonElements.ConnectionPoint, node);
                         break;
-                    case "Cable":
+                    case PonNodeType.CABLE:
                         // this.loadNode(PonElements.Cable, node);
                         break;
-                    case "Simplex":
+                    case PonNodeType.SIMPLEX:
                         this.loadNode(PonElements.Simplex, node);
+                        break;
+                    case PonType.PonNodeType.BOND:
+                        this.loadNode(PonElements.Bond, node);
+                        break;
                 }
             });
         }
@@ -99,7 +104,7 @@ export namespace PonEditor {
             this.winResizeSub?.unsubscribe();
         }
 
-        private bindHandlers(element: PonElements.Element) {
+        private bindHandlers(element: PonElements.AbstractElement) {
             element.onMouseEnter(this.elementMouseEnterHandler.bind(this));
             element.onMouseLeave(this.elementMouseLeaveHandler.bind(this));
             element.onMouseDown(this.elementMouseDownHandler.bind(this));
@@ -110,7 +115,7 @@ export namespace PonEditor {
             }
         }
 
-        private getMovingCP(element: PonElements.Element) {
+        private getMovingCP(element: PonElements.AbstractElement) {
             const movingCP: PonElements.ConnectionPoint[] = [];
             if (element instanceof PonElements.ConnectionPoint) {
                 movingCP.push(element);
@@ -246,7 +251,7 @@ export namespace PonEditor {
             }
         }
 
-        private elementMouseEnterHandler = (event: Konva.KonvaEventObject<MouseEvent>, element: PonElements.Element) => {
+        private elementMouseEnterHandler = (event: Konva.KonvaEventObject<MouseEvent>, element: PonElements.AbstractElement) => {
             switch (this.toolMode) {
                 case ToolMode.Connect:
                     if (element instanceof PonElements.ConnectionPoint) {
@@ -262,7 +267,7 @@ export namespace PonEditor {
             }
         }
 
-        private elementMouseLeaveHandler = (event: Konva.KonvaEventObject<MouseEvent>, element: PonElements.Element) => {
+        private elementMouseLeaveHandler = (event: Konva.KonvaEventObject<MouseEvent>, element: PonElements.AbstractElement) => {
             switch (this.toolMode) {
                 case ToolMode.Connect:
                     if (element instanceof PonElements.ConnectionPoint) {
@@ -278,7 +283,7 @@ export namespace PonEditor {
             }
         }
 
-        private elementMouseDownHandler = (event: Konva.KonvaEventObject<MouseEvent>, element: PonElements.Element) => {
+        private elementMouseDownHandler = (event: Konva.KonvaEventObject<MouseEvent>, element: PonElements.AbstractElement) => {
             switch (this.toolMode) {
                 case ToolMode.Connect:
                     if (element instanceof PonElements.ConnectionPoint) {
@@ -306,12 +311,12 @@ export namespace PonEditor {
             }
         }
 
-        private elementMouseMoveHandler = (event: Konva.KonvaEventObject<MouseEvent>, element: PonElements.Element) => {
+        private elementMouseMoveHandler = (event: Konva.KonvaEventObject<MouseEvent>, element: PonElements.AbstractElement) => {
             switch (this.toolMode) {
             }
         }
 
-        private elementMouseUpHandler = (event: Konva.KonvaEventObject<MouseEvent>, element: PonElements.Element) => {
+        private elementMouseUpHandler = (event: Konva.KonvaEventObject<MouseEvent>, element: PonElements.AbstractElement) => {
             switch (this.toolMode) {
                 case ToolMode.Connect:
                     if (element instanceof PonElements.ConnectionPoint && this.controlState === ControlState.Connecting && this.connectingFromPoint) {

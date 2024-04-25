@@ -20,6 +20,10 @@
                 <label>Id чата PON Alert</label>
                 <input formControlName="ponAlertChatId" pInputText type="text"/>
             </div>
+            <div class="input-label-wrapper">
+                <label>Id чата Sensors Alert</label>
+                <input formControlName="sensorsAlertChatId" pInputText type="text"/>
+            </div>
             <p-button (onClick)="saveConf()" [loading]="isSaving" [disabled]="!telegramConfigForm.valid" icon="mdi-save" label="Сохранить"
                       styleClass="p-button-success"></p-button>
         </div>
