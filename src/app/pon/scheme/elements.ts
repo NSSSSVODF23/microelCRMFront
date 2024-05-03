@@ -1,6 +1,10 @@
 import Konva from "konva";
 import {v4} from "uuid";
 import {EventType} from "../../types/transport-interfaces";
+import Image = Konva.Image;
+
+let dragIndicator: Image | null = null;
+
 
 export namespace PonType {
     export enum FiberColor {
@@ -66,26 +70,16 @@ export namespace PonData {
         type: PonType.PonNodeType;
         x: number;
         y: number;
-        z: number;
-        width: number;
-        height: number;
-        parent: Partial<PonNode>;
+        depth: number;
         scheme: Partial<PonScheme>;
-
-        simplexData: Partial<Simplex>;
-        connectionPointData: Partial<ConnectionPoint>;
-        boxData: Partial<Box>;
-        bondData: Partial<Bond>;
-        cableData: Partial<Cable>;
     }
 
-    export interface Simplex {
-        id: string;
+    export interface Simplex extends PonNode {
         connectorType: PonType.ConnectorType;
         polishingType: PonType.PolishingType;
-        inputConnectionPoint: Partial<PonNode>;
-        outputConnectionPoint: Partial<PonNode>;
-        box: Partial<PonNode>;
+        inputConnectionPoint: Partial<ConnectionPoint>;
+        outputConnectionPoint: Partial<ConnectionPoint>;
+        box?: Partial<Box>;
     }
 
     export interface Fiber {
@@ -106,24 +100,24 @@ export namespace PonData {
         yOut: number;
     }
 
-    export interface Bond {
-        id: string;
+    export interface Bond extends PonNode {
         path: number[];
-        inputConnectionPoint: Partial<PonNode>;
-        outputConnectionPoint: Partial<PonNode>;
+        inputConnectionPoint: Partial<ConnectionPoint>;
+        outputConnectionPoint: Partial<ConnectionPoint>;
     }
 
-    export interface ConnectionPoint {
-        id: string;
-        type: PonType.ConnectionPointType;
-        // bond: Partial<PonNode>;
+    export interface ConnectionPoint extends PonNode {
+        pointType: PonType.ConnectionPointType;
+        simplex?: Partial<Simplex>;
+        bond?: Partial<Bond>;
     }
 
-    export interface Box {
-        id: string;
-        type: PonType.BoxType;
+    export interface Box extends PonNode {
+        width: number;
+        height: number;
+        boxType: PonType.BoxType;
         name: string;
-        simplexes: Partial<PonNode>[];
+        simplexes: Partial<Simplex>[];
     }
 
     export interface SchemeChangeEvent {
@@ -146,7 +140,9 @@ export namespace PonElements {
 
         abstract unhighlight(): void;
 
-        abstract changePosition(position: {x: number, y: number}): void;
+        abstract visibleControls(visible: boolean): void;
+
+        abstract changePosition(position: { x: number, y: number }): void;
 
         abstract onMouseEnter(callback: (event: Konva.KonvaEventObject<MouseEvent>, element: AbstractElement) => void): void;
 
@@ -177,11 +173,11 @@ export namespace PonElements {
             radius: 8,
             fill: 'gray',
         });
-        private data: Partial<PonData.PonNode> = {};
+        private data: Partial<PonData.ConnectionPoint> = {};
         private node = new Konva.Group({});
-        private bond?: Partial<PonElements.Bond>;
+        private bond?: PonElements.Bond;
 
-        constructor(data?: Partial<PonData.PonNode>) {
+        constructor(data?: Partial<PonData.ConnectionPoint>) {
             super();
             this.node.add(this.point);
             this.data = data ?? {};
@@ -190,6 +186,16 @@ export namespace PonElements {
                 y: this.data.y ?? 0,
             });
             this.node.add(this.point);
+        }
+
+        static create(pos: { x: number, y: number }, type: PonType.ConnectionPointType) {
+            return new ConnectionPoint({
+                id: v4(),
+                type: PonType.PonNodeType.CONNECTION_POINT,
+                pointType: type,
+                x: pos.x,
+                y: pos.y,
+            });
         }
 
         getBond() {
@@ -214,6 +220,9 @@ export namespace PonElements {
 
         override unhighlight() {
 
+        }
+
+        override visibleControls(visible: boolean) {
         }
 
         override getUI(): Konva.Group {
@@ -266,7 +275,7 @@ export namespace PonElements {
     }
 
     export class Simplex extends AbstractElement {
-        private data: Partial<PonData.PonNode> = {};
+        private data: Partial<PonData.Simplex> = {};
         private node = new Konva.Group({});
         private inPoint?: ConnectionPoint;
         private outPoint?: ConnectionPoint;
@@ -290,11 +299,11 @@ export namespace PonElements {
             dash: [2, 2],
         });
 
-        constructor(data?: Partial<PonData.PonNode>) {
+        constructor(data?: Partial<PonData.Simplex>) {
             super();
             this.data = data ?? {};
-            this.inPoint = new ConnectionPoint(data?.simplexData?.inputConnectionPoint);
-            this.outPoint = new ConnectionPoint(data?.simplexData?.outputConnectionPoint);
+            this.inPoint = new ConnectionPoint(data?.inputConnectionPoint);
+            this.outPoint = new ConnectionPoint(data?.outputConnectionPoint);
             this.node.move({
                 x: this.data.x ?? 0,
                 y: this.data.y ?? 0,
@@ -305,8 +314,20 @@ export namespace PonElements {
             this.node.add(this.outPoint.getUI());
         }
 
-        static create(data: Partial<PonData.Simplex>) {
-            return new Simplex({id: v4(),...data});
+        static create(connectorType: PonType.ConnectorType, polishingType: PonType.PolishingType, inPoint: {
+            x: number;
+            y: number
+        }, outPoint: { x: number; y: number }) {
+            const inputConnectionPoint = ConnectionPoint.create(inPoint, PonType.ConnectionPointType.IN).getData();
+            const outputConnectionPoint = ConnectionPoint.create(outPoint, PonType.ConnectionPointType.OUT).getData();
+            return new Simplex({
+                id: v4(),
+                type: PonType.PonNodeType.SIMPLEX,
+                connectorType,
+                polishingType,
+                inputConnectionPoint,
+                outputConnectionPoint,
+            });
         }
 
         override changePosition(position: { x: number; y: number }) {
@@ -323,6 +344,9 @@ export namespace PonElements {
 
         override unhighlight() {
 
+        }
+
+        override visibleControls(visible: boolean) {
         }
 
         override getUI(): Konva.Group {
@@ -377,7 +401,7 @@ export namespace PonElements {
 
     export class Box extends AbstractElement {
 
-        private data: Partial<PonData.PonNode> = {};
+        private data: Partial<PonData.Box> = {};
         private node = new Konva.Group({
             draggable: false,
         });
@@ -400,11 +424,21 @@ export namespace PonElements {
             fill: 'gray',
         });
         private simplexes: PonElements.Simplex[] = [];
+        private sizeControl = new Konva.Rect({
+            x: 0,
+            y: 0,
+            width: 18,
+            height: 18,
+            fill: '#0e8ff8',
+            strokeEnabled: true,
+            stroke: '#0c42ce',
+            strokeWidth: 2,
+        })
 
-        constructor(data?: Partial<PonData.PonNode>) {
+        constructor(data?: Partial<PonData.Box>) {
             super();
             this.data = data ?? {};
-            this.title.setText(data?.boxData?.name ?? 'Без имени');
+            this.title.setText(data?.name ?? 'Без имени');
             if (data?.x && data?.y) {
                 this.node.move({
                     x: data.x,
@@ -415,13 +449,18 @@ export namespace PonElements {
                 this.node.setSize({width: data.width, height: data.height})
             }
             this.background.setSize({
-                width: data?.width ?? 310,
-                height: data?.height ? data.height : (data?.boxData?.simplexes?.length ?? 0) * 25 + 120,
+                width: 310,
+                height: (data?.simplexes?.length ?? 0) * 25 + 120,
             })
+            // this.background.setSize({
+            //     width: data?.width ?? 310,
+            //     height: data?.height ? data.height : (data?.boxData?.simplexes?.length ?? 0) * 25 + 120,
+            // })
             this.node.add(this.background);
             this.node.add(this.title);
+            this.node.add(this.sizeControl);
             let index = 0;
-            for (let simplex of data?.boxData?.simplexes ?? []) {
+            for (let simplex of data?.simplexes ?? []) {
                 if (!simplex.x) {
                     simplex.x = 120;
                 }
@@ -436,40 +475,25 @@ export namespace PonElements {
         }
 
         static create(x: number, y: number, portCount: number) {
-            let simplexes: Partial<PonData.PonNode>[] = [];
+            let simplexes: Partial<PonData.Simplex>[] = [];
             for (let i = 0; i < portCount; i++) {
-                simplexes.push({
-                    id: v4(),
-                    simplexData: {
-                        connectorType: PonType.ConnectorType.SCSC,
-                        polishingType: PonType.PolishingType.UPC,
-                        inputConnectionPoint: {
-                            id: v4(),
-                            connectionPointData: {
-                                id: v4(),
-                                type: PonType.ConnectionPointType.IN
-                            }
-                        },
-                        outputConnectionPoint: {
-                            id: v4(),
-                            connectionPointData: {
-                                id: v4(),
-                                type: PonType.ConnectionPointType.OUT
-                            }
-                        }
-                    }
-                });
+                simplexes.push(
+                    Simplex.create(
+                        PonType.ConnectorType.SCSC,
+                        PonType.PolishingType.UPC,
+                        {x: 10, y: 10},
+                        {x: 60, y: 10}
+                    ).getData()
+                );
             }
             return new Box({
                 id: v4(),
                 x,
                 y,
+                boxType: PonType.BoxType.ROOT,
                 type: PonType.PonNodeType.BOX,
-                boxData: {
-                    id: v4(),
-                    name: 'Ящик К.2.5',
-                    simplexes,
-                }
+                name: 'Ящик К.2.5',
+                simplexes,
             });
         }
 
@@ -490,6 +514,10 @@ export namespace PonElements {
         override unhighlight() {
             this.title.setAttr('fill', 'gray');
             this.background.setAttr('stroke', 'gray');
+        }
+
+        override visibleControls(visible: boolean) {
+
         }
 
         override getUI(): Konva.Group {
@@ -543,7 +571,7 @@ export namespace PonElements {
 
     export class Bond extends AbstractElement {
 
-        private data: Partial<PonData.PonNode> = {};
+        private data: Partial<PonData.Bond> = {};
         private node = new Konva.Group({
             draggable: false,
         });
@@ -556,11 +584,11 @@ export namespace PonElements {
         private inCp?: PonElements.ConnectionPoint;
         private outCp?: PonElements.ConnectionPoint;
 
-        constructor(data?: Partial<PonData.PonNode>) {
+        constructor(data?: Partial<PonData.Bond>) {
             super();
             this.data = data ?? {};
-            if (this.data.bondData?.inputConnectionPoint && this.data.bondData?.outputConnectionPoint) {
-                const path = this.data.bondData?.path ?? [];
+            if (this.data?.inputConnectionPoint && this.data?.outputConnectionPoint) {
+                const path = this.data.path ?? [];
                 this.line.setAttrs({
                     points: path,
                 })
@@ -568,21 +596,35 @@ export namespace PonElements {
             this.node.add(this.line);
         }
 
-        static create(inCp: PonElements.ConnectionPoint, outCp: PonElements.ConnectionPoint) {
-            console.log(inCp, outCp)
-            const path = PonFunc.calculateBondPath(inCp, outCp);
+        static create(from: PonElements.ConnectionPoint, to: PonElements.ConnectionPoint) {
+            // Определяем тип точек соединения, и распределяем их по переменным
+            let inCp: PonElements.ConnectionPoint | null = null;
+            let outCp: PonElements.ConnectionPoint | null = null;
+            if (from.getData().pointType === PonType.ConnectionPointType.IN) {
+                inCp = from;
+            } else if (from.getData().pointType === PonType.ConnectionPointType.OUT) {
+                outCp = from;
+            }
+            if (to.getData().pointType === PonType.ConnectionPointType.IN) {
+                inCp = to;
+            } else if (to.getData().pointType === PonType.ConnectionPointType.OUT) {
+                outCp = to;
+            }
+
+            if (!inCp || !outCp) {
+                throw new Error("Не верно заданы точки соединения");
+            }
+            const path = PonFunc.calculateBondPath(from, to);
             const bond = new Bond({
                 id: v4(),
-                bondData: {
-                    id: v4(),
-                    inputConnectionPoint: inCp.getData(),
-                    outputConnectionPoint: outCp.getData(),
-                    path,
-                }
+                type: PonType.PonNodeType.BOND,
+                path: path,
+                x: 0,
+                y: 0,
+                inputConnectionPoint: inCp.getData(),
+                outputConnectionPoint: outCp.getData(),
             });
-            inCp.setBond(bond);
-            outCp.setBond(bond);
-            bond.setConnectionPoints(inCp, outCp);
+            bond.connect(inCp, outCp);
             return bond;
         }
 
@@ -594,14 +636,17 @@ export namespace PonElements {
             return this.outCp;
         }
 
-        setConnectionPoints(inCp: PonElements.ConnectionPoint, outCp: PonElements.ConnectionPoint) {
+        connect(inCp: PonElements.ConnectionPoint, outCp: PonElements.ConnectionPoint) {
             this.inCp = inCp;
             this.outCp = outCp;
+            this.inCp.setBond(this);
+            this.outCp.setBond(this);
         }
 
         recalculate() {
             if (this.inCp && this.outCp) {
                 const path = PonFunc.calculateBondPath(this.inCp, this.outCp);
+                this.data.path = path;
                 this.line.setAttrs({
                     points: path,
                 })
@@ -613,7 +658,7 @@ export namespace PonElements {
             // this.data.y = position.y;
         }
 
-        override getData(): any {
+        override getData() {
             return this.data;
         }
 
@@ -623,6 +668,9 @@ export namespace PonElements {
 
         override unhighlight() {
 
+        }
+
+        override visibleControls(visible: boolean) {
         }
 
         override getChild(): PonElements.AbstractElement[] {
@@ -686,7 +734,10 @@ export namespace PonFunc {
      * @param y1 Конец отрезка Y
      * @param radius Радиус окружности
      */
-    export function getCircleIntersection(x0: number, y0: number, x1: number, y1: number, radius: number): { x: number, y: number } {
+    export function getCircleIntersection(x0: number, y0: number, x1: number, y1: number, radius: number): {
+        x: number,
+        y: number
+    } {
         const ang = getAngle(x0, y0, x1, y1);
         return {
             x: x0 + radius * Math.cos(ang),

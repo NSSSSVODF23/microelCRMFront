@@ -5,6 +5,8 @@ import PonNodeType = PonType.PonNodeType;
 
 export namespace PonEditor {
 
+    import ConnectionPoint = PonElements.ConnectionPoint;
+
     export enum ToolMode {
         Select,
         Move,
@@ -24,7 +26,12 @@ export namespace PonEditor {
         private toolMode = ToolMode.Select;
         private controlState = ControlState.None;
         private panning = false;
-        private layer = new Konva.Layer();
+
+        private gridSize = 20;
+        private gridLayer = new Konva.Layer();
+
+        private mainLayer = new Konva.Layer();
+        private bondLayer = new Konva.Layer();
         private auxiliaryLayer = new Konva.Layer();
         private elements: PonElements.AbstractElement[] = [];
         private connectingFromPoint?: PonElements.ConnectionPoint;
@@ -49,8 +56,7 @@ export namespace PonEditor {
                 this._context.setSize(resize);
             });
 
-            this._context.add(this.layer);
-            this._context.add(this.auxiliaryLayer);
+            this.setupLayers();
             this.bindStageHandlers();
             this.appendAuxiliaryElements();
         }
@@ -63,7 +69,13 @@ export namespace PonEditor {
         appendElement(element: PonElements.AbstractElement) {
             this.elements.push(element);
             this.bindHandlers(element);
-            this.layer.add(element.getUI());
+            switch (element.getData().type) {
+                case PonNodeType.BOND:
+                    this.bondLayer.add(element.getUI());
+                    break;
+                default:
+                    this.mainLayer.add(element.getUI());
+            }
         }
 
         createElement(elementClass: any) {
@@ -98,10 +110,82 @@ export namespace PonEditor {
                         break;
                 }
             });
+            this.connectConnectionPoints();
         }
 
         destroy() {
             this.winResizeSub?.unsubscribe();
+        }
+
+        /**
+         * Рисует сетку
+         */
+        drawGrid() {
+            // // Очищаем слой
+            // this.gridLayer.destroyChildren();
+            //
+            // // Получаем текущий масштаб
+            // const scale = this._context.scaleX();
+            //
+            // // Вычисляем видимую область
+            // let minX = -this._context.x() / scale;
+            // minX = minX + (minX % this.gridSize);
+            // let minY = -this._context.y() / scale;
+            // minY = minY + (minY % this.gridSize);
+            // let maxX = (this._context.width() / scale + minX);
+            // maxX = maxX - (maxX % this.gridSize);
+            // let maxY = (this._context.height() / scale + minY);
+            // maxY = maxY - (maxY % this.gridSize);
+            //
+            // // Рисуем сетку из точек
+            // for (let i = minX; i <= maxX; i += 1) {
+            //     for (let j = minY; j <= maxY; j += 1) {
+            //         // Создаем новую точку
+            //         const circle = new Konva.Circle({
+            //             x: i * this.gridSize * scale,
+            //             y: j * this.gridSize * scale,
+            //             radius: 1,
+            //             fill: 'gray',
+            //             listening: false,
+            //             // stroke: 'black',
+            //             // strokeWidth: 1 * scale
+            //         });
+            //
+            //         // Добавляем точку на слой
+            //         this.gridLayer.add(circle);
+            //     }
+            // }
+            //
+            // // Рисуем слой
+            // this.gridLayer.draw();
+        }
+
+        /**
+         * Соединяет точки с линиями
+         */
+        private connectConnectionPoints() {
+            this.elements.forEach(element => {
+                if (element instanceof PonElements.Bond) {
+                    const bondData = element.getData();
+                    if (bondData.inputConnectionPoint && bondData.outputConnectionPoint) {
+                        const allConnectionPoints = this.getAllConnectionPoints();
+                        const inputPoint = allConnectionPoints.find(el => el.getData().id === bondData.inputConnectionPoint?.id) as ConnectionPoint;
+                        const outputPoint = allConnectionPoints.find(el => el.getData().id === bondData.outputConnectionPoint?.id) as ConnectionPoint;
+                        console.log(inputPoint, outputPoint, bondData);
+                        if (inputPoint && outputPoint) {
+                            element.connect(inputPoint, outputPoint);
+                        }
+                    }
+                }
+            })
+        }
+
+        private setupLayers() {
+            this._context.add(this.gridLayer);
+            this._context.add(this.mainLayer);
+            this._context.add(this.bondLayer);
+            this._context.add(this.auxiliaryLayer);
+            this.drawGrid();
         }
 
         private bindHandlers(element: PonElements.AbstractElement) {
@@ -115,13 +199,21 @@ export namespace PonEditor {
             }
         }
 
-        private getMovingCP(element: PonElements.AbstractElement) {
+        private getConnectionPoints(element: PonElements.AbstractElement) {
             const movingCP: PonElements.ConnectionPoint[] = [];
             if (element instanceof PonElements.ConnectionPoint) {
                 movingCP.push(element);
             }
             for (const child of element.getChild()) {
-                movingCP.push(...this.getMovingCP(child));
+                movingCP.push(...this.getConnectionPoints(child));
+            }
+            return movingCP;
+        }
+
+        private getAllConnectionPoints() {
+            const movingCP: PonElements.ConnectionPoint[] = [];
+            for (const element of this.elements) {
+                movingCP.push(...this.getConnectionPoints(element));
             }
             return movingCP;
         }
@@ -173,6 +265,7 @@ export namespace PonEditor {
                         position.y = position.y - (position.y % 10);
                         this.movingElement.getUI().setPosition(position);
                         this.movingElement.changePosition(position);
+                        this.recalculateBonds(this.getConnectionPoints(this.movingElement));
                         this.controlState = ControlState.None;
                         this.movingElement = undefined;
                     }
@@ -185,6 +278,7 @@ export namespace PonEditor {
                     x: event.evt.movementX,
                     y: event.evt.movementY
                 })
+                this.drawGrid();
                 return;
             }
             switch (this.toolMode) {
@@ -209,7 +303,6 @@ export namespace PonEditor {
                             x: event.evt.movementX / this._context.scaleX(),
                             y: event.evt.movementY / this._context.scaleY(),
                         });
-                        this.recalculateBonds(this.getMovingCP(this.movingElement));
                     }
             }
         }
@@ -241,13 +334,15 @@ export namespace PonEditor {
                 y: pointer.y - mousePointTo.y * newScale,
             };
             this._context.position(newPos);
+            this.drawGrid();
         }
 
         private recalculateBonds(movingCP: PonElements.ConnectionPoint[]) {
             for (const cp of movingCP) {
-                const bond = cp.getBond() as PonElements.Bond;
-                if (bond)
+                const bond = cp.getBond();
+                if (bond) {
                     bond.recalculate();
+                }
             }
         }
 
