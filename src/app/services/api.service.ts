@@ -1,6 +1,6 @@
 import {Injectable} from '@angular/core';
 import {HttpClient} from "@angular/common/http";
-import {catchError, delay, map, Observable, of, share, tap, zip} from "rxjs";
+import {catchError, debounceTime, delay, first, map, Observable, of, share, shareReplay, tap, zip} from "rxjs";
 import {
     AcpConf,
     AcpHouse,
@@ -88,7 +88,7 @@ import {
     WireframeDashboardStatistic,
     OltWorker,
     WorkingDay,
-    WorkLog, DateRange, AutoTariff, AutoTariffForm, EmployeeFiltrationForm
+    WorkLog, DateRange, AutoTariff, AutoTariffForm, EmployeeFiltrationForm, NotificationType
 } from "../types/transport-interfaces";
 import {MessageService, TreeNode} from "primeng/api";
 import {cyrb53, Storage, Utils} from "../util";
@@ -100,6 +100,7 @@ import EmployeeWorkStatisticsForm = Statistics.EmployeeWorkStatisticsForm;
 import {PonForm} from "../pon/scheme/froms";
 import {PonData} from "../pon/scheme/elements";
 import {TemperatureRange, TemperatureSensor} from "../types/sensors-types";
+import {NotificationSettingsForm} from "../types/notification-types";
 
 @Injectable({
     providedIn: 'root'
@@ -107,6 +108,7 @@ import {TemperatureRange, TemperatureSensor} from "../types/sensors-types";
 export class ApiService {
 
     requestCacheMap: { [hash: string]: Observable<any> } = {}
+    requestCacheMapTimers: { [hash: string]: any } = {}
     loggedIn = false;
 
     constructor(readonly client: HttpClient, readonly toast: MessageService) {
@@ -127,7 +129,7 @@ export class ApiService {
         // Если запрос не в кэше, создаем его
         if (!this.requestCacheMap[requestHash]) {
             observable = this.client.get<T>(uri, {params: query})
-                .pipe(share(), catchError(async (err, caught) => {
+                .pipe(shareReplay(1), catchError(async (err, caught) => {
                     this.toast.add({severity: 'error', summary: "Ошибка запроса", detail: err.error.message})
                     throw err;
                 }));
@@ -135,10 +137,14 @@ export class ApiService {
             // После создания запроса создаем таймер удаляющий его из кэша по таймауту
             setTimeout(() => {
                 delete this.requestCacheMap[requestHash];
-            }, 10000);
+            }, 30000);
         } else {
+            clearTimeout(this.requestCacheMapTimers[requestHash]);
             // Если запрос в кэше, возвращаем его
             observable = this.requestCacheMap[requestHash];
+            this.requestCacheMapTimers[requestHash] = this.requestCacheMapTimers[requestHash] = setTimeout(() => {
+                delete this.requestCacheMap[requestHash];
+            }, 30000);
         }
         return observable;
     }
@@ -154,14 +160,20 @@ export class ApiService {
         const requestHash = this.generateHash(uri, query);
         let observable: Observable<T> | null = null;
         if (!this.requestCacheMap[requestHash]) {
+            console.log(uri, query);
+
             observable = this.client.get<T>(uri, {params: query})
-                .pipe(share());
+                .pipe(shareReplay(1));
             this.requestCacheMap[requestHash] = observable;
-            setTimeout(() => {
+            this.requestCacheMapTimers[requestHash] = setTimeout(() => {
                 delete this.requestCacheMap[requestHash];
-            }, 10000);
+            }, 30000);
         } else {
+            clearTimeout(this.requestCacheMapTimers[requestHash]);
             observable = this.requestCacheMap[requestHash];
+            this.requestCacheMapTimers[requestHash] = setTimeout(() => {
+                delete this.requestCacheMap[requestHash];
+            }, 30000);
         }
         return observable;
     }
@@ -602,8 +614,16 @@ export class ApiService {
         return this.sendGet<TaskFieldsSnapshot[]>("api/private/task/" + taskId + "/edit-snapshots");
     }
 
-    getNotifications(first: number, limit: number, unreadOnly: boolean = false) {
-        return this.sendGet<Page<INotification>>("api/private/notifications", {first, limit, unreadOnly});
+    getNotifications(first: number, limit: number) {
+        return this.sendGet<Page<INotification>>("api/private/notifications", {first, limit});
+    }
+
+    getNotificationTypes() {
+        return this.sendGet<{label: string, value: NotificationType}[]>("api/private/types/notification");
+    }
+
+    saveNotificationSettings(settings: NotificationSettingsForm){
+        return this.sendPatch("api/private/employee/notification-settings", settings);
     }
 
     getCountOfUnreadNotifications() {

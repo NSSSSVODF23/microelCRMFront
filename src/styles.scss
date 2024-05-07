@@ -1853,3 +1853,19 @@ pre {
   background-color: var(--primary-400) !important;
 }
 
+.p-sidebar-only-content.p-sidebar{
+  display: flex !important;
+  .p-sidebar-header{
+    display: none;
+  }
+  .p-sidebar-content {
+    display: flex !important;
+    flex-grow: 1 !important;
+    padding: 0 !important;
+    flex-direction: column !important;
+    gap: 1.5rem !important;
+  }
+  .p-sidebar-footer{
+    display: none;
+  }
+}

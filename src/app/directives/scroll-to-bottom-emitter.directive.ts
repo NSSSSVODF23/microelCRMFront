@@ -12,7 +12,7 @@ export class ScrollToBottomEmitterDirective {
 
     @HostListener('scroll', ['$event'])
     onScroll(event: any) {
-        if (((event.target['scrollHeight'] - Math.abs( event.target['scrollTop'])) - event.target.clientHeight) < 25) {
+        if (((event.target['scrollHeight'] - Math.abs(event.target['scrollTop'])) - event.target.clientHeight) < 50) {
             this.onScrollToBottom.emit();
         }
     }

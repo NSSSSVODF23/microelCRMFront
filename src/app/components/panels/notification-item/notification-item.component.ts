@@ -18,7 +18,7 @@ export class NotificationItemComponent implements OnInit {
     }
 
     getIcon(type: NotificationType) {
-        return this.notifyService.icons[type] + ' icon header';
+        return this.notifyService.icons[type];
     }
 
     getTitle(type: NotificationType) {

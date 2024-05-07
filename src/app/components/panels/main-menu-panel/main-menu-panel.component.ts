@@ -1,5 +1,6 @@
 import {Component, OnInit} from '@angular/core';
 import {MainMenuService} from "../../../services/main-menu.service";
+import {NotificationsService} from "../../../services/notifications.service";
 
 @Component({
     selector: 'app-main-menu-panel',
@@ -8,11 +9,15 @@ import {MainMenuService} from "../../../services/main-menu.service";
 })
 export class MainMenuPanelComponent implements OnInit {
 
+    notificationSidebarVisible = false;
 
-    constructor(readonly menuService: MainMenuService) {
+    constructor(readonly menuService: MainMenuService, readonly notificationsService: NotificationsService) {
     }
 
     ngOnInit(): void {
     }
 
+    openNotificationSidebar(event: MouseEvent) {
+        this.notificationSidebarVisible = true;
+    }
 }

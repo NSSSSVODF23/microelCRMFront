@@ -27,33 +27,33 @@
     </ng-container>
 </ng-template>
 
-<p-sidebar (onHide)="notifyService.readAllNotifications()" (onShow)="notifyService.load()"
-           [(visible)]="notifyService.displaySideBar"
-           [blockScroll]="true"
-           [position]="'right'" [showCloseIcon]="false" [style]="{width:'max-content', maxWidth: '30vw'}"
-           appScrollToBottomEmitter>
-    <ng-template pTemplate="header">
-        <span class="caption size-big flexed inline hcenter gap3"><i
-                class="mdi-circle_notifications"></i> Уведомления</span>
-        <div class="stretched"></div>
-        <p-button (onClick)="notifyService.readAllNotifications()" [disabled]="!notifyService.isHasUnread"
-                  icon="mdi-clear_all"
-                  label="Отчистить" styleClass="p-button-text"></p-button>
-    </ng-template>
-    <ng-template pTemplate="content">
-        <div (onScrollToBottom)="!notifyService.isLast && notifyService.load()" *ngIf="!notifyService.isEmpty"
-             appScrollToBottomEmitter
-             class="list-view flexed v-scroll">
-            <app-notification-item *ngFor="let notify of notifyService.list"
-                                   [notification]="notify"></app-notification-item>
-        </div>
-        <div *ngIf="notifyService.isEmpty" [style.padding-top]="'10rem'" class="flexed hcenter vcenter column p10">
-            <span class="flexed hcenter gap5 caption size-big wt-bold f-color-500"><i class="mdi-inventory"></i> Новых уведомлений пока нет</span>
-            <p-button (onClick)="notifyService.changeNotificationViewMode('ALL')" label="Показать предыдущие"
-                      styleClass="p-button-text one-line"></p-button>
-        </div>
-    </ng-template>
-</p-sidebar>
+<!--<p-sidebar (onHide)="notifyService.readAllNotifications()" (onShow)="notifyService.load()"-->
+<!--           [(visible)]="notifyService.displaySideBar"-->
+<!--           [blockScroll]="true"-->
+<!--           [position]="'right'" [showCloseIcon]="false" [style]="{width:'max-content', maxWidth: '30vw'}"-->
+<!--           appScrollToBottomEmitter>-->
+<!--    <ng-template pTemplate="header">-->
+<!--        <span class="caption size-big flexed inline hcenter gap3"><i-->
+<!--                class="mdi-circle_notifications"></i> Уведомления</span>-->
+<!--        <div class="stretched"></div>-->
+<!--        <p-button (onClick)="notifyService.readAllNotifications()" [disabled]="!notifyService.isHasUnread"-->
+<!--                  icon="mdi-clear_all"-->
+<!--                  label="Отчистить" styleClass="p-button-text"></p-button>-->
+<!--    </ng-template>-->
+<!--    <ng-template pTemplate="content">-->
+<!--        <div (onScrollToBottom)="!notifyService.isLast && notifyService.load()" *ngIf="!notifyService.isEmpty"-->
+<!--             appScrollToBottomEmitter-->
+<!--             class="list-view flexed v-scroll">-->
+<!--            <app-notification-item *ngFor="let notify of notifyService.list"-->
+<!--                                   [notification]="notify"></app-notification-item>-->
+<!--        </div>-->
+<!--        <div *ngIf="notifyService.isEmpty" [style.padding-top]="'10rem'" class="flexed hcenter vcenter column p10">-->
+<!--            <span class="flexed hcenter gap5 caption size-big wt-bold f-color-500"><i class="mdi-inventory"></i> Новых уведомлений пока нет</span>-->
+<!--            <p-button (onClick)="notifyService.changeNotificationViewMode('ALL')" label="Показать предыдущие"-->
+<!--                      styleClass="p-button-text one-line"></p-button>-->
+<!--        </div>-->
+<!--    </ng-template>-->
+<!--</p-sidebar>-->
 
 <app-float-dock-panel></app-float-dock-panel>
 

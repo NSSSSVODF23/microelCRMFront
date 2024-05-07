@@ -1,65 +1,83 @@
 <div class="sticky z-5 top-0 h-screen flex flex-column bg-white border-right-1 border-bluegray-100 shadow-1 overflow-hidden">
     <div class="flex flex-column p-3 gap-3">
-        <div class="flex gap-2 align-items-center" *ngIf="menuService.currentUser$ | async as user">
-            <app-avatar [src]="user.avatar" [name]="user.fullName" [size]="2.2" shape="square"></app-avatar>
-            <div class="flex-grow-1 white-space-nowrap">{{user.fullName}}</div>
-            <button pButton icon="mdi-more_vert" (click)="menu.toggle($event)"
-                    class="p-button-secondary p-button-icon p-button-text w-fit"></button>
+        <div *ngIf="menuService.currentUser$ | async as user" class="flex gap-2 align-items-center">
+            <app-avatar [name]="user.fullName" [size]="2.2" [src]="user.avatar" shape="square"></app-avatar>
+            <div class="flex-grow-1 white-space-nowrap">{{ user.fullName }}</div>
+            <button (click)="menu.toggle($event)" class="p-button-secondary p-button-icon p-button-text w-fit" icon="mdi-more_vert"
+                    pButton></button>
         </div>
-        <button pButton label="Новая задача" icon="mdi-add_task" (click)="menuService.createTask()"
-                class="p-button-success white-space-nowrap"></button>
+        <button (click)="menuService.createTask()" class="p-button-success white-space-nowrap" icon="mdi-add_task" label="Новая задача"
+                pButton></button>
     </div>
     <div class="flex flex-grow-1">
         <div class="flex flex-column w-full">
             <ng-container *ngFor="let item of menuService.menuModel">
-                <app-extended-menu-item [onlyIcon]="!!(menuService.currentSubmenu$ | async)" [caption]="item.caption" [exact]="item.exactMatch ?? false" [icon]="item.icon" [link]="item.link" *ngIf="menuService.hasAccess(item)"></app-extended-menu-item>
+                <app-extended-menu-item *ngIf="menuService.hasAccess(item)" [caption]="item.caption"
+                                        [exact]="item.exactMatch ?? false" [icon]="item.icon" [link]="item.link"
+                                        [onlyIcon]="!!(menuService.currentSubmenu$ | async)"></app-extended-menu-item>
             </ng-container>
+            <div class="flex-grow-1"></div>
+            <div (click)="openNotificationSidebar($event)" [ngClass]="this.notificationsService.statusColorClass$ | async"
+                 class="flex gap-2 align-items-center px-3 py-3 white-space-nowrap select-none outline-none
+                        transition-colors transition-duration-150 text-xl cursor-pointer border-white">
+                <span [ngClass]="this.notificationsService.statusIcon$ | async"></span>
+                <span *ngIf="!(menuService.currentSubmenu$ | async)">Уведомления</span>
+            </div>
         </div>
-        <div class="flex flex-column" *ngIf="menuService.currentSubmenu$ | async as currentSubmenu">
+        <div *ngIf="menuService.currentSubmenu$ | async as currentSubmenu" class="flex flex-column">
             <ng-container *ngFor="let item of currentSubmenu">
-                <app-extended-menu-item [caption]="item.caption" [exact]="item.exactMatch ?? false" [icon]="item.icon" [link]="item.link" *ngIf="menuService.hasAccess(item)"></app-extended-menu-item>
+                <app-extended-menu-item *ngIf="menuService.hasAccess(item)" [caption]="item.caption" [exact]="item.exactMatch ?? false"
+                                        [icon]="item.icon" [link]="item.link"></app-extended-menu-item>
             </ng-container>
         </div>
     </div>
 </div>
 
-<p-menu #menu [model]="menuService.userMenuOptions" [popup]="true" appendTo="body" [baseZIndex]="2000"
-        appCloseIfScroll [isVisible]="menu.visible" [alignFn]="menu.alignOverlay.bind(menu)"></p-menu>
+<p-menu #menu [alignFn]="menu.alignOverlay.bind(menu)" [baseZIndex]="2000" [isVisible]="menu.visible" [model]="menuService.userMenuOptions"
+        [popup]="true" appCloseIfScroll appendTo="body"></p-menu>
 
-<ng-template #buttonTemplate let-caption="caption" let-icon="icon" let-ext="ext" let-styleClass="styleClass" let-click="click">
+<ng-template #buttonTemplate let-caption="caption" let-click="click" let-ext="ext" let-icon="icon"
+             let-styleClass="styleClass">
     <div (click)="click"
          [ngClass]="'flex gap-2 align-items-center p-2 white-space-nowrap select-none outline-none transition-colors' +
           ' transition-duration-150 text-2xl justify-content-center cursor-pointer ' +
            (styleClass ? styleClass : 'text-bluegray-300 hover:bg-bluegray-50 hover:text-bluegray-500')"
     >
         <span [class]="icon"></span>
-        <span *ngIf="ext">{{caption}}</span>
+        <span *ngIf="ext">{{ caption }}</span>
     </div>
 </ng-template>
 
-<p-dialog [(visible)]="menuService.avatarChangeDialogVisible" [draggable]="false" [modal]="true" [resizable]="false" appendTo="body"
-          [dismissableMask]="true" header="Изменить аватар">
+<p-dialog [(visible)]="menuService.avatarChangeDialogVisible" [dismissableMask]="true" [draggable]="false" [modal]="true"
+          [resizable]="false"
+          appendTo="body" header="Изменить аватар">
     <div class="flex flex-column">
         <div class="flex gap-3 align-items-center justify-content-center p-2">
             <div class="flex gap-2 bg-bluegray-50 border-round-xl text-bluegray-500 align-items-center p-3 font-bold">
-                <div class="w-6rem h-6rem border-circle fit-content object-fit-cover bg-bluegray-400 border-1
-                 border-bluegray-500 text-white text-xl flex align-items-center justify-content-center" *ngIf="!menuService.croppedImage"><i class="mdi-image"></i></div>
-                <img class="w-6rem h-6rem border-circle fit-content object-fit-cover" [src]="menuService.croppedImage" *ngIf="menuService.croppedImage" alt=""/>
+                <div *ngIf="!menuService.croppedImage"
+                     class="w-6rem h-6rem border-circle fit-content object-fit-cover bg-bluegray-400 border-1
+                 border-bluegray-500 text-white text-xl flex align-items-center justify-content-center"><i class="mdi-image"></i></div>
+                <img *ngIf="menuService.croppedImage" [src]="menuService.croppedImage"
+                     alt="" class="w-6rem h-6rem border-circle fit-content object-fit-cover"/>
                 <span>
                     Предпросмотр
                 </span>
             </div>
             <div class="flex flex-column gap-2">
-                <p-button label="Выбрать" (onClick)="menuService.selectFile(fileInput)" icon="mdi-image" [disabled]="menuService.avatarUpload" styleClass="p-button-text p-button-secondary"></p-button>
-                <p-button label="Сохранить" (onClick)="menuService.saveAvatar()" icon="mdi-upload" [loading]="menuService.avatarUpload" [disabled]="!menuService.croppedImage"></p-button>
+                <p-button (onClick)="menuService.selectFile(fileInput)" [disabled]="menuService.avatarUpload" icon="mdi-image"
+                          label="Выбрать"
+                          styleClass="p-button-text p-button-secondary"></p-button>
+                <p-button (onClick)="menuService.saveAvatar()" [disabled]="!menuService.croppedImage" [loading]="menuService.avatarUpload"
+                          icon="mdi-upload" label="Сохранить"></p-button>
             </div>
-            <input #fileInput (change)="menuService.imageChangedEvent = $event" type="file" [style.display]="'none'" accept="image/jpeg, image/png, image/jpg, image/bmp"/>
+            <input #fileInput (change)="menuService.imageChangedEvent = $event" [style.display]="'none'" accept="image/jpeg, image/png, image/jpg, image/bmp"
+                   type="file"/>
         </div>
         <image-cropper
                 (imageCropped)="menuService.imageCropped($event)"
                 [aspectRatio]="1"
-                [cropperMinWidth]="64"
                 [cropperMinHeight]="64"
+                [cropperMinWidth]="64"
                 [imageChangedEvent]="menuService.imageChangedEvent"
                 [maintainAspectRatio]="true"
                 [style]="{maxWidth: '40vw', minWidth: '15rem', height: 'fit-content'}"
@@ -68,11 +86,75 @@
     </div>
 </p-dialog>
 
-<p-dialog [(visible)]="menuService.phyPhoneSelectionDialogVisible" [draggable]="true" [modal]="true" [resizable]="false" appendTo="body"
-          [dismissableMask]="true" header="Привязать телефон" contentStyleClass="flex gap-3 align-items-center pt-1">
+<p-dialog [(visible)]="menuService.phyPhoneSelectionDialogVisible" [dismissableMask]="true" [draggable]="true" [modal]="true"
+          [resizable]="false"
+          appendTo="body" contentStyleClass="flex gap-3 align-items-center pt-1" header="Привязать телефон">
     <ng-template pTemplate="content">
-        <p-dropdown [options]="(menuService.phones$ | async) ?? []" appendTo="body"
-                    [formControl]="menuService.phyPhoneControl" [disabled]="menuService.isPhyPhoneIsBinding"></p-dropdown>
-        <p-button (onClick)="menuService.bindPhone()" label="Привязать" [loading]="menuService.isPhyPhoneIsBinding"></p-button>
+        <p-dropdown [disabled]="menuService.isPhyPhoneIsBinding" [formControl]="menuService.phyPhoneControl"
+                    [options]="(menuService.phones$ | async) ?? []"
+                    appendTo="body"></p-dropdown>
+        <p-button (onClick)="menuService.bindPhone()" [loading]="menuService.isPhyPhoneIsBinding"
+                  label="Привязать"></p-button>
     </ng-template>
 </p-dialog>
+
+<p-sidebar [(visible)]="notificationSidebarVisible" position="left" appendTo="body" [showCloseIcon]="false"
+           [blockScroll]="true" [style]="{width: '30vw'}" styleClass="p-sidebar-only-content" (onShow)="notificationsService.loadFirst()">
+    <ng-template pTemplate="content">
+        <div class="flex flex-column flex-grow-1 overflow-y-auto" appScrollToBottomEmitter (onScrollToBottom)="notificationsService.loadNext()">
+            <ng-container *ngIf="notificationsService.notifications as notifications">
+                <app-notification-item *ngFor="let notify of notifications" [notification]="notify"></app-notification-item>
+            </ng-container>
+            <ng-container *ngIf="notificationsService.loadingNotifications" [ngTemplateOutlet]="notificationSkeletonTemplate"></ng-container>
+        </div>
+        <div class="flex flex-wrap align-items-center gap-2 p-3" [formGroup]="notificationsService.notificationSettingsForm">
+            <p-toggleButton onLabel="Отключены" offLabel="Включены"
+                    onIcon="mdi-notifications_off" offIcon="mdi-notifications" formControlName="muted"></p-toggleButton>
+            <p-multiSelect appendTo="body" [options]="(notificationsService.notificationTypes$ | async) ?? []"
+                           formControlName="passedTypes" selectedItemsLabel="{0} типов уведомлений"></p-multiSelect>
+            <p-progressSpinner *ngIf="notificationsService.savingNotificationSettings" styleClass="w-2rem h-2rem"></p-progressSpinner>
+        </div>
+    </ng-template>
+</p-sidebar>
+
+<ng-template #notificationSkeletonTemplate>
+    <div class="flex flex-column gap-1 p-2">
+        <div class="flex align-items-center gap-2 text-bluegray-400 text-sm font-bold">
+            <p-skeleton width="0.875rem" height="0.875rem"></p-skeleton>
+            <p-skeleton width="7rem" height="0.875rem"></p-skeleton>
+            <div class="flex-grow-1"></div>
+            <p-skeleton width="4rem" height="0.875rem"></p-skeleton>
+        </div>
+        <div class="flex flex-column gap-1">
+            <p-skeleton width="17rem" height="0.875rem"></p-skeleton>
+            <p-skeleton width="14rem" height="0.875rem"></p-skeleton>
+            <p-skeleton width="9rem" height="0.875rem"></p-skeleton>
+        </div>
+    </div>
+    <div class="flex flex-column gap-1 p-2">
+        <div class="flex align-items-center gap-2 text-bluegray-400 text-sm font-bold">
+            <p-skeleton width="0.875rem" height="0.875rem"></p-skeleton>
+            <p-skeleton width="7rem" height="0.875rem"></p-skeleton>
+            <div class="flex-grow-1"></div>
+            <p-skeleton width="4rem" height="0.875rem"></p-skeleton>
+        </div>
+        <div class="flex flex-column gap-1">
+            <p-skeleton width="15rem" height="0.875rem"></p-skeleton>
+            <p-skeleton width="9rem" height="0.875rem"></p-skeleton>
+            <p-skeleton width="13rem" height="0.875rem"></p-skeleton>
+        </div>
+    </div>
+    <div class="flex flex-column gap-1 p-2">
+        <div class="flex align-items-center gap-2 text-bluegray-400 text-sm font-bold">
+            <p-skeleton width="0.875rem" height="0.875rem"></p-skeleton>
+            <p-skeleton width="7rem" height="0.875rem"></p-skeleton>
+            <div class="flex-grow-1"></div>
+            <p-skeleton width="4rem" height="0.875rem"></p-skeleton>
+        </div>
+        <div class="flex flex-column gap-1">
+            <p-skeleton width="18rem" height="0.875rem"></p-skeleton>
+            <p-skeleton width="12rem" height="0.875rem"></p-skeleton>
+            <p-skeleton width="15rem" height="0.875rem"></p-skeleton>
+        </div>
+    </div>
+</ng-template>

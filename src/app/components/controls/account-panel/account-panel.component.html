@@ -8,7 +8,7 @@
         <ng-container *ngIf="!user.offsite else logoutButtonTemp">
             <p-button (onClick)="menu.toggle($event)" icon="mdi-more_vert"
                       styleClass="p-button-text p-button-icon p-button-rounded"></p-button>
-            <ng-container *ngIf="notifyService.isHasUnread; then fullNoti else emptyNoti"></ng-container>
+<!--            <ng-container *ngIf="notifyService.isHasUnread; then fullNoti else emptyNoti"></ng-container>-->
         </ng-container>
     </ng-container>
 </div>
@@ -55,17 +55,17 @@
 <p-menu #menu [model]="controls" [popup]="true" appendTo="body" [baseZIndex]="2000"
         appCloseIfScroll [isVisible]="menu.visible" [alignFn]="menu.alignOverlay.bind(menu)"></p-menu>
 
-<ng-template #emptyNoti>
-    <p-button (onClick)="notifyService.showSideBar()" icon="mdi-notifications_none"
-              styleClass="p-button-text p-button-icon p-button-rounded"></p-button>
-</ng-template>
+<!--<ng-template #emptyNoti>-->
+<!--    <p-button (onClick)="notifyService.showSideBar()" icon="mdi-notifications_none"-->
+<!--              styleClass="p-button-text p-button-icon p-button-rounded"></p-button>-->
+<!--</ng-template>-->
 
-<ng-template #fullNoti>
-    <span [value]="notifyService.unreadCount.toString()" pBadge severity="warning">
-        <p-button (onClick)="notifyService.showSideBar()" icon="mdi-notifications_active"
-                  styleClass="p-button-text p-button-icon p-button-rounded"></p-button>
-    </span>
-</ng-template>
+<!--<ng-template #fullNoti>-->
+<!--    <span [value]="notifyService.unreadCount.toString()" pBadge severity="warning">-->
+<!--        <p-button (onClick)="notifyService.showSideBar()" icon="mdi-notifications_active"-->
+<!--                  styleClass="p-button-text p-button-icon p-button-rounded"></p-button>-->
+<!--    </span>-->
+<!--</ng-template>-->
 
 <ng-template #logoutButtonTemp>
     <p-button (onClick)="this.exitFromAccount()" label="Выйти из аккаунта" icon="mdi-logout" styleClass="p-button-text p-button-secondary"></p-button>

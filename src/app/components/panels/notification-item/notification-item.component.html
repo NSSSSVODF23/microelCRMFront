@@ -1,15 +1,14 @@
-<div class="notification" [ngClass]="{unread: notification.unread}">
-
-    <i [class]="getIcon(notification.type)"></i>
-    <span class="title header">
-        {{getTitle(notification.type)}}
-    </span>
-
-    <div class="description indent05" appTextRevival>
+<div class="flex flex-column gap-1 p-3">
+    <div class="flex align-items-center gap-2 text-bluegray-400 text-sm font-bold">
+        <span [class]="getIcon(notification.type)"></span>
+        <span class="flex-grow-1">
+            {{getTitle(notification.type)}}
+        </span>
+        <span class="text-bluegray-300 text-xs">
+            {{notification.created | date:'dd-MM-yyyy HH:mm'}}
+        </span>
+    </div>
+    <div class="text-bluegray-500" appTextRevival>
         {{notification.message}}
     </div>
-    <span class="timestamp">
-        {{notification.created | date:'dd MMMM yyyy HH:mm'}}
-    </span>
-
 </div>

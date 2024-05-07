@@ -259,6 +259,7 @@ import {
     LoginAssignOntPopupComponent
 } from "../../components/pon/login-assign-ont-popup/login-assign-ont-popup.component";
 import {PonBoxComponent} from "../../components/pon/scheme/elements/pon-box/pon-box.component";
+import {ToggleButtonModule} from "primeng/togglebutton";
 
 
 @NgModule({
@@ -571,7 +572,8 @@ import {PonBoxComponent} from "../../components/pon/scheme/elements/pon-box/pon-
         InputSwitchModule,
         ContextMenuModule,
         DynamicDialogModule,
-        NgTerminalModule
+        NgTerminalModule,
+        ToggleButtonModule
     ],
     entryComponents: [
         TerminalDialogComponent

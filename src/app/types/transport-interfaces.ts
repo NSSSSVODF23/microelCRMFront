@@ -1,4 +1,5 @@
 import {Subscription} from "rxjs";
+import {NotificationSettings} from "./notification-types";
 
 export enum WireframeFieldType {
     BOOLEAN = "BOOLEAN",
@@ -207,6 +208,7 @@ export interface Employee {
     base781Credentials?: Credentials;
     base1785Credentials?: Credentials;
     base1783Credentials?: Credentials;
+    notificationSettings?: NotificationSettings;
 }
 
 export interface EmployeeFiltrationForm {
@@ -813,6 +815,7 @@ export enum NotificationType {
     WORKS_COMPLETED = "WORKS_COMPLETED",
     REPORT_RECEIVED = "REPORT_RECEIVED",
     MENTIONED_IN_TASK = "MENTIONED_IN_TASK",
+    TASK_MOVED_TO_DIRECTORY = "TASK_MOVED_TO_DIRECTORY"
 }
 
 export interface INotification {
