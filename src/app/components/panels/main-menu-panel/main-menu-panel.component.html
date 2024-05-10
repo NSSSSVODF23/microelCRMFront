@@ -99,11 +99,19 @@
 </p-dialog>
 
 <p-sidebar [(visible)]="notificationSidebarVisible" position="left" appendTo="body" [showCloseIcon]="false"
-           [blockScroll]="true" [style]="{width: '30vw'}" styleClass="p-sidebar-only-content" (onShow)="notificationsService.loadFirst()">
+           [blockScroll]="true" [style]="{width: '30vw'}" styleClass="p-sidebar-only-content"
+           (onShow)="notificationsService.loadFirst(); notificationsService.sidebarOpenStatus = true"
+           (onHide)="notificationsService.sidebarOpenStatus = false">
     <ng-template pTemplate="content">
+        <div class="flex justify-content-end p-3" *ngIf="notificationsService.unreadNum as unreadNum">
+            <p-button label="Прочитать" icon="mdi-done_all"
+                      [loading]="notificationsService.readingNotifications"
+                      (onClick)="notificationsService.readAll()" [badge]="unreadNum.toString()"></p-button>
+        </div>
         <div class="flex flex-column flex-grow-1 overflow-y-auto" appScrollToBottomEmitter (onScrollToBottom)="notificationsService.loadNext()">
             <ng-container *ngIf="notificationsService.notifications as notifications">
-                <app-notification-item *ngFor="let notify of notifications" [notification]="notify"></app-notification-item>
+                <app-notification-item *ngFor="let notify of notifications" appObserveVisibility
+                                       [notification]="notify" (visible)="notificationsService.inView(notify)"></app-notification-item>
             </ng-container>
             <ng-container *ngIf="notificationsService.loadingNotifications" [ngTemplateOutlet]="notificationSkeletonTemplate"></ng-container>
         </div>

@@ -75,6 +75,11 @@
         </section>
         <section class="flex gap-3 w-max align-self-end my-3" *ngIf="templateLoadingState === 'READY'">
             <div class="flex gap-2 align-items-center" [formGroup]="paidWorkForm">
+                <p-button (onClick)="globalRatioMenu.toggle($event)" [disabled]="(noActions$ | async) ?? true"
+                          icon="mdi-percent" label="Коэффициент задачи"></p-button>
+                <input pInputText formControlName="comment" [size]="80" placeholder="Комментарий...">
+                <span class="text-sm text-bluegray-400 font-bold white-space-nowrap">Юр. лицо?</span>
+                <p-inputSwitch class="line-height-0" formControlName="isLegalEntity"></p-inputSwitch>
                 <span class="text-sm text-bluegray-400 font-bold white-space-nowrap">Платная работа</span>
                 <p-inputSwitch class="line-height-0" formControlName="isPaidWork"></p-inputSwitch>
                 <p-inputNumber formControlName="amountOfMoneyTaken" *ngIf="paidWorkForm.value.isPaidWork"
@@ -85,6 +90,8 @@
         </section>
     </div>
 </div>
+
+<p-menu #globalRatioMenu appendTo="body" [model]="globalRatioMenuOptions" [popup]="true"></p-menu>
 
 <ng-template #wireframesLoadingTemp>
     <div *ngIf="wireframesLoadingState!=='READY'" [ngSwitch]="wireframesLoadingState"

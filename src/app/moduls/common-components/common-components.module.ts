@@ -260,6 +260,7 @@ import {
 } from "../../components/pon/login-assign-ont-popup/login-assign-ont-popup.component";
 import {PonBoxComponent} from "../../components/pon/scheme/elements/pon-box/pon-box.component";
 import {ToggleButtonModule} from "primeng/togglebutton";
+import {ObserveVisibilityDirective} from "../../directives/observe-visibility.directive";
 
 
 @NgModule({
@@ -390,7 +391,8 @@ import {ToggleButtonModule} from "primeng/togglebutton";
         RenameOntPopupComponent,
         OntAssignLoginPopupComponent,
         LoginAssignOntPopupComponent,
-        PonBoxComponent
+        PonBoxComponent,
+        ObserveVisibilityDirective
     ],
     exports: [
         AccountPanelComponent,
@@ -515,7 +517,8 @@ import {ToggleButtonModule} from "primeng/togglebutton";
         DelayedInputDirective,
         RenameOntPopupComponent,
         OntAssignLoginPopupComponent,
-        PonBoxComponent
+        PonBoxComponent,
+        ObserveVisibilityDirective
     ],
     imports: [
         CommonPipesModule,

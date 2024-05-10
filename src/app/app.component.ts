@@ -9,6 +9,7 @@ import {Router, Scroll} from "@angular/router";
 import {ViewportScroller} from "@angular/common";
 import {delay, filter} from "rxjs";
 import {InputTextarea} from "primeng/inputtextarea";
+import {NotificationsService} from "./services/notifications.service";
 
 @Component({
     selector: 'app-root',
@@ -18,7 +19,8 @@ import {InputTextarea} from "primeng/inputtextarea";
 export class AppComponent {
     title = 'Microel CRM';
 
-    constructor(readonly config: PrimeNGConfig, injector: Injector, router: Router, viewportScroller: ViewportScroller) {
+    constructor(readonly config: PrimeNGConfig, injector: Injector, router: Router,
+                viewportScroller: ViewportScroller, readonly notificationService: NotificationsService) {
         configurePrimeng(config);
         registerCustomElements(injector);
         router.events

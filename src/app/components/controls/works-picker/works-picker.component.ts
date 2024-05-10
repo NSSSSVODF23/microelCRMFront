@@ -8,7 +8,7 @@ import {
     TreeNodeUpdateEvent,
     WorkLog
 } from "../../../types/transport-interfaces";
-import {TreeDragDropService, TreeNode} from "primeng/api";
+import {MenuItem, TreeDragDropService, TreeNode} from "primeng/api";
 import {SubscriptionsHolder} from "../../../util";
 import {v4} from "uuid";
 import {ApiService} from "../../../services/api.service";
@@ -83,7 +83,7 @@ export class WorksPickerComponent implements OnInit, OnDestroy, ControlValueAcce
             return {
                 label: employee.fullName,
                 items: [
-                    {label: "x0", command: () => this.addActionRatio(0.0001, employee.login)},
+                    // {label: "x0", command: () => this.addActionRatio(0.0001, employee.login)},
                     {label: "x0.1", command: () => this.addActionRatio(0.1, employee.login)},
                     {label: "x0.25", command: () => this.addActionRatio(0.2, employee.login)},
                     {label: "x0.5", command: () => this.addActionRatio(0.5, employee.login)},

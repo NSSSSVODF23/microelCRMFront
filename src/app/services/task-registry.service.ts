@@ -68,7 +68,7 @@ export class TaskRegistryService {
             tap(()=>this.tableOffset = 0)
         );
 
-    tabelColumns$ = this.changeTableType$
+    tableColumns$ = this.changeTableType$
         .pipe(
             switchMap(([taskStatus, taskClass, tagMode]) => this.api.getTaskRegistryTableHeaders(taskStatus!, taskClass!)),
             shareReplay(1)
@@ -133,6 +133,7 @@ export class TaskRegistryService {
     globalFilter: string | null = null;
 
     constructor(private api: ApiService) {
+        this.taskClass$.subscribe();
         this.api.getWireframes().subscribe(wireframes => {
             this.taskClassOptions = wireframes.map(wf => ({label: wf.name, value: wf.wireframeId}));
             this.taskClassSelector.setValue(this.taskClassOptions[0].value);

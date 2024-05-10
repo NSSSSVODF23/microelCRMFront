@@ -27,7 +27,7 @@
 <ng-template #activeWorkLogTemplate let-activeWorkLog="activeWorkLog">
     <div class="flex terminated p-3">
         <div class="flex flex-column gap-2">
-            <app-task-link [task]="activeWorkLog.task"></app-task-link>
+            <app-task-link [taskId]="activeWorkLog.task.taskId"></app-task-link>
             <app-label label="Монтажники" styleClass="translate-x-0">
                 <app-avatar-list [employees]="activeWorkLog.employees" [size]="2"></app-avatar-list>
             </app-label>
@@ -45,7 +45,7 @@
 <ng-template #unactiveWorkLogTemplate let-workLog="workLog">
     <div class="flex terminated p-3">
         <div class="flex flex-column gap-2">
-            <app-task-link [task]="workLog.task"></app-task-link>
+            <app-task-link [taskId]="workLog.task.taskId"></app-task-link>
             <app-label label="Монтажники" styleClass="translate-x-0">
                 <app-avatar-list [employees]="workLog.employees" [size]="2"></app-avatar-list>
             </app-label>

@@ -1,4 +1,4 @@
-<ng-container *ngIf="service.tabelColumns$ | async as tableColumns">
+<ng-container *ngIf="service.tableColumns$ | async as tableColumns">
     <p-table #registryTable (onLazyLoad)="service.tableLazyLoad$.next($event)" [(first)]="service.tableOffset"
              (onPage)="scrollTop()" [lazyLoadOnInit]="service.isFirstLoad"
              [lazy]="true" [loading]="service.tableContentLoading"

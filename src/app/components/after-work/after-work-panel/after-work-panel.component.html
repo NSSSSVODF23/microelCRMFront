@@ -23,7 +23,7 @@
     <div class="flex align-items-center gap-1 terminated p-3">
         <div class="flex flex-column gap-2 w-min">
             <div class="flex justify-content-between align-items-center gap-3">
-                <app-task-link [task]="workLog.task"></app-task-link>
+                <app-task-link [taskId]="workLog.task.taskId"></app-task-link>
                 <app-avatar-list [employees]="workLog.employees"></app-avatar-list>
                 <app-label label="Отдана/Завершена" styleClass="font-bold translate-x-0">
                     <div class="flex align-items-center gap-1 white-space-nowrap">

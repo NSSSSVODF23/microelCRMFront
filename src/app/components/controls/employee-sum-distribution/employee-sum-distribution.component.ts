@@ -247,7 +247,7 @@ export class EmployeeSumDistributionComponent implements OnInit, OnDestroy, Cont
                 if (!actionTaken) return prev;
                 return prev + actionTaken.cost;
             }, 0);
-            const employeeRatio = this.employeeRatioForm.value[factorAction.login].ratio;
+            const employeeRatio = this.employeeRatioForm.value[factorAction.login]?.ratio ?? 0;
             const cost = costOfWork * employeeRatio;
             return Math.round((cost * factorAction.factor) - cost);
         }

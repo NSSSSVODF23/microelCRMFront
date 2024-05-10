@@ -1,14 +1,14 @@
-<div class="flex flex-column gap-1 p-3">
-    <div class="flex align-items-center gap-2 text-bluegray-400 text-sm font-bold">
+<div class="flex flex-column gap-1 p-3 transition-colors transition-duration-1000" [ngClass]="{'bg-orange-50': notification.unread}">
+    <div class="flex align-items-center gap-2 text-sm font-bold transition-colors transition-duration-1000" [ngClass]="notification.unread ? 'text-orange-500' : 'text-bluegray-400'">
         <span [class]="getIcon(notification.type)"></span>
         <span class="flex-grow-1">
             {{getTitle(notification.type)}}
         </span>
-        <span class="text-bluegray-300 text-xs">
+        <span class="text-xs transition-colors transition-duration-1000" [ngClass]="notification.unread ? 'text-orange-300' : 'text-bluegray-300'">
             {{notification.created | date:'dd-MM-yyyy HH:mm'}}
         </span>
     </div>
-    <div class="text-bluegray-500" appTextRevival>
+    <div class="transition-colors transition-duration-1000" [ngClass]="notification.unread ? 'text-orange-500' : 'text-bluegray-500'" appTextRevival>
         {{notification.message}}
     </div>
 </div>

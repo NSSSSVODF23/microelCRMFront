@@ -88,7 +88,7 @@ import {
     WireframeDashboardStatistic,
     OltWorker,
     WorkingDay,
-    WorkLog, DateRange, AutoTariff, AutoTariffForm, EmployeeFiltrationForm, NotificationType
+    WorkLog, DateRange, AutoTariff, AutoTariffForm, EmployeeFiltrationForm, NotificationType, WorkCalculationForm
 } from "../types/transport-interfaces";
 import {MessageService, TreeNode} from "primeng/api";
 import {cyrb53, Storage, Utils} from "../util";
@@ -160,7 +160,7 @@ export class ApiService {
         const requestHash = this.generateHash(uri, query);
         let observable: Observable<T> | null = null;
         if (!this.requestCacheMap[requestHash]) {
-            console.log(uri, query);
+            // console.log(uri, query);
 
             observable = this.client.get<T>(uri, {params: query})
                 .pipe(shareReplay(1));
@@ -660,6 +660,10 @@ export class ApiService {
 
     readAllNotifications() {
         return this.sendPatch<void>("api/private/notifications/read-all", {});
+    }
+
+    readNotification(id: number) {
+        return this.sendPatch<void>(`api/private/notifications/${id}/read`, {});
     }
 
     changeMyStatus(status: EmployeeStatus) {

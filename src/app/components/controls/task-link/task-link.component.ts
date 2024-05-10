@@ -2,7 +2,7 @@ import {Component, Input, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {Task} from "../../../types/transport-interfaces";
 import {OverlayPanel} from "primeng/overlaypanel";
 import {ApiService} from "../../../services/api.service";
-import {BehaviorSubject, debounceTime, Subscription} from "rxjs";
+import {BehaviorSubject, debounceTime, Observable, of, Subscription} from "rxjs";
 
 @Component({
     selector: 'app-task-link',
@@ -11,26 +11,23 @@ import {BehaviorSubject, debounceTime, Subscription} from "rxjs";
 })
 export class TaskLinkComponent implements OnInit, OnDestroy {
 
-    @Input() task?: Task;
-    failed = false;
+    // @Input() task?: Task;
+    _taskId?: number;
     @ViewChild('previewConnectedTask') previewConnectedTask?: OverlayPanel;
     panelShowSubject = new BehaviorSubject<MouseEvent | null>(null);
     panelShow$ = this.panelShowSubject.pipe(debounceTime(500));
     panelShowSub?: Subscription;
 
+    task$: Observable<Task> = of();
+
 
     constructor(readonly api: ApiService) {
     }
 
-    _taskId?: number;
-
     @Input() set taskId(value: number) {
         if (value === 0) return;
         this._taskId = value;
-        this.api.getTask(this._taskId, true).subscribe({
-            next: task => this.task = task,
-            error: () => this.failed = true
-        })
+        this.task$ = this.api.getTask(value, true);
     }
 
     static createElement(taskId: number): HTMLElement {

@@ -22,21 +22,30 @@
             </ng-container>
             <div class="flex gap-3 align-items-center align-self-end">
                 <div class="flex gap-2 align-items-center" [formGroup]="paidWorkForm">
+                    <p-button (onClick)="globalRatioMenu.toggle($event)" [disabled]="(noActions$ | async) ?? true"
+                              icon="mdi-percent" label="Коэффициент задачи"></p-button>
+                    <input pInputText formControlName="comment" [size]="80" placeholder="Комментарий...">
+                    <span class="text-sm text-bluegray-400 font-bold white-space-nowrap">Юр. лицо?</span>
+                    <p-inputSwitch class="line-height-0" formControlName="isLegalEntity"></p-inputSwitch>
                     <span class="text-sm text-bluegray-400 font-bold white-space-nowrap">Платная работа</span>
                     <p-inputSwitch class="line-height-0" formControlName="isPaidWork"></p-inputSwitch>
                     <p-inputNumber formControlName="amountOfMoneyTaken" class="touched-error" *ngIf="paidWorkForm.value.isPaidWork"
                                    placeholder="Сумма" mode="currency" currency="RUB"></p-inputNumber>
                 </div>
                 <ng-container *ngIf="recalculate$ | async as recalculate">
-                    <p-button (onClick)="sendCalculation()" *ngIf="recalculate === 'CALCULATE'" [loading]="isSendingCalculation"
+                    <p-button (onClick)="sendCalculation()" *ngIf="recalculate === 'CALCULATE'"
+                              [loading]="isSendingCalculation" [disabled]="paidWorkForm.invalid"
                               icon="mdi-currency_exchange" label="Рассчитать"></p-button>
-                    <p-button (onClick)="openRecalculationConformationDialog()" *ngIf="recalculate === 'RECALCULATE'" [loading]="isSendingCalculation"
+                    <p-button (onClick)="openRecalculationConformationDialog()" *ngIf="recalculate === 'RECALCULATE'"
+                              [loading]="isSendingCalculation" [disabled]="paidWorkForm.invalid"
                               icon="mdi-currency_exchange" label="Пересчитать"></p-button>
                 </ng-container>
             </div>
         </div>
     </ng-container>
 </div>
+
+<p-menu #globalRatioMenu appendTo="body" [model]="globalRatioMenuOptions" [popup]="true"></p-menu>
 
 <ng-template #uncalculatedListTemp>
     <div class="flex align-items-center px-5 py-4 border-bottom-1 border-bluegray-100">
@@ -61,7 +70,7 @@
                 tooltipPosition="bottom"
                 [ngClass]="workLog.isReportsUncompleted ? 'opacity-50' : 'cursor-pointer hover:bg-bluegray-50'">
                 <td>{{workLog.workLogId}}</td>
-                <td><app-task-link [task]="workLog.task"></app-task-link></td>
+                <td><app-task-link [taskId]="workLog.task.taskId"></app-task-link></td>
                 <td><app-employee-label [employee]="workLog.creator"></app-employee-label></td>
                 <td>
                     <div class="flex flex-wrap gap-2">

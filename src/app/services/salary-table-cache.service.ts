@@ -141,6 +141,10 @@ export class SalaryTableCacheService {
         return workLog.workReports.find(report => report.author.login === targetLogin)?.description;
     }
 
+    // getAcceptedTimestamp(workLog: WorkLog, targetLogin: string) {
+    //     return workLog.acceptedEmployees.find(employee => employee.login === targetLogin)?.acceptedTimestamp;
+    // }
+
     isSelected(row: number, col: number) {
         return this.highlightedDay?.row === row && this.highlightedDay?.col === col;
     }

@@ -89,10 +89,13 @@
                             <th>ИД</th>
                             <th>Задача</th>
                             <th>Отчёт</th>
-                            <th>Отдана/Закрыта</th>
+                            <th>Комментарий</th>
+                            <th>Коэф.</th>
+                            <th>Отдана/Принята/Закрыта</th>
                             <th>Доля</th>
                             <th>Считал</th>
                             <th>Платная?</th>
+                            <th>Юр.лицо?</th>
                             <th>Сумма</th>
                             <th>Сумма без НДФЛ</th>
                             <th>Пересчитать</th>
@@ -111,7 +114,7 @@
                                 {{rowData.workCalculationId}}
                             </td>
                             <td>
-                                <app-task-link [task]="rowData.workLog.task"></app-task-link>
+                                <app-task-link [taskId]="rowData.workLog.task.taskId"></app-task-link>
                             </td>
                             <td>
                                 <span [style.max-width]="'20rem'" appTooltip class="text-max-lines-3 text-sm">
@@ -119,9 +122,20 @@
                                 </span>
                             </td>
                             <td>
+                                <span [style.max-width]="'20rem'" appTooltip class="text-max-lines-3 text-sm">
+                                    {{rowData.comment}}
+                                </span>
+                            </td>
+                            <td>
+                                x{{rowData.averageFactor | number:'1.2-2'}}
+                            </td>
+                            <td>
                                 <div class="flex flex-column">
                                     <span>
                                         {{rowData.workLog.created | date:'dd-MM-yyyy HH:mm'}}
+                                    </span>
+                                    <span>
+                                        {{rowData.workLog.lastAcceptedTimestamp | date:'dd-MM-yyyy HH:mm'}}
                                     </span>
                                     <span>
                                         {{rowData.workLog.closed | date:'dd-MM-yyyy HH:mm'}}
@@ -137,6 +151,9 @@
                             </td>
                             <td>
                                 {{rowData.isPaidWork ? 'Да' : 'Нет'}}
+                            </td>
+                            <td>
+                                {{rowData.isLegalEntity ? 'Да' : 'Нет'}}
                             </td>
                             <td [colSpan]="rowData.isPaidWork ? 2 : 1" [style.text-align]="rowData.isPaidWork ? 'center' : ''">
                                 <ng-container *ngIf="rowData.isPaidWork">

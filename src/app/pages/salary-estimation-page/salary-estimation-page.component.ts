@@ -1,7 +1,7 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
 import {ApiService} from "../../services/api.service";
-import {LoadingState, WorkLog} from "../../types/transport-interfaces";
-import {ConfirmationService, TreeDragDropService} from "primeng/api";
+import {ActionTaken, Employee, LoadingState, WorkActionFormItem, WorkLog} from "../../types/transport-interfaces";
+import {ConfirmationService, MenuItem, TreeDragDropService} from "primeng/api";
 import {FormControl, FormGroup, Validators} from "@angular/forms";
 import {SubscriptionsHolder} from "../../util";
 import {RealTimeUpdateService} from "../../services/real-time-update.service";
@@ -9,12 +9,15 @@ import {filter, map, Observable, of, shareReplay, switchMap} from "rxjs";
 import {TFactorAction, WorksPickerValue} from "../../components/controls/works-picker/works-picker.component";
 import {ActivatedRoute, Router} from "@angular/router";
 import {CustomNavigationService} from "../../services/custom-navigation.service";
+import {v4} from "uuid";
+import {AutoUnsubscribe} from "../../decorators";
 
 @Component({
     templateUrl: './salary-estimation-page.component.html',
     styleUrls: ['./salary-estimation-page.component.scss'],
     providers: [TreeDragDropService],
 })
+@AutoUnsubscribe()
 export class SalaryEstimationPageComponent implements OnInit, OnDestroy {
 
     uncalculatedWorkLogs: WorkLog[] = [];
@@ -94,8 +97,64 @@ export class SalaryEstimationPageComponent implements OnInit, OnDestroy {
 
     paidWorkForm = new FormGroup({
         isPaidWork: new FormControl(false),
-        amountOfMoneyTaken: new FormControl(null, [Validators.min(0), Validators.required])
+        amountOfMoneyTaken: new FormControl(null, [Validators.min(0), Validators.required]),
+        comment: new FormControl(''),
+        isLegalEntity: new FormControl(false),
     })
+
+    amountValidatorSub = this.paidWorkForm.controls.isPaidWork.valueChanges.subscribe(value => {
+        if (value) {
+            this.paidWorkForm.controls.amountOfMoneyTaken.setValidators([Validators.min(0), Validators.required])
+        } else {
+            this.paidWorkForm.controls.amountOfMoneyTaken.clearValidators();
+        }
+        this.paidWorkForm.controls.amountOfMoneyTaken.updateValueAndValidity()
+    })
+
+    globalRatioMenuOptions: MenuItem[] = [
+        {label: "x0.1", command: () => this.setFactorToAllActions(0.1)},
+        {label: "x0.25", command: () => this.setFactorToAllActions(0.25)},
+        {label: "x0.5", command: () => this.setFactorToAllActions(0.5)},
+        {label: "x0.75", command: () => this.setFactorToAllActions(0.75)},
+        {label: "x1.25", command: () => this.setFactorToAllActions(1.25)},
+        {label: "x1.5", command: () => this.setFactorToAllActions(1.5)},
+        {label: "x2", command: () => this.setFactorToAllActions(2)},
+        {label: "x3", command: () => this.setFactorToAllActions(3)},
+        {label: "Отчистить", command: () => this.clearFactors()},
+    ]
+
+    noActions$ = this.worksPickerForm.valueChanges.pipe(
+        map(value => !value?.actionsTaken || value.actionsTaken.length === 0),
+        shareReplay(1)
+    )
+
+    setFactorToAllActions(factor: number) {
+        const value = this.worksPickerForm.value;
+        if(!value || !value.actionsTaken || value.actionsTaken.length === 0) return;
+        const factors: TFactorAction[] = [];
+        const employees = this.selectedWorkLog?.employees;
+        value.actionsTaken.forEach((action: WorkActionFormItem) => {
+            employees?.forEach((employee: Employee) => {
+                const factorAction: TFactorAction = {
+                    factor: factor,
+                    login: employee.login,
+                    name: action.actionName,
+                    actionUuids: [action.uuid],
+                    uuid: v4()
+                }
+                factors.push(factorAction);
+            });
+        });
+        value.factorsActions = factors;
+        this.worksPickerForm.setValue(value);
+    }
+
+    clearFactors() {
+        const value = this.worksPickerForm.value;
+        if(!value) return;
+        value.factorsActions = [];
+        this.worksPickerForm.setValue(value);
+    }
 
     constructor(readonly api: ApiService, private confirmation: ConfirmationService, private rt: RealTimeUpdateService,
                 private router: Router, private route: ActivatedRoute, private nav: CustomNavigationService) {
@@ -131,6 +190,12 @@ export class SalaryEstimationPageComponent implements OnInit, OnDestroy {
             if (!value) return;
             this.actionsTaken = value.actionsTaken;
             this.factorsActions = value.factorsActions ?? [];
+            if(this.factorsActions.length > 0){
+                this.paidWorkForm.controls.comment.addValidators(Validators.required);
+            }else{
+                this.paidWorkForm.controls.comment.clearValidators();
+            }
+            this.paidWorkForm.controls.comment.updateValueAndValidity()
         }));
         this.subscriptions.addSubscription('wlUpd', this.rt.workLogUpdated().subscribe(()=>this.api.getUncalculatedWorkLogs().subscribe({
             next: workLogs => {
@@ -155,12 +220,19 @@ export class SalaryEstimationPageComponent implements OnInit, OnDestroy {
                 this.employeeRatioForm.setValue(value.employeesRatio);
                 this.paidWorkForm.setValue({
                     isPaidWork: value.isPaidWork ?? false,
-                    amountOfMoneyTaken: value.amountOfMoneyTaken ?? null
+                    amountOfMoneyTaken: value.amountOfMoneyTaken ?? null,
+                    comment: value.comment ?? '',
+                    isLegalEntity: value.isLegalEntity?? false
                 })
             }else{
                 this.worksPickerForm.reset();
                 this.employeeRatioForm.reset();
-                this.paidWorkForm.reset();
+                this.paidWorkForm.reset({
+                    comment: '',
+                    isPaidWork: false,
+                    amountOfMoneyTaken: null,
+                    isLegalEntity: false,
+                });
             }
         }))
     }
@@ -239,7 +311,9 @@ export class SalaryEstimationPageComponent implements OnInit, OnDestroy {
                         }
                     }),
                     isPaidWork: this.paidWorkForm.value.isPaidWork,
-                    amountOfMoneyTaken: this.paidWorkForm.value.amountOfMoneyTaken
+                    amountOfMoneyTaken: this.paidWorkForm.value.amountOfMoneyTaken,
+                    comment: this.paidWorkForm.value.comment,
+                    isLegalEntity: this.paidWorkForm.value.isLegalEntity,
                 }).subscribe(this.sendingCalculationHandlers)
             }
         })
@@ -278,7 +352,9 @@ export class SalaryEstimationPageComponent implements OnInit, OnDestroy {
                 }
             }),
             isPaidWork: this.paidWorkForm.value.isPaidWork,
-            amountOfMoneyTaken: this.paidWorkForm.value.amountOfMoneyTaken
+            amountOfMoneyTaken: this.paidWorkForm.value.amountOfMoneyTaken,
+            comment: this.paidWorkForm.value.comment,
+            isLegalEntity: this.paidWorkForm.value.isLegalEntity,
         }).subscribe(this.sendingCalculationHandlers)
     }
 
@@ -309,7 +385,9 @@ export class SalaryEstimationPageComponent implements OnInit, OnDestroy {
                 }
             }),
             isPaidWork: this.paidWorkForm.value.isPaidWork,
-            amountOfMoneyTaken: this.paidWorkForm.value.amountOfMoneyTaken
+            amountOfMoneyTaken: this.paidWorkForm.value.amountOfMoneyTaken,
+            comment: this.paidWorkForm.value.comment,
+            isLegalEntity: this.paidWorkForm.value.isLegalEntity,
         }).subscribe(this.sendingCalculationHandlers)
     }
 

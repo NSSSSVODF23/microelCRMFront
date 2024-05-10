@@ -151,7 +151,7 @@
                                 <span>Дочерние:</span>
                                 <div class="flexed column gap3">
                                     <span *ngFor="let taskCld of currentTask?.children" class="flexed gap3 hcenter">
-                                        <app-task-link [task]="taskCld"></app-task-link>
+                                        <app-task-link  [taskId]="taskCld.taskId"></app-task-link>
                                         <app-tiny-button (onClick)="unlinkParentTask(taskCld.taskId)" icon="link_off"
                                                          model="danger" pTooltip="Отсоединить задачу"
                                                          tooltipPosition="bottom"></app-tiny-button>

@@ -1,18 +1,21 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
 import {ApiService} from "../../services/api.service";
-import {map, of, Subject, switchMap, tap} from "rxjs";
-import {Employee, FieldItem, LoadingState, Wireframe} from "../../types/transport-interfaces";
+import {map, of, shareReplay, Subject, switchMap, tap} from "rxjs";
+import {Employee, FieldItem, LoadingState, Wireframe, WorkActionFormItem} from "../../types/transport-interfaces";
 import {AbstractControl, FormControl, FormGroup, ValidationErrors, Validators} from "@angular/forms";
 import {FormToModelItemConverter, SubscriptionsHolder} from "../../util";
 import {TFactorAction, WorksPickerValue} from "../../components/controls/works-picker/works-picker.component";
 import {CustomValidators} from "../../custom-validators";
 import {InputSwitchOnChangeEvent} from "primeng/inputswitch";
-import {MessageService} from "primeng/api";
+import {MenuItem, MessageService} from "primeng/api";
+import {v4} from "uuid";
+import {AutoUnsubscribe} from "../../decorators";
 
 @Component({
     templateUrl: './bypass-work-calculation.component.html',
     styleUrls: ['./bypass-work-calculation.component.scss']
 })
+@AutoUnsubscribe()
 export class BypassWorkCalculationComponent implements OnInit, OnDestroy {
 
     selectedWireframe?: Wireframe;
@@ -64,7 +67,17 @@ export class BypassWorkCalculationComponent implements OnInit, OnDestroy {
     employeeRatioForm = new FormControl<{ [key: string]: { ratio: number, sum: number } }>({});
     paidWorkForm = new FormGroup({
         isPaidWork: new FormControl(false),
-        amountOfMoneyTaken: new FormControl(null)
+        amountOfMoneyTaken: new FormControl(null),
+        comment: new FormControl(''),
+        isLegalEntity: new FormControl(false),
+    })
+    amountValidatorSub = this.paidWorkForm.controls.isPaidWork.valueChanges.subscribe(value => {
+        if (value) {
+            this.paidWorkForm.controls.amountOfMoneyTaken.setValidators([Validators.min(0), Validators.required])
+        } else {
+            this.paidWorkForm.controls.amountOfMoneyTaken.clearValidators();
+        }
+        this.paidWorkForm.controls.amountOfMoneyTaken.updateValueAndValidity()
     })
     private _selectTemplateSubject = new Subject<number>();
     selectWireframe$ = this._selectTemplateSubject.pipe(
@@ -94,7 +107,61 @@ export class BypassWorkCalculationComponent implements OnInit, OnDestroy {
         })
     );
 
+    globalRatioMenuOptions: MenuItem[] = [
+        {label: "x0.1", command: () => this.setFactorToAllActions(0.1)},
+        {label: "x0.25", command: () => this.setFactorToAllActions(0.25)},
+        {label: "x0.5", command: () => this.setFactorToAllActions(0.5)},
+        {label: "x0.75", command: () => this.setFactorToAllActions(0.75)},
+        {label: "x1.25", command: () => this.setFactorToAllActions(1.25)},
+        {label: "x1.5", command: () => this.setFactorToAllActions(1.5)},
+        {label: "x2", command: () => this.setFactorToAllActions(2)},
+        {label: "x3", command: () => this.setFactorToAllActions(3)},
+        {label: "Отчистить", command: () => this.clearFactors()},
+    ]
+
+    noActions$ = this.worksPickerForm.valueChanges.pipe(
+        map(value => !value?.actionsTaken || value.actionsTaken.length === 0),
+        shareReplay(1)
+    )
+
+    worksPickerValidatorSub = this.worksPickerForm.valueChanges.subscribe(value => {
+        if((value?.factorsActions ?? []).length > 0){
+            this.paidWorkForm.controls.comment.addValidators(Validators.required);
+        }else{
+            this.paidWorkForm.controls.comment.clearValidators();
+        }
+        this.paidWorkForm.controls.comment.updateValueAndValidity()
+    })
+
     constructor(private api: ApiService, private toast: MessageService) {
+    }
+
+    setFactorToAllActions(factor: number) {
+        const value = this.worksPickerForm.value;
+        if(!value || !value.actionsTaken || value.actionsTaken.length === 0) return;
+        const factors: TFactorAction[] = [];
+        const employees = this.installersReportForm.value.installers;
+        value.actionsTaken.forEach((action: WorkActionFormItem) => {
+            employees?.forEach((employee: Employee) => {
+                const factorAction: TFactorAction = {
+                    factor: factor,
+                    login: employee.login,
+                    name: action.actionName,
+                    actionUuids: [action.uuid],
+                    uuid: v4()
+                }
+                factors.push(factorAction);
+            });
+        });
+        value.factorsActions = factors;
+        this.worksPickerForm.setValue(value);
+    }
+
+    clearFactors() {
+        const value = this.worksPickerForm.value;
+        if(!value) return;
+        value.factorsActions = [];
+        this.worksPickerForm.setValue(value);
     }
 
     worksPickerValidator(control: AbstractControl): ValidationErrors | null {
@@ -123,6 +190,7 @@ export class BypassWorkCalculationComponent implements OnInit, OnDestroy {
     }
 
     createTaskAndCalculate() {
+
         const employees: Employee[] = <Employee[]>this.installersReportForm.value.installers;
         this.taskInformationForm.markAllAsTouched();
         this.worksPickerForm.markAllAsTouched();
@@ -172,7 +240,7 @@ export class BypassWorkCalculationComponent implements OnInit, OnDestroy {
         this.employeeRatioForm.disable()
         this.installersReportForm.disable()
         this.taskInformationForm.disable()
-        this.paidWorkForm.disable()
+        // this.paidWorkForm.disable()
 
         this.api.sendBypassWorkCalculation({
             taskInfo: {
@@ -198,7 +266,9 @@ export class BypassWorkCalculationComponent implements OnInit, OnDestroy {
                 }
             }),
             isPaidWork: this.paidWorkForm.value.isPaidWork,
-            amountOfMoneyTaken: this.paidWorkForm.value.amountOfMoneyTaken
+            amountOfMoneyTaken: this.paidWorkForm.value.amountOfMoneyTaken,
+            comment: this.paidWorkForm.value.comment,
+            isLegalEntity: this.paidWorkForm.value.isLegalEntity,
         }).subscribe(this.sendingCalculationHandler)
     }
 
@@ -212,7 +282,12 @@ export class BypassWorkCalculationComponent implements OnInit, OnDestroy {
             this.paidWorkForm.enable()
             this.worksPickerForm.reset()
             this.employeeRatioForm.reset()
-            this.paidWorkForm.reset()
+            this.paidWorkForm.reset({
+                isPaidWork: false,
+                isLegalEntity: false,
+                amountOfMoneyTaken: null,
+                comment: '',
+            })
             this.installersReportForm.reset({
                 installers: [],
                 report: '',

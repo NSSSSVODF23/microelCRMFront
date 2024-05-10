@@ -982,6 +982,7 @@ export interface WorkActionFormItem {
     actionName: string;
     count: number;
     unit: PaidActionUnit;
+    uuid: string;
     price: number;
     cost: number;
     actionId: number;
@@ -993,6 +994,7 @@ export interface WorkCalculationForm {
     actions: WorkActionFormItem[];
     spreading: SpreadingItem[];
     editingDescription?: string;
+    comment?: string;
 }
 
 export interface EmployeeIntervention {
@@ -1038,6 +1040,7 @@ export interface WorkCalculation {
     lastEdit?: EmployeeIntervention;
     isPaidWork: boolean;
     amountOfMoneyTaken: number;
+    comment?: string;
 }
 
 export interface WorkingDay {
