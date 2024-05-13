@@ -233,6 +233,7 @@ export class NotificationsService {
         this.readingNotifications = true
         this.api.readAllNotifications()
             .pipe(tap(()=>{
+                this.notifications.forEach(notify => notify.unread = false);
                 this.readNotification$.next(-this.unreadNum);
                 this.messageService.clear('notification');
             }))
