@@ -1,0 +1,8 @@
+:host{
+  display: flex;
+  flex-grow: 1;
+}
+
+.tag-container:not(:empty){
+  border-left: solid 1px var(--bluegray-100);
+}

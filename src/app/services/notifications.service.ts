@@ -5,7 +5,7 @@ import {RealTimeUpdateService} from "./real-time-update.service";
 import {FocusStatus, PersonalityService} from "./personality.service";
 import {
     combineLatest,
-    debounceTime,
+    debounceTime, delay,
     distinctUntilChanged,
     filter,
     map,
@@ -223,6 +223,7 @@ export class NotificationsService {
     inView(notify: INotification) {
         if (!notify.unread) return;
         this.api.readNotification(notify.notificationId)
+            .pipe(delay(2000))
             .subscribe(() => {
                 notify.unread = false;
                 this.readNotification$.next(-1);

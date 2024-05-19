@@ -320,15 +320,44 @@ export class TasksCatalogPageCacheService {
         return PATH;
     }
 
-    getTasksCounter(pageType: PageType | null, filter: TaskFilterOptions) {
-        const {status, cls, type, directory, tag, schedulingType, dateOfClose, actualFrom, actualTo} = filter;
-        const key = '' + status + cls + type + directory + tag + schedulingType + JSON.stringify(dateOfClose) + JSON.stringify(actualFrom) + JSON.stringify(actualTo) + pageType;
+    getCountersKey(pageType: PageType | null, filterOptions: TaskFilterOptions){
+        const {status,
+            cls,
+            type,
+            directory,
+            tag,
+            schedulingType,
+            dateOfClose,
+            actualFrom,
+            actualTo} = filterOptions;
+        let key = (schedulingType?.toString() ?? '');
+        if (status) key += '/' + (status?.toString() ?? '');
+        if (cls) key += '/' + (cls?.toString() ?? '');
+        if (type) key += '/' + (type?.toString() ?? '');
+        if (directory) key += '/' + (directory?.toString() ?? '');
+        if (dateOfClose) key += '/' + (dateOfClose ? dateOfClose.timeFrame : '');
+        if (actualFrom) key += '/' + (actualFrom ? actualFrom.timeFrame : '');
+        if (actualTo) key += '/' + (actualTo ? actualTo.timeFrame : '');
+        if (tag) key += '/' + (tag?.toString() ?? '');
+        // if (pageType) key += '/' + (pageType?.toString() ?? '');
+        return key;
+    }
+
+    getTasksCounter(pageType: PageType | null, filterOptions: TaskFilterOptions) {
+        const key = this.getCountersKey(pageType, filterOptions);
+        // if(filterOptions.actualFrom) console.log("Local observable key: " + key);
         if (this.taskCountersMap.has(key))
             return this.taskCountersMap.get(key);
         const observable = merge(
-            this.rt.updateTaskCount(status ?? '', cls, type, pageType, directory, tag, dateOfClose, actualFrom, actualTo, schedulingType),
-            this.api.getCountTasks(TasksCatalogPageCacheService.filterOptionsToCondition(filter))
-        ).pipe(map(c => c.toString()), shareReplay(1));
+            this.rt.updateCachedTaskCounter()
+                .pipe(
+                    filter(value => value.conditions.id === key),
+                    map(value => value.count),
+                    debounceTime(100)
+                ),
+            // this.rt.updateTaskCount(status ?? '', cls, type, pageType, directory, tag, dateOfClose, actualFrom, actualTo, schedulingType),
+            this.api.getCachedCountTasks(TasksCatalogPageCacheService.filterOptionsToCondition(filterOptions))
+        ).pipe(map(c => c?.toString()), shareReplay(1));
 
         this.taskCountersMap.set(key, observable);
         return observable;
@@ -336,7 +365,9 @@ export class TasksCatalogPageCacheService {
 
     static filterOptionsToCondition(filterOptions: TaskFilterOptions) {
         const CONDITION = {} as TaskFiltrationConditions;
-        const {status, cls, type, directory, dateOfClose, actualFrom, actualTo, schedulingType} = filterOptions;
+        const {status, cls, type, directory,
+            dateOfClose, actualFrom, actualTo,
+            schedulingType} = filterOptions;
         if (status)
             CONDITION.status = [status];
         if (cls)

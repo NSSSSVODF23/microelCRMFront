@@ -340,6 +340,7 @@ export interface TaskFiltrationConditions {
     dateOfClose?: DateRange | null;
     actualFrom?: DateRange | null;
     actualTo?: DateRange | null;
+    id?: string | null;
 }
 
 export interface TaskFieldFilter{

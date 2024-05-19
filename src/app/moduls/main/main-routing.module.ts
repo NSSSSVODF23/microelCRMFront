@@ -92,7 +92,7 @@ const routes: Routes = [{
                 path: ':status/:class/:type', component: CatalogSearchTasksListViewComponent
             }]
         },
-        {path: 'tasks', pathMatch: 'full', redirectTo: 'tasks/catalog/active'},
+        {path: 'tasks', pathMatch: 'full', redirectTo: 'tasks/catalog'},
         {
             path: 'tasks/catalog', component: TaskCatalogPageComponent, children: [{
                 path: 'scheduled/:status',

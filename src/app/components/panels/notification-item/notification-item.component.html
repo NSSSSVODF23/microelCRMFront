@@ -8,7 +8,7 @@
             {{notification.created | date:'dd-MM-yyyy HH:mm'}}
         </span>
     </div>
-    <div class="transition-colors transition-duration-1000" [ngClass]="notification.unread ? 'text-orange-500' : 'text-bluegray-500'" appTextRevival>
+    <div class="transition-colors transition-duration-1000 pre-wrap w-fit" [ngClass]="notification.unread ? 'text-orange-500' : 'text-bluegray-500'" appTextRevival>
         {{notification.message}}
     </div>
 </div>

@@ -90,15 +90,7 @@
                       icon="mdi-restore"
                       label="Перерасчет" styleClass="p-button-help p-button-text"></p-button>
             <div class="stretched"></div>
-            <span *ngIf="creditAmount" [style.letter-spacing]="'2px'" class="text-red-400 text-xl font-bold">
-                Кредит:
-                {{creditAmount | currency: 'RUB'}}
-            </span>
-            <span [ngClass]="{'f-color-primary': moneyAmount>=0, 'f-color-danger': moneyAmount<0}"
-                  [style.letter-spacing]="'2px'" class="text-primary text-xl font-bold">
-                Баланс:
-                {{moneyAmount | currency: 'RUB'}}
-            </span>
+
         </div>
     </div>
     <ng-container *ngIf="tasks$ | async as tasks">
@@ -180,10 +172,12 @@
                     *ngTemplateOutlet="infoRowTemplate; context: {label: 'ФИО', value: userInfo?.ibase?.fio}"></ng-container>
             <ng-container
                     *ngTemplateOutlet="infoRowTemplate; context: {label: 'Телефон', value: userInfo?.ibase?.phone}"></ng-container>
+            <ng-container *ngIf="passwordObserver$ | async as password" [ngTemplateOutlet]="infoRowTemplate"
+                          [ngTemplateOutletContext]="{label: 'Пароль', value: password, valueClass:'text-red-500'}"></ng-container>
             <ng-container
                     *ngTemplateOutlet="infoRowTemplate; context: {label: 'Договор заключен', value: userInfo?.ibase?.ddog | date: 'EEEE dd-MM-yyyy' | titlecase}"></ng-container>
             <ng-container
-                    *ngTemplateOutlet="infoRowTemplate; context: {label: 'Комментарий', value: userInfo?.ibase?.coment}"></ng-container>
+                    *ngTemplateOutlet="infoRowTemplate; context: {label: 'Комментарий', value: userInfo?.ibase?.coment, valueClass:'text-red-500'}"></ng-container>
         </div>
     </div>
 </ng-template>
@@ -289,7 +283,7 @@
         <div class="flex flex-column gap-2 p-3">
             <ng-container
                     *ngTemplateOutlet="infoRowTemplatedTemplate; context:{label:'Основной', template: mainTariffTemplate}"></ng-container>
-            <ng-container *ngIf="services.length>0 else emptyServicesTemplate">
+            <ng-container *ngIf="(services?.length ?? 0)>0 else emptyServicesTemplate">
                 <ng-container
                         *ngTemplateOutlet="infoRowTemplatedTemplate; context:{label:'Сервисы', template: serviceListTemplate}"></ng-container>
             </ng-container>
@@ -303,6 +297,15 @@
                     *ngTemplateOutlet="infoRowTemplate; context: {label: 'Списание через', value: userInfo?.newTarif?.edate | elapsedTime:'':'':false:true}"></ng-container>
             <ng-container
                     *ngTemplateOutlet="infoRowTemplate; context: {label: 'Изм. состояния', value: userInfo?.newTarif?.endstate | date: 'dd-MM-yyyy HH:mm' | titlecase, help: 'Момент времени, когда произойдет изменение состояния абонента. (Прим. закончится отл. платеж)'}"></ng-container>
+        </div>
+        <div class="flex gap-2 p-3 align-items-center border-bluegray-100 border-1 border-round-xl">
+            <span *ngIf="creditAmount" [style.letter-spacing]="'2px'" class="text-red-400 text-xl font-bold">
+                Кредит:{{creditAmount | currency: 'RUB'}}
+            </span>
+            <span [ngClass]="{'f-color-primary': moneyAmount>=0, 'f-color-danger': moneyAmount<0}"
+                  [style.letter-spacing]="'2px'" class="text-primary text-xl font-bold">
+                Баланс:{{moneyAmount | currency: 'RUB'}}
+            </span>
         </div>
     </div>
 </ng-template>
@@ -729,31 +732,35 @@
 
 <p-dialog [(visible)]="isPaymentDialogVisible" [dismissableMask]="true" [modal]="true"
           [resizable]="false" appendTo="body" contentStyleClass="flex flex-column gap-3 pt-2" header="Оплата">
-    <ng-template [formGroup]="paymentForm" pTemplate="content">
-        <div class="flex gap-3 align-items-center">
-            <p-selectButton [options]="paymentModeOptions" formControlName="paymentType"></p-selectButton>
-            <input [size]="10" formControlName="sum" pInputText pKeyFilter="pint" placeholder="Сумма"/>
-        </div>
-        <textarea [autoResize]="true" [cols]="30" [rows]="3" formControlName="comment" pInputTextarea
-                  placeholder="Комментарий"></textarea>
-        <p-button (onClick)="sendPayment()" [disabled]="!paymentForm.valid" class="mt-3 align-self-end"
-                  icon="mdi-attach_money" label="Оплатить"></p-button>
+    <ng-template pTemplate="content">
+        <ng-container [formGroup]="paymentForm">
+            <div class="flex gap-3 align-items-center">
+                <p-selectButton [options]="paymentModeOptions" formControlName="paymentType"></p-selectButton>
+                <input [size]="10" formControlName="sum" pInputText pKeyFilter="pint" placeholder="Сумма"/>
+            </div>
+            <textarea [autoResize]="true" [cols]="30" [rows]="3" formControlName="comment" pInputTextarea
+                      placeholder="Комментарий"></textarea>
+            <p-button (onClick)="sendPayment()" [disabled]="!paymentForm.valid" class="mt-3 align-self-end"
+                      icon="mdi-attach_money" label="Оплатить"></p-button>
+        </ng-container>
     </ng-template>
 </p-dialog>
 
 <p-dialog [(visible)]="isRecalculationDialogVisible" [dismissableMask]="true"
           [modal]="true"
           [resizable]="false" appendTo="body" contentStyleClass="flex flex-column gap-3 pt-2" header="Перерасчет">
-    <ng-template [formGroup]="recalculationForm" pTemplate="content">
-        <div class="flex gap-3 align-items-center">
-            <p-selectButton [options]="recalculationModeOptions" formControlName="mode"></p-selectButton>
-            <input [placeholder]="recalculationForm.value.mode === 'DAYS' ? 'Кол-во дней' : 'Кол-во рублей'" [size]="12" formControlName="count" pInputText
-                   pKeyFilter="int"/>
-        </div>
-        <textarea [autoResize]="true" [cols]="30" [rows]="3" formControlName="comment" pInputTextarea
-                  placeholder="Комментарий"></textarea>
-        <p-button (onClick)="sendRecalculation()" [disabled]="!recalculationForm.valid" class="mt-3 align-self-end"
-                  icon="mdi-restore" label="Применить"></p-button>
+    <ng-template pTemplate="content">
+        <ng-container [formGroup]="recalculationForm">
+            <div class="flex gap-3 align-items-center">
+                <p-selectButton [options]="recalculationModeOptions" formControlName="mode"></p-selectButton>
+                <input [placeholder]="recalculationForm.value.mode === 'DAYS' ? 'Кол-во дней' : 'Кол-во рублей'" [size]="12" formControlName="count" pInputText
+                       pKeyFilter="int"/>
+            </div>
+            <textarea [autoResize]="true" [cols]="30" [rows]="3" formControlName="comment" pInputTextarea
+                      placeholder="Комментарий"></textarea>
+            <p-button (onClick)="sendRecalculation()" [disabled]="!recalculationForm.valid" class="mt-3 align-self-end"
+                      icon="mdi-restore" label="Применить"></p-button>
+        </ng-container>
     </ng-template>
 </p-dialog>
 

@@ -1,6 +1,6 @@
 import {Injectable} from '@angular/core';
 import {ActivatedRouteSnapshot, CanActivate, Router, RouterStateSnapshot, UrlTree} from '@angular/router';
-import {first, map, Observable, tap} from 'rxjs';
+import {map, Observable} from 'rxjs';
 import {TasksCatalogPageCacheService} from "../services/tasks-catalog-page-cache.service";
 
 @Injectable({
@@ -8,6 +8,7 @@ import {TasksCatalogPageCacheService} from "../services/tasks-catalog-page-cache
 })
 export class CatalogRedirectGuard implements CanActivate {
 
+    isRedirecting = false;
     catalogCachedRoute$ = this.service.lastRoute$
         .pipe(
             map(route => ['/tasks', 'catalog', ...TasksCatalogPageCacheService.convertToPath(route, true)]),
@@ -23,13 +24,24 @@ export class CatalogRedirectGuard implements CanActivate {
             return this.catalogCachedRoute$
                 .pipe(
                     map(path => {
-                      if(path.join('/') === state.url) {
-                          return true;
-                      }
-                      return this.router.createUrlTree(path)
+                        if(state.url === '/tasks/catalog') {
+                            this.isRedirecting = true;
+                            return this.router.createUrlTree(path);
+                        }
+                        if (path.join('/') !== state.url || this.isRedirecting) {
+                            this.isRedirecting = false;
+                            return true;
+                        }
+                        this.isRedirecting = true;
+                        return this.router.createUrlTree(path)
                     })
                 )
         } else {
+            if(state.url === '/tasks/catalog') {
+                this.isRedirecting = true;
+                return this.router.createUrlTree(['/tasks', 'catalog', 'active']);
+            }
+            this.isRedirecting = false;
             return true;
         }
     }

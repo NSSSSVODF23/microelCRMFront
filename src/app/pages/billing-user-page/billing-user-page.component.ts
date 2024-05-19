@@ -19,7 +19,7 @@ import {
     filter,
     first,
     map,
-    merge, mergeMap, of, repeat,
+    merge, mergeMap, Observable, of, repeat,
     shareReplay,
     startWith,
     Subject,
@@ -55,11 +55,14 @@ export class BillingUserPageComponent implements OnInit, OnDestroy {
     currentLogin?: string;
     update$ = new Subject<string>();
     subscriptions = new SubscriptionsHolder();
+    passwordObserver$?: Observable<string>;
     userInfoHandler = {
         next: (userInfo: BillingTotalUserInfo) => {
             this.userInfo = undefined;
             setTimeout(() => {
                 this.userInfo = userInfo;
+                if(this.currentLogin)
+                    this.passwordObserver$ = this.api.getBillingUserPassword(this.currentLogin);
                 this.initControlMenuItems();
                 this.loadingTimestamp = new Date();
             })

@@ -101,6 +101,7 @@ import {PonForm} from "../pon/scheme/froms";
 import {PonData} from "../pon/scheme/elements";
 import {TemperatureRange, TemperatureSensor} from "../types/sensors-types";
 import {NotificationSettingsForm} from "../types/notification-types";
+import {DashboardItem} from "../types/task-dashboard";
 
 @Injectable({
     providedIn: 'root'
@@ -147,6 +148,14 @@ export class ApiService {
             }, 30000);
         }
         return observable;
+    }
+
+    private sendGetUncached<T>(uri: string, query?: any) {
+        return this.client.get<T>(uri, {params: query})
+            .pipe(shareReplay(1), catchError(async (err, caught) => {
+                this.toast.add({severity: 'error', summary: "Ошибка запроса", detail: err.error.message})
+                throw err;
+            }));
     }
 
     // Генерируем хэш запроса по URI и параметрам запроса
@@ -455,14 +464,14 @@ export class ApiService {
     }
 
     authCheckout(): Observable<TokenChain> {
-        return this.sendGet<TokenChain>("api/public/auth-checkout")
+        return this.sendGetUncached<TokenChain>("api/public/auth-checkout")
             .pipe(tap(chain => {
                 if (chain) localStorage.setItem('token', chain.token)
             }))
     }
 
     getMe(): Observable<Employee> {
-        return this.sendGet<Employee>("api/private/me");
+        return this.sendGetUncached<Employee>("api/private/me");
     }
 
     setAvatar(avatar: string) {
@@ -750,15 +759,16 @@ export class ApiService {
         return this.sendGet<{ [key: string]: number }>(`api/private/task/wireframe/${wireframeId}/by-stages/count`, {});
     }
 
-    // getCountTasks(status: string[], cls: number[] | null, type: string | null, directory:  number | null,
-    //               tags: number[] | null, schedulingType: SchedulingType | null, dateOfClose: DateRange | null,
-    //               actualFrom: DateRange | null, actualTo: DateRange | null, filters: any) {
-    //     return this.sendPost<number>("api/private/tasks/count", {...filters, status, template: cls,
-    //         stage: type, tags, directory, schedulingType, dateOfClose, actualFrom, actualTo});
-    // }
-
     getCountTasks(filters: TaskFiltrationConditions = {}) {
         return this.sendPost<number>("api/private/task/count", filters);
+    }
+
+    getCachedCountTasks(filters: TaskFiltrationConditions = {}) {
+        return this.sendPost<number>("api/private/task/count/cached", filters);
+    }
+
+    getTaskDashboard() {
+        return this.sendGet<DashboardItem[]>("api/private/task/dashboard", {});
     }
 
     getTagsListFromCatalog(filters: TaskFiltrationConditions = {}) {
@@ -966,6 +976,10 @@ export class ApiService {
 
     enableLogin(login: string) {
         return this.sendPatch(`api/private/billing/user/${encodeURIComponent(login)}/enable-login`, {});
+    }
+
+    getBillingUserPassword(login: string) {
+        return this.sendGetSilent<string>(`api/private/billing/user/${encodeURIComponent(login)}/password`);
     }
 
     changeUserAddress(login: string, address: string) {

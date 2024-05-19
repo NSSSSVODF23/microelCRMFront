@@ -36,7 +36,7 @@ import {
     TreeNodeUpdateEvent, TypesOfContracts,
     Wireframe,
     WireframeTaskCounter, OltWorker,
-    WorkLog, Ont
+    WorkLog, Ont, TaskFiltrationConditions
 } from "../types/transport-interfaces";
 import {cyrb53} from "../util";
 import {OldTracker, SimpleMessage} from "../types/parsing-interfaces";
@@ -457,6 +457,10 @@ export class RealTimeUpdateService {
             directory??null, tag??null, dateOfClose?.timeFrame??null, actualFrom?.timeFrame??null, actualTo?.timeFrame??null, scheduling??null])
 
         return this.watch<number>('task', 'counter', ...PATH);
+    }
+
+    updateCachedTaskCounter(){
+        return this.watch<{ count: number, conditions: TaskFiltrationConditions}>('task', 'cached', 'counter');
     }
 
     incomingTagTaskCountChange(login: string){

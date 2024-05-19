@@ -1,13 +1,211 @@
-<div appExtendPageHeight class="flex justify-content-center">
-    <div class="responsive-wrapper flex gap-3">
-<!--        <app-main-menu-panel></app-main-menu-panel>-->
-        <div class="grid h-fit w-full">
-            <ng-container *ngIf="wireframes$ | async as wireframes; else empty">
-                <app-dashboard-task-statistic-panel *ngFor="let wireframe of wireframes" [wireframe]="wireframe" class="col-4"></app-dashboard-task-statistic-panel>
-            </ng-container>
-        </div>
+<div class="flex flex-column flex-grow-1">
+    <div class="flex flex-wrap flex-grow-1 gap-4 justify-content-evenly p-4 relative">
+        <ng-container *ngFor="let dashboardItem of service.dashboardItems" [ngTemplateOutlet]="dashboardItemTemplate"
+                      [ngTemplateOutletContext]="{dashboardItem: dashboardItem}">
+        </ng-container>
+        <ng-container *ngIf="service.loading === LoadingState.LOADING">
+            <p-skeleton width="100%" height="100%" class="flex-1 h-30rem"></p-skeleton>
+            <p-skeleton width="100%" height="100%" class="flex-1 h-30rem"></p-skeleton>
+            <p-skeleton width="100%" height="100%" class="flex-1 h-30rem"></p-skeleton>
+        </ng-container>
+        <ng-container *ngIf="service.loading === LoadingState.ERROR">
+            <div class="flex flex-column align-items-center p-8
+             justify-content-center center-of-content text-5xl text-red-500">
+                <span class="mds-error"></span>
+                <span class="text-2xl font-bold">Произошла ошибка загрузки данных</span>
+            </div>
+        </ng-container>
+        <ng-container *ngIf="service.loading === LoadingState.EMPTY">
+            <div class="flex flex-column align-items-center p-8
+             justify-content-center center-of-content text-5xl text-bluegray-200">
+                <span class="mds-empty_dashboard"></span>
+                <span class="text-2xl font-bold">Нет активных шаблонов задач</span>
+            </div>
+        </ng-container>
     </div>
 </div>
+
+<ng-template #dashboardItemTemplate let-dashboardItem = "dashboardItem">
+    <ng-container *ngIf="toDashboardItem(dashboardItem) as item">
+        <div class="flex flex-column flex-1 border-1 border-bluegray-100 shadow-1 border-round h-fit">
+            <div class="text-xl text-bluegray-500 px-3 py-2 border-bottom-1 border-bluegray-100 font-semibold">
+                {{item.taskClassName}}
+            </div>
+            <div class="flex flex-column gap-3 p-3 border-bottom-1 border-bluegray-100">
+                <ng-container *ngFor="let status of item.activeTasks" [ngTemplateOutlet]="statusItemTemplate" [ngTemplateOutletContext]="{value: status}"></ng-container>
+                <div class="border-bottom-1 border-bluegray-100"></div>
+<!--                <ng-container *ngFor="let status of item.processedTasks" [ngTemplateOutlet]="statusItemTemplate" [ngTemplateOutletContext]="{value: status}"></ng-container>-->
+<!--                <ng-container *ngFor="let status of item.closedTasks" [ngTemplateOutlet]="statusItemTemplate" [ngTemplateOutletContext]="{value: status}"></ng-container>-->
+                <ng-container *ngFor="let status of item.scheduledTasks" [ngTemplateOutlet]="statusScheduledItemTemplate" [ngTemplateOutletContext]="{value: status}"></ng-container>
+<!--                <ng-container *ngFor="let status of item.deadlinesTasks" [ngTemplateOutlet]="statusItemTemplate" [ngTemplateOutletContext]="{value: status}"></ng-container>-->
+            </div>
+            <div class="flex-grow-1"></div>
+            <div class="flex flex-column">
+                <div class="flex align-items-center gap-1 p-3 text-bluegray-400 font-bold">
+                    <span class="mdi-verified"></span>
+                    <span>
+                        Закрытые задачи
+                    </span>
+                </div>
+                <div class="flex flex-column gap-2 px-4 pb-4 text-bluegray-500">
+                    <div class="flex gap-2">
+                        <span class="text-bluegray-300">Сегодня</span>
+                        <span>{{service.doneTasksToday(dashboardItem)}}</span>
+                    </div>
+                    <div class="flex gap-2">
+                        <span class="text-bluegray-300">Вчера</span>
+                        <span>{{service.doneTasksYesterday(dashboardItem)}}</span>
+                    </div>
+                    <div class="flex gap-2">
+                        <span class="text-bluegray-300">На этой неделе</span>
+                        <span>{{service.doneTasksThisWeek(dashboardItem)}}</span>
+                    </div>
+                    <div class="flex gap-2">
+                        <span class="text-bluegray-300">В этом месяце</span>
+                        <span>{{service.doneTasksThisMonth(dashboardItem)}}</span>
+                    </div>
+                    <div class="flex gap-2">
+                        <span class="text-bluegray-300">На прошлой неделе</span>
+                        <span>{{service.doneTasksLastWeek(dashboardItem)}}</span>
+                    </div>
+                    <div class="flex gap-2">
+                        <span class="text-bluegray-300">В прошлом месяце</span>
+                        <span>{{service.doneTasksLastMonth(dashboardItem)}}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </ng-container>
+</ng-template>
+
+<ng-template #statusItemTemplate let-value = "value">
+    <ng-container *ngIf="toStatusItem(value) as item">
+        <div class="flex">
+            <div class="text-sm text-bluegray-500 white-space-nowrap pr-2 border-right-1 border-bluegray-100">
+                <span (click)="service.followTheLink(item.updatePath)" class="hover:text-primary cursor-pointer">
+                    {{item.statusName}}
+                </span>
+                <span class="text-primary">
+                    {{item.count}}
+                </span>
+            </div>
+            <div class="flex flex-1 flex-column gap-3">
+                <ng-container *ngFor="let type of item.typesItems" [ngTemplateOutlet]="typeItemTemplate" [ngTemplateOutletContext]="{value: type}"></ng-container>
+            </div>
+        </div>
+    </ng-container>
+</ng-template>
+
+<ng-template #statusScheduledItemTemplate let-value = "value">
+    <ng-container *ngIf="toStatusItem(value) as item">
+        <div class="flex">
+            <div class="text-sm text-bluegray-500 white-space-nowrap pr-2">
+                <span (click)="service.followTheLink(item.updatePath)" class="hover:text-primary cursor-pointer">
+                    {{item.statusName}}
+                </span>
+                <span class="text-primary">
+                    {{item.count}}
+                </span>
+            </div>
+            <div class="flex flex-1 flex-column gap-3 tag-container">
+                <ng-container *ngFor="let type of item.typesItems">
+                    <ng-container *ngIf="type.count > 0" [ngTemplateOutlet]="typeScheduledItemTemplate"
+                                  [ngTemplateOutletContext]="{value: type}">
+                    </ng-container>
+                </ng-container>
+            </div>
+        </div>
+    </ng-container>
+</ng-template>
+
+<ng-template #typeItemTemplate let-value = "value">
+    <ng-container *ngIf="toTypeItem(value) as item">
+        <div class="flex">
+            <div class="text-sm text-bluegray-500 white-space-nowrap px-2">
+                <span (click)="service.followTheLink(item.updatePath)" class="hover:text-primary cursor-pointer">
+                    {{item.typeName}}
+                </span>
+                <span class="text-primary">
+                    {{item.count}}
+                </span>
+            </div>
+            <div class="flex flex-column tag-container">
+                <ng-container *ngFor="let directory of item.directoriesItems" [ngTemplateOutlet]="directoryItemTemplate" [ngTemplateOutletContext]="{value: directory}"></ng-container>
+            </div>
+        </div>
+    </ng-container>
+</ng-template>
+
+<ng-template #typeScheduledItemTemplate let-value = "value">
+    <ng-container *ngIf="toTypeItem(value) as item">
+        <div class="flex">
+            <div class="text-sm text-bluegray-500 white-space-nowrap px-2 border-right-1 border-bluegray-100">
+                <span (click)="service.followTheLink(item.updatePath)" class="hover:text-primary cursor-pointer">
+                    {{item.typeName}}
+                </span>
+                <span class="text-primary">
+                    {{item.count}}
+                </span>
+            </div>
+            <div class="flex flex-column">
+                <ng-container *ngFor="let timeFrame of item.timeFramesItems">
+                    <ng-container *ngIf="timeFrame.count > 0" [ngTemplateOutlet]="timeFrameItemTemplate"
+                                  [ngTemplateOutletContext]="{value: timeFrame}"></ng-container>
+                </ng-container>
+            </div>
+        </div>
+    </ng-container>
+</ng-template>
+
+<ng-template #timeFrameItemTemplate let-value = "value">
+    <ng-container *ngIf="toTimeFrameItem(value) as item">
+        <div class="flex">
+            <div class="text-sm text-bluegray-500 white-space-nowrap px-2">
+                <span (click)="service.followTheLink(item.updatePath)" class="hover:text-primary cursor-pointer">
+                    {{item.timeFrameName}}
+                </span>
+                <span class="text-primary">
+                    {{item.count | json}}
+                </span>
+            </div>
+            <div class="flex gap-2 flex-wrap tag-container pl-2">
+                <ng-container *ngFor="let tag of item.tagsItems">
+                    <ng-container *ngIf="tag.count > 0" [ngTemplateOutlet]="tagTemplate" [ngTemplateOutletContext]="{value: tag}"></ng-container>
+                </ng-container>
+            </div>
+        </div>
+    </ng-container>
+</ng-template>
+
+<ng-template #directoryItemTemplate let-value = "value">
+    <ng-container *ngIf="toDirectoryItem(value) as item">
+        <div class="flex">
+            <div class="text-sm text-bluegray-500 white-space-nowrap px-2">
+                <span (click)="service.followTheLink(item.updatePath)" class="hover:text-primary cursor-pointer">
+                    {{item.directoryName}}
+                </span>
+                <span class="text-primary">
+                    {{item.count}}
+                </span>
+            </div>
+            <div class="flex gap-2 flex-wrap tag-container pl-2">
+                <ng-container *ngFor="let tag of item.tagsItems">
+                    <ng-container *ngIf="tag.count > 0" [ngTemplateOutlet]="tagTemplate" [ngTemplateOutletContext]="{value: tag}"></ng-container>
+                </ng-container>
+            </div>
+        </div>
+    </ng-container>
+</ng-template>
+
+<ng-template #tagTemplate let-value = "value">
+    <ng-container *ngIf="toTagItem(value) as item">
+        <div class="flex gap-1 align-items-center border-round-3xl text-xs font-bold w-fit h-fit white-space-nowrap hover:text-primary cursor-pointer"
+             [style.color]="item.color" (click)="service.followTheLink(item.updatePath)">
+            <span>{{item.tagName}}</span>
+            <span>{{item.count}}</span>
+        </div>
+    </ng-container>
+</ng-template>
 
 <ng-template #empty>
     <div class="flex flex-column flex-grow-1 w-full align-items-center justify-content-center p-5 text-bluegray-400 text-4xl font-light">
