@@ -187,6 +187,33 @@ export class ApiService {
         return observable;
     }
 
+    private sendGetStringSilent(uri: string, query?: any): Observable<string> {
+        for (let q in query) {
+            if (query[q] === undefined || query[q] === null) {
+                delete query[q];
+            }
+        }
+        const requestHash = this.generateHash(uri, query);
+        let observable: Observable<string> | null = null;
+        if (!this.requestCacheMap[requestHash]) {
+            // console.log(uri, query);
+
+            observable = this.client.get(uri, {params: query, responseType: 'text'})
+                .pipe(shareReplay(1));
+            this.requestCacheMap[requestHash] = observable;
+            this.requestCacheMapTimers[requestHash] = setTimeout(() => {
+                delete this.requestCacheMap[requestHash];
+            }, 30000);
+        } else {
+            clearTimeout(this.requestCacheMapTimers[requestHash]);
+            observable = this.requestCacheMap[requestHash];
+            this.requestCacheMapTimers[requestHash] = setTimeout(() => {
+                delete this.requestCacheMap[requestHash];
+            }, 30000);
+        }
+        return observable;
+    }
+
     private sendPost<T>(uri: string, body: any) {
         return this.client.post<T>(uri, body)
             .pipe(catchError(async (err, caught) => {
@@ -979,7 +1006,7 @@ export class ApiService {
     }
 
     getBillingUserPassword(login: string) {
-        return this.sendGetSilent<string>(`api/private/billing/user/${encodeURIComponent(login)}/password`);
+        return this.sendGetStringSilent(`api/private/billing/user/${encodeURIComponent(login)}/password`);
     }
 
     changeUserAddress(login: string, address: string) {
