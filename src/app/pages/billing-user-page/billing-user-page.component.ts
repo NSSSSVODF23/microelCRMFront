@@ -3,23 +3,29 @@ import {ApiService} from "../../services/api.service";
 import {ActivatedRoute} from "@angular/router";
 import {
     BillingTotalUserInfo,
+    DateRange,
     DhcpBinding,
     DhcpLog,
     DhcpLogsRequest,
     LoadingState,
-    NCLHistoryWrapper, Ont,
-    UserEvents, UserTariff
+    NCLHistoryWrapper,
+    Ont,
+    Page,
+    TimeFrame,
+    UserEvents,
+    UserTariff
 } from "../../types/transport-interfaces";
 import {DynamicValueFactory, SubscriptionsHolder, Utils} from "../../util";
 import {CustomNavigationService} from "../../services/custom-navigation.service";
 import {
     BehaviorSubject,
     combineLatest,
-    debounceTime, delay,
+    debounceTime,
     filter,
-    first,
     map,
-    merge, mergeMap, Observable, of, repeat,
+    merge,
+    Observable,
+    of, ReplaySubject,
     shareReplay,
     startWith,
     Subject,
@@ -36,8 +42,8 @@ import {BlockUiService} from "../../services/block-ui.service";
 import {AccessFlag} from "../../types/access-flag";
 import {PersonalityService} from "../../services/personality.service";
 import {AutoUnsubscribe} from "../../decorators";
-import {co} from "@fullcalendar/core/internal-common";
 import {OntManagementService} from "../../services/pon/ont-management.service";
+import {LogItem} from "../../types/user-types";
 
 @Component({
     templateUrl: './billing-user-page.component.html',
@@ -53,16 +59,48 @@ export class BillingUserPageComponent implements OnInit, OnDestroy {
     loadingTimestamp = new Date();
 
     currentLogin?: string;
+    currentLogin$ = new ReplaySubject<string>(1);
     update$ = new Subject<string>();
     subscriptions = new SubscriptionsHolder();
     passwordObserver$?: Observable<string>;
+
+    logsFilterForm = new FormGroup({
+        page: new FormControl(0),
+        plen: new FormControl(20),
+        dateRange: new FormControl<DateRange>({timeFrame: TimeFrame.THIS_MONTH}),
+    });
+    resetLogsFilterPageSub = this.logsFilterForm.controls.dateRange.valueChanges
+        .subscribe(() => this.logsFilterForm.controls.page.setValue(0));
+    logsFilter$ = this.logsFilterForm.valueChanges.pipe(startWith({
+        page: 0,
+        plen: 20,
+        dateRange: {timeFrame: TimeFrame.THIS_MONTH}
+    }), shareReplay(1));
+    loadingLogs = true;
+    userLogs$: Observable<Page<LogItem>> = combineLatest([this.currentLogin$, this.logsFilter$])
+        .pipe(
+            debounceTime(100),
+            switchMap(([login, filter]) => {
+                this.loadingLogs = true;
+                return this.api.getUserLogs({
+                    login,
+                    page: filter.page ?? 0,
+                    plen: filter.plen ?? 20,
+                    dateRange: filter.dateRange ?? {timeFrame: TimeFrame.THIS_MONTH}
+                })
+            }),
+            tap(() => this.loadingLogs = false),
+            shareReplay(1)
+        );
+
     userInfoHandler = {
         next: (userInfo: BillingTotalUserInfo) => {
             this.userInfo = undefined;
             setTimeout(() => {
                 this.userInfo = userInfo;
-                if(this.currentLogin)
+                if(this.currentLogin) {
                     this.passwordObserver$ = this.api.getBillingUserPassword(this.currentLogin);
+                }
                 this.initControlMenuItems();
                 this.loadingTimestamp = new Date();
             })
@@ -171,6 +209,7 @@ export class BillingUserPageComponent implements OnInit, OnDestroy {
     controlMenuItems: MenuItem[] = [];
     pathChange$ = this.route.params.pipe(tap(params => {
         this.currentLogin = params['login']
+        this.currentLogin$.next(params['login'])
     }), map(params => params['login']));
 
     tasks$ = DynamicValueFactory.ofPage(
@@ -413,6 +452,13 @@ export class BillingUserPageComponent implements OnInit, OnDestroy {
                 return "в рублях";
         }
         return null;
+    }
+
+    toLogItem(value: any): LogItem { return value }
+
+    changeLogsPage(event: any){
+        const {first, rows} = event;
+        this.logsFilterForm.controls.page.setValue(first / rows);
     }
 
     initControlMenuItems() {

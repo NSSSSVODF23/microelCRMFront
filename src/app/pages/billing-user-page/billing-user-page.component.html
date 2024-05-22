@@ -645,6 +645,45 @@
                     </ng-template>
                 </p-table>
             </p-tabPanel>
+            <p-tabPanel header="Расширенные">
+                <ng-template pTemplate="content">
+                    <div class="flex flex-column gap-2" *ngIf="userLogs$ | async as logsPage else logsLoadTemplate">
+                        <app-data-range-input [formControl]="logsFilterForm.controls.dateRange"></app-data-range-input>
+                        <p-table [paginator]="true" [scrollable]="true" (onPage)="changeLogsPage($event)"
+                                 [first]="(logsFilterForm.controls.page.value ?? 0) * 20" [rows]="20" [lazy]="true"
+                                 [value]="logsPage.content" scrollHeight="30rem" [totalRecords]="logsPage.totalElements"
+                                 currentPageReportTemplate="Найдено {totalRecords} логов" [showCurrentPageReport]="true"
+                                 [loading]="loadingLogs"
+                                 styleClass="p-datatable-sm border-round-lg border-1 border-bluegray-100 overflow-hidden">
+                            <ng-template pTemplate="header">
+                                <tr>
+                                    <th>Дата/Время</th>
+                                    <th>Название</th>
+                                    <th>Описание</th>
+                                    <th>Сумма</th>
+                                    <th>Остаток</th>
+                                </tr>
+                            </ng-template>
+                            <ng-template pTemplate="emptymessage">
+                                <tr>
+                                    <td [attr.colspan]="5">
+                                        Логов не найдено
+                                    </td>
+                                </tr>
+                            </ng-template>
+                            <ng-template let-rowData pTemplate="body">
+                                <tr *ngIf="toLogItem(rowData) as log">
+                                    <td>{{log.timestamp | date:'dd-MM-yyyy HH:mm'}}</td>
+                                    <td>{{log.action}}</td>
+                                    <td>{{log.description}}</td>
+                                    <td>{{log.amount | currency:'RUB'}}</td>
+                                    <td>{{log.balance | currency:'RUB'}}</td>
+                                </tr>
+                            </ng-template>
+                        </p-table>
+                    </div>
+                </ng-template>
+            </p-tabPanel>
         </p-tabView>
     </ng-template>
 </p-dialog>
@@ -809,3 +848,10 @@
 </p-overlayPanel>
 
 <p-menu #controlMenu [model]="controlMenuItems" [popup]="true" appendTo="body"></p-menu>
+
+<ng-template #logsLoadTemplate>
+    <div class="flex flex-column gap-2">
+        <p-skeleton width="15rem" height="3rem"></p-skeleton>
+        <p-skeleton width="35rem" height="35rem"></p-skeleton>
+    </div>
+</ng-template>

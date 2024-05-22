@@ -102,6 +102,7 @@ import {PonData} from "../pon/scheme/elements";
 import {TemperatureRange, TemperatureSensor} from "../types/sensors-types";
 import {NotificationSettingsForm} from "../types/notification-types";
 import {DashboardItem} from "../types/task-dashboard";
+import {LogItem, LogsForm} from "../types/user-types";
 
 @Injectable({
     providedIn: 'root'
@@ -1007,6 +1008,10 @@ export class ApiService {
 
     getBillingUserPassword(login: string) {
         return this.sendGetStringSilent(`api/private/billing/user/${encodeURIComponent(login)}/password`);
+    }
+
+    getUserLogs(form: LogsForm) {
+        return this.sendPost<Page<LogItem>>('api/private/billing/user/logs', form);
     }
 
     changeUserAddress(login: string, address: string) {
