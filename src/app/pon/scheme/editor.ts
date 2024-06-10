@@ -79,7 +79,15 @@ export namespace PonEditor {
         }
 
         createElement(elementClass: any) {
-            this.appendElement(elementClass.create(0, 0, 12));
+            if (!elementClass) return;
+            switch (elementClass.name) {
+                case 'Box':
+                    this.appendElement(elementClass.create(0, 0, 12));
+                    break;
+                case 'Cable':
+                    this.appendElement(elementClass.create(0, 0, 1));
+                    break;
+            }
         }
 
         loadNode(elementClass: any, nodeData: PonData.PonNode) {
@@ -100,7 +108,7 @@ export namespace PonEditor {
                         this.loadNode(PonElements.ConnectionPoint, node);
                         break;
                     case PonNodeType.CABLE:
-                        // this.loadNode(PonElements.Cable, node);
+                        this.loadNode(PonElements.Cable, node);
                         break;
                     case PonNodeType.SIMPLEX:
                         this.loadNode(PonElements.Simplex, node);

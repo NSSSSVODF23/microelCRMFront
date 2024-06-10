@@ -1,4 +1,13 @@
+.blink_me {
+  color: var(--bluegray-300);
+  animation: blinker 1.5s ease-in-out infinite;
+}
 
+@keyframes blinker {
+  50% {
+    color: var(--orange-500);
+  }
+}
 
 .wrapper{
   overflow: hidden;

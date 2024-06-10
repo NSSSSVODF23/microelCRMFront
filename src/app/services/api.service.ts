@@ -88,7 +88,14 @@ import {
     WireframeDashboardStatistic,
     OltWorker,
     WorkingDay,
-    WorkLog, DateRange, AutoTariff, AutoTariffForm, EmployeeFiltrationForm, NotificationType, WorkCalculationForm
+    WorkLog,
+    DateRange,
+    AutoTariff,
+    AutoTariffForm,
+    EmployeeFiltrationForm,
+    NotificationType,
+    WorkCalculationForm,
+    UserTelegramConf
 } from "../types/transport-interfaces";
 import {MessageService, TreeNode} from "primeng/api";
 import {cyrb53, Storage, Utils} from "../util";
@@ -102,7 +109,7 @@ import {PonData} from "../pon/scheme/elements";
 import {TemperatureRange, TemperatureSensor} from "../types/sensors-types";
 import {NotificationSettingsForm} from "../types/notification-types";
 import {DashboardItem} from "../types/task-dashboard";
-import {LogItem, LogsForm} from "../types/user-types";
+import {LogItem, LogsForm, TelegramUserRequest, TelegramUserTariff} from "../types/user-types";
 
 @Injectable({
     providedIn: 'root'
@@ -1215,6 +1222,10 @@ export class ApiService {
         return this.sendGet<TelegramConf>('api/private/configuration/telegram');
     }
 
+    getUserTelegramConfiguration() {
+        return this.sendGet<UserTelegramConf>('api/private/configuration/user-telegram');
+    }
+
     getAcpConfiguration() {
         return this.sendGet<AcpConf>('api/private/acp/configuration');
     }
@@ -1225,6 +1236,10 @@ export class ApiService {
 
     setTelegramConfiguration(telegramConf: TelegramConf) {
         return this.sendPost('api/private/configuration/telegram', telegramConf);
+    }
+
+    setUserTelegramConfiguration(telegramConf: UserTelegramConf) {
+        return this.sendPost('api/private/configuration/user-telegram', telegramConf);
     }
 
     setAcpConfiguration(acpConf: AcpConf) {
@@ -1766,5 +1781,37 @@ export class ApiService {
 
     deleteTemperatureRange(id: number) {
         return this.sendDelete(`api/private/sensor/temperature/range/${id}`);
+    }
+
+    getTelegramUserTariffs() {
+        return this.sendGet<TelegramUserTariff[]>("api/private/user/telegram/tariffs");
+    }
+
+    createTelegramUserTariff(form: Partial<TelegramUserTariff>){
+        return this.sendPost<TelegramUserTariff>("api/private/user/telegram/tariff", form);
+    }
+
+    updateTelegramUserTariff(id: number, form: Partial<TelegramUserTariff>){
+        return this.sendPatch<TelegramUserTariff>(`api/private/user/telegram/tariff/${id}`, form);
+    }
+
+    deleteTelegramUserTariff(id: number){
+        return this.sendDelete(`api/private/user/telegram/tariff/${id}`);
+    }
+
+    getTelegramUserRequests(page: number, size: number, unprocessed: boolean, login: string)  {
+        return this.sendGetUncached<Page<TelegramUserRequest>>(`api/private/user/telegram/requests`, {page, size, unprocessed, login});
+    }
+
+    createTelegramUserChat(login: string)  {
+        return this.sendGetUncached<string[]>(`api/private/user/telegram/new-chat/${login}`);
+    }
+
+    sendRequestProcessingAccept(userRequestId: number | null | undefined, userMessage: string | null | undefined) {
+        return this.sendPatch(`api/private/user/telegram/request/${userRequestId}/processed`, {userMessage});
+    }
+
+    getUnprocessedTelegramUserRequestsCount()  {
+        return this.sendGetUncached<number>("api/private/user/telegram/request/unprocessed/count");
     }
 }

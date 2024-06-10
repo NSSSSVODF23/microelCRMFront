@@ -26,6 +26,7 @@ import {CustomNavigationService} from "../../../../../../services/custom-navigat
 import {ApiService} from "../../../../../../services/api.service";
 import {PonEditor} from "../../../../../../pon/scheme/editor";
 import ToolMode = PonEditor.ToolMode;
+import {PonsEditor} from "../../../../../../../../../../jspons/index";
 
 
 @Component({
@@ -63,7 +64,6 @@ export class PonSchemePage implements OnInit, OnDestroy, AfterViewInit {
             children: [
                 {
                     label: 'Коммутатор',
-                    data: PonElements.Box
                 },
                 {
                     label: 'Опт. терминал'
@@ -74,7 +74,8 @@ export class PonSchemePage implements OnInit, OnDestroy, AfterViewInit {
             label: 'Коммутация',
             children: [
                 {
-                    label: 'Опт. ящик'
+                    label: 'Опт. ящик',
+                    data: PonElements.Box
                 },
                 {
                     label: 'Опт. кросс'
@@ -86,7 +87,7 @@ export class PonSchemePage implements OnInit, OnDestroy, AfterViewInit {
         },
         {
             label: 'Кабель',
-            children: []
+            data: PonElements.Cable,
         }
     ];
     selectedObject?: TreeNode;
@@ -115,6 +116,7 @@ export class PonSchemePage implements OnInit, OnDestroy, AfterViewInit {
     }
 
     ngAfterViewInit(): void {
+        new PonsEditor().load().then();
         this.stage = new PonEditor.Stage("container", this.windowResize$)
         this.elemSub = this.id.pipe(switchMap(id => this.api.getPonSchemeElements(id))).subscribe(elements => {
             this.stage?.loadNodes(elements);

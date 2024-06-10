@@ -10,11 +10,11 @@
                 pButton></button>
     </div>
     <div class="flex flex-grow-1">
-        <div class="flex flex-column w-full">
+        <div class="flex flex-column" [ngClass]="(menuService.currentSubmenu$ | async) ? '': 'flex-grow-1'">
             <ng-container *ngFor="let item of menuService.menuModel">
                 <app-extended-menu-item *ngIf="menuService.hasAccess(item)" [caption]="item.caption"
                                         [exact]="item.exactMatch ?? false" [icon]="item.icon" [link]="item.link"
-                                        [onlyIcon]="!!(menuService.currentSubmenu$ | async)"></app-extended-menu-item>
+                                        [onlyIcon]="!!(menuService.currentSubmenu$ | async)" [counter]="item.counterObserver"></app-extended-menu-item>
             </ng-container>
             <div class="flex-grow-1"></div>
             <div (click)="openNotificationSidebar($event)" [ngClass]="this.notificationsService.statusColorClass$ | async"
@@ -24,10 +24,10 @@
                 <span *ngIf="!(menuService.currentSubmenu$ | async)">Уведомления</span>
             </div>
         </div>
-        <div *ngIf="menuService.currentSubmenu$ | async as currentSubmenu" class="flex flex-column">
+        <div *ngIf="menuService.currentSubmenu$ | async as currentSubmenu" class="flex flex-column flex-grow-1">
             <ng-container *ngFor="let item of currentSubmenu">
                 <app-extended-menu-item *ngIf="menuService.hasAccess(item)" [caption]="item.caption" [exact]="item.exactMatch ?? false"
-                                        [icon]="item.icon" [link]="item.link"></app-extended-menu-item>
+                                        [icon]="item.icon" [link]="item.link" [counter]="item.counterObserver"></app-extended-menu-item>
             </ng-container>
         </div>
     </div>

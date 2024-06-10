@@ -16,11 +16,11 @@ import {SalaryTablePageComponent} from "../../pages/salary-table-page/salary-tab
 import {PaidActionsPageComponent} from "../../pages/paid-actions-page/paid-actions-page.component";
 import {WorksPageComponent} from "../../pages/works-page/works-page.component";
 import {SalaryEstimationPageComponent} from "../../pages/salary-estimation-page/salary-estimation-page.component";
-import {BillingSearchUserPageComponent} from "../../pages/billing-search-user-page/billing-search-user-page.component";
-import {BillingUserPageComponent} from "../../pages/billing-user-page/billing-user-page.component";
+import {BillingSearchUserPageComponent} from "../../pages/billing/billing-search-user-page/billing-search-user-page.component";
+import {BillingUserPageComponent} from "../../pages/billing/billing-user-page/billing-user-page.component";
 import {AddressesListPageComponent} from "../../pages/addresses-list-page/addresses-list-page.component";
 import {BypassWorkCalculationComponent} from "../../pages/bypass-work-calculation/bypass-work-calculation.component";
-import {BillingSettingsPageComponent} from "../../pages/billing-settings-page/billing-settings-page.component";
+import {BillingSettingsPageComponent} from "../../pages/billing/billing-settings-page/billing-settings-page.component";
 import {TelegramSettingsPageComponent} from "../../pages/telegram-settings-page/telegram-settings-page.component";
 import {AcpSettingsPageComponent} from "../../pages/acp-settings-page/acp-settings-page.component";
 import {FilesPageComponent} from "../../pages/files-page/files-page.component";
@@ -78,6 +78,9 @@ import {
     PonSchemeListPage
 } from "../../pages/pon/children/scheme/children/pon-scheme-list-page/pon-scheme-list-page.component";
 import {TopologySensorsPage} from "../../pages/topology/children/topology-sensors-page/topology-sensors-page.component";
+import {BillingBootstrapPage} from "../../pages/billing/billing-bootstrap-page/billing-bootstrap-page.component";
+import {UserRequestsPage} from "../../pages/billing/user-requests-page/user-requests-page.component";
+import {UserSettingsPage} from "../../pages/billing/user-settings-page/user-settings-page.component";
 
 const routes: Routes = [{
     path: '', component: MainBootstrap, children: [
@@ -201,14 +204,33 @@ const routes: Routes = [{
             canActivate: [accessCanActivate(AccessFlag.COUNT_SALARY)]
         },
         {
-            path: 'clients/billing/search',
-            component: BillingSearchUserPageComponent,
-            canActivate: [accessCanActivate(AccessFlag.BILLING)]
+            path:"clients", pathMatch: 'full', redirectTo: 'clients/billing/search',
         },
         {
-            path: 'clients/billing/user/:login',
-            component: BillingUserPageComponent,
-            canActivate: [accessCanActivate(AccessFlag.BILLING)]
+            path:'clients',
+            component: BillingBootstrapPage,
+            children: [
+                {
+                    path: 'billing/search',
+                    component: BillingSearchUserPageComponent,
+                    canActivate: [accessCanActivate(AccessFlag.BILLING)]
+                },
+                {
+                    path: 'requests',
+                    component: UserRequestsPage,
+                    canActivate: [accessCanActivate(AccessFlag.BILLING)]
+                },
+                {
+                    path: 'settings',
+                    component: UserSettingsPage,
+                    canActivate: [accessCanActivate(AccessFlag.BILLING)]
+                },
+                {
+                    path: 'billing/user/:login',
+                    component: BillingUserPageComponent,
+                    canActivate: [accessCanActivate(AccessFlag.BILLING)]
+                }
+            ]
         },
         {path: 'addresses', pathMatch: 'full', redirectTo: 'addresses/list'},
         {

@@ -36,7 +36,7 @@ import {
     TreeNodeUpdateEvent, TypesOfContracts,
     Wireframe,
     WireframeTaskCounter, OltWorker,
-    WorkLog, Ont, TaskFiltrationConditions
+    WorkLog, Ont, TaskFiltrationConditions, UserTelegramConf, UpdateCarrier
 } from "../types/transport-interfaces";
 import {cyrb53} from "../util";
 import {OldTracker, SimpleMessage} from "../types/parsing-interfaces";
@@ -45,6 +45,7 @@ import {RxStompState} from "@stomp/rx-stomp";
 import {BlockIcon, BlockMessage, BlockUiService, BlockZIndex} from "./block-ui.service";
 import {PonData} from "../pon/scheme/elements";
 import {SensorUpdateEvent} from "../types/sensors-types";
+import {TelegramUserRequest, TelegramUserTariff} from "../types/user-types";
 
 @Injectable({
     providedIn: 'root'
@@ -381,6 +382,10 @@ export class RealTimeUpdateService {
         return this.watch<TelegramConf>('telegram-config', 'change')
     }
 
+    userTelegramConfigChanged() {
+        return this.watch<UserTelegramConf>('user-telegram-config', 'change')
+    }
+
     acpConfigChanged() {
         return this.watch<AcpConf>('acp-config', 'change')
     }
@@ -533,5 +538,13 @@ export class RealTimeUpdateService {
 
     receiveSensorUpdateEvent() {
         return this.watch<SensorUpdateEvent>('sensor', 'event');
+    }
+
+    receiveTlgUserTariff() {
+        return this.watch<UpdateCarrier<TelegramUserTariff>>('telegram-user-tariff');
+    }
+
+    receiveTlgUserRequest() {
+        return this.watch<UpdateCarrier<TelegramUserRequest>>('telegram-user-request');
     }
 }

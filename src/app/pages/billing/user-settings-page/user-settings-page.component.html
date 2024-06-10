@@ -1,0 +1,113 @@
+<div class="flex flex-column flex-grow-1">
+    <div class="flex p-4 justify-content-between align-items-center">
+        <span class="text-bluegray-500 text-2xl font-semibold">Настройки</span>
+    </div>
+    <div class="flex flex-column gap-1 border-top-1 border-bluegray-100">
+        <p-tabView styleClass="tab-content-unpadding">
+            <p-tabPanel header="Тарифы">
+                <ng-template pTemplate="content">
+                    <div class="flex flex-column">
+                        <div class="flex gap-3 p-3">
+                            <p-button (click)="showTariffDialog()" icon="mdi-add" label="Добавить тариф"
+                                      styleClass="p-button-success"></p-button>
+                        </div>
+                        <p-table (onLazyLoad)="lazyLoadUserTariffs($event)" [lazy]="true" [loading]="loadingUserTariffs"
+                                 [value]="userTariffs">
+                            <ng-template pTemplate="header">
+                                <tr>
+                                    <th>Тип</th>
+                                    <th>Название тарифа</th>
+                                    <th>Название в биллинге</th>
+                                    <th>Цена</th>
+                                    <th>Создан</th>
+                                    <th>Отредактирован</th>
+                                    <th></th>
+                                </tr>
+                            </ng-template>
+                            <ng-template let-row pTemplate="body">
+                                <tr *ngIf="toTariff(row) as tariff">
+                                    <td>
+                                        <p-tag [severity]="tariff.isService ? 'danger' : 'success'"
+                                               [value]="tariff.isService ? 'Сервис' : 'Тариф'"></p-tag>
+                                    </td>
+                                    <td>
+                                        {{ tariff.name }}
+                                    </td>
+                                    <td>
+                                        {{ tariff.baseName }}
+                                    </td>
+                                    <td>
+                                        {{ tariff.priceLabel }}
+                                    </td>
+                                    <td>
+                                        {{ tariff.createdBy.employee.fullName }} -
+                                        {{ tariff.createdBy.timestamp | date:'dd-MM-yyyy HH:mm' }}
+                                    </td>
+                                    <td>
+                                        <ng-container *ngIf="tariff.editedBy">
+                                            {{ tariff.editedBy.employee.fullName }} -
+                                            {{ tariff.editedBy.timestamp | date:'dd-MM-yyyy HH:mm' }}
+                                        </ng-container>
+                                    </td>
+                                    <td>
+                                        <p-button (click)="showEditTariffDialog(tariff)" [loading]="loadingUserTariffs"
+                                                  icon="mdi-edit"
+                                                  styleClass="p-button-warning p-button-icon p-button-text"></p-button>
+                                        <p-button (click)="deleteTariff(tariff)" [loading]="loadingUserTariffs"
+                                                  icon="mdi-delete"
+                                                  styleClass="p-button-danger p-button-icon p-button-text"></p-button>
+                                    </td>
+                                </tr>
+                            </ng-template>
+                        </p-table>
+                    </div>
+                </ng-template>
+            </p-tabPanel>
+        </p-tabView>
+    </div>
+</div>
+
+<p-dialog (onHide)="resetUserTariffForm(false)" [(visible)]="userTariffDialogVisible" [dismissableMask]="true"
+          [draggable]="true"
+          [header]="editableTariff?'Редактирование тарифа':'Добавление тарифа'" [modal]="true">
+    <ng-template pTemplate="content">
+        <form [formGroup]="userTariffForm" class="flex flex-column gap-3 mt-2">
+            <p-selectButton (onChange)="resetUserTariffForm($event.value)" [disabled]="!!editableTariff"
+                            [options]="[{label: 'Тариф', value: false}, {label: 'Сервис', value: true}]"
+                            formControlName="isService"></p-selectButton>
+            <ng-container *ngIf="!editableTariff">
+                <ng-container *ngIf="!userTariffForm.value.isService">
+                    <app-label *ngIf="billingTariffs$ | async as billingTariffs;" label="Тариф">
+                        <p-dropdown (onChange)="handleChangeTariff($event.value)" [filter]="true" [options]="billingTariffs"
+                                    appendTo="body"
+                                    dataKey="id"
+                                    filterBy="name" optionLabel="name"
+                                    placeholder="Выберите тариф"></p-dropdown>
+                    </app-label>
+                </ng-container>
+                <ng-container *ngIf="userTariffForm.value.isService">
+                    <app-label *ngIf="billingServices$ | async as billingServices" label="Сервис">
+                        <p-dropdown (onChange)="handleChangeTariff($event.value)" [filter]="true"
+                                    [options]="billingServices" appendTo="body"
+                                    dataKey="id"
+                                    filterBy="name" optionLabel="name"
+                                    placeholder="Выберите сервис"></p-dropdown>
+                    </app-label>
+                </ng-container>
+            </ng-container>
+            <app-label label="Название тарифа">
+                <input formControlName="name" pInputText/>
+            </app-label>
+            <app-label label="Цена тарифа">
+                <p-inputNumber [min]="0" formControlName="price"></p-inputNumber>
+            </app-label>
+            <app-label label="Перидод оплаты (мес.)">
+                <p-inputNumber [min]="0" formControlName="paymentPeriod"></p-inputNumber>
+            </app-label>
+            <p-button (onClick)="addTariff()" *ngIf="!editableTariff" [disabled]="userTariffForm.invalid" [loading]="loadingUserTariffs"
+                      icon="mdi-add" label="Создать"></p-button>
+            <p-button (onClick)="editTariff()"  *ngIf="editableTariff" [disabled]="userTariffForm.invalid"  [loading]="loadingUserTariffs"
+                      icon="mdi-edit" label="Редактировать"></p-button>
+        </form>
+    </ng-template>
+</p-dialog>

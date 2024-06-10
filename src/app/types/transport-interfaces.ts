@@ -28,14 +28,14 @@ export interface TaskStage {
     directories: TaskTypeDirectory[];
 }
 
-export interface TaskTypeDirectory{
+export interface TaskTypeDirectory {
     taskTypeDirectoryId: number;
     name: string;
     description: string;
     orderIndex?: number;
 }
 
-export type TagListItem = {id: number, name: string, count: number}
+export type TagListItem = { id: number, name: string, count: number }
 
 export interface OldTrackerBind {
     oldTrackerBindId: number;
@@ -108,7 +108,7 @@ export interface TaskStageOT {
     type: TaskStageOTTypes;
 }
 
-export enum TaskStageOTTypes{
+export enum TaskStageOTTypes {
     ARCHIVE = 0,
     ACTIVE = 1,
 }
@@ -119,7 +119,7 @@ export interface TaskFieldOT {
     type: TaskFieldOTTypes;
 }
 
-export enum TaskFieldOTTypes{
+export enum TaskFieldOTTypes {
     TEXT = 0,
     STREET = 1,
     DEFAULT = 2,
@@ -147,14 +147,14 @@ export interface Wireframe {
     documentTemplates?: any[];
 }
 
-export interface WireframeDashboardStatistic{
+export interface WireframeDashboardStatistic {
     taskCount: DataPair[];
     taskCountByStage: DataPair[];
     worksDone: DataPair[];
     taskCountByTags: DataPair[];
 }
 
-export interface DataPair{
+export interface DataPair {
     label: string;
     value: any;
     color?: string;
@@ -225,7 +225,7 @@ export interface Credentials {
     password: string;
 }
 
-export interface OldTrackerCredentials extends Credentials{
+export interface OldTrackerCredentials extends Credentials {
     installerId: string;
 }
 
@@ -343,7 +343,7 @@ export interface TaskFiltrationConditions {
     id?: string | null;
 }
 
-export interface TaskFieldFilter{
+export interface TaskFieldFilter {
     type: FilteringType;
     textValue?: string;
     addressValue?: Address;
@@ -352,7 +352,7 @@ export interface TaskFieldFilter{
     connectionServiceValue?: number;
 }
 
-export enum FilteringType{
+export enum FilteringType {
     TEXT = "TEXT",
     LOGIN = "LOGIN",
     ADDRESS = "ADDRESS",
@@ -378,7 +378,7 @@ export enum AdvertisingSource {
     EARLYUSED = "EARLYUSED"
 }
 
-export enum ConnectionType{
+export enum ConnectionType {
     NEW = "NEW",
     RESUMPTION = "RESUMPTION",
     TRANSFER = "TRANSFER"
@@ -559,7 +559,14 @@ export interface Page<T> {
     last: boolean;
     number: number;
     numberOfElements: number;
-    pageable: { offset: number, sort: { empty: boolean, sorted: boolean, unsorted: boolean }, pageSize: number, pageNumber: number, paged: boolean, unpaged: boolean }
+    pageable: {
+        offset: number,
+        sort: { empty: boolean, sorted: boolean, unsorted: boolean },
+        pageSize: number,
+        pageNumber: number,
+        paged: boolean,
+        unpaged: boolean
+    }
     size: number;
     sort: { empty: boolean, sorted: boolean, unsorted: boolean }
     totalElements: number;
@@ -658,7 +665,7 @@ export interface DateRange {
     end?: Date | null;
 }
 
-export enum SchedulingType{
+export enum SchedulingType {
     ALL = "ALL",
     SCHEDULED = "SCHEDULED",
     UNSCHEDULED = "UNSCHEDULED",
@@ -667,7 +674,7 @@ export enum SchedulingType{
     EXCEPT_PLANNED = "EXCEPT_PLANNED",
 }
 
-export interface UserTariff{
+export interface UserTariff {
     id: number;
     name: string;
     cost: number;
@@ -1254,6 +1261,11 @@ export interface TelegramConf {
     dhcpNotificationChatId: string;
 }
 
+export interface UserTelegramConf {
+    botToken: string;
+    botName: string;
+}
+
 export interface AcpConf {
     acpFlexConnectorEndpoint: string;
 }
@@ -1316,7 +1328,7 @@ export interface DhcpBinding {
     lastConnectionLocation?: NetworkConnectionLocation;
 }
 
-export interface AcpUserBriefLogin{
+export interface AcpUserBriefLogin {
     login: string;
     uname: string;
     ipaddr: string;
@@ -1325,7 +1337,7 @@ export interface AcpUserBriefLogin{
     state: number;
 }
 
-export interface AcpUserBriefAccount{
+export interface AcpUserBriefAccount {
     uname: string;
     utype: string;
     ndog: string;
@@ -1336,7 +1348,7 @@ export interface AcpUserBriefAccount{
     phone: string;
 }
 
-export interface AcpUserBriefBalance{
+export interface AcpUserBriefBalance {
     bmoney: string;
     bcredit: string;
     btraf: string;
@@ -1344,7 +1356,7 @@ export interface AcpUserBriefBalance{
     deferredPay: boolean;
 }
 
-export interface AcpUserBriefTariff{
+export interface AcpUserBriefTariff {
     serviceN: number;
     service: string;
     uname: string;
@@ -1411,7 +1423,7 @@ export interface NetworkConnectionLocation {
     lastPortCheck?: Date;
 }
 
-export interface NCLHistoryWrapper{
+export interface NCLHistoryWrapper {
     from: string;
     to: string;
     nclItems: {
@@ -1702,7 +1714,7 @@ export interface Switchport {
     description: string;
 }
 
-export interface CommutatorListItem{
+export interface CommutatorListItem {
     id: number;
     ip: string;
     name: string;
@@ -1745,13 +1757,13 @@ export enum TaskJournalSortingTypes {
     CREATE_DATE_DESC = "CREATE_DATE_DESC"
 }
 
-export interface WireframeTaskCounter{
+export interface WireframeTaskCounter {
     id: number;
     num: number;
-    stages: {id:string, num: number}[]
+    stages: { id: string, num: number }[]
 }
 
-export interface FileSystemItem{
+export interface FileSystemItem {
     discriminator: string | null;
     fileSystemItemId: number;
     name: string;
@@ -1761,11 +1773,11 @@ export interface FileSystemItem{
     parent: Directory | null;
 }
 
-export interface Directory extends FileSystemItem{
+export interface Directory extends FileSystemItem {
     fileCount: number;
 }
 
-export interface TFile extends FileSystemItem{
+export interface TFile extends FileSystemItem {
     mimeType: string | null;
     sizeMbyte: number;
     type: AttachmentType;
@@ -1784,12 +1796,12 @@ export interface FilesLoadFileEvent {
     targetDirectoryId?: number | null;
 }
 
-export interface LoadingDirectoryWrapper{
+export interface LoadingDirectoryWrapper {
     path: Directory[];
     files: FileSystemItem[];
 }
 
-export interface PhyPhoneInfo{
+export interface PhyPhoneInfo {
     phyPhoneInfoId: number;
     ip: string;
     login: string;
@@ -1797,7 +1809,7 @@ export interface PhyPhoneInfo{
     model: PhyPhoneModel;
 }
 
-export interface PhyPhoneInfoForm{
+export interface PhyPhoneInfoForm {
     employeeLogin?: string | null;
     ip?: string | null;
     login?: string | null;
@@ -1805,12 +1817,12 @@ export interface PhyPhoneInfoForm{
     model?: PhyPhoneModel | null;
 }
 
-export enum PhyPhoneModel{
+export enum PhyPhoneModel {
     NEW = "NEW",
     OLD = "OLD"
 }
 
-export interface CreateUserForm{
+export interface CreateUserForm {
     address: Address;
     fullName: string;
     phone: string;
@@ -1822,13 +1834,13 @@ export enum UserType {
     ORG = "орг."
 }
 
-export interface EmployeeWorkLogs{
+export interface EmployeeWorkLogs {
     employees: Employee[];
     active: WorkLog | null;
     unactive: WorkLog[];
 }
 
-export interface TypesOfContracts{
+export interface TypesOfContracts {
     typeOfContractId: number;
     name: string;
     description?: string;
@@ -1840,19 +1852,19 @@ export interface TypesOfContracts{
     isDeleted: boolean;
 }
 
-export interface TypesOfContractsForm{
+export interface TypesOfContractsForm {
     name: string;
     description?: string;
     receivers: string[];
     archivers: string[];
 }
 
-export interface TypesOfContractsSuggestion{
+export interface TypesOfContractsSuggestion {
     label: string;
     value: number;
 }
 
-export interface Contract{
+export interface Contract {
     contractId: number;
     typeOfContract: TypesOfContracts;
     count: number;
@@ -1860,14 +1872,14 @@ export interface Contract{
     archived?: EmployeeIntervention;
 }
 
-export namespace Statistics{
+export namespace Statistics {
 
-    export interface EmployeeWorkStatisticsForm{
+    export interface EmployeeWorkStatisticsForm {
         period: DateRange;
         employees: string[];
     }
 
-    export interface EmployeeWorkStatisticsTable{
+    export interface EmployeeWorkStatisticsTable {
         rows: FlatEmployeeRow[];
         taskCountChart: any;
         timingsChart: any;
@@ -1879,12 +1891,12 @@ export namespace Statistics{
     //     rows: TaskClass[];
     // }
 
-    export interface TaskClass{
+    export interface TaskClass {
         name: string;
         rows: TaskType[];
     }
 
-    export interface TaskType{
+    export interface TaskType {
         name: string;
         count: number;
         quantityPerShift: number;
@@ -1892,13 +1904,13 @@ export namespace Statistics{
         money: Money;
     }
 
-    export interface Timings{
+    export interface Timings {
         givenAndReceived: number;
         givenAndClosed: number;
         receivedAndClosed: number;
     }
 
-    export interface Money{
+    export interface Money {
         quantityPerShift: number;
         quantityPerHour: number;
     }
@@ -1962,7 +1974,7 @@ export interface DynamicTableCell {
     value: string;
 }
 
-export enum DynamicTableCellType{
+export enum DynamicTableCellType {
     STRING = "STRING",
     DATE = "DATE",
     LOGIN = "LOGIN",
@@ -2054,4 +2066,9 @@ export enum EventType {
     UPDATE = "UPDATE",
     EDIT = "EDIT",
     DELETE = "DELETE"
+}
+
+export interface UpdateCarrier<T> {
+    type: EventType;
+    data: T;
 }

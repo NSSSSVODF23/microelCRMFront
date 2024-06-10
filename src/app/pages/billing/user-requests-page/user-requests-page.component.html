@@ -1,0 +1,72 @@
+<div class="flex flex-column flex-grow-1">
+    <div class="flex p-4 gap-3 justify-content-between align-items-center">
+        <span class="text-bluegray-500 text-2xl font-semibold">Запросы абонентов</span>
+        <div class="flex-grow-1"></div>
+        <input pInputText placeholder="Поиск по логину" [formControl]="service.requestsForm.controls.login"/>
+        <p-toggleButton onLabel="Обработанные" offLabel="Не обработанные" [formControl]="service.requestsForm.controls.unprocessed"></p-toggleButton>
+    </div>
+    <div class="flex flex-column gap-1 border-top-1 border-bluegray-100">
+        <ng-container *ngIf="service.requestsPage$ | async as requestsPage">
+            <p-table (onLazyLoad)="onRequestLazyLoad($event)" [first]="requestsPage.pageNumber * (service.requestsForm.value.size ?? 10)" [lazyLoadOnInit]="service.isFirst"
+                     [lazy]="true" [loading]="requestsPage.loadingState === 'LOADING'"
+                     [paginator]="true"
+                     [rowsPerPageOptions]="[10,25,50]" [rows]="10"
+                     [totalRecords]="requestsPage.totalElements" [value]="requestsPage.value">
+                <ng-template pTemplate="header">
+                    <tr>
+                        <th>Статус</th>
+                        <th>Целевой логин</th>
+                        <th>Тема</th>
+                        <th>Описание</th>
+                        <th>Дата запроса</th>
+                        <th>Обработан</th>
+                        <th></th>
+                    </tr>
+                </ng-template>
+                <ng-template let-row pTemplate="body">
+                    <tr *ngIf="toRequest(row) as request">
+                        <td>
+                            <p-tag [severity]="request.processedBy ? 'success' : 'danger'"
+                                   [value]="request.processedBy ? 'Обработан'  :   'Не обработан'"></p-tag>
+                        </td>
+                        <td>
+                            <app-billing-login [loginData]="request.userLogin" [popup]="true"></app-billing-login>
+                        </td>
+                        <td>{{ request.subject }}</td>
+                        <td>{{ request.description }}</td>
+                        <td>{{ request.created | date:'dd-MM-yyyy HH:mm' }}</td>
+                        <td>
+                            <span *ngIf="request.processedBy" [pTooltip]="request.processedBy.description ?? ''" tooltipPosition="bottom">
+                                {{ request.processedBy.timestamp | date:'dd-MM-yyyy HH:mm' }} ({{request.processedBy.employee?.fullName}})
+                            </span>
+                        </td>
+                        <td>
+                            <div class="flex gap-2" *ngIf="!request.processedBy">
+                                <p-button (onClick)="service.createTlgChat(request.userLogin)" icon="mdi-chat"
+                                          pTooltip="Чат с абонентом"
+                                          styleClass="p-button-sm p-button-text p-button-secondary"></p-button>
+                                <p-button (onClick)="service.onRequestProcessed($event, request, acceptRequestPanel)" icon="mdi-check"
+                                          label="Запрос обработан"
+                                          styleClass="p-button-sm p-button-text"></p-button>
+                            </div>
+                        </td>
+                    </tr>
+                </ng-template>
+            </p-table>
+        </ng-container>
+    </div>
+</div>
+
+<p-overlayPanel #acceptRequestPanel>
+    <ng-template pTemplate="content" >
+        <ng-container [formGroup]="service.processingForm">
+            <app-label label="Сообщение абоненту">
+                <textarea pInputTextarea [rows]="7" [cols]="50" [autoResize]="true" formControlName="userMessage"></textarea>
+            </app-label>
+            <div class="flex gap-2 justify-content-end mt-2">
+                <p-button icon="mdi-check" label="Подтвердить" (onClick)="service.sendRequestProcessingAccept($event, acceptRequestPanel)"
+                          [disabled]="service.processingForm.invalid" [loading]="service.acceptRequestLoading"></p-button>
+            </div>
+        </ng-container>
+    </ng-template>
+</p-overlayPanel>

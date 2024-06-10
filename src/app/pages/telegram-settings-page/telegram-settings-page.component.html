@@ -3,30 +3,57 @@
         <div class="flex p-4 justify-content-between align-items-center border-bottom-1 border-bluegray-100">
             <span class="text-bluegray-500 text-2xl font-semibold">Конфигурация интеграции с Telegram</span>
         </div>
-        <div [formGroup]="telegramConfigForm" class="flex gap-3 px-5 align-items-end">
-            <div class="input-label-wrapper">
-                <label>Токен бота</label>
-                <input formControlName="botToken" pInputText type="text" [size]="50"/>
+        <div class="flex flex-column gap-3">
+            <span class="text-xl text-bluegray-400 ml-4">
+                Настройки для бота Telegram сотрудников
+            </span>
+            <div [formGroup]="telegramConfigForm" class="flex gap-3 px-5 align-items-end">
+                <div class="input-label-wrapper">
+                    <label>Токен бота</label>
+                    <input formControlName="botToken" pInputText type="text" [size]="50"/>
+                </div>
+                <div class="input-label-wrapper">
+                    <label>Имя бота</label>
+                    <input formControlName="botName" pInputText type="text"/>
+                </div>
+                <div class="input-label-wrapper">
+                    <label>Id чата DHCP уведомлений</label>
+                    <input formControlName="dhcpNotificationChatId" pInputText type="text"/>
+                </div>
+                <div class="input-label-wrapper">
+                    <label>Id чата PON Alert</label>
+                    <input formControlName="ponAlertChatId" pInputText type="text"/>
+                </div>
+                <div class="input-label-wrapper">
+                    <label>Id чата Sensors Alert</label>
+                    <input formControlName="sensorsAlertChatId" pInputText type="text"/>
+                </div>
+                <p-button (onClick)="saveConf()" [loading]="isSaving" [disabled]="telegramConfigForm.invalid" icon="mdi-save" label="Сохранить"
+                          styleClass="p-button-success"></p-button>
             </div>
-            <div class="input-label-wrapper">
-                <label>Имя бота</label>
-                <input formControlName="botName" pInputText type="text"/>
-            </div>
-            <div class="input-label-wrapper">
-                <label>Id чата DHCP уведомлений</label>
-                <input formControlName="dhcpNotificationChatId" pInputText type="text"/>
-            </div>
-            <div class="input-label-wrapper">
-                <label>Id чата PON Alert</label>
-                <input formControlName="ponAlertChatId" pInputText type="text"/>
-            </div>
-            <div class="input-label-wrapper">
-                <label>Id чата Sensors Alert</label>
-                <input formControlName="sensorsAlertChatId" pInputText type="text"/>
-            </div>
-            <p-button (onClick)="saveConf()" [loading]="isSaving" [disabled]="!telegramConfigForm.valid" icon="mdi-save" label="Сохранить"
-                      styleClass="p-button-success"></p-button>
         </div>
+        <div class="flex flex-column gap-3">
+            <span class="text-xl text-bluegray-400 ml-4">
+                Настройки для бота Telegram абонентов
+            </span>
+            <div [formGroup]="userTelegramConfigForm" class="flex gap-3 px-5 align-items-end">
+                <div class="input-label-wrapper">
+                    <label>Токен бота</label>
+                    <input formControlName="botToken" pInputText type="text" [size]="50"/>
+                </div>
+                <div class="input-label-wrapper">
+                    <label>Имя бота</label>
+                    <input formControlName="botName" pInputText type="text"/>
+                </div>
+                <div class="input-label-wrapper">
+                    <label>IP:PORT MicroelHub</label>
+                    <input formControlName="microelHubIpPort" pInputText type="text"/>
+                </div>
+                <p-button (onClick)="saveUserConf()" [loading]="isSaving" [disabled]="userTelegramConfigForm.invalid" icon="mdi-save" label="Сохранить"
+                          styleClass="p-button-success"></p-button>
+            </div>
+        </div>
+
     </ng-container>
     <ng-container *ngIf="isLoading">
         <span class="text-xl font-light text-bluegray-600 p-3">Конфигурация интеграции с Telegram</span>

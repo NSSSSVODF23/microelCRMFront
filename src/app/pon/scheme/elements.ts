@@ -569,6 +569,340 @@ export namespace PonElements {
         }
     }
 
+    export class Cable extends AbstractElement {
+
+        private data: Partial<PonData.Cable> = {};
+        private node  = new Konva.Group({
+            draggable: false,
+        });
+
+        private nodeIn = new Konva.Group({
+            draggable: false,
+        });
+        private nodeOut = new Konva.Group({
+            draggable: false,
+            x: 100,
+            y: 0,
+        });
+
+        private bgIn = new Konva.Rect({
+            x: 0,
+            y: 0,
+            width: 24,
+            height: 100,
+            fill: 'white',
+            cornerRadius: 5,
+            strokeEnabled: true,
+            stroke: 'gray',
+            strokeWidth: 2,
+            dash: [5, 5],
+        });
+
+        private inputConnectionPoints: ConnectionPoint[] = [];
+
+        private bgOut = new Konva.Rect({
+            x: 0,
+            y: 0,
+            width: 24,
+            height: 100,
+            fill: 'white',
+            cornerRadius: 5,
+            strokeEnabled: true,
+            stroke: 'gray',
+            strokeWidth: 2,
+            dash: [5, 5],
+        });
+
+        private outputConnectionPoints: ConnectionPoint[] = [];
+
+        constructor(data?: Partial<PonData.Cable>) {
+            super();
+            this.data = data ?? {};
+            const numFibers = (data?.fibers?.length ?? 4);
+            for (let i = 0; i < numFibers; i++) {
+                this.inputConnectionPoints.push(ConnectionPoint.create({
+                    x: 12,
+                    y: (12 + 20 * i)
+                }, PonType.ConnectionPointType.IN));
+                this.outputConnectionPoints.push(ConnectionPoint.create({
+                    x: 12,
+                    y: (12 + 20 * i)
+                }, PonType.ConnectionPointType.OUT));
+            }
+
+            this.bgIn.setSize({
+                width: 24,
+                height: 24 + 20 * (numFibers - 1)
+            })
+            this.bgOut.setSize({
+                width: 24,
+                height: 24 + 20 * (numFibers - 1)
+            })
+
+            this.node.add(this.nodeIn, this.nodeOut);
+            this.nodeIn.add(this.bgIn);
+            this.nodeOut.add(this.bgOut);
+            this.inputConnectionPoints.forEach(point => this.nodeIn.add(point.getUI()));
+            this.outputConnectionPoints.forEach(point => this.nodeOut.add(point.getUI()));
+        }
+
+        static create(x: number, y: number, fiberCount: number) {
+            let fibers: Partial<PonData.Fiber>[] = [];
+            for (let i = 0; i < fiberCount; i++) {
+                fibers.push(
+                    {
+                        color: PonType.FiberColor.BLUE
+                    }
+                );
+            }
+            return new Cable({
+                id: v4(),
+                fibers: fibers,
+            });
+        }
+
+        override changePosition(position: { x: number; y: number }) {
+            // this.data.x = position.x;
+            // this.data.y = position.y;
+        }
+
+        override getData(): any {
+            return this.data;
+        }
+
+        override highlight() {
+            // this.title.setAttr('fill', 'blue');
+            // this.background.setAttr('stroke', 'blue');
+        }
+
+        override unhighlight() {
+            // this.title.setAttr('fill', 'gray');
+            // this.background.setAttr('stroke', 'gray');
+        }
+
+        override visibleControls(visible: boolean) {
+
+        }
+
+        override getUI(): Konva.Group {
+            return this.node;
+        }
+
+        override getChild(): PonElements.AbstractElement[] {
+            return [];
+        }
+
+        override onMouseEnter(callback: (event: Konva.KonvaEventObject<MouseEvent>, element: AbstractElement) => void): void {
+            this.node.on('mouseenter', ev => callback(ev, this));
+        }
+
+        override onMouseLeave(callback: (event: Konva.KonvaEventObject<MouseEvent>, element: AbstractElement) => void): void {
+            this.node.on('mouseleave', ev => callback(ev, this));
+        }
+
+        override onMouseDown(callback: (event: Konva.KonvaEventObject<MouseEvent>, element: AbstractElement) => void): void {
+            this.node.on('mousedown', ev => callback(ev, this));
+        }
+
+        override onMouseUp(callback: (event: Konva.KonvaEventObject<MouseEvent>, element: AbstractElement) => void): void {
+            this.node.on('mouseup', ev => callback(ev, this));
+        }
+
+        override onMouseMove(callback: (event: Konva.KonvaEventObject<MouseEvent>, element: AbstractElement) => void): void {
+            this.node.on('mousemove', ev => callback(ev, this));
+        }
+
+        override onMouseClick(callback: (event: Konva.KonvaEventObject<MouseEvent>, element: AbstractElement) => void): void {
+            this.node.on('click', ev => callback(ev, this));
+        }
+
+        override onMouseDblClick(callback: (event: Konva.KonvaEventObject<MouseEvent>, element: AbstractElement) => void): void {
+            this.node.on('dblclick', ev => callback(ev, this));
+        }
+
+        override onDragStart(callback: (event: Konva.KonvaEventObject<MouseEvent>, element: AbstractElement) => void): void {
+            this.node.on('dragstart', ev => callback(ev, this));
+        }
+
+        override onDragMove(callback: (event: Konva.KonvaEventObject<MouseEvent>, element: AbstractElement) => void): void {
+            this.node.on('dragmove', ev => callback(ev, this));
+        }
+
+        override onDragEnd(callback: (event: Konva.KonvaEventObject<MouseEvent>, element: AbstractElement) => void): void {
+            this.node.on('dragend', ev => callback(ev, this));
+        }
+    }
+
+    export class Splitter extends AbstractElement {
+
+        private data: Partial<PonData.Box> = {};
+        private node = new Konva.Group({
+            draggable: false,
+        });
+        private background = new Konva.Rect({
+            x: 0,
+            y: 0,
+            width: 100,
+            height: 100,
+            fill: 'white',
+            cornerRadius: 5,
+            strokeEnabled: true,
+            stroke: 'gray',
+            strokeWidth: 2,
+            dash: [5, 5],
+        });
+        private title = new Konva.Text({
+            x: 10,
+            y: 10,
+            text: 'Ящик К.2.5',
+            fill: 'gray',
+        });
+        private simplexes: PonElements.Simplex[] = [];
+        private sizeControl = new Konva.Rect({
+            x: 0,
+            y: 0,
+            width: 18,
+            height: 18,
+            fill: '#0e8ff8',
+            strokeEnabled: true,
+            stroke: '#0c42ce',
+            strokeWidth: 2,
+        })
+
+        constructor(data?: Partial<PonData.Box>) {
+            super();
+            this.data = data ?? {};
+            this.title.setText(data?.name ?? 'Без имени');
+            if (data?.x && data?.y) {
+                this.node.move({
+                    x: data.x,
+                    y: data.y,
+                });
+            }
+            if (data?.width && data?.height) {
+                this.node.setSize({width: data.width, height: data.height})
+            }
+            this.background.setSize({
+                width: 310,
+                height: (data?.simplexes?.length ?? 0) * 25 + 120,
+            })
+            // this.background.setSize({
+            //     width: data?.width ?? 310,
+            //     height: data?.height ? data.height : (data?.boxData?.simplexes?.length ?? 0) * 25 + 120,
+            // })
+            this.node.add(this.background);
+            this.node.add(this.title);
+            this.node.add(this.sizeControl);
+            let index = 0;
+            for (let simplex of data?.simplexes ?? []) {
+                if (!simplex.x) {
+                    simplex.x = 120;
+                }
+                if (!simplex.y) {
+                    simplex.y = index * 25 + 60;
+                }
+                const simplexElement = new Simplex(simplex);
+                this.simplexes.push(simplexElement);
+                this.node.add(simplexElement.getUI());
+                index++;
+            }
+        }
+
+        static create(x: number, y: number, portCount: number) {
+            let simplexes: Partial<PonData.Simplex>[] = [];
+            for (let i = 0; i < portCount; i++) {
+                simplexes.push(
+                    Simplex.create(
+                        PonType.ConnectorType.SCSC,
+                        PonType.PolishingType.UPC,
+                        {x: 10, y: 10},
+                        {x: 60, y: 10}
+                    ).getData()
+                );
+            }
+            return new Box({
+                id: v4(),
+                x,
+                y,
+                boxType: PonType.BoxType.ROOT,
+                type: PonType.PonNodeType.BOX,
+                name: 'Ящик К.2.5',
+                simplexes,
+            });
+        }
+
+        override changePosition(position: { x: number; y: number }) {
+            this.data.x = position.x;
+            this.data.y = position.y;
+        }
+
+        override getData(): any {
+            return this.data;
+        }
+
+        override highlight() {
+            this.title.setAttr('fill', 'blue');
+            this.background.setAttr('stroke', 'blue');
+        }
+
+        override unhighlight() {
+            this.title.setAttr('fill', 'gray');
+            this.background.setAttr('stroke', 'gray');
+        }
+
+        override visibleControls(visible: boolean) {
+
+        }
+
+        override getUI(): Konva.Group {
+            return this.node;
+        }
+
+        override getChild(): PonElements.AbstractElement[] {
+            return this.simplexes;
+        }
+
+        override onMouseEnter(callback: (event: Konva.KonvaEventObject<MouseEvent>, element: AbstractElement) => void): void {
+            this.node.on('mouseenter', ev => callback(ev, this));
+        }
+
+        override onMouseLeave(callback: (event: Konva.KonvaEventObject<MouseEvent>, element: AbstractElement) => void): void {
+            this.node.on('mouseleave', ev => callback(ev, this));
+        }
+
+        override onMouseDown(callback: (event: Konva.KonvaEventObject<MouseEvent>, element: AbstractElement) => void): void {
+            this.node.on('mousedown', ev => callback(ev, this));
+        }
+
+        override onMouseUp(callback: (event: Konva.KonvaEventObject<MouseEvent>, element: AbstractElement) => void): void {
+            this.node.on('mouseup', ev => callback(ev, this));
+        }
+
+        override onMouseMove(callback: (event: Konva.KonvaEventObject<MouseEvent>, element: AbstractElement) => void): void {
+            this.node.on('mousemove', ev => callback(ev, this));
+        }
+
+        override onMouseClick(callback: (event: Konva.KonvaEventObject<MouseEvent>, element: AbstractElement) => void): void {
+            this.node.on('click', ev => callback(ev, this));
+        }
+
+        override onMouseDblClick(callback: (event: Konva.KonvaEventObject<MouseEvent>, element: AbstractElement) => void): void {
+            this.node.on('dblclick', ev => callback(ev, this));
+        }
+
+        override onDragStart(callback: (event: Konva.KonvaEventObject<MouseEvent>, element: AbstractElement) => void): void {
+            this.node.on('dragstart', ev => callback(ev, this));
+        }
+
+        override onDragMove(callback: (event: Konva.KonvaEventObject<MouseEvent>, element: AbstractElement) => void): void {
+            this.node.on('dragmove', ev => callback(ev, this));
+        }
+
+        override onDragEnd(callback: (event: Konva.KonvaEventObject<MouseEvent>, element: AbstractElement) => void): void {
+            this.node.on('dragend', ev => callback(ev, this));
+        }
+    }
+
     export class Bond extends AbstractElement {
 
         private data: Partial<PonData.Bond> = {};

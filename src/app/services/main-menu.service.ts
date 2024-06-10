@@ -1,6 +1,6 @@
 import {Injectable} from '@angular/core';
 import {NavigationEnd, Router} from "@angular/router";
-import {filter, map, ReplaySubject, shareReplay, tap} from "rxjs";
+import {filter, map, Observable, ReplaySubject, shareReplay, startWith, switchMap} from "rxjs";
 import {AccessFlag} from "../types/access-flag";
 import {PersonalityService} from "./personality.service";
 import {TaskCreatorService} from "./task-creator.service";
@@ -8,6 +8,7 @@ import {ImageCroppedEvent} from "ngx-image-cropper";
 import {FormControl} from "@angular/forms";
 import {MenuItem} from "primeng/api";
 import {ApiService} from "./api.service";
+import {RealTimeUpdateService} from "./real-time-update.service";
 
 type MainMenuItem = {
     link: string[],
@@ -15,6 +16,7 @@ type MainMenuItem = {
     icon: string,
     accessFlags?: number[],
     exactMatch?: boolean,
+    counterObserver?: Observable<number>,
     children?: MainMenuItem[],
 };
 
@@ -24,6 +26,13 @@ type MainMenuItem = {
 export class MainMenuService {
 
     currentRoute$ = new ReplaySubject<string[]>(1);
+
+    userRequestCounter$ = this.rt.receiveTlgUserRequest()
+        .pipe(
+            startWith(true),
+            switchMap(() => this.api.getUnprocessedTelegramUserRequestsCount()),
+            shareReplay(1)
+        );
 
     menuModel: MainMenuItem[] = [
         {
@@ -63,8 +72,27 @@ export class MainMenuService {
         {
             caption: "Абоненты",
             icon: "mdi-group",
-            link: ["/clients", "billing", "search"],
-            accessFlags: [AccessFlag.BILLING]
+            link: ["/clients"],
+            accessFlags: [AccessFlag.BILLING],
+            counterObserver: this.userRequestCounter$,
+            children: [
+                {
+                    caption: "Поиск",
+                    icon: "mdi-search",
+                    link: ["/clients", "billing", "search"],
+                },
+                {
+                    caption: "Запросы",
+                    icon: "mdi-local_activity",
+                    link: ["/clients", "requests"],
+                    counterObserver: this.userRequestCounter$
+                },
+                {
+                    caption: "Настройки",
+                    icon: "mdi-settings",
+                    link: ["/clients", "settings"]
+                }
+            ]
         },
         {
             caption: "Адреса",
@@ -252,7 +280,7 @@ export class MainMenuService {
         .pipe(
             map(route => {
                 const parent = this.menuModel.find(item => item.link[0].substring(1) === route[0]);
-                if(!parent || !parent.children || parent.children.length === 0) return null;
+                if (!parent || !parent.children || parent.children.length === 0) return null;
                 return parent.children
             }),
             shareReplay(1)
@@ -269,9 +297,13 @@ export class MainMenuService {
         {label: "Выбрать телефон", command: () => this.openPhyPhoneSelectionDialog()},
         {label: "Выйти из аккаунта", command: this.exitFromAccount.bind(this)}
     ];
+    imageChangedEvent: any = '';
+    croppedImage: any = '';
+    avatarUpload = false;
+    phones$ = this.api.getPhyPhoneList().pipe(map(list => [{label: "Без телефона", value: null}, ...list]));
 
     constructor(private router: Router, private personality: PersonalityService,
-                private api: ApiService, private taskCreator: TaskCreatorService) {
+                private api: ApiService, private rt: RealTimeUpdateService, private taskCreator: TaskCreatorService) {
         this.currentRoute$.next(this.router.url.substring(1).split('/'));
         this.router.events
             .pipe(
@@ -281,7 +313,7 @@ export class MainMenuService {
     }
 
     hasAccess(item: MainMenuItem): boolean {
-        if(!item.accessFlags || item.accessFlags.length == 0) return true;
+        if (!item.accessFlags || item.accessFlags.length == 0) return true;
         return this.personality.isHasAccess(...item.accessFlags)
     }
 
@@ -295,13 +327,8 @@ export class MainMenuService {
         })
     }
 
-    imageChangedEvent: any = '';
-    croppedImage: any = '';
-    avatarUpload = false;
-    phones$ = this.api.getPhyPhoneList().pipe(map(list=>[{label:"Без телефона", value: null}, ...list]));
-
     openPhyPhoneSelectionDialog() {
-        if(this.personality.me)
+        if (this.personality.me)
             this.phyPhoneControl.setValue(this.personality.me.phyPhoneInfo?.phyPhoneInfoId ?? null);
         this.phyPhoneSelectionDialogVisible = true;
     }
@@ -311,7 +338,7 @@ export class MainMenuService {
     }
 
     saveAvatar() {
-        if(!this.croppedImage) return;
+        if (!this.croppedImage) return;
         this.avatarUpload = true;
         this.api.setAvatar(this.croppedImage).subscribe({
             next: () => {
@@ -329,7 +356,7 @@ export class MainMenuService {
         fileInput.click();
     }
 
-    bindPhone(){
+    bindPhone() {
         this.isPhyPhoneIsBinding = true;
         this.api.setPhyPhoneBind(this.phyPhoneControl.value).subscribe({
             next: () => {

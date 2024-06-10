@@ -1,10 +1,13 @@
 <div #rla="routerLinkActive" #titleElem (click)="toggle()" [pTooltip]="onlyIcon ? caption : ''"
-     [ngClass]="[!rla.isActive ? 'hover:bg-bluegray-50 hover:text-bluegray-500 cursor-pointer border-white' : 'border-primary']"
+     [ngClass]="[!rla.isActive ? 'hover:bg-bluegray-50 hover:text-bluegray-500 cursor-pointer border-white' : 'border-primary', (counter | async) ? 'blink_me' : 'text-bluegray-300']"
      [routerLinkActiveOptions]="{ exact }" [routerLink]="link"
-     class="flex gap-2 align-items-center px-3 py-2 white-space-nowrap text-bluegray-300 select-none outline-none
+     class="flex gap-2 align-items-center px-3 py-2 white-space-nowrap select-none outline-none
      transition-colors transition-duration-150 text-xl border-right-2"
      routerLinkActive="text-primary bg-primary-50">
     <span [class]="icon"></span>
-    <span *ngIf="!onlyIcon && caption" appTicker class="overflow-hidden max-w-7rem white-space-nowrap">{{caption}}</span>
+    <ng-container *ngIf="!onlyIcon">
+        <span *ngIf="caption" appTicker class="overflow-hidden max-w-7rem white-space-nowrap">{{caption}}</span>
+        <div class="px-2 py-1 border-round bg-orange-500 text-white text-xs" *ngIf="counter | async as c">{{c}}</div>
+    </ng-container>
 </div>
 <p-contextMenu [model]="contextOptions" [target]="titleElem" appendTo="body"></p-contextMenu>

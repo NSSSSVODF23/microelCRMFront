@@ -3,11 +3,13 @@ import {FormControl, FormGroup, Validators} from "@angular/forms";
 import {Subscription} from "rxjs";
 import {ApiService} from "../../services/api.service";
 import {RealTimeUpdateService} from "../../services/real-time-update.service";
+import {AutoUnsubscribe} from "../../decorators";
 
 @Component({
     templateUrl: './telegram-settings-page.component.html',
     styleUrls: ['./telegram-settings-page.component.scss']
 })
+@AutoUnsubscribe()
 export class TelegramSettingsPageComponent implements OnInit,OnDestroy {
 
     isLoading = true;
@@ -19,7 +21,13 @@ export class TelegramSettingsPageComponent implements OnInit,OnDestroy {
         ponAlertChatId: new FormControl(''),
         sensorsAlertChatId: new FormControl(''),
     });
-    subscription?: Subscription;
+    userTelegramConfigForm = new FormGroup({
+        botToken: new FormControl('', [Validators.required]),
+        botName: new FormControl('', [Validators.required]),
+        microelHubIpPort: new FormControl('',  [Validators.required]),
+    });
+    updateTelegramConfigSub = this.rt.telegramConfigChanged().subscribe(config=> this.telegramConfigForm.patchValue(config));
+    updateUserTelegramConfigSub  = this.rt.userTelegramConfigChanged().subscribe(config=> this.userTelegramConfigForm.patchValue(config));
 
     constructor(private api: ApiService, private rt: RealTimeUpdateService) {
     }
@@ -29,11 +37,13 @@ export class TelegramSettingsPageComponent implements OnInit,OnDestroy {
             this.telegramConfigForm.patchValue(config);
             this.isLoading = false;
         })
-        this.subscription = this.rt.telegramConfigChanged().subscribe(config=> this.telegramConfigForm.patchValue(config))
+        this.api.getUserTelegramConfiguration().subscribe(config => {
+            this.userTelegramConfigForm.patchValue(config);
+            this.isLoading = false;
+        })
     }
 
     ngOnDestroy(): void {
-        this.subscription?.unsubscribe();
     }
 
     saveConf() {
@@ -48,6 +58,22 @@ export class TelegramSettingsPageComponent implements OnInit,OnDestroy {
             error: () => {
                 this.isSaving = false;
                 this.telegramConfigForm.enable({emitEvent: false});
+            }
+        })
+    }
+
+    saveUserConf() {
+        this.isSaving = true;
+        this.userTelegramConfigForm.disable({emitEvent: false});
+        const config = this.userTelegramConfigForm.value as any;
+        this.api.setUserTelegramConfiguration(config).subscribe({
+            next: () => {
+                this.isSaving = false;
+                this.userTelegramConfigForm.enable({emitEvent: false});
+            },
+            error: () => {
+                this.isSaving = false;
+                this.userTelegramConfigForm.enable({emitEvent: false});
             }
         })
     }

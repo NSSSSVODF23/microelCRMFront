@@ -90,14 +90,14 @@ import {TableModule} from "primeng/table";
 import {SliderModule} from "primeng/slider";
 import {SlideMenuModule} from "primeng/slidemenu";
 import {SplitButtonModule} from "primeng/splitbutton";
-import {BillingSearchUserPageComponent} from "../../pages/billing-search-user-page/billing-search-user-page.component";
-import {BillingUserPageComponent} from "../../pages/billing-user-page/billing-user-page.component";
+import {BillingSearchUserPageComponent} from "../../pages/billing/billing-search-user-page/billing-search-user-page.component";
+import {BillingUserPageComponent} from "../../pages/billing/billing-user-page/billing-user-page.component";
 import {AddressesListPageComponent} from "../../pages/addresses-list-page/addresses-list-page.component";
 import {ChipsModule} from "primeng/chips";
 import {InputMaskModule} from "primeng/inputmask";
 import {AngularYandexMapsModule, YaConfig} from "angular8-yandex-maps";
 import {BypassWorkCalculationComponent} from "../../pages/bypass-work-calculation/bypass-work-calculation.component";
-import {BillingSettingsPageComponent} from "../../pages/billing-settings-page/billing-settings-page.component";
+import {BillingSettingsPageComponent} from "../../pages/billing/billing-settings-page/billing-settings-page.component";
 import {TelegramSettingsPageComponent} from "../../pages/telegram-settings-page/telegram-settings-page.component";
 import {AcpSettingsPageComponent} from "../../pages/acp-settings-page/acp-settings-page.component";
 import {AutoCompleteModule} from "primeng/autocomplete";
@@ -156,6 +156,9 @@ import {
 } from "../../pages/pon/children/scheme/children/pon-scheme-list-page/pon-scheme-list-page.component";
 import {TopologySensorsPage} from "../../pages/topology/children/topology-sensors-page/topology-sensors-page.component";
 import {TagModule} from "primeng/tag";
+import {BillingBootstrapPage} from "../../pages/billing/billing-bootstrap-page/billing-bootstrap-page.component";
+import {UserRequestsPage} from "../../pages/billing/user-requests-page/user-requests-page.component";
+import {UserSettingsPage} from "../../pages/billing/user-settings-page/user-settings-page.component";
 
 const mapConfig: YaConfig = {
     apikey: '008574e5-f34b-4270-b3d5-91aaabd036e8',
@@ -211,7 +214,10 @@ const mapConfig: YaConfig = {
         PonTerminalPage,
         SchemeBootstrapPage,
         PonSchemeListPage,
-        PonSchemePage
+        PonSchemePage,
+        BillingBootstrapPage,
+        UserRequestsPage,
+        UserSettingsPage
     ],
     imports: [
         CommonComponentsModule,

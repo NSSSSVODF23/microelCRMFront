@@ -2,6 +2,7 @@ import {AfterViewInit, Component, ContentChild, ElementRef, Input, OnInit, ViewC
 import {ActivatedRoute} from '@angular/router';
 import {MenuItem} from "primeng/api";
 import {OnChange} from "../../../decorators";
+import {Observable} from "rxjs";
 
 export type ExtendedMenuModel = { label: string, link: string[], children?: ExtendedMenuModel[], nestingLevel?: number, extended: boolean };
 
@@ -23,6 +24,7 @@ export class ExtendedMenuItemComponent implements OnInit, AfterViewInit {
     @Input() badge?: string;
     @Input() exact = false;
     @Input() onlyIcon = false;
+    @Input() counter?: Observable<number>;
     animationTimer?: any;
 
     constructor(readonly route: ActivatedRoute) {

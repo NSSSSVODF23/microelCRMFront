@@ -27,7 +27,7 @@
 
 <ng-template #dashboardItemTemplate let-dashboardItem = "dashboardItem">
     <ng-container *ngIf="toDashboardItem(dashboardItem) as item">
-        <div class="flex flex-column flex-1 border-1 border-bluegray-100 shadow-1 border-round h-fit">
+        <div class="flex flex-column flex-1 shadow-1 border-round h-fit">
             <div class="text-xl text-bluegray-500 px-3 py-2 border-bottom-1 border-bluegray-100 font-semibold">
                 {{item.taskClassName}}
             </div>
