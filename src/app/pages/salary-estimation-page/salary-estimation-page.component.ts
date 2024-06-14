@@ -40,7 +40,7 @@ export class SalaryEstimationPageComponent implements OnInit, OnDestroy {
     subscriptions: SubscriptionsHolder = new SubscriptionsHolder();
     removeWorkLogFromListHandler = {
         next: (workLog: WorkLog) => {
-            this.uncalculatedWorkLogs = this.uncalculatedWorkLogs.filter(wl => wl.workLogId !== workLog.workLogId)
+            this.uncalculatedWorkLogs.splice(this.uncalculatedWorkLogs.findIndex(wl =>  wl.workLogId === workLog.workLogId), 1);
         }
     }
     addWorkLogToListHandler = {
@@ -57,9 +57,12 @@ export class SalaryEstimationPageComponent implements OnInit, OnDestroy {
             this.recalculationDescription = '';
             this.resetCalculation()
             if (this.selectedWorkLog) {
-                this.uncalculatedWorkLogs = this.uncalculatedWorkLogs.filter(wl => wl.workLogId !== this.selectedWorkLog?.workLogId);
+                this.uncalculatedWorkLogs.splice(this.uncalculatedWorkLogs.findIndex(wl =>  wl.workLogId === this.selectedWorkLog?.workLogId), 0);
+                // this.uncalculatedWorkLogs = this.uncalculatedWorkLogs.filter(wl => wl.workLogId !== this.selectedWorkLog?.workLogId);
                 if (this.uncalculatedWorkLogs.length > 0) {
                     this.selectWork(this.uncalculatedWorkLogs[0]);
+                }else{
+                    this.unselectWorkLog();
                 }
             }
         },
@@ -73,13 +76,18 @@ export class SalaryEstimationPageComponent implements OnInit, OnDestroy {
         shareReplay(1)
     )
 
-    workLogId$: Observable<number | undefined> = <Observable<number | undefined>>this.route.queryParams.pipe(map(params => params['workLogId']));
+    workLogId$: Observable<number | undefined> = <Observable<number | undefined>>this.route.queryParams
+        .pipe(
+            map(params => params['workLogId']),
+            shareReplay(1)
+        );
 
     selectedWorkLog$ = this.workLogId$.pipe(
         switchMap(id => {
             if (!id) return of(undefined);
             return this.api.getWorkLog(id, true)
-        })
+        }),
+        shareReplay(1)
     )
 
     setupFormValues$ = this.selectedWorkLog$.pipe(
@@ -260,8 +268,11 @@ export class SalaryEstimationPageComponent implements OnInit, OnDestroy {
     }
 
     selectWork(work: WorkLog) {
-        // this.selectedWorkLog = work;
         this.router.navigate(['.'], {relativeTo: this.route, queryParams: {workLogId: work.workLogId}}).then();
+    }
+
+    unselectWorkLog()  {
+        this.router.navigate(['.'], {relativeTo: this.route}).then();
     }
 
     unselectWork() {
