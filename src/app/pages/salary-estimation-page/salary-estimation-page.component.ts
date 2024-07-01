@@ -57,7 +57,7 @@ export class SalaryEstimationPageComponent implements OnInit, OnDestroy {
             this.recalculationDescription = '';
             this.resetCalculation()
             if (this.selectedWorkLog) {
-                this.uncalculatedWorkLogs.splice(this.uncalculatedWorkLogs.findIndex(wl =>  wl.workLogId === this.selectedWorkLog?.workLogId), 0);
+                this.uncalculatedWorkLogs.splice(this.uncalculatedWorkLogs.findIndex(wl =>  wl.workLogId === this.selectedWorkLog?.workLogId), 1);
                 // this.uncalculatedWorkLogs = this.uncalculatedWorkLogs.filter(wl => wl.workLogId !== this.selectedWorkLog?.workLogId);
                 if (this.uncalculatedWorkLogs.length > 0) {
                     this.selectWork(this.uncalculatedWorkLogs[0]);
@@ -276,10 +276,10 @@ export class SalaryEstimationPageComponent implements OnInit, OnDestroy {
     }
 
     unselectWork() {
-        // // this.selectedWorkLog = undefined;
-        // this.router.navigate(['.'], {relativeTo: this.route}).then();
-        this.nav.backOrDefault(["/salary","estimation"]);
+        this.selectedWorkLog = undefined;
         this.resetCalculation();
+        this.router.navigate(['.'], {relativeTo: this.route}).then();
+        // this.nav.backOrDefault(["/salary","estimation"]);
     }
 
     resetCalculation() {
