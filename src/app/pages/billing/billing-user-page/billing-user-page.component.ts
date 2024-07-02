@@ -6,12 +6,12 @@ import {
     DateRange,
     DhcpBinding,
     DhcpLog,
-    DhcpLogsRequest,
+    DhcpLogsRequest, EventType,
     LoadingState,
     NCLHistoryWrapper,
     Ont,
     Page,
-    TimeFrame,
+    TimeFrame, UpdateCarrier,
     UserEvents,
     UserTariff
 } from "../../../types/transport-interfaces";
@@ -44,6 +44,7 @@ import {PersonalityService} from "../../../services/personality.service";
 import {AutoUnsubscribe} from "../../../decorators";
 import {OntManagementService} from "../../../services/pon/ont-management.service";
 import {LogItem} from "../../../types/user-types";
+import {UserReview} from "../../../types/user-reviews";
 
 @Component({
     templateUrl: './billing-user-page.component.html',
@@ -222,6 +223,15 @@ export class BillingUserPageComponent implements OnInit, OnDestroy {
     );
 
     login$ = merge(this.pathChange$, this.update$);
+
+    userReviews = [] as UserReview[];
+    userReviewsLoadSub = this.login$
+        .pipe(switchMap(login => this.api.getUserReviewsByLogin(login)))
+        .subscribe(this.userReviewsHandler.bind(this));
+
+    userReviewsUpdateSub = this.rt.receiveUserReviewUpdate()
+        .subscribe(this.userReviewsHandler.bind(this));
+
     activeBinding$ = this.login$.pipe(switchMap(login=>this.api.getActiveBindingByLogin(login)));
     activeBuildingId$ = this.activeBinding$
         .pipe(
@@ -456,6 +466,8 @@ export class BillingUserPageComponent implements OnInit, OnDestroy {
 
     toLogItem(value: any): LogItem { return value }
 
+    toUserReview(value: any): UserReview { return value }
+
     changeLogsPage(event: any){
         const {first, rows} = event;
         this.logsFilterForm.controls.page.setValue(first / rows);
@@ -527,6 +539,18 @@ export class BillingUserPageComponent implements OnInit, OnDestroy {
                     });
             }
         });
+    }
+
+    userReviewsHandler(value: UserReview[] | UpdateCarrier<UserReview>){
+        if (Array.isArray(value)) {
+            this.userReviews = value;
+        } else if(value.data.userLogin === this.currentLogin) {
+            switch (value.type){
+                case EventType.CREATE:{
+                    this.userReviews.unshift(value.data);
+                }
+            }
+        }
     }
 
     trackByDhcpBinding(index: number, item: DhcpBinding) {

@@ -25,6 +25,7 @@ export class TelegramSettingsPageComponent implements OnInit,OnDestroy {
         botToken: new FormControl('', [Validators.required]),
         botName: new FormControl('', [Validators.required]),
         microelHubIpPort: new FormControl('',  [Validators.required]),
+        notificationChannelId: new FormControl(''),
     });
     updateTelegramConfigSub = this.rt.telegramConfigChanged().subscribe(config=> this.telegramConfigForm.patchValue(config));
     updateUserTelegramConfigSub  = this.rt.userTelegramConfigChanged().subscribe(config=> this.userTelegramConfigForm.patchValue(config));

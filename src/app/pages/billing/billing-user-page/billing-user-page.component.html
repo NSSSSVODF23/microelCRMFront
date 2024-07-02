@@ -28,7 +28,7 @@
             <span class="caption size-huge wt-tiny f-color-600 with-icon">
                 <span class="mds-person caption size-xlarge"></span>
                 <span>
-                    {{userInfo?.uname}}
+                    {{ userInfo?.uname }}
                 </span>
             </span>
             <ng-container *ngTemplateOutlet="titleTagsTemp"></ng-container>
@@ -52,7 +52,7 @@
                            listStyleClass="simple-list">
                     <ng-template let-group pTemplate="group">
                         <div class="flex align-items-center text-sm">
-                            <span *ngIf="!isToday(group.state.date)">{{group.state.date | date:'dd MMMM yyyy' | titlecase}}</span>
+                            <span *ngIf="!isToday(group.state.date)">{{ group.state.date | date:'dd MMMM yyyy' | titlecase }}</span>
                             <span *ngIf="isToday(group.state.date)">Сегодня</span>
                         </div>
                     </ng-template>
@@ -60,13 +60,13 @@
                         <div [style.background-color]="item.state.color"
                              class="flex flex-grow-1 m-1 px-3 py-2 gap-2 border-round align-items-center text-white font-bold text-sm">
                             <span>
-                                <span>{{item.state.endTime | date:'HH:mm'}}</span>
-                                <span *ngIf="item.state.startTime !== item.state.endTime">-{{item.state.startTime | date: 'HH:mm'}}</span>
+                                <span>{{ item.state.endTime | date:'HH:mm' }}</span>
+                                <span *ngIf="item.state.startTime !== item.state.endTime">-{{ item.state.startTime | date: 'HH:mm' }}</span>
                             </span>
-                            <span>{{item.state.description}}</span>
+                            <span>{{ item.state.description }}</span>
                             <span *ngIf="item.state.numbers > 1" class="flex-grow-1"></span>
                             <span *ngIf="item.state.numbers > 1" [style.color]="item.state.color"
-                                  class="bg-white border-round px-2 py-1 text-xs">{{item.state.numbers}}</span>
+                                  class="bg-white border-round px-2 py-1 text-xs">{{ item.state.numbers }}</span>
                         </div>
                     </ng-template>
                     <ng-template pTemplate="empty">
@@ -80,13 +80,15 @@
         <div class="flexed gap10 p10 hcenter">
             <p-button (onClick)="createTaskMenu.toggle($event)" icon="mdi-add" label="Создать задачу"
                       styleClass="p-button-success p-button-text"></p-button>
-            <p-button (onClick)="controlMenu.toggle($event)" *ngIf="personality.isHasAccess(AccessFlag.MANAGE_SUBSCRIBERS)" icon="mdi-menu"
+            <p-button (onClick)="controlMenu.toggle($event)"
+                      *ngIf="personality.isHasAccess(AccessFlag.MANAGE_SUBSCRIBERS)" icon="mdi-menu"
                       label="Управление"
                       styleClass="p-button-info p-button-text"></p-button>
             <p-button (onClick)="openPaymentDialog()" *ngIf="personality.isHasAccess(AccessFlag.MANAGE_CASH)"
                       icon="mdi-currency_ruble"
                       label="Оплата" styleClass="p-button-warning p-button-text"></p-button>
-            <p-button (onClick)="openRecalculationDialog()" *ngIf="personality.isHasAccess(AccessFlag.MANAGE_RECALCULATION)"
+            <p-button (onClick)="openRecalculationDialog()"
+                      *ngIf="personality.isHasAccess(AccessFlag.MANAGE_RECALCULATION)"
                       icon="mdi-restore"
                       label="Перерасчет" styleClass="p-button-help p-button-text"></p-button>
             <div class="stretched"></div>
@@ -99,7 +101,7 @@
                 <span class="mdi-history"></span>
                 <span class="flex-grow-1">История задач</span>
                 <span *ngIf="tasks.totalElements > 0" class="text-sm text-primary-400 font-bold">
-                    Найдено: {{tasks.totalElements}} {{tasks.totalElements | decline:'задача':'задачи':'задач'}}
+                    Найдено: {{ tasks.totalElements }} {{ tasks.totalElements | decline:'задача':'задачи':'задач' }}
                 </span>
             </div>
             <ng-container [ngSwitch]="tasks.loadingState">
@@ -152,8 +154,8 @@
             <span class="text-lg font-bold text-gray-600">
                 Пользователь
             </span>
-            <button pButton icon="mdi-edit" label="Редактировать" (click)="openEditUserDialog()"
-                    class="p-button-sm p-button-success p-button-text"></button>
+            <button (click)="openEditUserDialog()" class="p-button-sm p-button-success p-button-text" icon="mdi-edit" label="Редактировать"
+                    pButton></button>
         </div>
         <div class="flex flex-column gap-2 p-3 pt-1">
             <div *ngIf="!isLoginEnable" class="flex gap-2 align-items-center text-red-400">
@@ -172,8 +174,8 @@
                     *ngTemplateOutlet="infoRowTemplate; context: {label: 'ФИО', value: userInfo?.ibase?.fio}"></ng-container>
             <ng-container
                     *ngTemplateOutlet="infoRowTemplate; context: {label: 'Телефон', value: userInfo?.ibase?.phone}"></ng-container>
-            <ng-container *ngIf="passwordObserver$ | async as password" [ngTemplateOutlet]="infoRowTemplate"
-                          [ngTemplateOutletContext]="{label: 'Пароль', value: password, valueClass:'text-red-500'}"></ng-container>
+            <ng-container *ngIf="passwordObserver$ | async as password" [ngTemplateOutletContext]="{label: 'Пароль', value: password, valueClass:'text-red-500'}"
+                          [ngTemplateOutlet]="infoRowTemplate"></ng-container>
             <ng-container
                     *ngTemplateOutlet="infoRowTemplate; context: {label: 'Договор заключен', value: userInfo?.ibase?.ddog | date: 'EEEE dd-MM-yyyy' | titlecase}"></ng-container>
             <ng-container
@@ -183,7 +185,7 @@
 </ng-template>
 
 <ng-template #hardwareInfoTemp>
-    <div  class="flex flex-column">
+    <div class="flex flex-column">
         <span class="text-lg font-bold text-gray-600">
             Оборудование
         </span>
@@ -191,7 +193,7 @@
               class="flex gap-2 p-3 text-orange-400 font-semibold align-items-center">
             <span class="mdi-warning"></span>
             <span>
-                {{hardwareEmptyMessage}}
+                {{ hardwareEmptyMessage }}
             </span>
         </span>
         <ng-container *ngIf="activeBinding$ | async as activeBinding">
@@ -204,8 +206,9 @@
                         *ngTemplateOutlet="infoRowTemplate; context: {label: 'IP', value: activeBinding.ipaddr}"></ng-container>
                 <ng-container
                         *ngTemplateOutlet="infoRowTemplate; context: {label: 'Активность', value: activeBinding.leaseStart | date: 'dd-MM-yyyy HH:mm:ss' | titlecase, help: 'Момент времени, когда оборудование отправило запрос серверу.'}"></ng-container>
-                <p-button label="Назначить ONU" styleClass="p-button-success p-button-outlined p-button-sm" *ngIf="ontNotFound"
-                          (onClick)="ontMgmt.openAssignOnt$.next({event: $event, login: currentLogin??'', ont: null})"></p-button>
+                <p-button (onClick)="ontMgmt.openAssignOnt$.next({event: $event, login: currentLogin??'', ont: null})" *ngIf="ontNotFound"
+                          label="Назначить ONU"
+                          styleClass="p-button-success p-button-outlined p-button-sm"></p-button>
             </div>
         </ng-container>
         <ng-container *ngIf="ont$ | async as ont">
@@ -214,9 +217,9 @@
                     <span class="text-bluegray-400 font-bold">
                         Mac Onu:
                     </span>
-                    <span class="text-lg max-w-18rem text-primary-400 cursor-pointer hover:text-primary-600"
-                          [routerLink]="['/pon','terminal',ont.id]" pTooltip="Открыть страницу терминала">
-                        {{ont.mac}}
+                    <span [routerLink]="['/pon','terminal',ont.id]"
+                          class="text-lg max-w-18rem text-primary-400 cursor-pointer hover:text-primary-600" pTooltip="Открыть страницу терминала">
+                        {{ ont.mac }}
                     </span>
                 </span>
                 <span class="flex align-items-center gap-1 text-bluegray-500">
@@ -224,10 +227,10 @@
                         Имя Onu:
                     </span>
                     <span class="text-lg max-w-18rem">
-                        {{ont.description ? ont.description : '-'}}
+                        {{ ont.description ? ont.description : '-' }}
                     </span>
-                    <span class="text-bluegray-400 font-semibold hover:text-primary-400 cursor-pointer"
-                          (click)="ontMgmt.openRename$.next({event: $event, id: ont.id, oldName: ont.description})">
+                    <span (click)="ontMgmt.openRename$.next({event: $event, id: ont.id, oldName: ont.description})"
+                          class="text-bluegray-400 font-semibold hover:text-primary-400 cursor-pointer">
                         Переименовать
                     </span>
                 </span>
@@ -242,36 +245,37 @@
                         Статус:
                     </span>
                     <span [ngClass]="ontStatusClass(ont)" class="text-lg max-w-18rem">
-                        {{ontStatusName(ont)}}
+                        {{ ontStatusName(ont) }}
                     </span>
-                    <span class="text-bluegray-400 font-semibold hover:text-red-500 cursor-pointer"
-                          (click)="ontMgmt.reboot(ont.id)" *ngIf="ont.isOnline">
+                    <span (click)="ontMgmt.reboot(ont.id)"
+                          *ngIf="ont.isOnline" class="text-bluegray-400 font-semibold hover:text-red-500 cursor-pointer">
                         Перезагрузить
                     </span>
                 </span>
-                <ng-container *ngIf="ont.curRxSignal" [ngTemplateOutlet]="infoRowTemplate"
-                              [ngTemplateOutletContext]="{label: 'Сигнал', value: ((ont.curRxSignal | number:'1.2-2')+ ' dBm'), valueClass: signalColor(ont)}"></ng-container>
-                <ng-container *ngTemplateOutlet="infoRowTemplate; context: {label: 'Аптайм', value: ont.uptime | date:'dd-MM-yyyy HH:mm'}"></ng-container>
+                <ng-container *ngIf="ont.curRxSignal" [ngTemplateOutletContext]="{label: 'Сигнал', value: ((ont.curRxSignal | number:'1.2-2')+ ' dBm'), valueClass: signalColor(ont)}"
+                              [ngTemplateOutlet]="infoRowTemplate"></ng-container>
+                <ng-container
+                        *ngTemplateOutlet="infoRowTemplate; context: {label: 'Аптайм', value: ont.uptime | date:'dd-MM-yyyy HH:mm'}"></ng-container>
                 <span class="flex align-items-center gap-1 text-bluegray-500">
                     <span class="text-bluegray-400 font-bold">
                         Обновлена:
                     </span>
                     <span class="text-lg max-w-18rem">
-                        {{ont.updated | date:'dd-MM-yyyy HH:mm'}}
+                        {{ ont.updated | date:'dd-MM-yyyy HH:mm' }}
                     </span>
-                    <span class="text-bluegray-400 font-semibold hover:text-primary-400 cursor-pointer"
-                          (click)="ontMgmt.update(ont.id)" *ngIf="!ontMgmt.isUpdatingOnt(ont.id)">
+                    <span (click)="ontMgmt.update(ont.id)"
+                          *ngIf="!ontMgmt.isUpdatingOnt(ont.id)" class="text-bluegray-400 font-semibold hover:text-primary-400 cursor-pointer">
                         Обновить
                     </span>
                 </span>
-<!--                <p-button label="Изменить ONU" styleClass="p-button-success p-button-outlined p-button-sm"-->
-<!--                          (onClick)="ontMgmt.openAssignOnt$.next({event: $event, login: currentLogin??'', ont: ont})"></p-button>-->
+                <!--                <p-button label="Изменить ONU" styleClass="p-button-success p-button-outlined p-button-sm"-->
+                <!--                          (onClick)="ontMgmt.openAssignOnt$.next({event: $event, login: currentLogin??'', ont: ont})"></p-button>-->
             </div>
         </ng-container>
         <p-button (onClick)="isAuthDialogVisible = true"
-           class="px-3" icon="mdi-check"
-           label="Найти и авторизовать" *ngIf="!(activeBinding$ | async)"
-           styleClass="p-button-warning p-button-outlined"></p-button>
+                  *ngIf="!(activeBinding$ | async)" class="px-3"
+                  icon="mdi-check" label="Найти и авторизовать"
+                  styleClass="p-button-warning p-button-outlined"></p-button>
     </div>
 </ng-template>
 
@@ -300,11 +304,11 @@
         </div>
         <div class="flex gap-2 p-3 align-items-center border-bluegray-100 border-1 border-round-xl">
             <span *ngIf="creditAmount" [style.letter-spacing]="'2px'" class="text-red-400 text-xl font-bold">
-                Кредит:{{creditAmount | currency: 'RUB'}}
+                Кредит:{{ creditAmount | currency: 'RUB' }}
             </span>
             <span [ngClass]="{'f-color-primary': moneyAmount>=0, 'f-color-danger': moneyAmount<0}"
                   [style.letter-spacing]="'2px'" class="text-primary text-xl font-bold">
-                Баланс:{{moneyAmount | currency: 'RUB'}}
+                Баланс:{{ moneyAmount | currency: 'RUB' }}
             </span>
         </div>
     </div>
@@ -313,10 +317,10 @@
 <ng-template #infoRowTemplate let-help="help" let-label="label" let-value="value" let-valueClass="valueClass">
     <span class="flex align-items-center gap-1 text-bluegray-500s">
         <span class="text-bluegray-400 font-bold">
-            {{label}}:
+            {{ label }}:
         </span>
         <span [ngClass]="valueClass" class="text-lg max-w-18rem">
-            {{value ?? '-'}}
+            {{ value ?? '-' }}
         </span>
         <span *ngIf="help" [pTooltip]="help"
               class="mdi-help_outline caption size-big f-color-300"></span>
@@ -326,7 +330,7 @@
 <ng-template #infoRowTemplatedTemplate let-label="label" let-template="template">
     <span class="flex gap-2 align-items-start">
         <span class="text-bluegray-400 font-bold">
-            {{label}}:
+            {{ label }}:
         </span>
         <span class="flex flex-column gap-2">
             <ng-container *ngTemplateOutlet="template;"></ng-container>
@@ -337,10 +341,10 @@
 <ng-template #mainTariffTemplate>
     <span class="text-bluegray-500 text-lg flex gap-2 align-items-center">
         <span>
-            {{mainTariff?.service ? mainTariff?.service : 'Нет тарифа'}}
+            {{ mainTariff?.service ? mainTariff?.service : 'Нет тарифа' }}
         </span>
         <span *ngIf="mainTariff?.service" class="text-primary text-sm">
-            {{mainTariff?.price}} руб/период
+            {{ mainTariff?.price }} руб/период
         </span>
         <span (click)="getTariffList($event, tariffsOverlayPanel)"
               *ngIf="personality.isHasAccess(AccessFlag.MANAGE_SUBSCRIBERS)">
@@ -362,10 +366,10 @@
 <ng-template #serviceItemTemplate let-service="service">
     <div class="text-bluegray-500 text-lg flex align-items-center gap-2">
         <div>
-            {{service.service}}
+            {{ service.service }}
         </div>
         <div class="text-primary text-sm">
-            {{service.price}} руб/период
+            {{ service.price }} руб/период
         </div>
         <div (click)="removeService(service.service)"
              *ngIf="personality.isHasAccess(AccessFlag.MANAGE_SUBSCRIBERS)"
@@ -386,7 +390,7 @@
     <span [ngClass]="btnClass" class="flex align-items-center gap-1 cursor-pointer w-fit">
         <span [ngClass]="icon" class="text-sm"></span>
         <span>
-            {{label}}
+            {{ label }}
         </span>
     </span>
 </ng-template>
@@ -398,7 +402,7 @@
                 По тарифу
             </span>
             <span class="text-primary text-sm">
-                {{userInfo?.newTarif?.tspeed}} Мбит/с
+                {{ userInfo?.newTarif?.tspeed }} Мбит/с
             </span>
         </span>
         <span>
@@ -406,7 +410,7 @@
                 Фактическая
             </span>
             <span class="text-primary text-sm">
-                {{userInfo?.newTarif?.speed}} Мбит/с
+                {{ userInfo?.newTarif?.speed }} Мбит/с
             </span>
         </span>
     </div>
@@ -416,20 +420,47 @@
     <div class="flex flex-column overflow-hidden border-round-md border-bluegray-100 border-1">
         <p-tabView styleClass="tabview-unpadding">
             <p-tabPanel header="Оборудование абонента">
-                <app-bindings-table [filterId]="login$ | async" filterMode="login"
-                                    [inline]="true" [preparedAuthLogin]="currentLogin"></app-bindings-table>
+                <app-bindings-table [filterId]="login$ | async" [inline]="true"
+                                    [preparedAuthLogin]="currentLogin" filterMode="login"></app-bindings-table>
             </p-tabPanel>
             <ng-container *ngIf="activeBuildingId$ | async as buildingId">
-                <p-tabPanel header="Оборудование в доме" *ngIf="buildingId">
+                <p-tabPanel *ngIf="buildingId" header="Оборудование в доме">
                     <ng-template pTemplate="content">
-                        <app-bindings-table [filterId]="buildingId" filterMode="building" bindingsStatus="online"
-                                            [inline]="true" [preparedAuthLogin]="currentLogin"></app-bindings-table>
+                        <app-bindings-table [filterId]="buildingId" [inline]="true" [preparedAuthLogin]="currentLogin"
+                                            bindingsStatus="online" filterMode="building"></app-bindings-table>
                     </ng-template>
                 </p-tabPanel>
-                <p-tabPanel header="Коммутаторы" *ngIf="buildingId">
+                <p-tabPanel *ngIf="buildingId" header="Коммутаторы">
                     <ng-template pTemplate="content">
                         <app-commutators-table [buildId]="buildingId" [inline]="true"></app-commutators-table>
                     </ng-template>
+                </p-tabPanel>
+            </ng-container>
+            <ng-container *ngIf="userReviews as reviews">
+                <p-tabPanel [header]="'Отзывы абонента ' + reviews.length">
+                    <p-table [value]="reviews" class="flex-grow-1" styleClass="p-datatable-sm flex-grow-1"
+                             [scrollable]="true" scrollHeight="400px">
+                        <ng-template pTemplate="header">
+                            <tr>
+                                <th>Отзыв</th>
+                                <th>Дата</th>
+                                <th>Источник</th>
+                            </tr>
+                        </ng-template>
+                        <ng-template let-row pTemplate="body">
+                            <tr *ngIf="toUserReview(row) as review">
+                                <td>
+                                    {{ review.text }}
+                                </td>
+                                <td class="white-space-nowrap">
+                                    {{ review.timestamp | date: 'dd.MM.yyyy HH:mm' }}
+                                </td>
+                                <td>
+                                    {{ review.source }}
+                                </td>
+                            </tr>
+                        </ng-template>
+                    </p-table>
                 </p-tabPanel>
             </ng-container>
         </p-tabView>
@@ -444,7 +475,7 @@
         <ng-container *ngIf="lastBindingsPage$ | async as lastBindingsPage; else loading">
             <div [formGroup]="lastBindingsFilterForm" class="flex py-3 gap-3 align-items-end justify-content-end">
                 <div class="text-primary-400 font-bold">
-                    Найдено: {{lastBindingsPage.totalElements}} {{lastBindingsPage.totalElements | decline:'сессия':'сессии':'сессий'}}
+                    Найдено: {{ lastBindingsPage.totalElements }} {{ lastBindingsPage.totalElements | decline:'сессия':'сессии':'сессий' }}
                 </div>
                 <p-toggleButton [disabled]="isLoadingLastBindings" formControlName="state" offIcon="mdi-cancel"
                                 offLabel="Не в сети" onIcon="mdi-check_circle" onLabel="В сети"></p-toggleButton>
@@ -489,15 +520,15 @@
                 <ng-template let-binding pTemplate="body">
                     <tr (click)="authConfirm(binding)"
                         class="cursor-pointer hover:bg-primary-50 hover:text-primary-400">
-                        <td>{{binding.macaddr}}</td>
-                        <td>{{binding.authName}}</td>
+                        <td>{{ binding.macaddr }}</td>
+                        <td>{{ binding.authName }}</td>
                         <td>
                             <div [style.max-width]="'7rem'" appTicker class="white-space-nowrap overflow-hidden">
                                 <ng-container *ngIf="binding.dhcpClient">
-                                    {{binding.dhcpClient}}
+                                    {{ binding.dhcpClient }}
                                 </ng-container>
                                 <ng-container *ngIf="binding.dhcpHostname">
-                                    {{binding.dhcpHostname}}
+                                    {{ binding.dhcpHostname }}
                                 </ng-container>
                             </div>
                         </td>
@@ -507,9 +538,9 @@
                                 <span *ngSwitchCase="true" class="text-green-400">Авторизован</span>
                             </ng-container>
                         </td>
-                        <td>{{binding.streetName}} {{binding.houseNum}}</td>
-                        <td>{{binding.ipaddr}}</td>
-                        <td>{{binding.vlanid}}</td>
+                        <td>{{ binding.streetName }} {{ binding.houseNum }}</td>
+                        <td>{{ binding.ipaddr }}</td>
+                        <td>{{ binding.vlanid }}</td>
                         <td>
                             <app-time-elapsed [startTime]="binding.leaseStart"
                                               type="short"></app-time-elapsed>
@@ -525,23 +556,23 @@
     </ng-template>
 </p-dialog>
 
-<p-dialog [(visible)]="isUserEditDialogVisible" [dismissableMask]="true" [modal]="true"
-          [resizable]="false" [draggable]="true" appendTo="body" header="Редактирование пользователя">
+<p-dialog [(visible)]="isUserEditDialogVisible" [dismissableMask]="true" [draggable]="true"
+          [modal]="true" [resizable]="false" appendTo="body" header="Редактирование пользователя">
     <form [formGroup]="userEditForm" class="flex flex-column gap-2">
         <app-label label="Адрес">
-            <input pInputText formControlName="address">
+            <input formControlName="address" pInputText>
         </app-label>
         <app-label label="ФИО">
-            <input pInputText formControlName="fullName">
+            <input formControlName="fullName" pInputText>
         </app-label>
         <app-label label="Телефон">
-            <input pInputText formControlName="phone">
+            <input formControlName="phone" pInputText>
         </app-label>
         <app-label label="Комментарий">
-            <textarea pInputTextarea formControlName="comment"></textarea>
+            <textarea formControlName="comment" pInputTextarea></textarea>
         </app-label>
-        <button pButton class="mt-2" icon="mdi-check" (click)="confirmUserEdit()"
-                label="Сохранить" [disabled]="userEditForm.invalid"></button>
+        <button (click)="confirmUserEdit()" [disabled]="userEditForm.invalid" class="mt-2" icon="mdi-check"
+                label="Сохранить" pButton></button>
     </form>
 </p-dialog>
 
@@ -576,11 +607,11 @@
                     </ng-template>
                     <ng-template let-rowData pTemplate="body">
                         <tr>
-                            <td [style.color]="rowData.ptypeColor">{{rowData.ptypeName}}</td>
-                            <td>{{rowData.bmoney | currency:'RUB'}}</td>
-                            <td>{{rowData.pdate | date:'EEEE, dd MMMM yyyy HH:mm' | titlecase}}</td>
-                            <td>{{rowData.who}}</td>
-                            <td>{{rowData.cmt}}</td>
+                            <td [style.color]="rowData.ptypeColor">{{ rowData.ptypeName }}</td>
+                            <td>{{ rowData.bmoney | currency:'RUB' }}</td>
+                            <td>{{ rowData.pdate | date:'EEEE, dd MMMM yyyy HH:mm' | titlecase }}</td>
+                            <td>{{ rowData.who }}</td>
+                            <td>{{ rowData.cmt }}</td>
                         </tr>
                     </ng-template>
                 </p-table>
@@ -607,11 +638,11 @@
                     </ng-template>
                     <ng-template let-rowData pTemplate="body">
                         <tr>
-                            <td [style.color]="rowData.eventColor">{{rowData.eventName}}</td>
-                            <td>{{rowData.evTimeStamp | date:'EEEE, dd MMMM yyyy HH:mm' | titlecase}}</td>
-                            <td [ngClass]="{'text-green-400':rowData.moneyDirection > 0, 'text-red-400':rowData.moneyDirection < 0}">{{rowData.money | currency:'RUB'}}</td>
-                            <td>{{rowData.info}}</td>
-                            <td>{{rowData.coment}}</td>
+                            <td [style.color]="rowData.eventColor">{{ rowData.eventName }}</td>
+                            <td>{{ rowData.evTimeStamp | date:'EEEE, dd MMMM yyyy HH:mm' | titlecase }}</td>
+                            <td [ngClass]="{'text-green-400':rowData.moneyDirection > 0, 'text-red-400':rowData.moneyDirection < 0}">{{ rowData.money | currency:'RUB' }}</td>
+                            <td>{{ rowData.info }}</td>
+                            <td>{{ rowData.coment }}</td>
                         </tr>
                     </ng-template>
                 </p-table>
@@ -637,23 +668,23 @@
                     </ng-template>
                     <ng-template let-rowData pTemplate="body">
                         <tr>
-                            <td>{{rowData.service}}</td>
-                            <td>{{rowData.price | currency:'RUB'}}</td>
-                            <td>{{rowData.hdate | date:'dd MMMM yyyy HH:mm' | titlecase}}</td>
-                            <td>{{rowData.edate | date:'dd MMMM yyyy HH:mm' | titlecase}}</td>
+                            <td>{{ rowData.service }}</td>
+                            <td>{{ rowData.price | currency:'RUB' }}</td>
+                            <td>{{ rowData.hdate | date:'dd MMMM yyyy HH:mm' | titlecase }}</td>
+                            <td>{{ rowData.edate | date:'dd MMMM yyyy HH:mm' | titlecase }}</td>
                         </tr>
                     </ng-template>
                 </p-table>
             </p-tabPanel>
             <p-tabPanel header="Расширенные">
                 <ng-template pTemplate="content">
-                    <div class="flex flex-column gap-2" *ngIf="userLogs$ | async as logsPage else logsLoadTemplate">
+                    <div *ngIf="userLogs$ | async as logsPage else logsLoadTemplate" class="flex flex-column gap-2">
                         <app-data-range-input [formControl]="logsFilterForm.controls.dateRange"></app-data-range-input>
-                        <p-table [paginator]="true" [scrollable]="true" (onPage)="changeLogsPage($event)"
-                                 [first]="(logsFilterForm.controls.page.value ?? 0) * 20" [rows]="20" [lazy]="true"
-                                 [value]="logsPage.content" scrollHeight="30rem" [totalRecords]="logsPage.totalElements"
-                                 currentPageReportTemplate="Найдено {totalRecords} логов" [showCurrentPageReport]="true"
-                                 [loading]="loadingLogs"
+                        <p-table (onPage)="changeLogsPage($event)" [first]="(logsFilterForm.controls.page.value ?? 0) * 20" [lazy]="true"
+                                 [loading]="loadingLogs" [paginator]="true" [rows]="20"
+                                 [scrollable]="true" [showCurrentPageReport]="true" [totalRecords]="logsPage.totalElements"
+                                 [value]="logsPage.content" currentPageReportTemplate="Найдено {totalRecords} логов"
+                                 scrollHeight="30rem"
                                  styleClass="p-datatable-sm border-round-lg border-1 border-bluegray-100 overflow-hidden">
                             <ng-template pTemplate="header">
                                 <tr>
@@ -673,11 +704,11 @@
                             </ng-template>
                             <ng-template let-rowData pTemplate="body">
                                 <tr *ngIf="toLogItem(rowData) as log">
-                                    <td>{{log.timestamp | date:'dd-MM-yyyy HH:mm'}}</td>
-                                    <td>{{log.action}}</td>
-                                    <td>{{log.description}}</td>
-                                    <td>{{log.amount | currency:'RUB'}}</td>
-                                    <td>{{log.balance | currency:'RUB'}}</td>
+                                    <td>{{ log.timestamp | date:'dd-MM-yyyy HH:mm' }}</td>
+                                    <td>{{ log.action }}</td>
+                                    <td>{{ log.description }}</td>
+                                    <td>{{ log.amount | currency:'RUB' }}</td>
+                                    <td>{{ log.balance | currency:'RUB' }}</td>
                                 </tr>
                             </ng-template>
                         </p-table>
@@ -697,7 +728,8 @@
                 <ng-container *ngSwitchCase="'READY'">
                     <ng-container *ngFor="let location of (history.nclItems | keyvalue); let i = index">
                         <div [style]="{'gridArea': (i+1) + '/1/'+(i+2)+'/2'}"
-                             class="text-bluegray-400 mr-2 pr-2 border-right-1 border-bluegray-100">{{location.key}}</div>
+                             class="text-bluegray-400 mr-2 pr-2 border-right-1 border-bluegray-100">{{ location.key }}
+                        </div>
                         <ng-container *ngFor="let item of (history.nclItems[location.key])">
                             <div [pTooltip]="'Начало: ' + (item.timeStart|date:'EEEE dd MMMM yyyy HH:mm'|titlecase) + ' Конец: ' + (item.timeEnd|date:'EEEE dd MMMM yyyy HH:mm'|titlecase)"
                                  [style]="{'gridArea': (i+1) + '/'+(item.percentStart+2)+'/'+(i+2)+'/'+(item.percentEnd+2),
@@ -708,8 +740,8 @@
                     </ng-container>
                     <div [style]="{gridArea:'-1/2/-1/-1'}"
                          class="flex align-items-center justify-content-between text-bluegray-400 text-sm font-bold">
-                        <span>{{history.from|date:'EEEE dd MMMM yyyy HH:mm'|titlecase}}</span>
-                        <span>{{history.to|date:'EEEE dd MMMM yyyy HH:mm'|titlecase}}</span>
+                        <span>{{ history.from|date:'EEEE dd MMMM yyyy HH:mm'|titlecase }}</span>
+                        <span>{{ history.to|date:'EEEE dd MMMM yyyy HH:mm'|titlecase }}</span>
                     </div>
                 </ng-container>
                 <ng-container *ngSwitchCase="'LOADING'">
@@ -750,7 +782,8 @@
                 <textarea [autoResize]="true" [cols]="40" [rows]="3"
                           formControlName="comment" pInputTextarea placeholder="Комментарий"></textarea>
             </form>
-            <p-button (onClick)="sendBalance()" [disabled]="!balanceForm.valid" class="align-self-end" icon="mdi-attach_money"
+            <p-button (onClick)="sendBalance()" [disabled]="!balanceForm.valid" class="align-self-end"
+                      icon="mdi-attach_money"
                       label="Оплата" styleClass="p-button-primary"></p-button>
         </div>
     </ng-template>
@@ -762,7 +795,8 @@
         <div class="flex flex-column gap-4 mt-1">
             <textarea [autoResize]="true" [cols]="40" [formControl]="balanceResetCommentControl"
                       [rows]="3" pInputTextarea placeholder="Комментарий к обнулению баланса..."></textarea>
-            <p-button (onClick)="sendBalanceReset()" [disabled]="!balanceResetCommentControl.valid" class="align-self-end"
+            <p-button (onClick)="sendBalanceReset()" [disabled]="!balanceResetCommentControl.valid"
+                      class="align-self-end"
                       icon="mdi-exposure_zero"
                       label="Обнулить баланс" styleClass="p-button-primary"></p-button>
         </div>
@@ -792,7 +826,8 @@
         <ng-container [formGroup]="recalculationForm">
             <div class="flex gap-3 align-items-center">
                 <p-selectButton [options]="recalculationModeOptions" formControlName="mode"></p-selectButton>
-                <input [placeholder]="recalculationForm.value.mode === 'DAYS' ? 'Кол-во дней' : 'Кол-во рублей'" [size]="12" formControlName="count" pInputText
+                <input [placeholder]="recalculationForm.value.mode === 'DAYS' ? 'Кол-во дней' : 'Кол-во рублей'"
+                       [size]="12" formControlName="count" pInputText
                        pKeyFilter="int"/>
             </div>
             <textarea [autoResize]="true" [cols]="30" [rows]="3" formControlName="comment" pInputTextarea
@@ -818,10 +853,10 @@
             <div [pTooltip]="tariff.description" [showDelay]="500"
                  class="flex align-items-center justify-content-between w-full h-full">
                 <span>
-                    {{tariff.name}}
+                    {{ tariff.name }}
                 </span>
                 <span>
-                    {{tariff.cost | currency:'RUB'}}
+                    {{ tariff.cost | currency:'RUB' }}
                 </span>
             </div>
         </ng-template>
@@ -837,10 +872,10 @@
             <div [pTooltip]="service.description" [showDelay]="500"
                  class="flex align-items-center justify-content-between w-full h-full">
                 <span>
-                    {{service.name}}
+                    {{ service.name }}
                 </span>
                 <span>
-                    {{service.cost | currency:'RUB'}}
+                    {{ service.cost | currency:'RUB' }}
                 </span>
             </div>
         </ng-template>
@@ -851,7 +886,7 @@
 
 <ng-template #logsLoadTemplate>
     <div class="flex flex-column gap-2">
-        <p-skeleton width="15rem" height="3rem"></p-skeleton>
-        <p-skeleton width="35rem" height="35rem"></p-skeleton>
+        <p-skeleton height="3rem" width="15rem"></p-skeleton>
+        <p-skeleton height="35rem" width="35rem"></p-skeleton>
     </div>
 </ng-template>

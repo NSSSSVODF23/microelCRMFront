@@ -46,6 +46,7 @@ import {BlockIcon, BlockMessage, BlockUiService, BlockZIndex} from "./block-ui.s
 import {PonData} from "../pon/scheme/elements";
 import {SensorUpdateEvent} from "../types/sensors-types";
 import {TelegramUserRequest, TelegramUserTariff} from "../types/user-types";
+import {UserReview} from "../types/user-reviews";
 
 @Injectable({
     providedIn: 'root'
@@ -546,5 +547,9 @@ export class RealTimeUpdateService {
 
     receiveTlgUserRequest() {
         return this.watch<UpdateCarrier<TelegramUserRequest>>('telegram-user-request');
+    }
+
+    receiveUserReviewUpdate() {
+        return this.watch<UpdateCarrier<UserReview>>('user-review');
     }
 }

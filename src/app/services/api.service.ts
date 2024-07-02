@@ -110,6 +110,7 @@ import {TemperatureRange, TemperatureSensor} from "../types/sensors-types";
 import {NotificationSettingsForm} from "../types/notification-types";
 import {DashboardItem} from "../types/task-dashboard";
 import {LogItem, LogsForm, TelegramUserRequest, TelegramUserTariff} from "../types/user-types";
+import {UserReview} from "../types/user-reviews";
 
 @Injectable({
     providedIn: 'root'
@@ -1813,5 +1814,9 @@ export class ApiService {
 
     getUnprocessedTelegramUserRequestsCount()  {
         return this.sendGetUncached<number>("api/private/user/telegram/request/unprocessed/count");
+    }
+
+    getUserReviewsByLogin(login: string)  {
+        return this.sendGetUncached<UserReview[]>(`api/private/review/${login}`);
     }
 }

@@ -49,6 +49,10 @@
                     <label>IP:PORT MicroelHub</label>
                     <input formControlName="microelHubIpPort" pInputText type="text"/>
                 </div>
+                <div class="input-label-wrapper">
+                    <label>Id канала уведомлений</label>
+                    <input formControlName="notificationChannelId" pInputText type="text"/>
+                </div>
                 <p-button (onClick)="saveUserConf()" [loading]="isSaving" [disabled]="userTelegramConfigForm.invalid" icon="mdi-save" label="Сохранить"
                           styleClass="p-button-success"></p-button>
             </div>
