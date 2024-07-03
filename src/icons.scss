@@ -8852,6 +8852,14 @@
 
 .mds {
 
+  &-payments {
+    @include mds("payments");
+  }
+
+  &-credit_card {
+    @include mds("credit_card");
+  }
+
   &-flowsheet {
     @include mds("flowsheet");
   }

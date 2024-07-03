@@ -813,6 +813,11 @@
             </div>
             <textarea [autoResize]="true" [cols]="30" [rows]="3" formControlName="comment" pInputTextarea
                       placeholder="Комментарий"></textarea>
+            <div *ngIf="paymentWarning$ | async as warning" [ngClass]="warning.bgColor"
+                 class="flex px-5 select-none h-8rem border-round-xl gap-3 align-items-center text-white text-5xl font-light">
+                <span [ngClass]="warning.icon"></span>
+                <span>{{ warning.label }}</span>
+            </div>
             <p-button (onClick)="sendPayment()" [disabled]="!paymentForm.valid" class="mt-3 align-self-end"
                       icon="mdi-attach_money" label="Оплатить"></p-button>
         </ng-container>

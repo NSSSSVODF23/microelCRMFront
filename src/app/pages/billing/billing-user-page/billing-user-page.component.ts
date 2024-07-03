@@ -6,12 +6,14 @@ import {
     DateRange,
     DhcpBinding,
     DhcpLog,
-    DhcpLogsRequest, EventType,
+    DhcpLogsRequest,
+    EventType,
     LoadingState,
     NCLHistoryWrapper,
     Ont,
     Page,
-    TimeFrame, UpdateCarrier,
+    TimeFrame,
+    UpdateCarrier,
     UserEvents,
     UserTariff
 } from "../../../types/transport-interfaces";
@@ -25,7 +27,8 @@ import {
     map,
     merge,
     Observable,
-    of, ReplaySubject,
+    of,
+    ReplaySubject,
     shareReplay,
     startWith,
     Subject,
@@ -99,7 +102,7 @@ export class BillingUserPageComponent implements OnInit, OnDestroy {
             this.userInfo = undefined;
             setTimeout(() => {
                 this.userInfo = userInfo;
-                if(this.currentLogin) {
+                if (this.currentLogin) {
                     this.passwordObserver$ = this.api.getBillingUserPassword(this.currentLogin);
                 }
                 this.initControlMenuItems();
@@ -207,6 +210,29 @@ export class BillingUserPageComponent implements OnInit, OnDestroy {
         sum: new FormControl(null, [Validators.required]),
         comment: new FormControl(null, [Validators.required]),
     });
+    paymentWarning$ = this.paymentForm.controls.paymentType.valueChanges
+        .pipe(
+            startWith(
+                this.paymentForm.controls.paymentType.value
+            ),
+            map((paymentType) => {
+                switch (paymentType) {
+                    case  1:
+                        return {
+                            bgColor: 'bg-primary',
+                            label: 'Наличные',
+                            icon:'mds-payments',
+                        };
+                    case  25:
+                        return {
+                            bgColor: 'bg-red-500',
+                            label: 'Карта',
+                            icon:'mdi-credit_card',
+                        };
+                }
+                return  null;
+            })
+        );
     controlMenuItems: MenuItem[] = [];
     pathChange$ = this.route.params.pipe(tap(params => {
         this.currentLogin = params['login']
@@ -232,13 +258,13 @@ export class BillingUserPageComponent implements OnInit, OnDestroy {
     userReviewsUpdateSub = this.rt.receiveUserReviewUpdate()
         .subscribe(this.userReviewsHandler.bind(this));
 
-    activeBinding$ = this.login$.pipe(switchMap(login=>this.api.getActiveBindingByLogin(login)));
+    activeBinding$ = this.login$.pipe(switchMap(login => this.api.getActiveBindingByLogin(login)));
     activeBuildingId$ = this.activeBinding$
         .pipe(
-            switchMap(binding=> {
-                if(binding?.vlanid){
+            switchMap(binding => {
+                if (binding?.vlanid) {
                     return this.api.getBuildingIdByVlan(binding?.vlanid);
-                }else{
+                } else {
                     return of(null);
                 }
             })
@@ -252,28 +278,25 @@ export class BillingUserPageComponent implements OnInit, OnDestroy {
 
     loadUserSub = this.loadUser$.subscribe(this.userInfoHandler);
     updateUserSub = this.updateUser$.subscribe(this.userInfoHandler);
-    dhcpLogsUpdateSub = this.login$.subscribe(login=>{
-        this.dhcpLogsPageNum = 0;
-        this.dhcpLogsIsLastPage = false;
-        this.logsLoad(login);
-    })
+    // dhcpBindings$ = DynamicValueFactory.of(this.dhcpBindingsLoad$, 'id', null, this.rt.acpDhcpBindingUpdated());
+    hardwareEmptyMessage$ = this.activeBinding$.pipe(
+        map(binding => {
+            if (!binding) {
+                return 'Нет абонентского оборудования';
+            } else if (!binding.isAuth) {
+                return 'Нет авторизованного оборудования';
+            } else {
+                return null;
+            }
+        }),
+    );
 
     // dhcpBindingsLoad$ = this.login$.pipe(
     //     switchMap(login => this.api.getDhcpBindingsByLogin(login)),
     //     shareReplay(1)
     // );
-    // dhcpBindings$ = DynamicValueFactory.of(this.dhcpBindingsLoad$, 'id', null, this.rt.acpDhcpBindingUpdated());
-    hardwareEmptyMessage$ = this.activeBinding$.pipe(
-        map(binding => {
-            if(!binding){
-                return 'Нет абонентского оборудования';
-            }else if(!binding.isAuth){
-                return 'Нет авторизованного оборудования';
-            }else{
-                return null;
-            }
-        }),
-    );
+    // )
+    nclHistory$ = new BehaviorSubject<NCLHistoryWrapper | null>(null);
     // activeClientHardware$ = this.dhcpBindings$.pipe(
     //     map(bindings => bindings.value.find(b=>b.isAuth)),
     // )
@@ -315,15 +338,13 @@ export class BillingUserPageComponent implements OnInit, OnDestroy {
     //     this.rt.acpCommutatorCreated(),
     //     this.rt.acpCommutatorUpdated(),
     //     this.rt.acpCommutatorDeleted()
-    // )
-    nclHistory$ = new BehaviorSubject<NCLHistoryWrapper|null>(null);
     nclHistoryLoadingState = LoadingState.LOADING;
     nclHistoryViewStyle$ = this.nclHistory$.pipe(
         map(history => {
-            if(history){
+            if (history) {
                 try {
                     const length = Object.entries(history.nclItems).length;
-                    if(length === 0){
+                    if (length === 0) {
                         return {
                             display: 'grid',
                             alignItems: 'center',
@@ -347,13 +368,16 @@ export class BillingUserPageComponent implements OnInit, OnDestroy {
             };
         })
     )
-
     dhcpLogs = [] as DhcpLog[];
     dhcpLogsGroupedList: MenuItem[] = [];
     dhcpLogsPageNum = 0;
     dhcpLogsLoadingState = LoadingState.READY;
     dhcpLogsIsLastPage = false;
-
+    dhcpLogsUpdateSub = this.login$.subscribe(login => {
+        this.dhcpLogsPageNum = 0;
+        this.dhcpLogsIsLastPage = false;
+        this.logsLoad(login);
+    })
     tariffList: UserTariff[] = [];
     selectedTariff?: number;
     serviceList: UserTariff[] = [];
@@ -369,13 +393,13 @@ export class BillingUserPageComponent implements OnInit, OnDestroy {
 
     updateOnt$ = this.login$
         .pipe(
-            switchMap(login=>{
+            switchMap(login => {
                 return merge(
                     this.rt.receiveUpdatedOnt().pipe(filter(ont => ont.userLogin === login)),
                     this.rt.receiveNewOntStatusChangeEvents().pipe(
                         map(events => {
                             let foundEvent = events.find(event => event.terminal.userLogin === login);
-                            if(!!foundEvent){
+                            if (!!foundEvent) {
                                 return foundEvent.terminal;
                             }
                             return null;
@@ -385,13 +409,60 @@ export class BillingUserPageComponent implements OnInit, OnDestroy {
                 )
             })
         );
-
+    ontNotFound = false;
     ont$ = this.login$
         .pipe(
             switchMap(login => merge(this.api.getOntByLogin(login), this.updateOnt$)),
-            tap(onu=>this.ontNotFound = !onu)
+            tap(onu => this.ontNotFound = !onu)
         );
-    ontNotFound = false;
+    logsLoadHandler = {
+        next: (logs: DhcpLogsRequest) => {
+            this.dhcpLogsLoadingState = LoadingState.READY;
+            if (this.dhcpLogsPageNum === 0) {
+                this.dhcpLogs = [...logs.logs];
+            } else {
+                this.dhcpLogs = [...this.dhcpLogs, ...logs.logs];
+            }
+            this.dhcpLogsIsLastPage = logs.isLast;
+            this.dhcpLogsGroupedList = this.dhcpLogs.reduce((previousValue, currentValue) => {
+                const date = new Date(currentValue.startDatetime).toLocaleDateString();
+                const groupItem = previousValue.find(value => value.label === date);
+                if (!groupItem) {
+                    previousValue.push({
+                        label: date, state: {date: currentValue.startDatetime}, items: [{
+                            state: {
+                                startTime: currentValue.startDatetime,
+                                endTime: currentValue.endDatetime,
+                                color: this.logColor(currentValue.type),
+                                description: currentValue.description,
+                                numbers: currentValue.numberRepetitions,
+                                macAddresses: currentValue.macAddresses,
+                            }
+                        }]
+                    })
+                } else {
+                    groupItem.items?.push({
+                        state: {
+                            startTime: currentValue.startDatetime,
+                            endTime: currentValue.endDatetime,
+                            color: this.logColor(currentValue.type),
+                            description: currentValue.description,
+                            numbers: currentValue.numberRepetitions,
+                            macAddresses: currentValue.macAddresses,
+                        }
+                    })
+                }
+                return previousValue;
+            }, [] as MenuItem[]);
+            this.dhcpLogsPageNum++;
+        },
+        error: () => {
+            this.dhcpLogsLoadingState = LoadingState.ERROR;
+            this.dhcpLogs = [];
+            this.dhcpLogsGroupedList = [];
+            this.dhcpLogsIsLastPage = false;
+        }
+    }
 
     constructor(private api: ApiService, private rt: RealTimeUpdateService,
                 private route: ActivatedRoute, readonly customNav: CustomNavigationService,
@@ -445,7 +516,7 @@ export class BillingUserPageComponent implements OnInit, OnDestroy {
     }
 
     get paymentTypeName() {
-        switch (this.paymentForm.value.paymentType){
+        switch (this.paymentForm.value.paymentType) {
             case 1:
                 return "наличных";
             case 25:
@@ -455,7 +526,7 @@ export class BillingUserPageComponent implements OnInit, OnDestroy {
     }
 
     get recalculationModeName() {
-        switch (this.recalculationForm.value.mode){
+        switch (this.recalculationForm.value.mode) {
             case 'DAYS':
                 return "в днях";
             case 'MONEY':
@@ -464,11 +535,15 @@ export class BillingUserPageComponent implements OnInit, OnDestroy {
         return null;
     }
 
-    toLogItem(value: any): LogItem { return value }
+    toLogItem(value: any): LogItem {
+        return value
+    }
 
-    toUserReview(value: any): UserReview { return value }
+    toUserReview(value: any): UserReview {
+        return value
+    }
 
-    changeLogsPage(event: any){
+    changeLogsPage(event: any) {
         const {first, rows} = event;
         this.logsFilterForm.controls.page.setValue(first / rows);
     }
@@ -534,19 +609,19 @@ export class BillingUserPageComponent implements OnInit, OnDestroy {
                 this.block("Включение отложенного платежа");
                 this.api.setDeferredPayment(this.currentLogin)
                     .subscribe({
-                        next: ()=>this.unblock(),
-                        error: ()=>this.unblock()
+                        next: () => this.unblock(),
+                        error: () => this.unblock()
                     });
             }
         });
     }
 
-    userReviewsHandler(value: UserReview[] | UpdateCarrier<UserReview>){
+    userReviewsHandler(value: UserReview[] | UpdateCarrier<UserReview>) {
         if (Array.isArray(value)) {
             this.userReviews = value;
-        } else if(value.data.userLogin === this.currentLogin) {
-            switch (value.type){
-                case EventType.CREATE:{
+        } else if (value.data.userLogin === this.currentLogin) {
+            switch (value.type) {
+                case EventType.CREATE: {
                     this.userReviews.unshift(value.data);
                 }
             }
@@ -556,6 +631,19 @@ export class BillingUserPageComponent implements OnInit, OnDestroy {
     trackByDhcpBinding(index: number, item: DhcpBinding) {
         return item.vlanid + item.ipaddr + item.state + item.id + item.isAuth + item.authName + item.authExpire + item.lastConnectionLocation?.checkedAt;
     };
+
+    // load() {
+    //     if (this.currentLogin) {
+    //         this.subscriptions.unsubscribe('userUpd');
+    //         this.api.getBillingUserInfo(this.currentLogin).subscribe(this.userInfoHandler);
+    //         this.dhcpLogsPageNum = 0;
+    //         this.dhcpLogsIsLastPage = false;
+    //         this.logsLoad(this.currentLogin);
+    //         this.subscriptions.addSubscription('userUpd', this.rt.billingUserUpdated(this.currentLogin).subscribe(this.userInfoHandler));
+    //     } else {
+    //         this.loadingState = LoadingState.ERROR;
+    //     }
+    // }
 
     ngOnInit(): void {
         // this.subscriptions.addSubscription('pch',
@@ -584,75 +672,15 @@ export class BillingUserPageComponent implements OnInit, OnDestroy {
         });
     }
 
-    // load() {
-    //     if (this.currentLogin) {
-    //         this.subscriptions.unsubscribe('userUpd');
-    //         this.api.getBillingUserInfo(this.currentLogin).subscribe(this.userInfoHandler);
-    //         this.dhcpLogsPageNum = 0;
-    //         this.dhcpLogsIsLastPage = false;
-    //         this.logsLoad(this.currentLogin);
-    //         this.subscriptions.addSubscription('userUpd', this.rt.billingUserUpdated(this.currentLogin).subscribe(this.userInfoHandler));
-    //     } else {
-    //         this.loadingState = LoadingState.ERROR;
-    //     }
-    // }
-
-    logsLoad(login?: string){
-        if(!this.dhcpLogsIsLastPage && login && this.dhcpLogsLoadingState === LoadingState.READY){
+    logsLoad(login?: string) {
+        if (!this.dhcpLogsIsLastPage && login && this.dhcpLogsLoadingState === LoadingState.READY) {
             this.dhcpLogsLoadingState = LoadingState.LOADING;
             this.api.getDhcpLogsByLogin(login, this.dhcpLogsPageNum).subscribe(this.logsLoadHandler);
         }
     }
 
-    logsLoadHandler = {
-        next: (logs: DhcpLogsRequest) => {
-            this.dhcpLogsLoadingState = LoadingState.READY;
-            if(this.dhcpLogsPageNum === 0){
-                this.dhcpLogs = [...logs.logs];
-            }else{
-                this.dhcpLogs = [...this.dhcpLogs, ...logs.logs];
-            }
-            this.dhcpLogsIsLastPage = logs.isLast;
-            this.dhcpLogsGroupedList = this.dhcpLogs.reduce((previousValue, currentValue)=>{
-                const date = new Date(currentValue.startDatetime).toLocaleDateString();
-                const groupItem = previousValue.find(value=>value.label===date);
-                if(!groupItem){
-                    previousValue.push({label: date, state: {date: currentValue.startDatetime}, items: [{
-                            state: {
-                                startTime: currentValue.startDatetime,
-                                endTime: currentValue.endDatetime,
-                                color: this.logColor(currentValue.type),
-                                description: currentValue.description,
-                                numbers: currentValue.numberRepetitions,
-                                macAddresses: currentValue.macAddresses,
-                            }
-                        }]})
-                }else{
-                    groupItem.items?.push({
-                        state: {
-                            startTime: currentValue.startDatetime,
-                            endTime: currentValue.endDatetime,
-                            color: this.logColor(currentValue.type),
-                            description: currentValue.description,
-                            numbers: currentValue.numberRepetitions,
-                            macAddresses: currentValue.macAddresses,
-                        }
-                    })
-                }
-                return previousValue;
-            },[] as MenuItem[]);
-            this.dhcpLogsPageNum++;
-        },
-        error: () => {
-            this.dhcpLogsLoadingState = LoadingState.ERROR;
-            this.dhcpLogs = [];
-            this.dhcpLogsGroupedList = [];
-            this.dhcpLogsIsLastPage = false;
-        }
-    }
-
-    copyMacAddress(event:any){
-        if(event.value){
+    copyMacAddress(event: any) {
+        if (event.value) {
             Utils.copyToClipboard(event.value.state.macAddresses, this.toast, 'MAC адреса скопированы', 'Не удалось скопировать MAC адреса');
         }
     }
@@ -695,7 +723,9 @@ export class BillingUserPageComponent implements OnInit, OnDestroy {
     openBindingContextMenu(event: MouseEvent, binding: DhcpBinding, menu: Menu) {
         this.bindingContextMenuItems = [
             {
-                label: 'Авторизовать (текущий логин)', command: () => this.authCurrentLogin(binding.macaddr), disabled: binding.isAuth && binding.authName === this.currentLogin
+                label: 'Авторизовать (текущий логин)',
+                command: () => this.authCurrentLogin(binding.macaddr),
+                disabled: binding.isAuth && binding.authName === this.currentLogin
             },
             {
                 label: 'История подключений', command: () => this.openNCLHistoryDialog(binding),
@@ -783,7 +813,7 @@ export class BillingUserPageComponent implements OnInit, OnDestroy {
     }
 
     openEditUserDialog() {
-        if(!this.userInfo) return;
+        if (!this.userInfo) return;
         this.userEditForm.reset({
             address: this.userInfo.ibase.addr,
             fullName: this.userInfo.ibase.fio,
@@ -947,7 +977,7 @@ export class BillingUserPageComponent implements OnInit, OnDestroy {
     }
 
     getTariffList(event: any, panel: OverlayPanel) {
-        if(this.currentLogin) {
+        if (this.currentLogin) {
             panel.toggle(event);
             this.api.getBillingUserTariffs(this.currentLogin).subscribe((tariffs) => {
                 this.tariffList = tariffs;
@@ -957,7 +987,7 @@ export class BillingUserPageComponent implements OnInit, OnDestroy {
     }
 
     getServiceList(event: any, panel: OverlayPanel) {
-        if(this.currentLogin) {
+        if (this.currentLogin) {
             panel.toggle(event);
             this.api.getBillingUserServices(this.currentLogin).subscribe((services) => {
                 this.serviceList = services;
@@ -967,12 +997,12 @@ export class BillingUserPageComponent implements OnInit, OnDestroy {
     }
 
     appendService(event: any) {
-        if(this.currentLogin)
+        if (this.currentLogin)
             this.confirm.confirm({
                 header: 'Добавление сервиса',
                 message: 'Добавить сервис ' + event.option.name + ' абоненту?',
                 accept: () => {
-                    if(this.currentLogin) {
+                    if (this.currentLogin) {
                         this.block('Добавление сервиса')
                         this.api.appendServiceToBillingUser(event.value, this.currentLogin).subscribe({
                             next: () => {
@@ -988,12 +1018,12 @@ export class BillingUserPageComponent implements OnInit, OnDestroy {
     }
 
     removeService(name: string) {
-        if(this.currentLogin)
+        if (this.currentLogin)
             this.confirm.confirm({
                 header: 'Отключение сервиса',
                 message: 'Отключить сервис ' + name + '?',
                 accept: () => {
-                    if(this.currentLogin) {
+                    if (this.currentLogin) {
                         this.block('Отключение сервиса')
                         this.api.removeServiceFromBillingUser(name, this.currentLogin).subscribe({
                             next: () => {
@@ -1009,12 +1039,12 @@ export class BillingUserPageComponent implements OnInit, OnDestroy {
     }
 
     changeTariff(event: any) {
-        if(this.currentLogin)
+        if (this.currentLogin)
             this.confirm.confirm({
                 header: 'Изменение тарифа',
                 message: 'Изменить тариф абонента на ' + event.option.name + '?',
                 accept: () => {
-                    if(this.currentLogin) {
+                    if (this.currentLogin) {
                         this.block('Изменение тарифа')
                         this.api.changeTariffInBillingUser(event.value, this.currentLogin).subscribe({
                             next: () => {
@@ -1038,8 +1068,8 @@ export class BillingUserPageComponent implements OnInit, OnDestroy {
     }
 
     signalColor(ont: Ont) {
-        if(ont.curRxSignal > -25.5) return 'text-green-500';
-        if(ont.curRxSignal > -28.5) return 'text-orange-400';
+        if (ont.curRxSignal > -25.5) return 'text-green-500';
+        if (ont.curRxSignal > -28.5) return 'text-orange-400';
         return 'text-red-600';
     }
 
