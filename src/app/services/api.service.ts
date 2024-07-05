@@ -1099,7 +1099,7 @@ export class ApiService {
     }
 
     getDhcpLogsByLogin(login: string, page: number = 0) {
-        return this.sendGet<DhcpLogsRequest>(`api/private/acp/dhcp/binding/${login}/logs/${page}`, {});
+        return this.sendGetUncached<DhcpLogsRequest>(`api/private/acp/dhcp/binding/${login}/logs/${page}`, {});
     }
 
     getLastBindings(page: number, state?: number, macaddr?: string | null, login?: string | null, ip?: string | null, vlan?: number | null, buildingId?: number | null, commutator?: number | null, port?: number | null) {

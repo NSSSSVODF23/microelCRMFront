@@ -5,9 +5,9 @@ import {EmployeeLabelComponent} from "./components/controls/employee-label/emplo
 import {TaskLinkComponent} from "./components/controls/task-link/task-link.component";
 import {DepartmentLabelComponent} from "./components/controls/department-label/department-label.component";
 import {configurePrimeng, registerCustomElements} from "./util";
-import {Router, Scroll} from "@angular/router";
+import {NavigationEnd, Router, Scroll} from "@angular/router";
 import {ViewportScroller} from "@angular/common";
-import {delay, filter} from "rxjs";
+import {delay, filter, map} from "rxjs";
 import {InputTextarea} from "primeng/inputtextarea";
 import {NotificationsService} from "./services/notifications.service";
 

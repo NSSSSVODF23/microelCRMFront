@@ -461,6 +461,9 @@ export class BillingUserPageComponent implements OnInit, OnDestroy {
             this.dhcpLogs = [];
             this.dhcpLogsGroupedList = [];
             this.dhcpLogsIsLastPage = false;
+        },
+        complete: () =>  {
+            console.log('Complete')
         }
     }
 
@@ -673,9 +676,17 @@ export class BillingUserPageComponent implements OnInit, OnDestroy {
     }
 
     logsLoad(login?: string) {
-        if (!this.dhcpLogsIsLastPage && login && this.dhcpLogsLoadingState === LoadingState.READY) {
+        if (!this.dhcpLogsIsLastPage && login && this.dhcpLogsLoadingState === LoadingState.READY && this.logsLoadHandler) {
             this.dhcpLogsLoadingState = LoadingState.LOADING;
             this.api.getDhcpLogsByLogin(login, this.dhcpLogsPageNum).subscribe(this.logsLoadHandler);
+            // this.api.getDhcpLogsByLogin(login, this.dhcpLogsPageNum).subscribe({
+            //     next: (value) => {
+            //         console.log(value);
+            //     },
+            //     error: (error) => {
+            //         console.log(error);
+            //     }
+            // });
         }
     }
 

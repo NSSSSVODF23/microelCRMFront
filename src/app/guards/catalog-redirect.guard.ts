@@ -24,16 +24,18 @@ export class CatalogRedirectGuard implements CanActivate {
             return this.catalogCachedRoute$
                 .pipe(
                     map(path => {
-                        if(state.url === '/tasks/catalog') {
+                        if(state.url === '/tasks/catalog' && !this.isRedirecting) {
                             this.isRedirecting = true;
                             return this.router.createUrlTree(path);
                         }
-                        if (path.join('/') !== state.url || this.isRedirecting) {
-                            this.isRedirecting = false;
-                            return true;
-                        }
-                        this.isRedirecting = true;
-                        return this.router.createUrlTree(path)
+                        this.isRedirecting  = false;
+                        return true;
+                        // if (path.join('/') !== state.url || this.isRedirecting) {
+                        //     this.isRedirecting = false;
+                        //     return true;
+                        // }
+                        // this.isRedirecting = true;
+                        // return this.router.createUrlTree(path)
                     })
                 )
         } else {

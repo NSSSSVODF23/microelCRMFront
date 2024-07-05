@@ -37,6 +37,6 @@ export interface TelegramUserRequest {
     description: string;
     fromSource: string;
     created: string;
-    processedBy: EmployeeIntervention;
+    processedBy?: EmployeeIntervention;
     deleted: boolean;
 }

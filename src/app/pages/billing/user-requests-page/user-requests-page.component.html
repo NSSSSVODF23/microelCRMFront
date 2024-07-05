@@ -37,7 +37,8 @@
                         <td>{{ request.created | date:'dd-MM-yyyy HH:mm' }}</td>
                         <td>
                             <span *ngIf="request.processedBy" [pTooltip]="request.processedBy.description ?? ''" tooltipPosition="bottom">
-                                {{ request.processedBy.timestamp | date:'dd-MM-yyyy HH:mm' }} ({{request.processedBy.employee?.fullName}})
+                                {{ request.processedBy && request.processedBy.timestamp | date:'dd-MM-yyyy HH:mm' }}
+                                ({{request.processedBy ? request.processedBy.employee.fullName : ''}})
                             </span>
                         </td>
                         <td>

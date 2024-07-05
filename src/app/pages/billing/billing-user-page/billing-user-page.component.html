@@ -46,7 +46,7 @@
             </div>
             <div class="flex flex-column flex-grow-1">
                 <ng-container *ngTemplateOutlet="acpInfo"></ng-container>
-                <p-listbox (onClick)="copyMacAddress($event)" (onScrollDown)="logsLoad(currentLogin)" [group]="true"
+                <p-listbox *ngIf="logsLoadHandler" (onClick)="copyMacAddress($event)" (onScrollDown)="logsLoad(currentLogin)" [group]="true"
                            [listStyle]="{'max-height':'250px'}" [options]="dhcpLogsGroupedList"
                            appListElementLazyScroll class="mt-3"
                            listStyleClass="simple-list">
