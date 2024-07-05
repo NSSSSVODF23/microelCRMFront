@@ -72,7 +72,7 @@ export class TasksCatalogPageCacheService {
     termTime$ = this.termTimeSubject.asObservable();
 
     pageControl = new FormControl(0);
-    taskLoadingState = LoadingState.READY;
+    taskLoadingState = LoadingState.LOADING;
     hasCachedRoute = false;
     lastRoute$ = combineLatest([this.status$, this.class$, this.type$, this.pageType$,
         this.directory$, this.tag$, this.closeTime$, this.actualTime$, this.termTime$, this.scheduling$])

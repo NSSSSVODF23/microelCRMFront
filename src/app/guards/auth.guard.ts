@@ -21,29 +21,31 @@ export class AuthGuard implements CanActivate, CanActivateChild {
     canActivate(
         route: ActivatedRouteSnapshot,
         state: RouterStateSnapshot): Observable<boolean | UrlTree> | Promise<boolean | UrlTree> | boolean | UrlTree {
-        return this.api.authCheckout().pipe(catchError((err, caught)=>{
-            return of(this.router.createUrlTree(['/login']));
-        }), map((value)=> {
-            if (value instanceof UrlTree) {
-                return value;
-            } else {
-                return true;
-            }
-        }));
+        return true;
+        // return this.api.authCheckout().pipe(catchError((err, caught)=>{
+        //     return of(this.router.createUrlTree(['/login']));
+        // }), map((value)=> {
+        //     if (value instanceof UrlTree) {
+        //         return value;
+        //     } else {
+        //         return true;
+        //     }
+        // }));
     }
 
     canActivateChild(
         childRoute: ActivatedRouteSnapshot,
         state: RouterStateSnapshot): Observable<boolean | UrlTree> | Promise<boolean | UrlTree> | boolean | UrlTree {
-        return this.api.authCheckout().pipe(catchError((err, caught)=>{
-            return of(this.router.createUrlTree(['/login']));
-        }), map((value)=> {
-            if (value instanceof UrlTree) {
-                return value;
-            } else {
-                return true;
-            }
-        }));
+        return true;
+        // return this.api.authCheckout().pipe(catchError((err, caught)=>{
+        //     return of(this.router.createUrlTree(['/login']));
+        // }), map((value)=> {
+        //     if (value instanceof UrlTree) {
+        //         return value;
+        //     } else {
+        //         return true;
+        //     }
+        // }));
     }
 
 }

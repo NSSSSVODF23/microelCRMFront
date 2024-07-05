@@ -73,16 +73,18 @@ export class PersonalityService {
         }, 1000);
 
         // Проверяем истекает ли срок действия токена, если да обновляем его
-        setInterval(() => {
-            const now = new Date().getTime();
-            const rawToken = localStorage.getItem('token');
-            if (!rawToken) return;
-            const token = jwtDecode(rawToken) as Token;
-            if ((token.exp * 1000) - now < 30000) {
-                this.api.authCheckout().subscribe();
-                console.log("Проверка токена")
-            }
-        }, 10000)
+        // setInterval(() => {
+        //     const now = new Date().getTime();
+        //     const rawToken = localStorage.getItem('token');
+        //     console.log(rawToken)
+        //     if (!rawToken) return;
+        //     const token = jwtDecode(rawToken) as Token;
+        //     console.log("Токен истечет" + new Date(token.exp * 1000))
+        //     if ((token.exp * 1000) - now < 30000) {
+        //         this.api.authCheckout().subscribe();
+        //         console.log("Проверка токена")
+        //     }
+        // }, 10000)
     }
 
     updateMe() {

@@ -111,6 +111,7 @@ import {NotificationSettingsForm} from "../types/notification-types";
 import {DashboardItem} from "../types/task-dashboard";
 import {LogItem, LogsForm, TelegramUserRequest, TelegramUserTariff} from "../types/user-types";
 import {UserReview} from "../types/user-reviews";
+import {Router} from "@angular/router";
 
 @Injectable({
     providedIn: 'root'
@@ -121,7 +122,7 @@ export class ApiService {
     requestCacheMapTimers: { [hash: string]: any } = {}
     loggedIn = false;
 
-    constructor(readonly client: HttpClient, readonly toast: MessageService) {
+    constructor(readonly client: HttpClient, readonly toast: MessageService, private router: Router) {
     }
 
     // Результаты запросов на сервер кэшируются по таймауту, чтобы не было доп нагрузки на сервер
@@ -140,6 +141,8 @@ export class ApiService {
         if (!this.requestCacheMap[requestHash]) {
             observable = this.client.get<T>(uri, {params: query})
                 .pipe(shareReplay(1), catchError(async (err, caught) => {
+                    if(this.redirectToLoginPage(err))
+                        throw err;
                     this.toast.add({severity: 'error', summary: "Ошибка запроса", detail: err.error.message})
                     throw err;
                 }));
@@ -162,6 +165,8 @@ export class ApiService {
     private sendGetUncached<T>(uri: string, query?: any) {
         return this.client.get<T>(uri, {params: query})
             .pipe(shareReplay(1), catchError(async (err, caught) => {
+                if(this.redirectToLoginPage(err))
+                    throw err;
                 this.toast.add({severity: 'error', summary: "Ошибка запроса", detail: err.error.message})
                 throw err;
             }));
@@ -181,7 +186,13 @@ export class ApiService {
             // console.log(uri, query);
 
             observable = this.client.get<T>(uri, {params: query})
-                .pipe(shareReplay(1));
+                .pipe(
+                    shareReplay(1),
+                    catchError(async  (err, caught)  =>  {
+                        this.redirectToLoginPage(err)
+                        throw err;
+                    })
+                );
             this.requestCacheMap[requestHash] = observable;
             this.requestCacheMapTimers[requestHash] = setTimeout(() => {
                 delete this.requestCacheMap[requestHash];
@@ -208,7 +219,13 @@ export class ApiService {
             // console.log(uri, query);
 
             observable = this.client.get(uri, {params: query, responseType: 'text'})
-                .pipe(shareReplay(1));
+                .pipe(
+                    shareReplay(1),
+                    catchError(async  (err, caught)  =>  {
+                        this.redirectToLoginPage(err)
+                        throw err;
+                    }),
+                );
             this.requestCacheMap[requestHash] = observable;
             this.requestCacheMapTimers[requestHash] = setTimeout(() => {
                 delete this.requestCacheMap[requestHash];
@@ -226,6 +243,8 @@ export class ApiService {
     private sendPost<T>(uri: string, body: any) {
         return this.client.post<T>(uri, body)
             .pipe(catchError(async (err, caught) => {
+                if(this.redirectToLoginPage(err))
+                    throw err;
                 this.toast.add({severity: 'error', summary: "Ошибка запроса", detail: err.error.message})
                 throw err;
             }));
@@ -234,6 +253,8 @@ export class ApiService {
     private sendPatch<T>(uri: string, body: any) {
         return this.client.patch<T>(uri, body)
             .pipe(catchError((err, caught) => {
+                if(this.redirectToLoginPage(err))
+                    throw err;
                 this.toast.add({severity: 'error', summary: "Ошибка запроса", detail: err.error.message})
                 throw err;
             }));
@@ -242,6 +263,8 @@ export class ApiService {
     private sendDelete(uri: string) {
         return this.client.delete(uri)
             .pipe(catchError(async (err, caught) => {
+                if(this.redirectToLoginPage(err))
+                    throw err;
                 this.toast.add({severity: 'error', summary: "Ошибка запроса", detail: err.error.message})
                 throw err;
             }));
@@ -249,6 +272,14 @@ export class ApiService {
 
     private generateHash(uri: string, query: any) {
         return cyrb53(uri + JSON.stringify(query), 0);
+    }
+
+    private redirectToLoginPage(error: any)  {
+        if  (error.status === 403)  {
+            this.router.navigate(['/login']).then();
+            return true;
+        }
+        return false;
     }
 
     getWireframe(id: number) {
