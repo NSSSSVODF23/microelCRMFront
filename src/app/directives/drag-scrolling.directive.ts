@@ -14,7 +14,6 @@ export class DragScrollingDirective {
 
   @HostListener('mousedown', ['$event'])
   onMouseDown(event: MouseEvent) {
-      // Is left mouse down set this.mouseDown to true
       if (event.button === 0) {
           this.isMouseDown = true;
           this.el.nativeElement.style.cursor = 'grabbing';
@@ -23,7 +22,6 @@ export class DragScrollingDirective {
 
   @HostListener('mouseup', ['$event'])
   onMouseUp(event: MouseEvent) {
-      // Is left mouse down set this.mouseDown to false
       if (event.button === 0) {
           this.isMouseDown = false;
           this.el.nativeElement.style.cursor = 'grab';

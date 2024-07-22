@@ -1,9 +1,5 @@
-import {distinctUntilChanged, filter, fromEvent, map, shareReplay, Subject, Subscription, tap} from "rxjs";
-import {EnvironmentInjector, inject, Inject, Injectable, SimpleChanges} from "@angular/core";
-import {ActivatedRoute, OutletContext} from "@angular/router";
-import {AppModule} from "./app.module";
-import {MainModule} from "./moduls/main/main.module";
-import {MainRoutingModule} from "./moduls/main/main-routing.module";
+import {distinctUntilChanged, filter, fromEvent, map, Subscription} from "rxjs";
+import {SimpleChanges} from "@angular/core";
 
 /**
  * Создает наблюдателя испускающего сигнал при событии в html элементе
@@ -59,13 +55,15 @@ export function OnElementInit(selector: string) {
  */
 export function RouteParam(paramName?: string) {
     return function (prototype: any, name: string) {
-        const originalAfterViewInit = prototype.ngAfterViewInit ? prototype.ngAfterViewInit : () => {};
-        const originalOnDestroy = prototype.ngOnDestroy ? prototype.ngOnDestroy : () => {};
+        const originalAfterViewInit = prototype.ngAfterViewInit ? prototype.ngAfterViewInit : () => {
+        };
+        const originalOnDestroy = prototype.ngOnDestroy ? prototype.ngOnDestroy : () => {
+        };
         let sub: Subscription;
         prototype.ngAfterViewInit = function () {
             sub = this.route.params.pipe(
-                filter((p:{[key:string]:string}) => p[paramName?paramName:name] !== undefined),
-                map((p:{[key:string]:string}) => p[paramName?paramName:name]),
+                filter((p: { [key: string]: string }) => p[paramName ? paramName : name] !== undefined),
+                map((p: { [key: string]: string }) => p[paramName ? paramName : name]),
                 distinctUntilChanged(),
             ).subscribe(this[name]);
             originalAfterViewInit.apply(this, arguments);
@@ -82,11 +80,12 @@ export function RouteParam(paramName?: string) {
  * @param fieldName Имя атрибута компонента.
  * @constructor
  */
-export function OnChange(fieldName: string){
+export function OnChange(fieldName: string) {
     return function (prototype: any, name: string, descriptor: PropertyDescriptor) {
-        const originalOnChange = prototype.ngOnChanges ? prototype.ngOnChanges : () => {};
+        const originalOnChange = prototype.ngOnChanges ? prototype.ngOnChanges : () => {
+        };
         prototype.ngOnChanges = function (simpleChanges: SimpleChanges) {
-            if(simpleChanges[fieldName]) descriptor.value.call(this, simpleChanges[fieldName].currentValue);
+            if (simpleChanges[fieldName]) descriptor.value.call(this, simpleChanges[fieldName].currentValue);
             originalOnChange.apply(this, arguments);
         }
     }
@@ -99,9 +98,10 @@ export function OnChange(fieldName: string){
  */
 export function OnChangeObservable(fieldName: string) {
     return function (prototype: any, name: string) {
-        const originalOnChange = prototype.ngOnChanges ? prototype.ngOnChanges : () => {};
+        const originalOnChange = prototype.ngOnChanges ? prototype.ngOnChanges : () => {
+        };
         prototype.ngOnChanges = function (simpleChanges: SimpleChanges) {
-            if(simpleChanges[fieldName]) {
+            if (simpleChanges[fieldName]) {
                 this[name].next(simpleChanges[fieldName].currentValue);
             }
             originalOnChange.apply(this, arguments);
@@ -115,10 +115,11 @@ export function OnChangeObservable(fieldName: string) {
  */
 export function AutoUnsubscribe() {
     return function (constructor: any) {
-        const originalOnDestroy = constructor.prototype.ngOnDestroy ? constructor.prototype.ngOnDestroy : () => {};
+        const originalOnDestroy = constructor.prototype.ngOnDestroy ? constructor.prototype.ngOnDestroy : () => {
+        };
         constructor.prototype.ngOnDestroy = function () {
-            for(let prop in this){
-                if(this[prop] instanceof Subscription)
+            for (let prop in this) {
+                if (this[prop] instanceof Subscription)
                     this[prop].unsubscribe();
             }
             originalOnDestroy.apply(this, arguments);

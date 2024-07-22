@@ -261,6 +261,9 @@ import {
 import {PonBoxComponent} from "../../components/pon/scheme/elements/pon-box/pon-box.component";
 import {ToggleButtonModule} from "primeng/togglebutton";
 import {ObserveVisibilityDirective} from "../../directives/observe-visibility.directive";
+import {AutoSupportEditorComponent} from "../../components/panels/auto-support-editor/auto-support-editor.component";
+import {OrganizationChartModule} from "primeng/organizationchart";
+import {SplitterModule} from "primeng/splitter";
 
 
 @NgModule({
@@ -392,7 +395,8 @@ import {ObserveVisibilityDirective} from "../../directives/observe-visibility.di
         OntAssignLoginPopupComponent,
         LoginAssignOntPopupComponent,
         PonBoxComponent,
-        ObserveVisibilityDirective
+        ObserveVisibilityDirective,
+        AutoSupportEditorComponent
     ],
     exports: [
         AccountPanelComponent,
@@ -518,7 +522,8 @@ import {ObserveVisibilityDirective} from "../../directives/observe-visibility.di
         RenameOntPopupComponent,
         OntAssignLoginPopupComponent,
         PonBoxComponent,
-        ObserveVisibilityDirective
+        ObserveVisibilityDirective,
+        AutoSupportEditorComponent
     ],
     imports: [
         CommonPipesModule,
@@ -576,7 +581,9 @@ import {ObserveVisibilityDirective} from "../../directives/observe-visibility.di
         ContextMenuModule,
         DynamicDialogModule,
         NgTerminalModule,
-        ToggleButtonModule
+        ToggleButtonModule,
+        OrganizationChartModule,
+        SplitterModule
     ],
     entryComponents: [
         TerminalDialogComponent

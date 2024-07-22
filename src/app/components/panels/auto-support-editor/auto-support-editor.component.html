@@ -1,0 +1,125 @@
+<p-splitter [panelSizes]="[80,20]" [style]="{'height': '900px'}" class="flex-1" styleClass="flex">
+    <ng-template pTemplate>
+        <div class="flex relative flex-1">
+            <p-organizationChart #graph (onNodeSelect)="handleNodeSelect($event.node.data)"
+                                 [(selection)]="selectedTreeNode" [hidden]="!mainNodeData"
+                                 [ngClass]="{'pointer-events-none': isSaving}" [preserveSpace]="false"
+                                 [value]="[mainNodeVisual]" class="flex-1 p-3 absolute w-full h-full display-grid"
+                                 selectionMode="single"
+                                 styleClass="styled-org-chart block overflow-hidden select-none">
+                <ng-template let-treeNode pTemplate="default">
+                    <div (onDragEnd)="endDragNode(node)" (onDragStart)="startDragNode(node)"
+                         (onDrop)="handleDropNode(node)" *ngIf="toNode(treeNode.data) as node"
+                         [ngClass]="{'pointer-events-none opacity-30': dropDisabledNodes[node.id]}"
+                         [ngStyle]="selectedTreeNode === treeNode ? leafSelectedStyle[node.type] : leafStyle[node.type]"
+                         class="select-none flex gap-2 align-items-center"
+                         pDraggable="node"
+                         pDroppable="node">
+                        <span [ngClass]="icon[node.type]"></span>
+                        <span>
+                            {{ node.name ? node.name : 'Без названия' }}
+                        </span>
+                    </div>
+                </ng-template>
+            </p-organizationChart>
+            <p-button (onClick)="createRootNode()" *ngIf="!mainNodeData" class="absolute top-50 left-50 -translate-50"
+                      icon="mdi-auto_awesome"
+                      label="Создать корневой узел" styleClass="p-button-help"></p-button>
+        </div>
+    </ng-template>
+    <ng-template pTemplate>
+        <div class="flex flex-1 flex-column gap-3 p-3">
+            <div *ngIf="!!selectedTreeNode" [formGroup]="selectedNodeSettingsForm" class="flex flex-column gap-3">
+                <app-label label="ID ноды">
+                    <span>{{ selectedNodeSettingsForm.value.id }}</span>
+                </app-label>
+                <app-label label="Название">
+                    <input formControlName="name" pInputText type="text"/>
+                </app-label>
+                <app-label label="Тип ноды">
+                    <p-dropdown [options]="(nodeTypes$ | async) ?? []" appendTo="body"
+                                formControlName="type"></p-dropdown>
+                </app-label>
+                <app-label *ngIf="isShowFormControl([NodeType.REDIRECT], selectedTreeNode.data?.type)"
+                           label="Целевая нода">
+                    <p-dropdown [options]="parentOptionsList" appendTo="body" formControlName="redirectId"
+                                placeholder="Выбрать ноду"></p-dropdown>
+                </app-label>
+                <app-label *ngIf="isShowFormControl([NodeType.NORMAL, NodeType.INPUT], selectedTreeNode.data?.type)"
+                           label="Препроцессоры">
+                    <p-multiSelect [options]="(preprocessorTypes$ | async) ?? []" appendTo="body"
+                                   formControlName="preprocessorTypes"
+                                   placeholder="Выбрать препроцессор"></p-multiSelect>
+                </app-label>
+                <app-label *ngIf="isShowFormControl([NodeType.PREDICATE], selectedTreeNode.data?.type)"
+                           label="Утверждение">
+                    <p-dropdown [options]="(predicateTypes$ | async)?? []" appendTo="body"
+                                formControlName="predicateType" placeholder="Выбрать тип утверждения"></p-dropdown>
+                </app-label>
+                <ng-container
+                        *ngIf="selectedNodeSettingsForm.value.predicateType && isShowFormControl([NodeType.PREDICATE], selectedTreeNode.data?.type)">
+                    <div class="flex flex-column gap-2 border-round border-1 border-bluegray-100 p-2">
+                        <span class="text-xl text-bluegray-300 font-bold">Входные аргументы</span>
+                        <div class="flex flex-column gap-2" formGroupName="predicateArgumentsToTokensMap">
+                            <app-label *ngFor="let arg of Object.keys(selectedNodeSettingsForm.controls.predicateArgumentsToTokensMap.controls)" [label]="arg">
+                                <p-dropdown [options]="valuesTokensList"
+                                            [formControlName]="arg"
+                                            appendTo="body" optionLabel="name" optionValue="token"
+                                            placeholder="Выбрать значение аргумента"></p-dropdown>
+                            </app-label>
+                        </div>
+                    </div>
+                    <app-label label="Истина">
+                        <p-dropdown [formControl]="selectedNodeSettingsForm.controls.predicateRedirection.controls['1']"
+                                    [options]="childOptionsList"
+                                    appendTo="body"
+                                    placeholder="Выбрать дочернюю ноду"></p-dropdown>
+                    </app-label>
+                    <app-label label="Ложь">
+                        <p-dropdown [formControl]="selectedNodeSettingsForm.controls.predicateRedirection.controls['0']"
+                                    [options]="childOptionsList"
+                                    appendTo="body"
+                                    placeholder="Выбрать дочернюю ноду"></p-dropdown>
+                    </app-label>
+                </ng-container>
+
+                <app-label *ngIf="isShowFormControl([NodeType.NORMAL, NodeType.INPUT], selectedTreeNode.data?.type)"
+                           label="Шаблон сообщения">
+                    <div class="flex flex-column">
+                        <textarea [autoResize]="true" formControlName="messageTemplate" pInputTextarea
+                                  type="text"></textarea>
+                        <span class="text-bluegray-400 mt-3 mb-2">Доступные переменные</span>
+                        <div class="flex flex-wrap gap-2">
+                            <ng-container *ngFor="let token of valuesTokensList" [ngTemplateOutletContext]="{token}"
+                                          [ngTemplateOutlet]="tokenTemplate"></ng-container>
+                        </div>
+                    </div>
+                </app-label>
+                <ng-container
+                        *ngIf="isShowFormControl([NodeType.PREDICATE, NodeType.INPUT, NodeType.NORMAL, NodeType.TRUNK], selectedTreeNode.data?.type)">
+                    <p-button (onClick)="addSubNode()" *ngIf="isShowAddSubNodeButton(selectedTreeNode.data)"
+                              icon="mdi-add"
+                              label="Добавить дочернюю ноду"
+                              styleClass="p-button-success"></p-button>
+                </ng-container>
+                <p-button (onClick)="removeNode()" *ngIf="!isRootNode(selectedTreeNode.data)" icon="mdi-delete"
+                          label="Удалить эту ноду"
+                          styleClass="p-button-danger"></p-button>
+            </div>
+            <div class="flex-1"></div>
+            <div class="flex gap-3 justify-content-end">
+                <p-button (onClick)="saveToServer()" [loading]="isSaving" icon="mdi-save"
+                          label="Сохранить"></p-button>
+            </div>
+        </div>
+    </ng-template>
+</p-splitter>
+
+<ng-template #tokenTemplate let-token="token">
+    <span (click)="appendValueTokenToMessageTemplate(token)"
+          class="flex gap-2 align-items-center px-3 py-1 border-round bg-primary-50 text-primary white-space-nowrap hover:bg-primary hover:text-white select-none cursor-pointer">
+        {{ token.name }}
+    </span>
+</ng-template>
+<!--<span>{{mainNodeData | prettyJson:[1,1]}}</span>-->
+<!--<pre [innerHTML]="mainNodeData | prettyJson:[1,1]"></pre>-->

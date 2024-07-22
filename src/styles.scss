@@ -330,7 +330,9 @@ html, body {
   }
 
 }
-
+.display-grid{
+  display: grid;
+}
 .grided {
   display: grid;
 
@@ -1887,4 +1889,13 @@ pre {
 
 .pre-wrap{
   white-space: pre-wrap;
+}
+
+.styled-org-chart.p-organizationchart {
+  .p-organizationchart-table{
+    .p-organizationchart-node-content{
+      padding: 0 !important;
+      border: none;
+    }
+  }
 }

@@ -1,12 +1,14 @@
 import {Injectable} from '@angular/core';
 import {HttpClient} from "@angular/common/http";
-import {catchError, debounceTime, delay, first, map, Observable, of, share, shareReplay, tap, zip} from "rxjs";
+import {catchError, delay, map, Observable, of, shareReplay, tap, zip} from "rxjs";
 import {
     AcpConf,
     AcpHouse,
     AcpUserBrief,
     Address,
     Attachment,
+    AutoTariff,
+    AutoTariffForm,
     BillingConf,
     BillingTotalUserInfo,
     BillingUserItemData,
@@ -16,6 +18,7 @@ import {
     ClientEquipment,
     Comment,
     CommutatorListItem,
+    DateRange,
     DefaultObservers,
     Department,
     DhcpBinding,
@@ -23,6 +26,7 @@ import {
     DynamicTableCell,
     DynamicTableColumn,
     Employee,
+    EmployeeFiltrationForm,
     EmployeeStatus,
     EmployeeWorkLogs,
     FdbItem,
@@ -39,7 +43,9 @@ import {
     ModelItem,
     NCLHistoryWrapper,
     NetworkRemoteControl,
+    NotificationType,
     Olt,
+    OltWorker,
     Ont,
     OntStatusChangeEvent,
     Page,
@@ -84,26 +90,17 @@ import {
     TypesOfContractsSuggestion,
     UserEvents,
     UserTariff,
+    UserTelegramConf,
     Wireframe,
     WireframeDashboardStatistic,
-    OltWorker,
     WorkingDay,
-    WorkLog,
-    DateRange,
-    AutoTariff,
-    AutoTariffForm,
-    EmployeeFiltrationForm,
-    NotificationType,
-    WorkCalculationForm,
-    UserTelegramConf
+    WorkLog
 } from "../types/transport-interfaces";
 import {MessageService, TreeNode} from "primeng/api";
 import {cyrb53, Storage, Utils} from "../util";
 import {Duration} from "@fullcalendar/core";
 import {AddressCorrecting, OldTracker} from "../types/parsing-interfaces";
 import {DhcpBindingFilter} from "../types/service-interfaces";
-import EmployeeWorkStatisticsTable = Statistics.EmployeeWorkStatisticsTable;
-import EmployeeWorkStatisticsForm = Statistics.EmployeeWorkStatisticsForm;
 import {PonForm} from "../pon/scheme/froms";
 import {PonData} from "../pon/scheme/elements";
 import {TemperatureRange, TemperatureSensor} from "../types/sensors-types";
@@ -112,6 +109,9 @@ import {DashboardItem} from "../types/task-dashboard";
 import {LogItem, LogsForm, TelegramUserRequest, TelegramUserTariff} from "../types/user-types";
 import {UserReview} from "../types/user-reviews";
 import {Router} from "@angular/router";
+import {AutoSupportNodes} from "../types/auto-support-types";
+import EmployeeWorkStatisticsTable = Statistics.EmployeeWorkStatisticsTable;
+import EmployeeWorkStatisticsForm = Statistics.EmployeeWorkStatisticsForm;
 
 @Injectable({
     providedIn: 'root'
@@ -127,161 +127,6 @@ export class ApiService {
 
     // Результаты запросов на сервер кэшируются по таймауту, чтобы не было доп нагрузки на сервер
 
-    private sendGet<T>(uri: string, query?: any) {
-        for (let q in query) {
-            if (query[q] === undefined || query[q] === null) {
-                delete query[q];
-            }
-        }
-        // Генерируем хэш запроса на основе конечной точки и параметров запроса
-        const requestHash = this.generateHash(uri, query);
-        // Объявляем результирующий observable
-        let observable: Observable<T> | null = null;
-        // Если запрос не в кэше, создаем его
-        if (!this.requestCacheMap[requestHash]) {
-            observable = this.client.get<T>(uri, {params: query})
-                .pipe(shareReplay(1), catchError(async (err, caught) => {
-                    if(this.redirectToLoginPage(err))
-                        throw err;
-                    this.toast.add({severity: 'error', summary: "Ошибка запроса", detail: err.error.message})
-                    throw err;
-                }));
-            this.requestCacheMap[requestHash] = observable;
-            // После создания запроса создаем таймер удаляющий его из кэша по таймауту
-            setTimeout(() => {
-                delete this.requestCacheMap[requestHash];
-            }, 30000);
-        } else {
-            clearTimeout(this.requestCacheMapTimers[requestHash]);
-            // Если запрос в кэше, возвращаем его
-            observable = this.requestCacheMap[requestHash];
-            this.requestCacheMapTimers[requestHash] = this.requestCacheMapTimers[requestHash] = setTimeout(() => {
-                delete this.requestCacheMap[requestHash];
-            }, 30000);
-        }
-        return observable;
-    }
-
-    private sendGetUncached<T>(uri: string, query?: any) {
-        return this.client.get<T>(uri, {params: query})
-            .pipe(shareReplay(1), catchError(async (err, caught) => {
-                if(this.redirectToLoginPage(err))
-                    throw err;
-                this.toast.add({severity: 'error', summary: "Ошибка запроса", detail: err.error.message})
-                throw err;
-            }));
-    }
-
-    // Генерируем хэш запроса по URI и параметрам запроса
-
-    private sendGetSilent<T>(uri: string, query?: any) {
-        for (let q in query) {
-            if (query[q] === undefined || query[q] === null) {
-                delete query[q];
-            }
-        }
-        const requestHash = this.generateHash(uri, query);
-        let observable: Observable<T> | null = null;
-        if (!this.requestCacheMap[requestHash]) {
-            // console.log(uri, query);
-
-            observable = this.client.get<T>(uri, {params: query})
-                .pipe(
-                    shareReplay(1),
-                    catchError(async  (err, caught)  =>  {
-                        this.redirectToLoginPage(err)
-                        throw err;
-                    })
-                );
-            this.requestCacheMap[requestHash] = observable;
-            this.requestCacheMapTimers[requestHash] = setTimeout(() => {
-                delete this.requestCacheMap[requestHash];
-            }, 30000);
-        } else {
-            clearTimeout(this.requestCacheMapTimers[requestHash]);
-            observable = this.requestCacheMap[requestHash];
-            this.requestCacheMapTimers[requestHash] = setTimeout(() => {
-                delete this.requestCacheMap[requestHash];
-            }, 30000);
-        }
-        return observable;
-    }
-
-    private sendGetStringSilent(uri: string, query?: any): Observable<string> {
-        for (let q in query) {
-            if (query[q] === undefined || query[q] === null) {
-                delete query[q];
-            }
-        }
-        const requestHash = this.generateHash(uri, query);
-        let observable: Observable<string> | null = null;
-        if (!this.requestCacheMap[requestHash]) {
-            // console.log(uri, query);
-
-            observable = this.client.get(uri, {params: query, responseType: 'text'})
-                .pipe(
-                    shareReplay(1),
-                    catchError(async  (err, caught)  =>  {
-                        this.redirectToLoginPage(err)
-                        throw err;
-                    }),
-                );
-            this.requestCacheMap[requestHash] = observable;
-            this.requestCacheMapTimers[requestHash] = setTimeout(() => {
-                delete this.requestCacheMap[requestHash];
-            }, 30000);
-        } else {
-            clearTimeout(this.requestCacheMapTimers[requestHash]);
-            observable = this.requestCacheMap[requestHash];
-            this.requestCacheMapTimers[requestHash] = setTimeout(() => {
-                delete this.requestCacheMap[requestHash];
-            }, 30000);
-        }
-        return observable;
-    }
-
-    private sendPost<T>(uri: string, body: any) {
-        return this.client.post<T>(uri, body)
-            .pipe(catchError(async (err, caught) => {
-                if(this.redirectToLoginPage(err))
-                    throw err;
-                this.toast.add({severity: 'error', summary: "Ошибка запроса", detail: err.error.message})
-                throw err;
-            }));
-    }
-
-    private sendPatch<T>(uri: string, body: any) {
-        return this.client.patch<T>(uri, body)
-            .pipe(catchError((err, caught) => {
-                if(this.redirectToLoginPage(err))
-                    throw err;
-                this.toast.add({severity: 'error', summary: "Ошибка запроса", detail: err.error.message})
-                throw err;
-            }));
-    }
-
-    private sendDelete(uri: string) {
-        return this.client.delete(uri)
-            .pipe(catchError(async (err, caught) => {
-                if(this.redirectToLoginPage(err))
-                    throw err;
-                this.toast.add({severity: 'error', summary: "Ошибка запроса", detail: err.error.message})
-                throw err;
-            }));
-    }
-
-    private generateHash(uri: string, query: any) {
-        return cyrb53(uri + JSON.stringify(query), 0);
-    }
-
-    private redirectToLoginPage(error: any)  {
-        if  (error.status === 403)  {
-            this.router.navigate(['/login']).then();
-            return true;
-        }
-        return false;
-    }
-
     getWireframe(id: number) {
         return this.sendGet<Wireframe>('api/private/wireframe/' + id);
     }
@@ -289,6 +134,8 @@ export class ApiService {
     getWireframeDashboardStatistic(id: number) {
         return this.sendGet<WireframeDashboardStatistic>('api/private/wireframe/' + id + '/dashboard-statistic');
     }
+
+    // Генерируем хэш запроса по URI и параметрам запроса
 
     getWireframeFields(id: number) {
         return this.sendGet<FieldItem[]>('api/private/wireframe/' + id + '/fields');
@@ -365,29 +212,6 @@ export class ApiService {
         return this.sendPatch(`api/private/task/${taskId}/connect-to/${otTaskId}`, {});
     }
 
-    // getPageTasksByStatus(page: number, limit: number, status: string[], commonFilteringString?: string, taskCreator?: string, taskCreationDate?: Date[], filterTags?: TaskTag[], exclusionIds?: number[]): Observable<Page<Task>> {
-    //     const query: any = {page, limit, status}
-    //     if (commonFilteringString) query.commonFilteringString = commonFilteringString;
-    //     if (taskCreator) query.taskCreator = taskCreator;
-    //     if (taskCreationDate) query.taskCreationDate = Utils.dateArrayToStringRange(taskCreationDate);
-    //     if (filterTags) query.filterTags = filterTags.map(t => t.taskTagId);
-    //     if (exclusionIds) query.exclusionIds = exclusionIds;
-    //     return this.sendGet<Page<Task>>('api/private/tasks', query);
-    // }
-
-    // getPageTasksByStatusAndTemplate(page: number, limit: number, status: string[], template: number, filters?: { [filterId: string]: FilterModelItem }, filterTags?: TaskTag[], exclusionIds?: number[]) {
-    //     const query: any = {page, limit, status, template}
-    //     if (filters) {
-    //         let filterModelItems = Object.values(filters);
-    //         if (filterModelItems.length > 0 && filterModelItems.some(f => f.value)) {
-    //             query.filters = JSON.stringify(Object.values(filters))
-    //         }
-    //     }
-    //     if (filterTags) query.filterTags = filterTags.map(t => t.taskTagId);
-    //     if (exclusionIds) query.exclusionIds = exclusionIds;
-    //     return this.sendGet<Page<Task>>('api/private/tasks', query);
-    // }
-
     getHouses(id: number) {
         return this.sendGet<House[]>(`api/private/houses/${id}`);
     }
@@ -429,6 +253,29 @@ export class ApiService {
     getTaskJournal(taskId: number, offset: number, limit: number, sorting: TaskJournalSortingTypes): Observable<Page<Comment | TaskEvent>> {
         return this.sendGet<Page<Comment | TaskEvent>>(`api/private/task/${taskId}/journal`, {offset, limit, sorting});
     }
+
+    // getPageTasksByStatus(page: number, limit: number, status: string[], commonFilteringString?: string, taskCreator?: string, taskCreationDate?: Date[], filterTags?: TaskTag[], exclusionIds?: number[]): Observable<Page<Task>> {
+    //     const query: any = {page, limit, status}
+    //     if (commonFilteringString) query.commonFilteringString = commonFilteringString;
+    //     if (taskCreator) query.taskCreator = taskCreator;
+    //     if (taskCreationDate) query.taskCreationDate = Utils.dateArrayToStringRange(taskCreationDate);
+    //     if (filterTags) query.filterTags = filterTags.map(t => t.taskTagId);
+    //     if (exclusionIds) query.exclusionIds = exclusionIds;
+    //     return this.sendGet<Page<Task>>('api/private/tasks', query);
+    // }
+
+    // getPageTasksByStatusAndTemplate(page: number, limit: number, status: string[], template: number, filters?: { [filterId: string]: FilterModelItem }, filterTags?: TaskTag[], exclusionIds?: number[]) {
+    //     const query: any = {page, limit, status, template}
+    //     if (filters) {
+    //         let filterModelItems = Object.values(filters);
+    //         if (filterModelItems.length > 0 && filterModelItems.some(f => f.value)) {
+    //             query.filters = JSON.stringify(Object.values(filters))
+    //         }
+    //     }
+    //     if (filterTags) query.filterTags = filterTags.map(t => t.taskTagId);
+    //     if (exclusionIds) query.exclusionIds = exclusionIds;
+    //     return this.sendGet<Page<Task>>('api/private/tasks', query);
+    // }
 
     getEmployees(globalFilter?: string, showDeleted?: boolean, showOffsite?: boolean): Observable<Employee[]> {
         const query: any = {};
@@ -695,10 +542,10 @@ export class ApiService {
     }
 
     getNotificationTypes() {
-        return this.sendGet<{label: string, value: NotificationType}[]>("api/private/types/notification");
+        return this.sendGet<{ label: string, value: NotificationType }[]>("api/private/types/notification");
     }
 
-    saveNotificationSettings(settings: NotificationSettingsForm){
+    saveNotificationSettings(settings: NotificationSettingsForm) {
         return this.sendPatch("api/private/employee/notification-settings", settings);
     }
 
@@ -807,7 +654,9 @@ export class ApiService {
     getCountIncomingTasksByWireframeIdByTags(wireframeIds: number[]) {
         if (wireframeIds.length === 0)
             return of({} as { [key: string]: number })
-        return this.sendGet<{ [key: number]: number }>("api/private/task/incoming/wireframe/by-tags/count", {wireframeIds});
+        return this.sendGet<{
+            [key: number]: number
+        }>("api/private/task/incoming/wireframe/by-tags/count", {wireframeIds});
     }
 
     getCountAllTasksByWireframeId(wireframeId: number) {
@@ -817,7 +666,9 @@ export class ApiService {
     getCountIncomingTasksByStages(wireframeId: number) {
         if (!wireframeId)
             return of({} as { [key: string]: number })
-        return this.sendGet<{ [key: string]: number }>(`api/private/task/incoming/wireframe/${wireframeId}/by-stages/count`, {});
+        return this.sendGet<{
+            [key: string]: number
+        }>(`api/private/task/incoming/wireframe/${wireframeId}/by-stages/count`, {});
     }
 
     getCountTasksByStages(wireframeId: number) {
@@ -1227,7 +1078,10 @@ export class ApiService {
     }
 
     getConnectionServicesSuggestionsList(query: string) {
-        return this.sendGet<{ label: string, value: string }[]>('api/private/types/connection-service/suggestions', {query});
+        return this.sendGet<{
+            label: string,
+            value: string
+        }[]>('api/private/types/connection-service/suggestions', {query});
     }
 
     getBillingPaymentTypesList() {
@@ -1258,6 +1112,10 @@ export class ApiService {
         return this.sendGet<UserTelegramConf>('api/private/configuration/user-telegram');
     }
 
+    getAutoSupportNodes() {
+        return this.sendGet<AutoSupportNodes>('api/private/configuration/auto-support-nodes');
+    }
+
     getAcpConfiguration() {
         return this.sendGet<AcpConf>('api/private/acp/configuration');
     }
@@ -1272,6 +1130,10 @@ export class ApiService {
 
     setUserTelegramConfiguration(telegramConf: UserTelegramConf) {
         return this.sendPost('api/private/configuration/user-telegram', telegramConf);
+    }
+
+    setAutoSupportNodes(autoSupportNodes: AutoSupportNodes) {
+        return this.sendPost('api/private/configuration/auto-support-nodes', autoSupportNodes);
     }
 
     setAcpConfiguration(acpConf: AcpConf) {
@@ -1438,6 +1300,26 @@ export class ApiService {
         return this.sendGet<{ label: string, value: string }[]>('api/private/types/phy-phone-models');
     }
 
+    getAutoSupportPreprocessorsOutputValues() {
+        return this.sendGet<{ [key: string]: string[] }>('api/private/auto-support/preprocessors-outputs');
+    }
+
+    getAutoSupportPredicatesArguments() {
+        return this.sendGet<{ [key: string]: string[] }>('api/private/auto-support/predicates-arguments');
+    }
+
+    getAutoSupportTypes() {
+        return this.sendGet<{ label: string, value: string }[]>('api/private/types/auto-support-node');
+    }
+
+    getAutoSupportPreprocessorTypes() {
+        return this.sendGet<{ label: string, value: string }[]>('api/private/types/auto-support/preprocessor');
+    }
+
+    getAutoSupportPredicateTypes() {
+        return this.sendGet<{ label: string, value: string }[]>('api/private/types/auto-support/predicate');
+    }
+
     callToPhone(phoneNumber: string) {
         return this.sendPost(`api/private/call-to-phone`, {phoneNumber});
     }
@@ -1561,7 +1443,9 @@ export class ApiService {
      * Получить контент таблицы реестра задач
      */
     getTaskRegistryTableContent(taskStatus: TaskStatus, taskClass: number, tagMode: string, tags: number[], paging: any) {
-        return this.sendPost<Page<{ [key: string]: DynamicTableCell }>>(`api/private/task/registry/content/${taskStatus}/${taskClass}`, {
+        return this.sendPost<Page<{
+            [key: string]: DynamicTableCell
+        }>>(`api/private/task/registry/content/${taskStatus}/${taskClass}`, {
             tagMode,
             tags,
             paging
@@ -1714,7 +1598,7 @@ export class ApiService {
      * Создать оптическую схему
      * @param form Форма с информацией для создания схемы
      */
-    createPonScheme(form: PonForm.Scheme){
+    createPonScheme(form: PonForm.Scheme) {
         return this.sendPost<PonData.PonScheme>("api/private/pon/scheme/create", form);
     }
 
@@ -1723,7 +1607,7 @@ export class ApiService {
      * @param id Идентификатор редактируемой схемы
      * @param form Форма с информацией для редактирования схемы
      */
-    updatePonScheme(id: number, form: PonForm.Scheme){
+    updatePonScheme(id: number, form: PonForm.Scheme) {
         return this.sendPatch<PonData.PonScheme>(`api/private/pon/scheme/${id}/update`, form);
     }
 
@@ -1731,7 +1615,7 @@ export class ApiService {
      * Удалить оптическую схему по идентификатору
      * @param id Идентификатор удаляемой схемы
      */
-    deletePonScheme(id: number){
+    deletePonScheme(id: number) {
         return this.sendDelete(`api/private/pon/scheme/${id}/delete`);
     }
 
@@ -1739,14 +1623,14 @@ export class ApiService {
      * Получить оптическую схему по идентификатору
      * @param id Идентификатор оптической схемы
      */
-    getPonScheme(id: number){
+    getPonScheme(id: number) {
         return this.sendGet<PonData.PonScheme>(`api/private/pon/scheme/${id}`);
     }
 
     /**
      * Получить все оптические схемы
      */
-    getPonSchemes(){
+    getPonSchemes() {
         return this.sendGet<PonData.PonScheme[]>(`api/private/pon/scheme/list`);
     }
 
@@ -1766,14 +1650,14 @@ export class ApiService {
      * Получить элементы оптической схемы по идентификатору схемы
      * @param id Идентификатор схемы
      */
-    getPonSchemeElements(id: number){
+    getPonSchemeElements(id: number) {
         return this.sendGet<PonData.PonNode[]>(`api/private/pon/scheme/${id}/elements`);
     }
 
     /**
      * Получить все температурные датчики
      */
-    getTemperatureSensors(){
+    getTemperatureSensors() {
         return this.sendGet<TemperatureSensor[]>("api/private/sensor/temperature");
     }
 
@@ -1781,7 +1665,7 @@ export class ApiService {
      * Удалить температурный датчик по идентификатору
      * @param id Идентификатор температурного датчика
      */
-    deleteTemperatureSensor(id: number){
+    deleteTemperatureSensor(id: number) {
         return this.sendDelete(`api/private/sensor/temperature/${id}`);
     }
 
@@ -1790,7 +1674,7 @@ export class ApiService {
      * @param id Идентификатор температурного датчика
      * @param ranges Диапазоны температур
      */
-    patchTemperatureRanges(id: number, ranges: Partial<TemperatureRange>[]){
+    patchTemperatureRanges(id: number, ranges: Partial<TemperatureRange>[]) {
         return this.sendPatch(`api/private/sensor/temperature/${id}/ranges`, ranges);
     }
 
@@ -1819,23 +1703,28 @@ export class ApiService {
         return this.sendGet<TelegramUserTariff[]>("api/private/user/telegram/tariffs");
     }
 
-    createTelegramUserTariff(form: Partial<TelegramUserTariff>){
+    createTelegramUserTariff(form: Partial<TelegramUserTariff>) {
         return this.sendPost<TelegramUserTariff>("api/private/user/telegram/tariff", form);
     }
 
-    updateTelegramUserTariff(id: number, form: Partial<TelegramUserTariff>){
+    updateTelegramUserTariff(id: number, form: Partial<TelegramUserTariff>) {
         return this.sendPatch<TelegramUserTariff>(`api/private/user/telegram/tariff/${id}`, form);
     }
 
-    deleteTelegramUserTariff(id: number){
+    deleteTelegramUserTariff(id: number) {
         return this.sendDelete(`api/private/user/telegram/tariff/${id}`);
     }
 
-    getTelegramUserRequests(page: number, size: number, unprocessed: boolean, login: string)  {
-        return this.sendGetUncached<Page<TelegramUserRequest>>(`api/private/user/telegram/requests`, {page, size, unprocessed, login});
+    getTelegramUserRequests(page: number, size: number, unprocessed: boolean, login: string) {
+        return this.sendGetUncached<Page<TelegramUserRequest>>(`api/private/user/telegram/requests`, {
+            page,
+            size,
+            unprocessed,
+            login
+        });
     }
 
-    createTelegramUserChat(login: string)  {
+    createTelegramUserChat(login: string) {
         return this.sendGetUncached<string[]>(`api/private/user/telegram/new-chat/${login}`);
     }
 
@@ -1843,11 +1732,164 @@ export class ApiService {
         return this.sendPatch(`api/private/user/telegram/request/${userRequestId}/processed`, {userMessage});
     }
 
-    getUnprocessedTelegramUserRequestsCount()  {
+    getUnprocessedTelegramUserRequestsCount() {
         return this.sendGetUncached<number>("api/private/user/telegram/request/unprocessed/count");
     }
 
-    getUserReviewsByLogin(login: string)  {
+    getUserReviewsByLogin(login: string) {
         return this.sendGetUncached<UserReview[]>(`api/private/review/${login}`);
+    }
+
+    private sendGet<T>(uri: string, query?: any) {
+        for (let q in query) {
+            if (query[q] === undefined || query[q] === null) {
+                delete query[q];
+            }
+        }
+        // Генерируем хэш запроса на основе конечной точки и параметров запроса
+        const requestHash = this.generateHash(uri, query);
+        // Объявляем результирующий observable
+        let observable: Observable<T> | null = null;
+        // Если запрос не в кэше, создаем его
+        if (!this.requestCacheMap[requestHash]) {
+            observable = this.client.get<T>(uri, {params: query})
+                .pipe(shareReplay(1), catchError(async (err, caught) => {
+                    if (this.redirectToLoginPage(err))
+                        throw err;
+                    this.toast.add({severity: 'error', summary: "Ошибка запроса", detail: err.error.message})
+                    throw err;
+                }));
+            this.requestCacheMap[requestHash] = observable;
+            // После создания запроса создаем таймер удаляющий его из кэша по таймауту
+            setTimeout(() => {
+                delete this.requestCacheMap[requestHash];
+            }, 30000);
+        } else {
+            clearTimeout(this.requestCacheMapTimers[requestHash]);
+            // Если запрос в кэше, возвращаем его
+            observable = this.requestCacheMap[requestHash];
+            this.requestCacheMapTimers[requestHash] = this.requestCacheMapTimers[requestHash] = setTimeout(() => {
+                delete this.requestCacheMap[requestHash];
+            }, 30000);
+        }
+        return observable;
+    }
+
+    private sendGetUncached<T>(uri: string, query?: any) {
+        return this.client.get<T>(uri, {params: query})
+            .pipe(shareReplay(1), catchError(async (err, caught) => {
+                if (this.redirectToLoginPage(err))
+                    throw err;
+                this.toast.add({severity: 'error', summary: "Ошибка запроса", detail: err.error.message})
+                throw err;
+            }));
+    }
+
+    private sendGetSilent<T>(uri: string, query?: any) {
+        for (let q in query) {
+            if (query[q] === undefined || query[q] === null) {
+                delete query[q];
+            }
+        }
+        const requestHash = this.generateHash(uri, query);
+        let observable: Observable<T> | null = null;
+        if (!this.requestCacheMap[requestHash]) {
+            // console.log(uri, query);
+
+            observable = this.client.get<T>(uri, {params: query})
+                .pipe(
+                    shareReplay(1),
+                    catchError(async (err, caught) => {
+                        this.redirectToLoginPage(err)
+                        throw err;
+                    })
+                );
+            this.requestCacheMap[requestHash] = observable;
+            this.requestCacheMapTimers[requestHash] = setTimeout(() => {
+                delete this.requestCacheMap[requestHash];
+            }, 30000);
+        } else {
+            clearTimeout(this.requestCacheMapTimers[requestHash]);
+            observable = this.requestCacheMap[requestHash];
+            this.requestCacheMapTimers[requestHash] = setTimeout(() => {
+                delete this.requestCacheMap[requestHash];
+            }, 30000);
+        }
+        return observable;
+    }
+
+    private sendGetStringSilent(uri: string, query?: any): Observable<string> {
+        for (let q in query) {
+            if (query[q] === undefined || query[q] === null) {
+                delete query[q];
+            }
+        }
+        const requestHash = this.generateHash(uri, query);
+        let observable: Observable<string> | null = null;
+        if (!this.requestCacheMap[requestHash]) {
+            // console.log(uri, query);
+
+            observable = this.client.get(uri, {params: query, responseType: 'text'})
+                .pipe(
+                    shareReplay(1),
+                    catchError(async (err, caught) => {
+                        this.redirectToLoginPage(err)
+                        throw err;
+                    }),
+                );
+            this.requestCacheMap[requestHash] = observable;
+            this.requestCacheMapTimers[requestHash] = setTimeout(() => {
+                delete this.requestCacheMap[requestHash];
+            }, 30000);
+        } else {
+            clearTimeout(this.requestCacheMapTimers[requestHash]);
+            observable = this.requestCacheMap[requestHash];
+            this.requestCacheMapTimers[requestHash] = setTimeout(() => {
+                delete this.requestCacheMap[requestHash];
+            }, 30000);
+        }
+        return observable;
+    }
+
+    private sendPost<T>(uri: string, body: any) {
+        return this.client.post<T>(uri, body)
+            .pipe(catchError(async (err, caught) => {
+                if (this.redirectToLoginPage(err))
+                    throw err;
+                this.toast.add({severity: 'error', summary: "Ошибка запроса", detail: err.error.message})
+                throw err;
+            }));
+    }
+
+    private sendPatch<T>(uri: string, body: any) {
+        return this.client.patch<T>(uri, body)
+            .pipe(catchError((err, caught) => {
+                if (this.redirectToLoginPage(err))
+                    throw err;
+                this.toast.add({severity: 'error', summary: "Ошибка запроса", detail: err.error.message})
+                throw err;
+            }));
+    }
+
+    private sendDelete(uri: string) {
+        return this.client.delete(uri)
+            .pipe(catchError(async (err, caught) => {
+                if (this.redirectToLoginPage(err))
+                    throw err;
+                this.toast.add({severity: 'error', summary: "Ошибка запроса", detail: err.error.message})
+                throw err;
+            }));
+    }
+
+    private generateHash(uri: string, query: any) {
+        return cyrb53(uri + JSON.stringify(query), 0);
+    }
+
+    private redirectToLoginPage(error: any) {
+        if (error.status === 403) {
+            this.router.navigate(['/login']).then();
+            return true;
+        }
+        return false;
     }
 }

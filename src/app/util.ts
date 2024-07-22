@@ -1,5 +1,6 @@
 import {FieldItem, LoadingState, ModelItem, Page, Wireframe, WireframeFieldType} from "./types/transport-interfaces";
 import {
+    bufferTime,
     combineLatest,
     fromEvent,
     map,
@@ -307,7 +308,7 @@ export class Utils {
         return true;
     }
 
-    static getRandom(min:number, max:number) {
+    static getRandom(min: number, max: number) {
         return Math.round(Math.random() * (max - min) + min);
     }
 }
@@ -607,6 +608,50 @@ export function mediaQuery(query: string): Observable<boolean> {
         map((list: MediaQueryList) => list.matches)
     );
 }
+
+export class DraggingScroll {
+    private isGraphScrolling = false;
+    private subscriptions: Subscription[] = [];
+
+    appoint(element: HTMLElement) {
+        if (element) {
+            this.subscriptions.push(fromEvent<MouseEvent>(element, 'mousedown').subscribe(event => {
+                    if (event.button === 0) {
+                        this.isGraphScrolling = true;
+                        element.style.cursor = 'grabbing';
+                    }
+                }),
+                fromEvent<MouseEvent>(document.body, 'mouseup').subscribe(event => {
+                    if (event.button === 0) {
+                        this.isGraphScrolling = false;
+                        element.style.cursor = 'grab';
+                    }
+                }),
+                fromEvent<MouseEvent>(element, 'mousemove')
+                    .pipe(
+                        map(event => ({x: -event.movementX, y: -event.movementY})),
+                        bufferTime(30),
+                        map(coordinates => coordinates.reduce((acc, val) => {
+                            return {x: acc.x + val.x, y: acc.y + val.y}
+                        }, {x: 0, y: 0}))
+                    )
+                    .subscribe(({x, y}) => {
+                        if (this.isGraphScrolling) {
+                            element.scrollBy(x, y);
+                        }
+                    })
+            )
+        }else{
+            throw new Error('Элемент не найден');
+        }
+    }
+
+    destroy() {
+        this.subscriptions.forEach(sub => sub.unsubscribe());
+        this.subscriptions = [];
+    }
+}
+
 
 export class Storage {
     static save(key: string, value: any) {
