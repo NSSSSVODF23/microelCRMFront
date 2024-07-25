@@ -1,14 +1,28 @@
 import {AfterViewInit, Component, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {ApiService} from "../../../services/api.service";
-import {debounceTime, distinctUntilChanged, shareReplay, Subscription} from "rxjs";
+import {debounceTime, distinctUntilChanged, filter, fromEvent, map, shareReplay, Subscription} from "rxjs";
 import {ConfirmationService, TreeNode} from "primeng/api";
-import {Node, NodeType, PredicateType, PreprocessorType} from "../../../types/auto-support-types";
-import {FormControl, FormGroup} from "@angular/forms";
+import {
+    Node,
+    NodeEditorAction,
+    NodeEditorOperation,
+    NodeType,
+    PredicateType,
+    PreprocessorType
+} from "../../../types/auto-support-types";
+import {FormControl, FormGroup, Validators} from "@angular/forms";
 import {v4} from "uuid";
 import {OrganizationChart} from "primeng/organizationchart";
 import {DraggingScroll} from "../../../util";
 
 type ValuesToken = { name: string, token: string, type: 'INPUT' | 'PREPROCESSOR' }
+
+enum EditorMode {
+    SELECT,
+    PICK_NODE
+}
+
+type PickTargetsType = 'parent' | 'child' | 'all';
 
 @Component({
     selector: 'app-auto-support-editor',
@@ -17,11 +31,10 @@ type ValuesToken = { name: string, token: string, type: 'INPUT' | 'PREPROCESSOR'
 })
 export class AutoSupportEditorComponent implements OnInit, OnDestroy, AfterViewInit {
 
-    NodeType = NodeType;
-
     @ViewChild('graph') graph?: OrganizationChart;
     draggingController = new DraggingScroll();
-
+    editorMode = EditorMode.SELECT;
+    targetControlForPickNode: FormControl | null = null;
     autoSupportConfiguration$ = this.api.getAutoSupportNodes();
     nodeTypes$ = this.api.getAutoSupportTypes().pipe(shareReplay(1));
     preprocessorTypes$ = this.api.getAutoSupportPreprocessorTypes().pipe(shareReplay(1));
@@ -33,47 +46,39 @@ export class AutoSupportEditorComponent implements OnInit, OnDestroy, AfterViewI
     valuesTokensList: ValuesToken[] = [];
     mainNodeVisual: TreeNode<Node> = {};
     mainNodeData: Node | null = null;
-
     selectedTreeNode: TreeNode<Node> | null = null;
     selectedNodeSettingsForm = new FormGroup({
         id: new FormControl<string>(""),
         name: new FormControl<string>("Нода"),
         type: new FormControl<NodeType>(NodeType.NORMAL),
         preprocessorTypes: new FormControl<PreprocessorType[]>([]),
-        predicateType: new FormControl<PredicateType | null>(null),
-        predicateArgumentsToTokensMap: new FormGroup({}),
+        predicateType: new FormControl<PredicateType | null>(null, [Validators.required]),
+        predicateArgumentsToTokensMap: new FormGroup({}, [Validators.required]),
         predicateRedirection: new FormGroup({
             1: new FormControl<string | null>(null),
             0: new FormControl<string | null>(null),
-        }),
-        redirectId: new FormControl<string | null>(null),
-        messageTemplate: new FormControl<string | null>(null),
-        parent: new FormControl<string | null>(null),
-        children: new FormControl<Node[] | null>([]),
+        }, [Validators.required]),
+        redirectId: new FormControl<string | null>(null, [Validators.required]),
+        messageTemplate: new FormControl<string | null>(null, [Validators.required]),
+        ticketTitle: new FormControl<string | null>(null, [Validators.required]),
+        ticketTemplate: new FormControl<string | null>(null, [Validators.required]),
+        // parent: new FormControl<string | null>(null),
+        // children: new FormControl<Node[] | null>([]),
     });
     selectedNodeSettingsFormChange$ = this.selectedNodeSettingsForm.valueChanges
         .pipe(debounceTime(300));
-    selectedNodeTypeChange$ = this.selectedNodeSettingsFormChange$
-        .pipe(
-            distinctUntilChanged((previous, current) => previous.type === current.type)
-        );
+    selectedNodeTypeChange$ = this.selectedNodeSettingsForm.controls.type.valueChanges;
     selectedNodePredicateTypeChange$ = this.selectedNodeSettingsFormChange$
         .pipe(
             distinctUntilChanged((previous, current) => previous.predicateType === current.predicateType)
         );
-
-    autoSupportLoadSub?: Subscription;
-    modifyNodeSub?: Subscription;
-    changePredicateTypeSub?: Subscription;
-
-    changeNodeTypeSub?: Subscription;
     draggableNode: Node | null = null;
-
     dropDisabledNodes: { [key: string]: boolean } = {};
+    pickNodeMask: string[] = [];
     leafStyle: { [key: string]: Partial<CSSStyleDeclaration> } = {
         "NORMAL": {
-            backgroundColor: '#e4ccff',
-            color: '#341359',
+            backgroundColor: '#e8d7f8',
+            color: '#725593',
             padding: '1rem',
             borderRadius: '.3rem',
         },
@@ -100,12 +105,18 @@ export class AutoSupportEditorComponent implements OnInit, OnDestroy, AfterViewI
             color: '#578347',
             padding: '1rem',
             borderRadius: '.3rem',
+        },
+        "TICKET": {
+            backgroundColor: '#f37c32',
+            color: '#ffe2d1',
+            padding: '1rem',
+            borderRadius: '.3rem',
         }
     }
     leafSelectedStyle: { [key: string]: Partial<CSSStyleDeclaration> } = {
         "NORMAL": {
             backgroundColor: '#c4a7e5',
-            color: '#341359',
+            color: '#55317e',
             padding: '1rem',
             borderRadius: '.3rem',
         },
@@ -132,37 +143,56 @@ export class AutoSupportEditorComponent implements OnInit, OnDestroy, AfterViewI
             color: '#578347',
             padding: '1rem',
             borderRadius: '.3rem',
+        },
+        "TICKET": {
+            backgroundColor: '#e06214',
+            color: '#ffe2d1',
+            padding: '1rem',
+            borderRadius: '.3rem',
         }
     }
-
     icon = {
         "NORMAL": "mdi-mail_outline",
         "PREDICATE": "mdi-alt_route",
         "INPUT": "mdi-edit_note",
         "TRUNK": "mdi-south",
-        "REDIRECT": "mdi-move_up"
+        "REDIRECT": "mdi-move_up",
+        "TICKET": "mdi-task"
     }
+    actionsCache: NodeEditorAction[] = [];
+    actionPointer = 0;
+    isAllValid = false;
+    isLoading = true;
     isSaving = false;
+    protected readonly NodeType = NodeType;
     protected readonly Object = Object;
+    protected readonly EditorMode = EditorMode;
+    private autoSupportLoadSub?: Subscription;
+    private modifyNodeSub?: Subscription;
+    private changePredicateTypeSub?: Subscription;
+    private undoRedoNodeSub?: Subscription;
+    private preventDefaultUndoSub?: Subscription;
+    private changeNodeTypeSub?: Subscription;
+    private escapeSub?: Subscription;
 
     constructor(private api: ApiService, private confirmationService: ConfirmationService) {
     }
 
     ngOnInit(): void {
         this.loadAutoSupportConfiguration();
-        this.modifyNodeSub = this.selectedNodeSettingsFormChange$
-            .subscribe(data => this.handleModifyNode(data as Partial<Node>))
-        this.changeNodeTypeSub = this.selectedNodeTypeChange$
-            .subscribe(data => this.handleChangeNodeType(data as Partial<Node>))
-        this.changePredicateTypeSub = this.selectedNodePredicateTypeChange$
-            .subscribe(data => this.handleChangePredicateType(data as Partial<Node>))
-        this.api.getAutoSupportPreprocessorsOutputValues().subscribe(values => this.preprocessorsOutputValuesMap = values);
-        this.api.getAutoSupportPredicatesArguments().subscribe(data => this.predicatesArgumentsMap = data);
+        this.subscribeToNodeFormChanges();
+        this.loadMetadata();
+        this.initShortcuts();
     }
 
     ngOnDestroy(): void {
         this.autoSupportLoadSub?.unsubscribe();
         this.modifyNodeSub?.unsubscribe();
+        this.changeNodeTypeSub?.unsubscribe();
+        this.changePredicateTypeSub?.unsubscribe();
+        this.undoRedoNodeSub?.unsubscribe();
+        this.preventDefaultUndoSub?.unsubscribe();
+        this.escapeSub?.unsubscribe();
         this.draggingController.destroy();
     }
 
@@ -171,26 +201,22 @@ export class AutoSupportEditorComponent implements OnInit, OnDestroy, AfterViewI
         this.draggingController.appoint(rootScrollElement);
     }
 
-    handleNodeSelect(node: Node) {
-        if (node.predicateType) {
-            this.setPredicateArgumentsControls(node.predicateType);
+    handleNodeSelect(node: TreeNode<Node>) {
+        switch (this.editorMode) {
+            case EditorMode.SELECT:
+                this.selectedTreeNode = node;
+                this.doSelectNode(node.data!);
+                break;
+            case EditorMode.PICK_NODE:
+                this.doPickNode(node.data!);
+                break;
         }
-        this.selectedNodeSettingsForm.patchValue({
-            id: node.id,
-            name: node.name,
-            type: node.type,
-            preprocessorTypes: node.preprocessorTypes,
-            predicateType: node.predicateType,
-            predicateRedirection: node.predicateRedirection ?? undefined,
-            predicateArgumentsToTokensMap: node.predicateArgumentsToTokensMap ?? undefined,
-            redirectId: node.redirectId,
-            messageTemplate: node.messageTemplate,
-            parent: node.parent,
-            children: node.children,
-        }, {emitEvent: false});
-        this.parentOptionsList = this.getParentOptionsList(node);
-        this.childOptionsList = this.getChildOptionsList(node);
-        this.valuesTokensList = this.getValuesTokens(node);
+    }
+
+    handleNodeUnselect(node: TreeNode<Node>) {
+        if (this.editorMode === EditorMode.SELECT) {
+            this.selectedTreeNode = null;
+        }
     }
 
     isRootNode(node?: Node) {
@@ -204,7 +230,7 @@ export class AutoSupportEditorComponent implements OnInit, OnDestroy, AfterViewI
 
     createRootNode() {
         this.mainNodeData = this.createDefaultNode(null);
-        this.renderVisual();
+        this.renderVisual("createRootNode");
         this.selectedTreeNode = this.mainNodeVisual;
     }
 
@@ -217,9 +243,14 @@ export class AutoSupportEditorComponent implements OnInit, OnDestroy, AfterViewI
         targetNode.children.push(createdNode);
         this.selectedTreeNode.expanded = true;
         const selectedNodeKey = this.selectedTreeNode.key;
-        this.renderVisual();
+        this.renderVisual("addSubNode");
         if (!selectedNodeKey) return;
         this.selectedTreeNode = this.findVisualNode(selectedNodeKey, this.mainNodeVisual);
+
+        this.appendAction('APPEND_NODE', null, createdNode);
+
+        this.isAllValid = true;
+        this.checkNodeValidity(this.mainNodeData);
     }
 
     removeNode() {
@@ -233,6 +264,7 @@ export class AutoSupportEditorComponent implements OnInit, OnDestroy, AfterViewI
     }
 
     startDragNode(node: Node) {
+        this.draggingController.preventScrolling();
         setTimeout(() => {
             if (!this.mainNodeData) return;
             this.draggableNode = node;
@@ -246,19 +278,18 @@ export class AutoSupportEditorComponent implements OnInit, OnDestroy, AfterViewI
         const draggableNode = this.draggableNode;
         const mainNodeData = this.mainNodeData;
 
-        console.log("Draggable", draggableNode);
-
         const previousParent = this.findParentNode(draggableNode, mainNodeData);
-
-        console.log("previousParent", previousParent);
 
         if (!previousParent?.children) return;
         previousParent.children.splice(previousParent.children.indexOf(draggableNode), 1);
         if (!currentParent.children) currentParent.children = [];
         currentParent.children.push(draggableNode);
+        const previousData = JSON.parse(JSON.stringify(draggableNode));
         draggableNode.parent = currentParent.id;
-        this.renderVisual();
+        this.renderVisual("handleDropNode");
         this.dropDisabledNodes = {};
+
+        this.appendAction('MOVE_NODE', previousData, draggableNode);
     }
 
     endDragNode(node: any) {
@@ -277,6 +308,18 @@ export class AutoSupportEditorComponent implements OnInit, OnDestroy, AfterViewI
                     return child;
                 }
                 const result = this.findParentNode(node, child);
+                if (result) return result;
+            }
+        }
+        return null;
+    }
+
+    findNode(id: string, root: Node | null): Node | null {
+        if (!root) return null;
+        if (root.id === id) return root;
+        if (root.children && root.children.length > 0) {
+            for (const child of root.children) {
+                const result = this.findNode(id, child);
                 if (result) return result;
             }
         }
@@ -310,6 +353,9 @@ export class AutoSupportEditorComponent implements OnInit, OnDestroy, AfterViewI
             case NodeType.REDIRECT:
                 isChildLimitExceeded = true;
                 break;
+            case NodeType.TICKET:
+                isChildLimitExceeded = true;
+                break;
         }
 
         this.dropDisabledNodes[node.id] = isSameOrDescendant || isChildLimitExceeded;
@@ -320,7 +366,7 @@ export class AutoSupportEditorComponent implements OnInit, OnDestroy, AfterViewI
         }
     }
 
-    renderVisual() {
+    renderVisual(type: string) {
         if (!this.mainNodeData) return;
         const expandedMap = this.getExpandedMap(this.mainNodeVisual);
         this.mainNodeVisual = this.convertNodeToTreeNode(this.mainNodeData, expandedMap);
@@ -351,13 +397,6 @@ export class AutoSupportEditorComponent implements OnInit, OnDestroy, AfterViewI
         return value as Node
     }
 
-    getAvailableValues(preprocessorTypes?: PreprocessorType[] | null) {
-        if (!preprocessorTypes) return [];
-        return preprocessorTypes.map(type => {
-            return this.preprocessorsOutputValuesMap[type] ?? [];
-        }).flatMap(values => values);
-    }
-
     isShowAddSubNodeButton(data: Node | undefined) {
         if (!data) return false;
         switch (data.type) {
@@ -368,23 +407,204 @@ export class AutoSupportEditorComponent implements OnInit, OnDestroy, AfterViewI
             case NodeType.INPUT:
                 return (data.children?.length ?? 0) < 1;
             case NodeType.REDIRECT:
+            case NodeType.TICKET:
                 return false;
             case NodeType.NORMAL:
                 return true;
         }
     }
 
-    appendValueTokenToMessageTemplate(token: ValuesToken) {
-        const messageTemplateProperty = this.selectedNodeSettingsForm.controls.messageTemplate;
-        if (!messageTemplateProperty) return;
-        let messageTemplateValue = messageTemplateProperty?.value;
+    appendValueTokenToMessageTemplate(token: ValuesToken, control: FormControl<string>) {
+        let messageTemplateValue = control?.value;
         if (!messageTemplateValue) messageTemplateValue = '';
-        messageTemplateProperty.setValue(`${messageTemplateValue} {${token.token}}`);
+        control.setValue(`${messageTemplateValue} {${token.token}}`);
     }
 
-    getPredicateArgumentsList(node: Node | null) {
-        if (!this.predicatesArgumentsMap || !node?.predicateType) return [];
-        return this.predicatesArgumentsMap[node.predicateType];
+    hasPreviousAction() {
+        return this.actionPointer > 0;
+    }
+
+    hasNextAction() {
+        return this.actionPointer < this.actionsCache.length;
+    }
+
+    undo() {
+        if (!this.hasPreviousAction()) return;
+        this.actionPointer--;
+        const action = this.actionsCache[this.actionPointer];
+        let previousParent: Node | null = null;
+        let nextParent: Node | null = null;
+        let foundNode: Node | null = null;
+        switch (action.operation) {
+            case "APPEND_NODE":
+                if (!action.newState) return;
+                previousParent = this.findParentNode(action.newState, this.mainNodeData);
+                foundNode = this.findNode(action.newState.id, previousParent);
+                if (!previousParent?.children || !foundNode) return;
+                previousParent.children.splice(previousParent.children.indexOf(foundNode), 1);
+                break;
+            case "REMOVE_NODE":
+                if (!action.previousState) return;
+                previousParent = this.findParentNode(action.previousState, this.mainNodeData);
+                if (!previousParent?.children) return;
+                previousParent.children.push(action.previousState);
+                break;
+            case "CHANGE_NODE":
+                if (!action.previousState) return;
+                foundNode = this.findNode(action.previousState.id, this.mainNodeData);
+                if (!foundNode) return;
+                foundNode.name = action.previousState.name;
+                foundNode.type = action.previousState.type;
+                foundNode.predicateType = action.previousState.predicateType;
+                foundNode.predicateRedirection = action.previousState.predicateRedirection;
+                foundNode.predicateArgumentsToTokensMap = action.previousState.predicateArgumentsToTokensMap;
+                foundNode.preprocessorTypes = action.previousState.preprocessorTypes;
+                foundNode.redirectId = action.previousState.redirectId;
+                foundNode.messageTemplate = action.previousState.messageTemplate;
+                foundNode.ticketTitle = action.previousState.ticketTitle;
+                foundNode.ticketTemplate = action.previousState.ticketTemplate;
+                foundNode.isValid = action.previousState.isValid;
+                this.updateSelectedNodeForm(foundNode);
+                break;
+            case "MOVE_NODE":
+                if (!action.previousState || !action.newState) return;
+                nextParent = this.findParentNode(action.newState, this.mainNodeData);
+                foundNode = this.findNode(action.newState.id, nextParent);
+                previousParent = this.findParentNode(action.previousState, this.mainNodeData);
+                if (!previousParent?.children || !nextParent?.children || !foundNode) return;
+                nextParent.children.splice(nextParent.children.indexOf(foundNode), 1);
+                previousParent.children.push(foundNode);
+                break;
+        }
+        this.renderVisual("Undo");
+    }
+
+    redo() {
+        if (!this.hasNextAction()) return;
+        this.actionPointer++;
+        const action = this.actionsCache[this.actionPointer - 1];
+        let previousParent: Node | null = null;
+        let nextParent: Node | null = null;
+        let foundNode: Node | null = null;
+
+        switch (action.operation) {
+            case "APPEND_NODE":
+                if (!action.newState) return;
+                previousParent = this.findParentNode(action.newState, this.mainNodeData);
+                if (!previousParent?.children) return;
+                previousParent.children.push(action.newState);
+                break;
+            case "REMOVE_NODE":
+                if (!action.previousState) return;
+                previousParent = this.findParentNode(action.previousState, this.mainNodeData);
+                foundNode = this.findNode(action.previousState.id, previousParent);
+                if (!previousParent?.children || !foundNode) return;
+                previousParent.children.splice(previousParent.children.indexOf(foundNode), 1);
+                break;
+            case "CHANGE_NODE":
+                if (!action.newState) return;
+                foundNode = this.findNode(action.newState.id, this.mainNodeData);
+                if (!foundNode) return;
+                foundNode.name = action.newState.name;
+                foundNode.type = action.newState.type;
+                foundNode.predicateType = action.newState.predicateType;
+                foundNode.predicateRedirection = action.newState.predicateRedirection;
+                foundNode.predicateArgumentsToTokensMap = action.newState.predicateArgumentsToTokensMap;
+                foundNode.preprocessorTypes = action.newState.preprocessorTypes;
+                foundNode.redirectId = action.newState.redirectId;
+                foundNode.messageTemplate = action.newState.messageTemplate;
+                foundNode.ticketTitle = action.newState.ticketTitle;
+                foundNode.ticketTemplate = action.newState.ticketTemplate;
+                foundNode.isValid = action.newState.isValid;
+                this.updateSelectedNodeForm(foundNode);
+                break;
+            case "MOVE_NODE":
+                if (!action.previousState || !action.newState) return;
+                previousParent = this.findParentNode(action.previousState, this.mainNodeData);
+                foundNode = this.findNode(action.newState.id, previousParent);
+                nextParent = this.findParentNode(action.newState, this.mainNodeData);
+                if (!previousParent?.children || !nextParent?.children || !foundNode) return;
+                previousParent.children.splice(nextParent.children.indexOf(foundNode), 1);
+                nextParent.children.push(foundNode);
+                break;
+        }
+        this.renderVisual("Redo");
+    }
+
+    foldAll() {
+        this.setExpandedRecursively(this.mainNodeVisual, false);
+        this.renderVisual("Fold All");
+    }
+
+    unfoldAll() {
+        this.setExpandedRecursively(this.mainNodeVisual, true);
+        this.renderVisual("Unfold All");
+    }
+
+    changeToSelectMode() {
+        this.editorMode = EditorMode.SELECT;
+        this.pickNodeMask = [];
+    }
+
+    changeToPickMode(control: FormControl, targets: PickTargetsType = 'all') {
+        this.editorMode = EditorMode.PICK_NODE;
+        this.targetControlForPickNode = control;
+        if (this.selectedTreeNode?.data)
+            this.setupNodePickMask(this.selectedTreeNode.data, targets);
+    }
+
+    findNodeNameById(value: string): string | null {
+        return this.findNode(value, this.mainNodeData)?.name ?? null;
+    }
+
+    isShadedNode(node: Node) {
+        return (this.dropDisabledNodes[node.id] || (this.editorMode === EditorMode.PICK_NODE && !this.pickNodeMask.includes(node.id)))
+    }
+
+    private doSelectNode(node: Node) {
+        if (node.predicateType) {
+            this.setPredicateArgumentsControls(node.predicateType);
+        }
+        this.selectedNodeSettingsForm.patchValue({
+            id: node.id,
+            name: node.name,
+            type: node.type,
+            preprocessorTypes: node.preprocessorTypes,
+            predicateType: node.predicateType,
+            predicateRedirection: node.predicateRedirection ?? undefined,
+            predicateArgumentsToTokensMap: node.predicateArgumentsToTokensMap ?? undefined,
+            redirectId: node.redirectId,
+            messageTemplate: node.messageTemplate,
+            ticketTitle: node.ticketTitle,
+            ticketTemplate: node.ticketTemplate,
+            // parent: node.parent,
+            // children: node.children,
+        }, {emitEvent: false});
+        this.parentOptionsList = this.getParentOptionsList(node);
+        this.childOptionsList = this.getChildOptionsList(node);
+        this.valuesTokensList = this.getValuesTokens(node);
+    }
+
+    private doPickNode(node: Node) {
+        if (!this.pickNodeMask.includes(node.id)) return;
+        this.targetControlForPickNode?.setValue(node.id);
+        this.changeToSelectMode();
+    }
+
+    private setExpandedRecursively(visualNode: TreeNode | null, expanded: boolean) {
+        if (!visualNode) return;
+        visualNode.expanded = expanded;
+        if (!visualNode.children) return;
+        for (const child of visualNode.children) {
+            this.setExpandedRecursively(child, expanded);
+        }
+    }
+
+    private updateSelectedNodeForm(node: Node | null) {
+        if (!this.selectedTreeNode?.data || !node) return;
+        const selectedNode = this.selectedTreeNode.data;
+        if (selectedNode.id !== node.id) return;
+        this.handleNodeSelect(this.selectedTreeNode);
     }
 
     private getChildOptionsList(node: Node | null) {
@@ -403,6 +623,34 @@ export class AutoSupportEditorComponent implements OnInit, OnDestroy, AfterViewI
             currentNode = this.findParentNode(currentNode, this.mainNodeData);
         }
         return optionsList;
+    }
+
+    private setupNodePickMask(targetNode: Node, targets: PickTargetsType) {
+        if (targets === 'child') {
+            this.pickNodeMask = this.getChildNodeIds(targetNode);
+        } else if (targets === 'parent') {
+            this.pickNodeMask = this.getRecursiveParentNodeIds(targetNode);
+        } else {
+            this.pickNodeMask = [];
+        }
+    }
+
+    private getChildNodeIds(node: Node | null, ids: string[] = []): string[] {
+        if (!node) return ids;
+        if (node.children) {
+            ids = node.children.map(child => child.id);
+        }
+        return ids;
+    }
+
+    private getRecursiveParentNodeIds(node: Node | null, ids: string[] = []): string[] {
+        if (!node) return ids;
+        ids.push(node.id);
+        if (node.parent) {
+            const parentNode = this.findParentNode(node, this.mainNodeData);
+            ids = this.getRecursiveParentNodeIds(parentNode, ids);
+        }
+        return ids;
     }
 
     private getValuesTokens(node: Node | null): ValuesToken[] {
@@ -454,8 +702,11 @@ export class AutoSupportEditorComponent implements OnInit, OnDestroy, AfterViewI
             predicateArgumentsToTokensMap: null,
             redirectId: null,
             messageTemplate: null,
+            ticketTitle: null,
+            ticketTemplate: null,
             parent: targetNode?.id ?? null,
             children: [],
+            isValid: false
         }
     }
 
@@ -475,16 +726,68 @@ export class AutoSupportEditorComponent implements OnInit, OnDestroy, AfterViewI
     }
 
     private loadAutoSupportConfiguration() {
+        this.isLoading = true;
         this.autoSupportLoadSub = this.autoSupportConfiguration$.subscribe(data => {
             this.mainNodeData = data.defaultNodes;
-            this.renderVisual();
+            this.isAllValid = true;
+            this.checkNodeValidity(this.mainNodeData);
+            this.renderVisual("loadAutoSupportConfiguration");
+            this.isLoading = false;
         });
+    }
+
+    private subscribeToNodeFormChanges() {
+        this.modifyNodeSub = this.selectedNodeSettingsFormChange$
+            .subscribe(data => this.handleModifyNode(data as Partial<Node>))
+        this.changeNodeTypeSub = this.selectedNodeTypeChange$
+            .subscribe(data => this.handleChangeNodeType(data as Partial<Node>))
+        this.changePredicateTypeSub = this.selectedNodePredicateTypeChange$
+            .subscribe(data => this.handleChangePredicateType(data as Partial<Node>))
+    }
+
+    private loadMetadata() {
+        this.api.getAutoSupportPreprocessorsOutputValues().subscribe(values => this.preprocessorsOutputValuesMap = values);
+        this.api.getAutoSupportPredicatesArguments().subscribe(data => this.predicatesArgumentsMap = data);
+    }
+
+    private initShortcuts() {
+        this.preventDefaultUndoSub = fromEvent<KeyboardEvent>(window, 'keydown')
+            .pipe(filter(event => {
+                return (event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'z';
+
+            })).subscribe((event) => {
+                event.preventDefault();
+            });
+
+        this.undoRedoNodeSub = fromEvent<KeyboardEvent>(document.body, 'keyup')
+            .pipe(
+                debounceTime(100),
+                filter((event) => {
+                    return event.key.toLowerCase() === 'z' && ((event.shiftKey && event.ctrlKey) || event.ctrlKey)
+                }),
+                map((event) => {
+                    return event.shiftKey ? 'redo' : 'undo'
+                })
+            ).subscribe((action) => {
+                if (action === 'redo') {
+                    this.redo();
+                } else if (action === 'undo') {
+                    this.undo();
+                }
+            });
+
+        this.escapeSub = fromEvent<KeyboardEvent>(document.body, 'keyup')
+            .pipe(
+                filter(event => (event.key.toLowerCase() === 'escape'))
+            ).subscribe(() => this.handleEscape())
     }
 
     private handleModifyNode(modifyData: Partial<Node>) {
         if (!this.selectedTreeNode || !this.mainNodeData) return;
         const node = this.selectedTreeNode.data;
         if (!node) return;
+
+        const previousData = JSON.parse(JSON.stringify(node));
 
         node.name = modifyData.name ?? "";
         node.type = modifyData.type ?? NodeType.NORMAL;
@@ -494,7 +797,15 @@ export class AutoSupportEditorComponent implements OnInit, OnDestroy, AfterViewI
         node.predicateArgumentsToTokensMap = modifyData.predicateArgumentsToTokensMap ?? null;
         node.redirectId = modifyData.redirectId ?? null;
         node.messageTemplate = modifyData.messageTemplate ?? null;
-        node.parent = modifyData.parent ?? null;
+        node.ticketTitle = modifyData.ticketTitle ?? null;
+        node.ticketTemplate = modifyData.ticketTemplate ?? null;
+
+        const currentData = JSON.parse(JSON.stringify(node));
+
+        this.isAllValid = true;
+        this.checkNodeValidity(this.mainNodeData);
+
+        this.appendAction("CHANGE_NODE", previousData, currentData);
     }
 
     private handleChangeNodeType(nodeForm: Partial<Node>) {
@@ -509,6 +820,8 @@ export class AutoSupportEditorComponent implements OnInit, OnDestroy, AfterViewI
                 node.predicateRedirection = null;
                 node.predicateArgumentsToTokensMap = null;
                 node.messageTemplate = null;
+                node.ticketTemplate = null;
+                node.ticketTitle = null;
                 node.redirectId = null;
                 if (!node.children) node.children = [];
                 node.children = node.children.slice(0, 1);
@@ -519,13 +832,17 @@ export class AutoSupportEditorComponent implements OnInit, OnDestroy, AfterViewI
                 node.predicateRedirection = null;
                 node.predicateArgumentsToTokensMap = null;
                 node.messageTemplate = null;
+                node.ticketTemplate = null;
+                node.ticketTitle = null;
                 node.children = [];
                 break;
             case NodeType.PREDICATE:
                 node.preprocessorTypes = [];
                 node.messageTemplate = null;
                 node.redirectId = null;
-                node.predicateArgumentsToTokensMap = {};
+                // node.predicateArgumentsToTokensMap = {};
+                node.ticketTemplate = null;
+                node.ticketTitle = null;
                 if (!node.children) node.children = [];
                 node.children = node.children.slice(0, 2);
                 break;
@@ -534,19 +851,31 @@ export class AutoSupportEditorComponent implements OnInit, OnDestroy, AfterViewI
                 node.predicateRedirection = null;
                 node.redirectId = null;
                 node.predicateArgumentsToTokensMap = null;
+                node.ticketTemplate = null;
+                node.ticketTitle = null;
                 if (!node.children) node.children = [];
                 node.children = node.children.slice(0, 1);
+                break;
+            case NodeType.TICKET:
+                node.predicateType = null;
+                node.predicateRedirection = null;
+                node.redirectId = null;
+                node.predicateArgumentsToTokensMap = null;
+                node.preprocessorTypes = [];
+                node.children = [];
                 break;
             case NodeType.NORMAL:
                 node.predicateType = null;
                 node.predicateRedirection = null;
                 node.redirectId = null;
                 node.predicateArgumentsToTokensMap = null;
+                node.ticketTemplate = null;
+                node.ticketTitle = null;
                 break;
         }
 
-        this.renderVisual();
-        this.handleNodeSelect(node);
+        this.renderVisual("handleChangeNodeType");
+        // this.handleNodeSelect(node);
     }
 
     private handleChangePredicateType(data: Partial<Node>) {
@@ -576,6 +905,96 @@ export class AutoSupportEditorComponent implements OnInit, OnDestroy, AfterViewI
             parentNode.children?.splice(index, 1);
         }
         this.selectedTreeNode = null;
-        this.renderVisual();
+        this.renderVisual("handleRemoveNode");
+
+        this.appendAction('REMOVE_NODE', targetNode, null);
+    }
+
+    private checkNodeValidity(node: Node): void {
+        if (!node) return;
+        switch (node.type) {
+            case NodeType.NORMAL:
+            case NodeType.INPUT:
+                this.isAllValid = this.validateNormalNode(node) && this.isAllValid;
+                break;
+            case NodeType.TRUNK:
+                node.isValid = true;
+                break;
+            case NodeType.REDIRECT:
+                this.isAllValid = this.validateRedirectNode(node) && this.isAllValid;
+                break;
+            case NodeType.PREDICATE:
+                this.isAllValid = this.validatePredicateNode(node) && this.isAllValid;
+                break;
+            case NodeType.TICKET:
+                node.isValid = this.validateTicketNode(node) && this.isAllValid;
+                break;
+        }
+        if (!node.children) return;
+        for (const child of node.children) {
+            this.checkNodeValidity(child);
+        }
+    }
+
+    private validateNormalNode(node: Node): boolean {
+        if (!node) return false;
+        node.isValid = !!node.messageTemplate && node.messageTemplate.trim().length > 0;
+        return node.isValid;
+    }
+
+    private validateTicketNode(node: Node): boolean {
+        if (!node) return false;
+        const messageTemplateValid = !!node.messageTemplate && node.messageTemplate.trim().length > 0;
+        const ticketTemplateValid = !!node.ticketTemplate && node.ticketTemplate.trim().length > 0;
+        const ticketTitleValid = !!node.ticketTitle && node.ticketTitle.trim().length > 0;
+        node.isValid = messageTemplateValid && ticketTemplateValid && ticketTitleValid;
+        return node.isValid;
+    }
+
+    private validateRedirectNode(node: Node): boolean {
+        if (!node) return false;
+        return node.isValid = !!node.redirectId;
+    }
+
+    private validatePredicateNode(node: Node): boolean {
+        if (!node) return false;
+        let predicateTypeValid = false;
+        let predicateArgumentsValid = false;
+        let predicateRedirectionValid = false;
+
+        if (node.predicateType) {
+            predicateTypeValid = true;
+        }
+
+        if (node.predicateArgumentsToTokensMap) {
+            const values = Object.values(node.predicateArgumentsToTokensMap);
+            console.log(values)
+            predicateArgumentsValid = values.reduce((acc, val) => acc && !!val, true);
+        }
+
+        if (node.predicateRedirection) {
+            predicateRedirectionValid = !!node.predicateRedirection[0] && !!node.predicateRedirection[1];
+        }
+
+        node.isValid = predicateTypeValid && predicateArgumentsValid && predicateRedirectionValid;
+
+        return node.isValid;
+    }
+
+    private appendAction(operation: NodeEditorOperation, previousState: Node | null, newState: Node | null): void {
+        if (this.actionPointer < this.actionsCache.length) {
+            this.actionsCache.splice(this.actionPointer, this.actionsCache.length - this.actionPointer);
+        }
+        this.actionsCache.push({operation, previousState, newState});
+        this.actionPointer = this.actionsCache.length;
+        if (this.actionsCache.length > 250) {
+            this.actionsCache.shift(); // remove first element from cache
+        }
+    }
+
+    private handleEscape() {
+        if (this.editorMode !== EditorMode.SELECT) {
+            this.changeToSelectMode();
+        }
     }
 }

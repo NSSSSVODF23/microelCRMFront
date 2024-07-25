@@ -180,7 +180,9 @@ export class TestingPageComponent implements OnInit, AfterContentInit {
         this.api.convertBillingAddress("К.М 44-118 (4.7)").subscribe((address) => {
             this.taskCreatorService.wireframe(7, {
                 login: '16111630',
-                address
+                address,
+                phone: null,
+                description: null
             })
         })
     }

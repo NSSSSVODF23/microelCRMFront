@@ -667,7 +667,9 @@ export class BillingUserPageComponent implements OnInit, OnDestroy {
                         }
                         this.taskCreation.wireframe(value.wireframeId, {
                             login: this.currentLogin,
-                            address
+                            address,
+                            phone: null,
+                            description: null
                         })
                     })
                 },

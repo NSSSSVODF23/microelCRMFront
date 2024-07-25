@@ -1,7 +1,7 @@
 import {FieldItem, LoadingState, ModelItem, Page, Wireframe, WireframeFieldType} from "./types/transport-interfaces";
 import {
     bufferTime,
-    combineLatest,
+    combineLatest, filter,
     fromEvent,
     map,
     merge,
@@ -610,11 +610,18 @@ export function mediaQuery(query: string): Observable<boolean> {
 }
 
 export class DraggingScroll {
+    private draggingView?: HTMLElement;
     private isGraphScrolling = false;
     private subscriptions: Subscription[] = [];
 
+    preventScrolling() {
+        this.isGraphScrolling = false;
+        if(this.draggingView) this.draggingView.style.cursor = 'grab';
+    }
+
     appoint(element: HTMLElement) {
         if (element) {
+            this.draggingView = element;
             this.subscriptions.push(fromEvent<MouseEvent>(element, 'mousedown').subscribe(event => {
                     if (event.button === 0) {
                         this.isGraphScrolling = true;
@@ -629,17 +636,14 @@ export class DraggingScroll {
                 }),
                 fromEvent<MouseEvent>(element, 'mousemove')
                     .pipe(
+                        filter(event =>this.isGraphScrolling),
                         map(event => ({x: -event.movementX, y: -event.movementY})),
                         bufferTime(30),
                         map(coordinates => coordinates.reduce((acc, val) => {
                             return {x: acc.x + val.x, y: acc.y + val.y}
                         }, {x: 0, y: 0}))
                     )
-                    .subscribe(({x, y}) => {
-                        if (this.isGraphScrolling) {
-                            element.scrollBy(x, y);
-                        }
-                    })
+                    .subscribe(({x, y}) => element.scrollBy(x, y))
             )
         }else{
             throw new Error('Элемент не найден');

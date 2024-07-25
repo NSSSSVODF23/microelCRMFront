@@ -1,8 +1,28 @@
+<div class="p-2 flex gap-2 border-top-1 border-left-1 border-right-1 border-bluegray-100 border-round">
+    <p-button (onClick)="undo()" [disabled]="!hasPreviousAction()" icon="mdi-undo"
+              label="Отменить" pTooltip="Ctrl+Z" styleClass="p-button-sm p-button-text"
+              tooltipPosition="bottom"></p-button>
+    <p-button (onClick)="redo()" [disabled]="!hasNextAction()" icon="mdi-redo" iconPos="right"
+              label="Применить" pTooltip="Ctrl+Shift+Z" styleClass="p-button-sm p-button-text"
+              tooltipPosition="bottom"></p-button>
+    <p-button (onClick)="unfoldAll()" icon="mdi-unfold_more" label="Развернуть все"
+              styleClass="p-button-sm p-button-text"></p-button>
+    <p-button (onClick)="foldAll()" icon="mdi-unfold_less" label="Свернуть все"
+              styleClass="p-button-sm p-button-text"></p-button>
+    <div class="flex-1"></div>
+    <p-button (onClick)="saveToServer()" [disabled]="!isAllValid || !hasPreviousAction()" [loading]="isSaving"
+              icon="mdi-save"
+              label="Сохранить" styleClass="p-button-sm p-button-success"></p-button>
+</div>
 <p-splitter [panelSizes]="[80,20]" [style]="{'height': '900px'}" class="flex-1" styleClass="flex">
     <ng-template pTemplate>
         <div class="flex relative flex-1">
-            <p-organizationChart #graph (onNodeSelect)="handleNodeSelect($event.node.data)"
-                                 [(selection)]="selectedTreeNode" [hidden]="!mainNodeData"
+            <div *ngIf="editorMode === EditorMode.PICK_NODE"
+                 class="flex justify-content-between absolute w-full h-full p-3 border-2 border-round border-orange-400 text-orange-400 font-bold pointer-events-none">
+                <span>Выберите ноду</span>
+            </div>
+            <p-organizationChart #graph (onNodeSelect)="handleNodeSelect($event.node)"
+                                 (onNodeUnselect)="handleNodeUnselect($event.node)" [hidden]="!mainNodeData"
                                  [ngClass]="{'pointer-events-none': isSaving}" [preserveSpace]="false"
                                  [value]="[mainNodeVisual]" class="flex-1 p-3 absolute w-full h-full display-grid"
                                  selectionMode="single"
@@ -10,21 +30,26 @@
                 <ng-template let-treeNode pTemplate="default">
                     <div (onDragEnd)="endDragNode(node)" (onDragStart)="startDragNode(node)"
                          (onDrop)="handleDropNode(node)" *ngIf="toNode(treeNode.data) as node"
-                         [ngClass]="{'pointer-events-none opacity-30': dropDisabledNodes[node.id]}"
+                         [ngClass]="{'pointer-events-none opacity-30 cursor-default': isShadedNode(node), 'border-2 border-red-600':!node.isValid}"
                          [ngStyle]="selectedTreeNode === treeNode ? leafSelectedStyle[node.type] : leafStyle[node.type]"
+                         [pDraggableDisabled]="editorMode !== EditorMode.SELECT"
                          class="select-none flex gap-2 align-items-center"
                          pDraggable="node"
                          pDroppable="node">
                         <span [ngClass]="icon[node.type]"></span>
-                        <span>
+                        <span class="white-space-nowrap">
                             {{ node.name ? node.name : 'Без названия' }}
                         </span>
                     </div>
                 </ng-template>
             </p-organizationChart>
-            <p-button (onClick)="createRootNode()" *ngIf="!mainNodeData" class="absolute top-50 left-50 -translate-50"
+            <p-button (onClick)="createRootNode()" *ngIf="!mainNodeData && !isLoading"
+                      class="absolute top-50 left-50 -translate-50"
                       icon="mdi-auto_awesome"
                       label="Создать корневой узел" styleClass="p-button-help"></p-button>
+            <p-progressSpinner *ngIf="isLoading"
+                               class="custom-spinner custom-spinner-8xl custom-spinner-primary absolute top-50 left-50 -translate-50"
+                               strokeWidth="1"></p-progressSpinner>
         </div>
     </ng-template>
     <ng-template pTemplate>
@@ -42,8 +67,8 @@
                 </app-label>
                 <app-label *ngIf="isShowFormControl([NodeType.REDIRECT], selectedTreeNode.data?.type)"
                            label="Целевая нода">
-                    <p-dropdown [options]="parentOptionsList" appendTo="body" formControlName="redirectId"
-                                placeholder="Выбрать ноду"></p-dropdown>
+                    <ng-container
+                            *ngTemplateOutlet="nodePickerTemplate; context: {control:selectedNodeSettingsForm.controls['redirectId'], targets: 'all'}"></ng-container>
                 </app-label>
                 <app-label *ngIf="isShowFormControl([NodeType.NORMAL, NodeType.INPUT], selectedTreeNode.data?.type)"
                            label="Препроцессоры">
@@ -61,40 +86,60 @@
                     <div class="flex flex-column gap-2 border-round border-1 border-bluegray-100 p-2">
                         <span class="text-xl text-bluegray-300 font-bold">Входные аргументы</span>
                         <div class="flex flex-column gap-2" formGroupName="predicateArgumentsToTokensMap">
-                            <app-label *ngFor="let arg of Object.keys(selectedNodeSettingsForm.controls.predicateArgumentsToTokensMap.controls)" [label]="arg">
-                                <p-dropdown [options]="valuesTokensList"
-                                            [formControlName]="arg"
+                            <app-label
+                                    *ngFor="let arg of Object.keys(selectedNodeSettingsForm.controls.predicateArgumentsToTokensMap.controls)"
+                                    [label]="arg">
+                                <p-dropdown [formControlName]="arg"
+                                            [options]="valuesTokensList"
                                             appendTo="body" optionLabel="name" optionValue="token"
                                             placeholder="Выбрать значение аргумента"></p-dropdown>
                             </app-label>
                         </div>
                     </div>
                     <app-label label="Истина">
-                        <p-dropdown [formControl]="selectedNodeSettingsForm.controls.predicateRedirection.controls['1']"
-                                    [options]="childOptionsList"
-                                    appendTo="body"
-                                    placeholder="Выбрать дочернюю ноду"></p-dropdown>
+                        <ng-container
+                                *ngTemplateOutlet="nodePickerTemplate; context: {control:selectedNodeSettingsForm.controls.predicateRedirection.controls['1'], targets: 'child'}"></ng-container>
                     </app-label>
                     <app-label label="Ложь">
-                        <p-dropdown [formControl]="selectedNodeSettingsForm.controls.predicateRedirection.controls['0']"
-                                    [options]="childOptionsList"
-                                    appendTo="body"
-                                    placeholder="Выбрать дочернюю ноду"></p-dropdown>
+                        <ng-container
+                                *ngTemplateOutlet="nodePickerTemplate; context: {control:selectedNodeSettingsForm.controls.predicateRedirection.controls['0'], targets: 'child'}"></ng-container>
                     </app-label>
                 </ng-container>
 
-                <app-label *ngIf="isShowFormControl([NodeType.NORMAL, NodeType.INPUT], selectedTreeNode.data?.type)"
-                           label="Шаблон сообщения">
+                <app-label
+                        *ngIf="isShowFormControl([NodeType.NORMAL, NodeType.INPUT, NodeType.TICKET], selectedTreeNode.data?.type)"
+                        label="Шаблон сообщения">
                     <div class="flex flex-column">
                         <textarea [autoResize]="true" formControlName="messageTemplate" pInputTextarea
                                   type="text"></textarea>
                         <span class="text-bluegray-400 mt-3 mb-2">Доступные переменные</span>
                         <div class="flex flex-wrap gap-2">
-                            <ng-container *ngFor="let token of valuesTokensList" [ngTemplateOutletContext]="{token}"
+                            <ng-container *ngFor="let token of valuesTokensList" [ngTemplateOutletContext]="{token, control: selectedNodeSettingsForm.controls.messageTemplate}"
                                           [ngTemplateOutlet]="tokenTemplate"></ng-container>
                         </div>
                     </div>
                 </app-label>
+
+                <app-label
+                        *ngIf="isShowFormControl([NodeType.TICKET], selectedTreeNode.data?.type)"
+                        label="Название заявки">
+                    <input formControlName="ticketTitle" pInputText type="text"/>
+                </app-label>
+
+                <app-label
+                        *ngIf="isShowFormControl([NodeType.TICKET], selectedTreeNode.data?.type)"
+                        label="Шаблон описания заявки">
+                    <div class="flex flex-column">
+                        <textarea [autoResize]="true" formControlName="ticketTemplate" pInputTextarea
+                                  type="text"></textarea>
+                        <span class="text-bluegray-400 mt-3 mb-2">Доступные переменные</span>
+                        <div class="flex flex-wrap gap-2">
+                            <ng-container *ngFor="let token of valuesTokensList" [ngTemplateOutletContext]="{token, control: selectedNodeSettingsForm.controls.ticketTemplate}"
+                                          [ngTemplateOutlet]="tokenTemplate"></ng-container>
+                        </div>
+                    </div>
+                </app-label>
+
                 <ng-container
                         *ngIf="isShowFormControl([NodeType.PREDICATE, NodeType.INPUT, NodeType.NORMAL, NodeType.TRUNK], selectedTreeNode.data?.type)">
                     <p-button (onClick)="addSubNode()" *ngIf="isShowAddSubNodeButton(selectedTreeNode.data)"
@@ -106,20 +151,25 @@
                           label="Удалить эту ноду"
                           styleClass="p-button-danger"></p-button>
             </div>
-            <div class="flex-1"></div>
-            <div class="flex gap-3 justify-content-end">
-                <p-button (onClick)="saveToServer()" [loading]="isSaving" icon="mdi-save"
-                          label="Сохранить"></p-button>
-            </div>
         </div>
     </ng-template>
 </p-splitter>
 
-<ng-template #tokenTemplate let-token="token">
-    <span (click)="appendValueTokenToMessageTemplate(token)"
+<ng-template #tokenTemplate let-token="token" let-control="control">
+    <span (click)="appendValueTokenToMessageTemplate(token, control)"
           class="flex gap-2 align-items-center px-3 py-1 border-round bg-primary-50 text-primary white-space-nowrap hover:bg-primary hover:text-white select-none cursor-pointer">
         {{ token.name }}
     </span>
 </ng-template>
-<!--<span>{{mainNodeData | prettyJson:[1,1]}}</span>-->
-<!--<pre [innerHTML]="mainNodeData | prettyJson:[1,1]"></pre>-->
+
+<ng-template #nodePickerTemplate let-control="control" let-targets="targets">
+    <div class="flex gap-2">
+        <p-button (onClick)="changeToPickMode(control, targets)"
+                  [disabled]="editorMode === EditorMode.PICK_NODE"
+                  [label]="findNodeNameById(control.value) ?? 'Выбрать ноду'"
+                  styleClass="p-button-outlined p-button-info"></p-button>
+        <p-button (onClick)="changeToSelectMode()" *ngIf="editorMode === EditorMode.PICK_NODE" icon="mdi-close"
+                  label="Отмена"
+                  styleClass="p-button-danger p-button-text"></p-button>
+    </div>
+</ng-template>

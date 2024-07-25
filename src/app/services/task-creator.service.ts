@@ -6,6 +6,8 @@ export type TaskCreationMode = 'standard' | 'child' | 'parent' | 'billing';
 export type BillingInfo = {
     address: Address|null,
     login: string|null,
+    phone: string|null,
+    description: string|null,
 }
 
 @Injectable({

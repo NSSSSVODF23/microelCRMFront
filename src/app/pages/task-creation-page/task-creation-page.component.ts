@@ -4,8 +4,10 @@ import {fade, flow, swipeChild} from "../../animations";
 import {
     DefaultObservers,
     FieldItem,
-    TaskCreationBody, TaskStage,
-    TaskTag, TaskTypeDirectory,
+    TaskCreationBody,
+    TaskStage,
+    TaskTag,
+    TaskTypeDirectory,
     Wireframe
 } from "../../types/transport-interfaces";
 import {ActivatedRoute, Router} from "@angular/router";
@@ -15,7 +17,8 @@ import {PersonalityService} from "../../services/personality.service";
 import {CustomValidators} from "../../custom-validators";
 import {MessageService} from "primeng/api";
 import {TaskCreationMode, TaskCreatorService} from "../../services/task-creator.service";
-import {filter, fromEvent, Subject, switchMap} from "rxjs";
+import {filter, fromEvent, switchMap} from "rxjs";
+import {v4} from "uuid";
 
 enum ControlsType {
     NEXT_ONLY = "NEXT_ONLY", BOTH = "BOTH", PREV_FIN = "PREV_FIN", FIN_ONLY = "FIN_ONLY", NONE = "NONE"
@@ -67,11 +70,20 @@ export class TaskCreationPageComponent implements OnInit, OnDestroy {
 
     enterPressed$ = fromEvent(document.body, 'keydown')
         .pipe(
-            filter((e:any) => e.key === 'Tab'),
+            filter((e: any) => e.key === 'Tab'),
             filter(() => this.controlsType() === ControlsType.NEXT_ONLY || this.controlsType() === ControlsType.BOTH),
             filter(() => this.isValidCurrentStep),
-            filter(() => this.currentStepFields.length-1 === this.currentFieldFocus)
+            filter(() => this.currentStepFields.length - 1 === this.currentFieldFocus)
         )
+    openBillingCreationWindowHandle = {
+        next: (wireframe: Wireframe) => {
+            this.selectedTemplate = wireframe;
+            this.selectTemplateForTask();
+        },
+        error: () => {
+            window.close()
+        }
+    }
 
     constructor(readonly api: ApiService, readonly route: ActivatedRoute, readonly personality: PersonalityService,
                 readonly toast: MessageService, private taskCreation: TaskCreatorService, private router: Router) {
@@ -87,13 +99,13 @@ export class TaskCreationPageComponent implements OnInit, OnDestroy {
 
     set selectedTemplate(wireframe: Wireframe | null) {
         this._selectedTemplate = wireframe;
-        if(wireframe?.stages){
-            this.types = wireframe.stages.sort((a, b)=>a.orderIndex-b.orderIndex) ?? [];
+        if (wireframe?.stages) {
+            this.types = wireframe.stages.sort((a, b) => a.orderIndex - b.orderIndex) ?? [];
             this.type = this.types[0].stageId;
             this.directories = this.types[0].directories ? this.types[0].directories : [];
             this.directory = this.directories[0]?.taskTypeDirectoryId;
             this.isDuplicateInOldTracker = (!!this.types[0].oldTrackerBind && this.isUserHasOldTrackerCredentials);
-        }else{
+        } else {
             this.types = [];
             this.type = undefined;
             this.directories = [];
@@ -102,27 +114,15 @@ export class TaskCreationPageComponent implements OnInit, OnDestroy {
         }
     }
 
-    get nextStepName(){
-        return this.selectedTemplate?.steps[this.currentStep+1]?.name;
+    get nextStepName() {
+        return this.selectedTemplate?.steps[this.currentStep + 1]?.name;
     }
 
-    get prevStepName(){
-        return this.selectedTemplate?.steps[this.currentStep-1]?.name;
+    get prevStepName() {
+        return this.selectedTemplate?.steps[this.currentStep - 1]?.name;
     }
 
-    changeTaskType(type: string){
-        if(!type) this.isDuplicateInOldTracker = false;
-        const currentStage = this.types.find(t=>t.stageId===type);
-        if(currentStage) {
-            this.isDuplicateInOldTracker = (!!currentStage.oldTrackerBind && this.isUserHasOldTrackerCredentials);
-            this.directories = currentStage.directories;
-            return;
-        }
-        this.directories = [];
-        this.isDuplicateInOldTracker = false;
-    }
-
-    get isUserHasOldTrackerCredentials(){
+    get isUserHasOldTrackerCredentials() {
         const credentials = this.personality.me?.oldTrackerCredentials;
         return (!!credentials && !!credentials.username && !!credentials.password);
     }
@@ -141,11 +141,11 @@ export class TaskCreationPageComponent implements OnInit, OnDestroy {
     }
 
     get taskCreationBody(): TaskCreationBody | null {
-        if(!this.selectedTemplate) return null;
+        if (!this.selectedTemplate) return null;
 
         const rawValues = this.taskCreationForm.getRawValue().reduce((acc, curr) => {
             return {...acc, ...curr};
-        },{});
+        }, {});
 
         return {
             wireframeId: this.selectedTemplate.wireframeId,
@@ -161,8 +161,29 @@ export class TaskCreationPageComponent implements OnInit, OnDestroy {
         };
     }
 
+    get isCurrentTypeHasBind() {
+        if (!this.type) return false;
+        const currentStage = this.types.find(t => t.stageId === this.type);
+        if (currentStage) {
+            return !!currentStage.oldTrackerBind;
+        }
+        return false;
+    };
+
+    changeTaskType(type: string) {
+        if (!type) this.isDuplicateInOldTracker = false;
+        const currentStage = this.types.find(t => t.stageId === type);
+        if (currentStage) {
+            this.isDuplicateInOldTracker = (!!currentStage.oldTrackerBind && this.isUserHasOldTrackerCredentials);
+            this.directories = currentStage.directories;
+            return;
+        }
+        this.directories = [];
+        this.isDuplicateInOldTracker = false;
+    }
+
     ngOnInit(): void {
-        this.subscriptions.addSubscription('nextStep', this.enterPressed$.subscribe(()=>this.changeCreationStep(1)));
+        this.subscriptions.addSubscription('nextStep', this.enterPressed$.subscribe(() => this.changeCreationStep(1)));
         window.addEventListener('message', (event) => {
             const data = event.data;
             this.openMode = data.mode;
@@ -176,29 +197,19 @@ export class TaskCreationPageComponent implements OnInit, OnDestroy {
                     this.childId = data.dependencyIdentifier;
                     break;
                 case "billing":
-                    if(data.wireframeId) {
+                    if (data.wireframeId) {
                         this.defaultValues = data.billingInfo;
                         this.api.getWireframe(data.wireframeId).subscribe(this.openBillingCreationWindowHandle)
-                    }else {
+                    } else {
                         window.close()
                     }
                     break;
-                }
+            }
         }, false);
     }
 
     ngOnDestroy(): void {
         this.subscriptions.unsubscribeAll();
-    }
-
-    openBillingCreationWindowHandle = {
-        next: (wireframe: Wireframe) => {
-            this.selectedTemplate = wireframe;
-            this.selectTemplateForTask();
-        },
-        error: () => {
-            window.close()
-        }
     }
 
     // Выбор шаблона для создания задачи
@@ -211,18 +222,34 @@ export class TaskCreationPageComponent implements OnInit, OnDestroy {
         this.taskCreationForm = new FormArray(
             this.selectedTemplate.steps.map(step => {
                 return new FormGroup(
-                step.fields.reduce(
-                    (prev, field) => {
-                        let defaultValue = null;
-                        if(this.defaultValues){
-                            switch (field.name.toLowerCase()) {
-                                case "логин": defaultValue = this.defaultValues.login; break;
-                                case "адрес": defaultValue = this.defaultValues.address; break;
+                    step.fields.reduce(
+                        (prev, field) => {
+                            let defaultValue: any = null;
+                            if (this.defaultValues) {
+                                switch (field.name.toLowerCase()) {
+                                    case "логин":
+                                        defaultValue = this.defaultValues.login;
+                                        break;
+                                    case "адрес":
+                                        defaultValue = this.defaultValues.address;
+                                        break;
+                                    case "телефон":
+                                        if (this.defaultValues.phone) {
+                                            defaultValue = {};
+                                            const id = v4();
+                                            defaultValue[id] = this.defaultValues.phone;
+                                        }
+                                        break;
+                                    case "проблема":
+                                        defaultValue = this.defaultValues.description;
+                                }
                             }
-                        }
-                        return {...prev, [field.id]: new FormControl(defaultValue, CustomValidators.taskInput(field.type, field.variation))};
-                    }, {}
-                )
+                            return {
+                                ...prev,
+                                [field.id]: new FormControl(defaultValue, CustomValidators.taskInput(field.type, field.variation))
+                            };
+                        }, {}
+                    )
                 )
             })
         )
@@ -243,7 +270,7 @@ export class TaskCreationPageComponent implements OnInit, OnDestroy {
 
     // Изменение этапа создания задачи
     changeCreationStep(shift: number = 0) {
-        if(!this.isValidCurrentStep && shift > 0) {
+        if (!this.isValidCurrentStep && shift > 0) {
             this.currentStepForm.markAllAsTouched();
             return;
         }
@@ -281,15 +308,6 @@ export class TaskCreationPageComponent implements OnInit, OnDestroy {
         return ControlsType.NONE;
     }
 
-    get isCurrentTypeHasBind(){
-        if(!this.type) return false;
-        const currentStage = this.types.find(t=>t.stageId===this.type);
-        if(currentStage) {
-            return !!currentStage.oldTrackerBind;
-        }
-        return false;
-    };
-
     // Создание задачи
     createTask() {
         // Если this.taskCreationBody равно null, прерываем создание
@@ -297,7 +315,7 @@ export class TaskCreationPageComponent implements OnInit, OnDestroy {
             this.toast.add({severity: 'danger', summary: 'Ошибка', detail: 'Не выбран шаблон для создания задачи'});
             return;
         }
-        if(!this.taskCreationForm.valid){
+        if (!this.taskCreationForm.valid) {
             this.taskCreationForm.markAllAsTouched();
             return;
         }
@@ -324,7 +342,7 @@ export class TaskCreationPageComponent implements OnInit, OnDestroy {
             this.toast.add({severity: 'danger', summary: 'Ошибка', detail: 'Не выбран шаблон для создания задачи'});
             return;
         }
-        if(!this.taskCreationForm.valid){
+        if (!this.taskCreationForm.valid) {
             this.taskCreationForm.markAllAsTouched();
             return;
         }
@@ -350,14 +368,14 @@ export class TaskCreationPageComponent implements OnInit, OnDestroy {
             this.toast.add({severity: 'danger', summary: 'Ошибка', detail: 'Не выбран шаблон для создания задачи'});
             return;
         }
-        if(!this.taskCreationForm.valid){
+        if (!this.taskCreationForm.valid) {
             this.taskCreationForm.markAllAsTouched();
             return;
         }
         // Устанавливаем статус создания задачи
         this.isCreatedTask = true;
         // Отправляем запрос на сервер для создания задачи
-        this.api.createTask(this.taskCreationBody).pipe(switchMap((task)=>this.api.closeTask(task.taskId))).subscribe({
+        this.api.createTask(this.taskCreationBody).pipe(switchMap((task) => this.api.closeTask(task.taskId))).subscribe({
             next: (task) => {
                 // Устанавливаем статус создания задачи
                 this.isCreatedTask = false;

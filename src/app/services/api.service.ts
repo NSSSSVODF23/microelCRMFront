@@ -1728,6 +1728,10 @@ export class ApiService {
         return this.sendGetUncached<string[]>(`api/private/user/telegram/new-chat/${login}`);
     }
 
+    createTelegramUserChatByChatId(chatId: string) {
+        return this.sendGetUncached<string[]>(`api/private/user/telegram/new-chat`, {chatId});
+    }
+
     sendRequestProcessingAccept(userRequestId: number | null | undefined, userMessage: string | null | undefined) {
         return this.sendPatch(`api/private/user/telegram/request/${userRequestId}/processed`, {userMessage});
     }

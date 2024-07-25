@@ -6,7 +6,7 @@ export const environment = {
   production: false,
   wsHost: "ws://localhost:8080/socket",
   hmr: false,
-  microelHub: 'localhost:51187'
+  microelHub: 'localhost:54057'
 };
 
 /*

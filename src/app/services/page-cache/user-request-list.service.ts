@@ -56,8 +56,14 @@ export class UserRequestListService {
         }
     }
 
-    createTlgChat(userLogin: string) {
+    createTlgChatByLogin(userLogin: string) {
         this.api.createTelegramUserChat(userLogin).subscribe(chatUuids => {
+            window.open(`http://${environment['microelHub']}/messenger/${chatUuids[0]}`, '_blank');
+        })
+    }
+
+    createTlgChatById(id: string) {
+        this.api.createTelegramUserChatByChatId(id).subscribe(chatUuids => {
             window.open(`http://${environment['microelHub']}/messenger/${chatUuids[0]}`, '_blank');
         })
     }

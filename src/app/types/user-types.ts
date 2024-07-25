@@ -31,9 +31,12 @@ export interface TelegramUserTariff {
 
 export interface TelegramUserRequest {
     userRequestId: number;
+    title: string;
     type: 'REPLACE_TARIFF' | 'APPEND_SERVICE' | 'REMOVE_SERVICE';
     subject: string;
     userLogin: string;
+    chatId: string | null;
+    phoneNumber: string | null;
     description: string;
     fromSource: string;
     created: string;

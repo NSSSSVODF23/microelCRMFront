@@ -8,6 +8,7 @@ export enum NodeType {
     INPUT = "INPUT",
     TRUNK = "TRUNK",
     REDIRECT = "REDIRECT",
+    TICKET = "TICKET",
 }
 
 export enum PreprocessorType {
@@ -28,6 +29,17 @@ export interface Node {
     predicateArgumentsToTokensMap: {[key:string]:string | null} | null;
     redirectId: string | null;
     messageTemplate: string | null;
+    ticketTitle: string | null;
+    ticketTemplate: string | null;
     parent: string | null;
     children: Node[] | null;
+    isValid: boolean;
+}
+
+export type NodeEditorOperation = 'APPEND_NODE' | 'REMOVE_NODE' | 'CHANGE_NODE' | 'MOVE_NODE';
+
+export interface NodeEditorAction {
+    operation: NodeEditorOperation;
+    previousState: Node | null;
+    newState: Node | null;
 }

@@ -2,25 +2,29 @@
     <div class="flex p-4 gap-3 justify-content-between align-items-center">
         <span class="text-bluegray-500 text-2xl font-semibold">Запросы абонентов</span>
         <div class="flex-grow-1"></div>
-        <input pInputText placeholder="Поиск по логину" [formControl]="service.requestsForm.controls.login"/>
-        <p-toggleButton onLabel="Обработанные" offLabel="Не обработанные" [formControl]="service.requestsForm.controls.unprocessed"></p-toggleButton>
+        <input [formControl]="service.requestsForm.controls.login" pInputText placeholder="Поиск по логину"/>
+        <p-toggleButton [formControl]="service.requestsForm.controls.unprocessed" offLabel="Не обработанные"
+                        onLabel="Обработанные"></p-toggleButton>
     </div>
     <div class="flex flex-column gap-1 border-top-1 border-bluegray-100">
         <ng-container *ngIf="service.requestsPage$ | async as requestsPage">
-            <p-table (onLazyLoad)="onRequestLazyLoad($event)" [first]="requestsPage.pageNumber * (service.requestsForm.value.size ?? 10)" [lazyLoadOnInit]="service.isFirst"
+            <p-table (onLazyLoad)="onRequestLazyLoad($event)"
+                     [first]="requestsPage.pageNumber * (service.requestsForm.value.size ?? 10)"
+                     [lazyLoadOnInit]="service.isFirst"
                      [lazy]="true" [loading]="requestsPage.loadingState === 'LOADING'"
                      [paginator]="true"
                      [rowsPerPageOptions]="[10,25,50]" [rows]="10"
                      [totalRecords]="requestsPage.totalElements" [value]="requestsPage.value">
                 <ng-template pTemplate="header">
                     <tr>
-                        <th>Статус</th>
-                        <th>Целевой логин</th>
-                        <th>Тема</th>
-                        <th>Описание</th>
-                        <th>Дата запроса</th>
-                        <th>Обработан</th>
-                        <th></th>
+                        <th id="1">Статус</th>
+                        <th id="2">Целевой логин</th>
+                        <th id="3">Тема</th>
+                        <th id="4">Описание</th>
+                        <th id="5">Дата запроса</th>
+                        <th id="6" *ngIf="!isUnprocessed()">Обработан</th>
+                        <th id="7">Телефон</th>
+                        <th id="8" *ngIf="isUnprocessed()"></th>
                     </tr>
                 </ng-template>
                 <ng-template let-row pTemplate="body">
@@ -32,21 +36,31 @@
                         <td>
                             <app-billing-login [loginData]="request.userLogin" [popup]="true"></app-billing-login>
                         </td>
-                        <td>{{ request.subject }}</td>
+                        <td>{{ request.title }}</td>
                         <td>{{ request.description }}</td>
                         <td>{{ request.created | date:'dd-MM-yyyy HH:mm' }}</td>
-                        <td>
-                            <span *ngIf="request.processedBy" [pTooltip]="request.processedBy.description ?? ''" tooltipPosition="bottom">
+                        <td *ngIf="!isUnprocessed()">
+                            <span *ngIf="request.processedBy" [pTooltip]="request.processedBy.description ?? ''"
+                                  tooltipPosition="bottom">
                                 {{ request.processedBy && request.processedBy.timestamp | date:'dd-MM-yyyy HH:mm' }}
-                                ({{request.processedBy ? request.processedBy.employee.fullName : ''}})
+                                ({{ request.processedBy ? request.processedBy.employee.fullName : '' }})
                             </span>
                         </td>
                         <td>
-                            <div class="flex gap-2" *ngIf="!request.processedBy">
-                                <p-button (onClick)="service.createTlgChat(request.userLogin)" icon="mdi-chat"
-                                          pTooltip="Чат с абонентом"
+                            <app-dial-button *ngIf="request.phoneNumber" [phone]="request.phoneNumber"></app-dial-button>
+                            <span *ngIf="!request.phoneNumber" class="text-bluegray-300 font-bold">Нет телефона</span>
+                        </td>
+                        <td *ngIf="isUnprocessed()">
+                            <div *ngIf="!request.processedBy" class="flex gap-2">
+                                <p-button (onClick)="createChat(request)" icon="mdi-chat"
+                                          label="Открыть чат"
                                           styleClass="p-button-sm p-button-text p-button-secondary"></p-button>
-                                <p-button (onClick)="service.onRequestProcessed($event, request, acceptRequestPanel)" icon="mdi-check"
+                                <p-button (onClick)="selectedRequest = request; wireframePanel.toggle($event)"
+                                          icon="mdi-task"
+                                          label="Создать задачу"
+                                          styleClass="p-button-sm p-button-text"></p-button>
+                                <p-button (onClick)="service.onRequestProcessed($event, request, acceptRequestPanel)"
+                                          icon="mdi-check"
                                           label="Запрос обработан"
                                           styleClass="p-button-sm p-button-text"></p-button>
                             </div>
@@ -59,15 +73,26 @@
 </div>
 
 <p-overlayPanel #acceptRequestPanel>
-    <ng-template pTemplate="content" >
+    <ng-template pTemplate="content">
         <ng-container [formGroup]="service.processingForm">
             <app-label label="Сообщение абоненту">
-                <textarea pInputTextarea [rows]="7" [cols]="50" [autoResize]="true" formControlName="userMessage"></textarea>
+                <textarea [autoResize]="true" [cols]="50" [rows]="7" formControlName="userMessage"
+                          pInputTextarea></textarea>
             </app-label>
             <div class="flex gap-2 justify-content-end mt-2">
-                <p-button icon="mdi-check" label="Подтвердить" (onClick)="service.sendRequestProcessingAccept($event, acceptRequestPanel)"
-                          [disabled]="service.processingForm.invalid" [loading]="service.acceptRequestLoading"></p-button>
+                <p-button (onClick)="service.sendRequestProcessingAccept($event, acceptRequestPanel)" [disabled]="service.processingForm.invalid"
+                          [loading]="service.acceptRequestLoading"
+                          icon="mdi-check"
+                          label="Подтвердить"></p-button>
             </div>
         </ng-container>
+    </ng-template>
+</p-overlayPanel>
+
+<p-overlayPanel #wireframePanel styleClass="overlay-panel-unpadding">
+    <ng-template pTemplate="content">
+        <p-listbox [options]="(wireframes$ | async) ?? []"
+                   (onClick)="createTask(selectedRequest, $event.option.value, wireframePanel)">
+        </p-listbox>
     </ng-template>
 </p-overlayPanel>
