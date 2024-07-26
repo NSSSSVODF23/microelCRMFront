@@ -13,7 +13,8 @@ import {
 import {FormControl, FormGroup, Validators} from "@angular/forms";
 import {v4} from "uuid";
 import {OrganizationChart} from "primeng/organizationchart";
-import {DraggingScroll} from "../../../util";
+import {DraggingScroll, Events} from "../../../util";
+import KeyboardPredicate = Events.KeyboardPredicate;
 
 type ValuesToken = { name: string, token: string, type: 'INPUT' | 'PREPROCESSOR' }
 
@@ -167,15 +168,20 @@ export class AutoSupportEditorComponent implements OnInit, OnDestroy, AfterViewI
     protected readonly NodeType = NodeType;
     protected readonly Object = Object;
     protected readonly EditorMode = EditorMode;
-    private autoSupportLoadSub?: Subscription;
-    private modifyNodeSub?: Subscription;
-    private changePredicateTypeSub?: Subscription;
-    private undoRedoNodeSub?: Subscription;
-    private preventDefaultUndoSub?: Subscription;
-    private changeNodeTypeSub?: Subscription;
-    private escapeSub?: Subscription;
+    private subscriptions: Subscription[] = [];
+    private eventKeyUpFromBody$ = fromEvent<KeyboardEvent>(document.body, 'keyup');
+    private eventKeyDownFromBody$ = fromEvent<KeyboardEvent>(document.body, 'keydown');
+    private clipboard: Node | null = null;
 
     constructor(private api: ApiService, private confirmationService: ConfirmationService) {
+    }
+
+    hasClipboard() {
+        return this.clipboard !== null;
+    }
+
+    hasSelectedNode() {
+        return this.selectedTreeNode !== null;
     }
 
     ngOnInit(): void {
@@ -186,13 +192,7 @@ export class AutoSupportEditorComponent implements OnInit, OnDestroy, AfterViewI
     }
 
     ngOnDestroy(): void {
-        this.autoSupportLoadSub?.unsubscribe();
-        this.modifyNodeSub?.unsubscribe();
-        this.changeNodeTypeSub?.unsubscribe();
-        this.changePredicateTypeSub?.unsubscribe();
-        this.undoRedoNodeSub?.unsubscribe();
-        this.preventDefaultUndoSub?.unsubscribe();
-        this.escapeSub?.unsubscribe();
+        this.subscriptions.forEach(sub => sub.unsubscribe());
         this.draggingController.destroy();
     }
 
@@ -274,6 +274,7 @@ export class AutoSupportEditorComponent implements OnInit, OnDestroy, AfterViewI
 
     handleDropNode(currentParent: Node) {
         if (!this.draggableNode || !this.mainNodeData) return;
+        if (!this.isAcceptAppendChild(currentParent)) return;
 
         const draggableNode = this.draggableNode;
         const mainNodeData = this.mainNodeData;
@@ -397,7 +398,7 @@ export class AutoSupportEditorComponent implements OnInit, OnDestroy, AfterViewI
         return value as Node
     }
 
-    isShowAddSubNodeButton(data: Node | undefined) {
+    isAcceptAppendChild(data: Node | undefined) {
         if (!data) return false;
         switch (data.type) {
             case NodeType.TRUNK:
@@ -559,6 +560,27 @@ export class AutoSupportEditorComponent implements OnInit, OnDestroy, AfterViewI
 
     isShadedNode(node: Node) {
         return (this.dropDisabledNodes[node.id] || (this.editorMode === EditorMode.PICK_NODE && !this.pickNodeMask.includes(node.id)))
+    }
+
+    handleCopy() {
+        let copyNode = this.selectedTreeNode?.data;
+        if (!copyNode) return;
+        copyNode = JSON.parse(JSON.stringify(copyNode));
+        if (!copyNode) return;
+        this.renewNodeIdRecursive(copyNode);
+        this.clipboard = copyNode;
+    }
+
+    handlePaste() {
+        const node = this.selectedTreeNode?.data;
+        if (!this.clipboard || !node) return;
+        if (!this.isAcceptAppendChild(node)) return;
+        if (!node.children) node.children = [];
+        this.clipboard.parent = node.id;
+        node.children.push(this.clipboard);
+        this.appendAction('APPEND_NODE', null, this.clipboard);
+        this.renderVisual("handlePaste");
+        this.clipboard = null;
     }
 
     private doSelectNode(node: Node) {
@@ -727,22 +749,26 @@ export class AutoSupportEditorComponent implements OnInit, OnDestroy, AfterViewI
 
     private loadAutoSupportConfiguration() {
         this.isLoading = true;
-        this.autoSupportLoadSub = this.autoSupportConfiguration$.subscribe(data => {
-            this.mainNodeData = data.defaultNodes;
-            this.isAllValid = true;
-            this.checkNodeValidity(this.mainNodeData);
-            this.renderVisual("loadAutoSupportConfiguration");
-            this.isLoading = false;
-        });
+        this.subscriptions.push(
+            this.autoSupportConfiguration$.subscribe(data => {
+                this.mainNodeData = data.defaultNodes;
+                this.isAllValid = true;
+                this.checkNodeValidity(this.mainNodeData);
+                this.renderVisual("loadAutoSupportConfiguration");
+                this.isLoading = false;
+            })
+        );
     }
 
     private subscribeToNodeFormChanges() {
-        this.modifyNodeSub = this.selectedNodeSettingsFormChange$
-            .subscribe(data => this.handleModifyNode(data as Partial<Node>))
-        this.changeNodeTypeSub = this.selectedNodeTypeChange$
-            .subscribe(data => this.handleChangeNodeType(data as Partial<Node>))
-        this.changePredicateTypeSub = this.selectedNodePredicateTypeChange$
-            .subscribe(data => this.handleChangePredicateType(data as Partial<Node>))
+        this.subscriptions.push(
+            this.selectedNodeSettingsFormChange$
+                .subscribe(data => this.handleModifyNode(data as Partial<Node>)),
+            this.selectedNodeTypeChange$
+                .subscribe(data => this.handleChangeNodeType(data as Partial<Node>)),
+            this.selectedNodePredicateTypeChange$
+                .subscribe(data => this.handleChangePredicateType(data as Partial<Node>))
+        );
     }
 
     private loadMetadata() {
@@ -751,35 +777,56 @@ export class AutoSupportEditorComponent implements OnInit, OnDestroy, AfterViewI
     }
 
     private initShortcuts() {
-        this.preventDefaultUndoSub = fromEvent<KeyboardEvent>(window, 'keydown')
-            .pipe(filter(event => {
-                return (event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'z';
-
-            })).subscribe((event) => {
-                event.preventDefault();
-            });
-
-        this.undoRedoNodeSub = fromEvent<KeyboardEvent>(document.body, 'keyup')
-            .pipe(
-                debounceTime(100),
-                filter((event) => {
-                    return event.key.toLowerCase() === 'z' && ((event.shiftKey && event.ctrlKey) || event.ctrlKey)
+        this.subscriptions.push(
+            this.eventKeyDownFromBody$
+                .pipe(filter(event => {
+                    return KeyboardPredicate.fromEvent(event).ctrlPressed().isKey("z").eval();
+                }))
+                .subscribe((event) => {
+                    event.preventDefault();
                 }),
-                map((event) => {
-                    return event.shiftKey ? 'redo' : 'undo'
-                })
-            ).subscribe((action) => {
+            this.eventKeyDownFromBody$
+                .pipe(
+                    debounceTime(100),
+                    map((event) => {
+                        const undo = KeyboardPredicate.fromEvent(event).ctrlPressed().isKey("z").eval();
+                        if (undo) return 'undo';
+                        const redo = KeyboardPredicate.fromEvent(event).ctrlPressed().shiftPressed().isKey("z").eval();
+                        if (redo) return 'redo';
+                        return null;
+                    }),
+                    filter((event) => {
+                        return event !== null;
+                    })
+                ).subscribe((action) => {
                 if (action === 'redo') {
                     this.redo();
                 } else if (action === 'undo') {
                     this.undo();
                 }
-            });
+            }),
+            this.eventKeyUpFromBody$
+                .pipe(
+                    filter(event => KeyboardPredicate.fromEvent(event).isKey("escape").eval())
+                ).subscribe(() => this.handleEscape()),
+            this.eventKeyDownFromBody$
+                .pipe(
+                    filter(event => KeyboardPredicate.fromEvent(event).ctrlPressed().isKey("c").eval())
+                ).subscribe(this.handleCopy.bind(this)),
+            this.eventKeyDownFromBody$
+                .pipe(
+                    filter(event => KeyboardPredicate.fromEvent(event).ctrlPressed().isKey("v").eval())
+                ).subscribe(this.handlePaste.bind(this))
+        );
+    }
 
-        this.escapeSub = fromEvent<KeyboardEvent>(document.body, 'keyup')
-            .pipe(
-                filter(event => (event.key.toLowerCase() === 'escape'))
-            ).subscribe(() => this.handleEscape())
+    private renewNodeIdRecursive(node: Node) {
+        node.id = v4();
+        if (node.children) {
+            for (const child of node.children) {
+                this.renewNodeIdRecursive(child);
+            }
+        }
     }
 
     private handleModifyNode(modifyData: Partial<Node>) {
@@ -968,7 +1015,6 @@ export class AutoSupportEditorComponent implements OnInit, OnDestroy, AfterViewI
 
         if (node.predicateArgumentsToTokensMap) {
             const values = Object.values(node.predicateArgumentsToTokensMap);
-            console.log(values)
             predicateArgumentsValid = values.reduce((acc, val) => acc && !!val, true);
         }
 

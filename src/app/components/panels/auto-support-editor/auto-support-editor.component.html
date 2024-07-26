@@ -9,6 +9,10 @@
               styleClass="p-button-sm p-button-text"></p-button>
     <p-button (onClick)="foldAll()" icon="mdi-unfold_less" label="Свернуть все"
               styleClass="p-button-sm p-button-text"></p-button>
+    <p-button (onClick)="handleCopy()" icon="mdi-copy" label="Копировать" [disabled]="!hasSelectedNode()"
+              styleClass="p-button-sm p-button-text p-button-success"></p-button>
+    <p-button (onClick)="handlePaste()" icon="mdi-paste" label="Вставить" [disabled]="!hasClipboard()"
+              styleClass="p-button-sm p-button-text p-button-info"></p-button>
     <div class="flex-1"></div>
     <p-button (onClick)="saveToServer()" [disabled]="!isAllValid || !hasPreviousAction()" [loading]="isSaving"
               icon="mdi-save"
@@ -142,7 +146,7 @@
 
                 <ng-container
                         *ngIf="isShowFormControl([NodeType.PREDICATE, NodeType.INPUT, NodeType.NORMAL, NodeType.TRUNK], selectedTreeNode.data?.type)">
-                    <p-button (onClick)="addSubNode()" *ngIf="isShowAddSubNodeButton(selectedTreeNode.data)"
+                    <p-button (onClick)="addSubNode()" *ngIf="isAcceptAppendChild(selectedTreeNode.data)"
                               icon="mdi-add"
                               label="Добавить дочернюю ноду"
                               styleClass="p-button-success"></p-button>

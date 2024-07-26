@@ -656,6 +656,41 @@ export class DraggingScroll {
     }
 }
 
+export namespace Events {
+    export class KeyboardPredicate {
+        private event!: KeyboardEvent;
+        private predicate: boolean[] = [];
+        private constructor() {}
+        public static fromEvent(event: KeyboardEvent) {
+            const builder = new KeyboardPredicate();
+            builder.event = event;
+            return builder;
+        }
+        public isKey(key: string) {
+            this.predicate.push(this.event.key.toLowerCase() === key.toLowerCase());
+            return this;
+        }
+        public isNotKey(key: string) {
+            this.predicate.push(this.event.key.toLowerCase() !== key.toLowerCase());
+            return this;
+        }
+        public ctrlPressed() {
+            this.predicate.push(this.event.ctrlKey || this.event.metaKey);
+            return this;
+        }
+        public shiftPressed() {
+            this.predicate.push(this.event.shiftKey);
+            return this;
+        }
+        public altPressed() {
+            this.predicate.push(this.event.altKey);
+            return this;
+        }
+        public eval() {
+            return this.predicate.every(val => val);
+        }
+    }
+}
 
 export class Storage {
     static save(key: string, value: any) {

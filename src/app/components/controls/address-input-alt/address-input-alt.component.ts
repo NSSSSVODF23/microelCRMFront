@@ -22,7 +22,7 @@ import {log} from "util";
 import {ConfirmationService} from "primeng/api";
 import {BlockUiService} from "../../../services/block-ui.service";
 
-const houseNumRegexp = "^(?<houseNum>\\d{1,6})(\\/(?<fraction>\\d{1,3}))?(?<letter>[а-я]{1})?((_| ст?р?\\.?)(?<build>\\d{1,2}))?";
+const houseNumRegexp = "^(?<houseNum>\\d{1,6})(\\/(?<fraction>\\d{1,3}))?(?<letter>[а-я]{1})?((_| ст?р?\\.?)(?<eval>\\d{1,2}))?";
 const apartmentRegexps = [
     "(( |-| кв.)(?<apartmentNum>\\d{1,3}))?( (п\\.?|под\\.?|подъезд) ?(?<entrance>\\d{1,3}))( (э\\.?|эт\\.?|этаж) ?(?<floor>\\d{1,3}))( \\((?<apartmentMod>[а-я]+)\\))?",
     "(( |-| кв.)(?<apartmentNum>\\d{1,3}))?( (э\\.?|эт\\.?|этаж) ?(?<floor>\\d{1,3}))( (п\.?|под\\.?|подъезд) ?(?<entrance>\\d{1,3}))( \\((?<apartmentMod>[а-я]+)\\))?",
@@ -358,13 +358,13 @@ export class AddressInputAltComponent implements OnInit, ControlValueAccessor {
     showCreateHouseDialog() {
 
         // lastValueFrom(this.searchAddressChange$.pipe(first())).then(query => {
-        //     const info: {houseNum?: string, fraction?: string, letter?: string, build?: string} | undefined = regex.exec(query)?.groups;
+        //     const info: {houseNum?: string, fraction?: string, letter?: string, eval?: string} | undefined = regex.exec(query)?.groups;
         //     if(info) {
         //         this.createHouseForm.setValue({
         //             houseNum: info.houseNum ? parseInt(info.houseNum) : null,
         //             letter: info.letter ?? null,
         //             fraction: info.fraction ? parseInt(info.fraction) : null,
-        //             build: info.build ? parseInt(info.build) : null,
+        //             eval: info.eval ? parseInt(info.eval) : null,
         //             isApartmentHouse: false,
         //             acpHouseBind: null,
         //         })
@@ -374,7 +374,7 @@ export class AddressInputAltComponent implements OnInit, ControlValueAccessor {
         //         houseNum: null,
         //         letter: null,
         //         fraction: null,
-        //         build: null,
+        //         eval: null,
         //         isApartmentHouse: false,
         //         acpHouseBind: null,
         //     })
@@ -383,7 +383,7 @@ export class AddressInputAltComponent implements OnInit, ControlValueAccessor {
         //         houseNum: null,
         //         letter: null,
         //         fraction: null,
-        //         build: null,
+        //         eval: null,
         //         isApartmentHouse: false,
         //         acpHouseBind: null,
         //     })
