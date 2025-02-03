@@ -50,7 +50,7 @@ export class AppointInstallersDialogComponent implements OnInit {
         )
         .subscribe(
             comments => {
-                this.selectedTaskComments = comments.content.map(com=>com.commentId);
+                // this.selectedTaskComments = comments.content.map(com=>com.commentId);
                 this.taskComments = comments.content
             }
         )
